@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Search, Tv, Menu, X, ChevronDown } from 'lucide-react';
+import { Search, Menu, X, ChevronDown, Newspaper } from 'lucide-react';
 import { categories } from '@/lib/mockData';
 
 export default function Header() {
@@ -55,15 +55,15 @@ export default function Header() {
               <Search size={20} />
             </button>
 
-            {/* Live TV Button */}
-            <a
-              href="#live-tv"
+            {/* E-Paper Button */}
+            <Link
+              href="/category/epaper"
               className="flex items-center gap-1.5 bg-[#66000c] text-white font-bold px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm hover:bg-[#4d0009] transition-colors shadow-md"
             >
-              <Tv size={14} />
-              <span className="hidden sm:inline telugu-text">లైవ్ TV</span>
-              <span className="sm:hidden">Live</span>
-            </a>
+              <Newspaper size={14} />
+              <span className="hidden sm:inline telugu-text">ఈ-పేపర్</span>
+              <span className="sm:hidden">E-Paper</span>
+            </Link>
 
             {/* Mobile Menu Toggle */}
             <button
