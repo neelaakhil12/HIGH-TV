@@ -103,20 +103,9 @@ export default function TopBar() {
             <a href="#" className="hover:text-red-200 transition-colors" aria-label="Instagram">
               <InstagramIcon />
             </a>
-          </div>
-
-          <span className="text-red-400">|</span>
-
-          {/* Login */}
-          <a
-            href="/login"
-            className="flex items-center gap-1 bg-white text-[#66000c] font-bold px-3 py-0.5 rounded-full text-xs hover:bg-red-50 transition-colors"
-          >
-            <User size={11} />
-            లాగిన్
-          </a>
         </div>
       </div>
     </div>
+  </div>
   );
 }
