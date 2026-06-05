@@ -5,8 +5,8 @@ import Link from 'next/link';
 import NewsCard from '@/components/cards/NewsCard';
 import AdBanner from '@/components/home/AdBanner';
 import EPaperReader from '@/components/epaper/EPaperReader';
-import { categories, politicsNews, entertainmentNews, sportsNews, technologyNews, businessNews, healthNews, viralNews, featuredNews, rasipalaluNews } from '@/lib/mockData';
-import { Home, ChevronRight } from 'lucide-react';
+import { categories, politicsNews, entertainmentNews, sportsNews, technologyNews, businessNews, healthNews, viralNews, featuredNews, rasipalaluNews, apDistricts, tgDistricts, districtNews } from '@/lib/mockData';
+import { Home, ChevronRight, X } from 'lucide-react';
 import type { Metadata } from 'next';
 
 const allNews = [
@@ -19,6 +19,7 @@ const allNews = [
   ...viralNews,
   ...featuredNews,
   ...rasipalaluNews,
+  ...districtNews,
 ];
 
 export async function generateStaticParams() {
@@ -34,11 +35,33 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   };
 }
 
-export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+export default async function CategoryPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ category: string }>;
+  searchParams: Promise<{ district?: string }>;
+}) {
   const { category } = await params;
+  const sParams = await searchParams;
+  const districtSlug = sParams?.district;
+
   const cat = categories.find((c) => c.slug === category);
-  const articles = allNews.filter((n) => n.categorySlug === category);
-  const allArticles = articles.length > 0 ? articles : allNews.slice(0, 12);
+  
+  // Get all articles for this category
+  let articles = allNews.filter((n) => n.categorySlug === category);
+
+  // Apply district filter if present
+  let activeDistrictName = '';
+  if (districtSlug) {
+    const matchedDistrict = [...apDistricts, ...tgDistricts].find((d) => d.slug === districtSlug);
+    if (matchedDistrict) {
+      activeDistrictName = matchedDistrict.name;
+      articles = articles.filter((n) => n.districtSlug === districtSlug);
+    }
+  }
+
+  const allArticles = articles.length > 0 ? articles : allNews.filter((n) => n.categorySlug === category).slice(0, 12);
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -60,19 +83,44 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
             <span className="text-gray-800 font-semibold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
               {cat?.name || category}
             </span>
+            {activeDistrictName && (
+              <>
+                <ChevronRight size={14} />
+                <span className="text-[#66000c] font-bold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  {activeDistrictName}
+                </span>
+              </>
+            )}
           </div>
 
           {/* Category Header */}
           <div className="mb-6 pb-4 border-b-2" style={{ borderColor: cat?.color || '#66000c' }}>
-            <h1
-              className="text-3xl font-black telugu-text"
-              style={{ fontFamily: 'Noto Sans Telugu, sans-serif', color: cat?.color || '#66000c' }}
-            >
-              {cat?.name || category} వార్తలు
-            </h1>
-            <p className="text-gray-500 text-sm mt-1">
-              {allArticles.length} వార్తలు అందుబాటులో ఉన్నాయి
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h1
+                  className="text-3xl font-black telugu-text"
+                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif', color: cat?.color || '#66000c' }}
+                >
+                  {cat?.name || category} వార్తలు {activeDistrictName ? `- ${activeDistrictName}` : ''}
+                </h1>
+                <p className="text-gray-500 text-sm mt-1">
+                  {articles.length} వార్తలు అందుబాటులో ఉన్నాయి
+                </p>
+              </div>
+
+              {activeDistrictName && (
+                <div className="flex items-center gap-2 bg-red-50 text-[#66000c] border border-red-100 px-3.5 py-1.5 rounded-full text-sm font-semibold telugu-text shadow-sm transition-all hover:bg-red-100">
+                  <span>జిల్లా: {activeDistrictName}</span>
+                  <Link
+                    href={`/category/${category}`}
+                    className="hover:bg-[#66000c] hover:text-white rounded-full p-0.5 transition-colors"
+                    title="ఫిల్టర్ తొలగించు"
+                  >
+                    <X size={14} />
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
 
           <AdBanner position="leaderboard" />
