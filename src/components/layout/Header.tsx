@@ -100,7 +100,7 @@ export default function Header() {
       <div className="hidden md:block bg-gray-50 border-t border-gray-100">
         <div className="max-w-[1400px] mx-auto px-4">
           <nav className="flex items-center gap-0 overflow-x-auto hide-scrollbar">
-            {categories.map((cat) => (
+            {categories.filter(cat => cat.slug !== 'epaper').map((cat) => (
               <Link
                 key={cat.slug}
                 href={`/category/${cat.slug}`}
@@ -119,7 +119,7 @@ export default function Header() {
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 max-h-[70vh] overflow-y-auto">
           <nav className="flex flex-col">
-            {categories.map((cat) => (
+            {categories.filter(cat => cat.slug !== 'epaper').map((cat) => (
               <Link
                 key={cat.slug}
                 href={`/category/${cat.slug}`}
