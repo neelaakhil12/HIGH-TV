@@ -120,7 +120,7 @@ export default function Header() {
       {/* Desktop Category Nav */}
       <div className="hidden md:block bg-gray-50 border-t border-gray-100">
         <div className="max-w-[1400px] mx-auto px-4">
-          <nav className="flex items-center gap-0 overflow-x-auto hide-scrollbar">
+          <nav className="flex items-center gap-0 md:overflow-visible overflow-x-auto hide-scrollbar">
             {categories.filter(cat => cat.slug !== 'epaper').map((cat) => {
               const isAP = cat.slug === 'andhra-pradesh';
               const isTG = cat.slug === 'telangana';
@@ -161,7 +161,7 @@ export default function Header() {
                           {cat.slug === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్ అన్ని వార్తలు' : 'తెలంగాణ అన్ని వార్తలు'}
                         </Link>
                         
-                        <div className="grid grid-cols-2 gap-1.5">
+                        <div className="max-h-60 overflow-y-auto pr-1 grid grid-cols-2 gap-1.5 scrollbar-thin">
                           {districts.map((dist) => (
                             <Link
                               key={dist.slug}
