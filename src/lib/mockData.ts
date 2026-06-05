@@ -21,6 +21,7 @@ export interface NewsArticle {
 export const categories = [
   { name: 'హోమ్', slug: 'home', color: '#C00000' },
   { name: 'తాజా వార్తలు', slug: 'latest', color: '#C00000' },
+  { name: 'ఈ-పేపర్', slug: 'epaper', color: '#0f766e' },
   { name: 'రాజకీయాలు', slug: 'politics', color: '#1a6b3a' },
   { name: 'ఆంధ్రప్రదేశ్', slug: 'andhra-pradesh', color: '#d97706' },
   { name: 'తెలంగాణ', slug: 'telangana', color: '#7c3aed' },
