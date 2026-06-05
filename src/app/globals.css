@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+:root {
+  --brand-red: #C00000;
+  --brand-dark-red: #8B0000;
+  --brand-hover: #A00000;
+  --background: #ffffff;
+  --foreground: #222222;
+  --border: #E5E5E5;
+  --card-bg: #ffffff;
+  --section-bg: #F8F8F8;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-red: var(--brand-red);
+  --color-brand-dark: var(--brand-dark-red);
+  --color-brand-hover: var(--brand-hover);
+  --color-border: var(--border);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', 'Noto Sans Telugu', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Telugu font for all Telugu text */
+.telugu-text,
+[lang="te"] {
+  font-family: 'Noto Sans Telugu', 'Inter', sans-serif;
+}
+
+/* Breaking news ticker animation */
+@keyframes ticker {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.ticker-animate {
+  animation: ticker 30s linear infinite;
+  white-space: nowrap;
+}
+
+.ticker-animate:hover {
+  animation-play-state: paused;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C00000;
+  border-radius: 3px;
+}
+
+/* Category nav horizontal scroll hide scrollbar */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* News card hover effect */
+.news-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.news-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+
+/* Image zoom on hover */
+.img-zoom-container {
+  overflow: hidden;
+}
+
+.img-zoom-container img {
+  transition: transform 0.4s ease;
+}
+
+.img-zoom-container:hover img {
+  transform: scale(1.06);
+}
+
+/* Section heading red line */
+.section-heading {
+  position: relative;
+  display: inline-block;
+}
+
+.section-heading::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #C00000;
+  border-radius: 2px;
+}
+
+/* Breaking news badge pulse */
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.breaking-badge {
+  animation: pulse-badge 1.5s ease-in-out infinite;
+}
+
+/* Hero slider fade transition */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-fade-in {
+  animation: fadeIn 0.6s ease forwards;
+}
+
+/* Ad banner placeholder */
+.ad-placeholder {
+  background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+  border: 2px dashed #ccc;
+}
+
+/* Video play button */
+.play-button {
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.play-button:hover {
+  transform: scale(1.1);
+  background: rgba(192,0,0,0.9) !important;
+}
+
+/* Masonry gallery */
+.masonry-grid {
+  columns: 3;
+  column-gap: 12px;
+}
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+  .masonry-grid {
+    columns: 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .masonry-grid {
+    columns: 1;
+  }
+}
+
+/* Trending number badge */
+.trending-number {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: rgba(192, 0, 0, 0.08);
+  line-height: 1;
+  user-select: none;
+}
+
+/* Top bar ticker */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-inner {
+  display: flex;
+  animation: marquee 25s linear infinite;
+}
+
+.marquee-inner:hover {
+  animation-play-state: paused;
+}
+
+/* Smooth dropdown */
+.dropdown-menu {
+  transform-origin: top;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Search bar focus */
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(192, 0, 0, 0.3);
+}
+
+/* Card category pill */
+.category-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
