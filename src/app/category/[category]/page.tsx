@@ -41,44 +41,42 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
   const allArticles = articles.length > 0 ? articles : allNews.slice(0, 12);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <TopBar />
       <Header />
 
-      <main className="max-w-[1400px] mx-auto px-4 py-6">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-5">
-          <Link href="/" className="hover:text-[#C00000] transition-colors flex items-center gap-1">
-            <Home size={14} /> హోమ్
-          </Link>
-          <ChevronRight size={14} />
-          <span className="text-gray-800 font-semibold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-            {cat?.name || category}
-          </span>
-        </div>
-
-        {/* Category Header */}
-        <div className="mb-6 pb-4 border-b-2" style={{ borderColor: cat?.color || '#C00000' }}>
-          <h1
-            className="text-3xl font-black telugu-text"
-            style={{ fontFamily: 'Noto Sans Telugu, sans-serif', color: cat?.color || '#C00000' }}
-          >
-            {category === 'epaper' ? 'హై టీవీ ఈ-పేపర్' : `${cat?.name || category} వార్తలు`}
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            {category === 'epaper'
-              ? 'డిజిటల్ దినపత్రిక సంచికను ఇక్కడ చదవండి'
-              : `${allArticles.length} వార్తలు అందుబాటులో ఉన్నాయి`}
-          </p>
-        </div>
-
-        <AdBanner position="leaderboard" />
-
-        {category === 'epaper' ? (
-          <div className="mt-6">
-            <EPaperReader />
+      {category === 'epaper' ? (
+        <main className="flex-1 w-full bg-[#e9eff4]">
+          <EPaperReader />
+        </main>
+      ) : (
+        <main className="max-w-[1400px] mx-auto px-4 py-6 flex-1">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-sm text-gray-500 mb-5">
+            <Link href="/" className="hover:text-[#66000c] transition-colors flex items-center gap-1">
+              <Home size={14} /> హోమ్
+            </Link>
+            <ChevronRight size={14} />
+            <span className="text-gray-800 font-semibold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              {cat?.name || category}
+            </span>
           </div>
-        ) : (
+
+          {/* Category Header */}
+          <div className="mb-6 pb-4 border-b-2" style={{ borderColor: cat?.color || '#66000c' }}>
+            <h1
+              className="text-3xl font-black telugu-text"
+              style={{ fontFamily: 'Noto Sans Telugu, sans-serif', color: cat?.color || '#66000c' }}
+            >
+              {cat?.name || category} వార్తలు
+            </h1>
+            <p className="text-gray-500 text-sm mt-1">
+              {allArticles.length} వార్తలు అందుబాటులో ఉన్నాయి
+            </p>
+          </div>
+
+          <AdBanner position="leaderboard" />
+
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 mt-6">
             {/* Articles Grid */}
             <div className="xl:col-span-3">
@@ -91,7 +89,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
               {/* Load More */}
               <div className="text-center mt-8">
                 <button
-                  className="bg-[#C00000] text-white font-bold px-8 py-3 rounded-lg hover:bg-[#8B0000] transition-colors telugu-text"
+                  className="bg-[#66000c] text-white font-bold px-8 py-3 rounded-lg hover:bg-[#4d0009] transition-colors telugu-text"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   మరిన్ని వార్తలు లోడ్ చేయండి
@@ -115,20 +113,20 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
                       className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-red-50 group transition-colors"
                     >
                       <span
-                        className="text-sm font-medium text-gray-700 group-hover:text-[#C00000] transition-colors telugu-text"
+                        className="text-sm font-medium text-gray-700 group-hover:text-[#66000c] transition-colors telugu-text"
                         style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                       >
                         {c.name}
                       </span>
-                      <ChevronRight size={14} className="text-gray-300 group-hover:text-[#C00000] transition-colors" />
+                      <ChevronRight size={14} className="text-gray-300 group-hover:text-[#66000c] transition-colors" />
                     </Link>
                   ))}
                 </div>
               </div>
             </aside>
           </div>
-        )}
-      </main>
+        </main>
+      )}
 
       <Footer />
     </div>

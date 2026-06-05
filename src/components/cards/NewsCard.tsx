@@ -30,7 +30,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
           </span>
           <Link href={`/news/${article.slug}`}>
             <h3
-              className="text-sm font-bold text-gray-800 hover:text-[#C00000] transition-colors line-clamp-2 leading-snug telugu-text"
+              className="text-sm font-bold text-gray-800 hover:text-[#66000c] transition-colors line-clamp-2 leading-snug telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.title}
@@ -60,7 +60,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
         <div className="flex-1">
           <Link href={`/news/${article.slug}`}>
             <p
-              className="text-xs font-semibold text-gray-800 group-hover:text-[#C00000] transition-colors line-clamp-2 leading-snug telugu-text"
+              className="text-xs font-semibold text-gray-800 group-hover:text-[#66000c] transition-colors line-clamp-2 leading-snug telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.title}
@@ -128,7 +128,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         {article.isBreaking && (
-          <div className="absolute top-2 left-2 bg-[#C00000] text-white text-[10px] font-black px-2 py-0.5 rounded breaking-badge uppercase">
+          <div className="absolute top-2 left-2 bg-[#66000c] text-white text-[10px] font-black px-2 py-0.5 rounded breaking-badge uppercase">
             🔴 Breaking
           </div>
         )}
@@ -145,7 +145,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
 
         <Link href={`/news/${article.slug}`} className="flex-1">
           <h2
-            className="text-sm md:text-base font-bold text-gray-800 hover:text-[#C00000] transition-colors leading-snug line-clamp-2 mb-2 telugu-text"
+            className="text-sm md:text-base font-bold text-gray-800 hover:text-[#66000c] transition-colors leading-snug line-clamp-2 mb-2 telugu-text"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             {article.title}
@@ -170,7 +170,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
               <span>{(article.views / 1000).toFixed(1)}K</span>
             </div>
           </div>
-          <button className="text-gray-400 hover:text-[#C00000] transition-colors" aria-label="Share">
+          <button className="text-gray-400 hover:text-[#66000c] transition-colors" aria-label="Share">
             <Share2 size={14} />
           </button>
         </div>

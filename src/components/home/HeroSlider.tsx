@@ -56,7 +56,7 @@ export default function HeroSlider() {
           {/* Category + Breaking badge */}
           <div className="flex items-center gap-2 mb-3">
             {slide.isBreaking && (
-              <span className="bg-[#C00000] text-white text-xs font-black px-3 py-1 rounded breaking-badge uppercase tracking-wider">
+              <span className="bg-[#66000c] text-white text-xs font-black px-3 py-1 rounded breaking-badge uppercase tracking-wider">
                 🔴 బ్రేకింగ్
               </span>
             )}
@@ -88,7 +88,7 @@ export default function HeroSlider() {
           <div className="flex items-center gap-4">
             <Link
               href={`/news/${slide.slug}`}
-              className="bg-[#C00000] text-white font-bold px-5 py-2.5 rounded-lg hover:bg-[#8B0000] transition-colors text-sm telugu-text"
+              className="bg-[#66000c] text-white font-bold px-5 py-2.5 rounded-lg hover:bg-[#4d0009] transition-colors text-sm telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               పూర్తి వార్త చదవండి →
@@ -124,7 +124,7 @@ export default function HeroSlider() {
             key={idx}
             onClick={() => setCurrent(idx)}
             className={`h-1.5 rounded-full transition-all duration-300 ${
-              idx === current ? 'w-6 bg-[#C00000]' : 'w-1.5 bg-white/60 hover:bg-white'
+              idx === current ? 'w-6 bg-[#66000c]' : 'w-1.5 bg-white/60 hover:bg-white'
             }`}
             aria-label={`Slide ${idx + 1}`}
           />

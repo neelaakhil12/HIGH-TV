@@ -1,46 +1,66 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import {
-  Calendar,
+  Home,
+  Minus,
+  Plus,
+  Scissors,
+  Share2,
+  Download,
   ChevronLeft,
   ChevronRight,
-  Download,
-  ZoomIn,
-  ZoomOut,
-  Share2,
-  X,
+  Calendar,
+  Grid,
   FileText,
-  CheckCircle,
+  X,
+  Layers
 } from 'lucide-react';
 
 const editions = [
-  'ప్రధాన సంచిక (Main Edition)',
-  'హైదరాబాద్ ఎడిషన్ (Hyderabad)',
-  'విజయవాడ ఎడిషన్ (Vijayawada)',
-  'విశాఖపట్నం ఎడిషన్ (Visakhapatnam)',
-  'తెలంగాణ జిల్లాలు (Telangana Districts)',
+  'Main Edition',
+  'Hyderabad Edition',
+  'Vijayawada Edition',
+  'Visakhapatnam Edition',
+  'Telangana Districts',
 ];
 
 const epaperPages = [
-  { pageNum: 1, title: 'మొదటి పేజీ (Page 1)', image: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=1100&fit=crop' },
-  { pageNum: 2, title: 'రాష్ట్ర వార్తలు (Page 2)', image: 'https://images.unsplash.com/photo-1588681664899-f142ff22516d?w=800&h=1100&fit=crop' },
-  { pageNum: 3, title: 'క్రీడా విభాగం (Page 3)', image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=1100&fit=crop' },
-  { pageNum: 4, title: 'వాణిజ్యం / వ్యాపారం (Page 4)', image: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&h=1100&fit=crop' },
-  { pageNum: 5, title: 'సినిమా విశేషాలు (Page 5)', image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&h=1100&fit=crop' },
-  { pageNum: 6, title: 'జాతీయ వార్తలు (Page 6)', image: 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=800&h=1100&fit=crop' },
-  { pageNum: 7, title: 'అంతర్జాతీయ ప్రగతి (Page 7)', image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&h=1100&fit=crop' },
-  { pageNum: 8, title: 'జిల్లా ఎడిటోరియల్ (Page 8)', image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=1100&fit=crop' },
+  { pageNum: 1, title: 'మొదటి పేజీ (Page 1)', image: '/newspaper_sample.svg' },
+  { pageNum: 2, title: 'రాష్ట్ర వార్తలు (Page 2)', image: '/newspaper_sample.svg' },
+  { pageNum: 3, title: 'క్రీడా విభాగం (Page 3)', image: '/newspaper_sample.svg' },
+  { pageNum: 4, title: 'వాణిజ్యం / వ్యాపారం (Page 4)', image: '/newspaper_sample.svg' },
+  { pageNum: 5, title: 'సినిమా విశేషాలు (Page 5)', image: '/newspaper_sample.svg' },
+  { pageNum: 6, title: 'జాతీయ వార్తలు (Page 6)', image: '/newspaper_sample.svg' },
+  { pageNum: 7, title: 'అంతర్జాతీయ ప్రగతి (Page 7)', image: '/newspaper_sample.svg' },
+  { pageNum: 8, title: 'జిల్లా ఎడిటోరియల్ (Page 8)', image: '/newspaper_sample.svg' },
 ];
 
 export default function EPaperReader() {
   const [selectedEdition, setSelectedEdition] = useState(0);
   const [selectedDate, setSelectedDate] = useState('2026-06-05');
-  const [activePageIdx, setActivePageIdx] = useState<number | null>(null);
+  const [activePageIdx, setActivePageIdx] = useState(0);
+  const [viewMode, setViewMode] = useState<'reader' | 'grid'>('reader');
   const [zoom, setZoom] = useState(100);
   const [downloading, setDownloading] = useState(false);
   const [copied, setCopied] = useState(false);
+  
+  // Sidebar state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  // Clipping / Crop Box state
+  const [isClipping, setIsClipping] = useState(false);
+  const [clipBox, setClipBox] = useState({ x: 250, y: 200, width: 320, height: 240 });
+  const [interactionType, setInteractionType] = useState<'none' | 'moving' | 'resizing-tl' | 'resizing-tr' | 'resizing-bl' | 'resizing-br'>('none');
+  const [dragStartOffset, setDragStartOffset] = useState({ x: 0, y: 0 });
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+
+  // Share Modal state
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [generatedClipUrl, setGeneratedClipUrl] = useState('');
+  const [clipCopied, setClipCopied] = useState(false);
 
   const handlePrevDay = () => {
     const d = new Date(selectedDate);
@@ -58,8 +78,13 @@ export default function EPaperReader() {
     setDownloading(true);
     setTimeout(() => {
       setDownloading(false);
-      alert('పిడిఎఫ్ (PDF) విజయవంతంగా డౌన్‌లోడ్ చేయబడింది!');
-    }, 2000);
+      const link = document.createElement('a');
+      link.href = '/newspaper_sample.svg';
+      link.download = `hightv-epaper-${selectedDate}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }, 1500);
   };
 
   const handleShare = () => {
@@ -68,220 +93,674 @@ export default function EPaperReader() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const zoomIn = () => {
+    setZoom(prev => Math.min(200, prev + 25));
+  };
+
+  const zoomOut = () => {
+    setZoom(prev => Math.max(50, prev - 25));
+  };
+
+  // Clipping Drag / Resize Logic
+  const handleResizeMouseDown = (e: React.MouseEvent, handle: 'tl' | 'tr' | 'bl' | 'br') => {
+    setInteractionType(`resizing-${handle}`);
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  const handleClipMouseDown = (e: React.MouseEvent) => {
+    if (!imageContainerRef.current) return;
+    const rect = imageContainerRef.current.getBoundingClientRect();
+    const scale = zoom / 100;
+    const mouseX = (e.clientX - rect.left) / scale;
+    const mouseY = (e.clientY - rect.top) / scale;
+
+    setInteractionType('moving');
+    setDragStartOffset({
+      x: mouseX - clipBox.x,
+      y: mouseY - clipBox.y
+    });
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  const handleContainerMouseMove = (e: React.MouseEvent) => {
+    if (interactionType === 'none') return;
+    if (!imageContainerRef.current) return;
+    const rect = imageContainerRef.current.getBoundingClientRect();
+    const scale = zoom / 100;
+    const mouseX = (e.clientX - rect.left) / scale;
+    const mouseY = (e.clientY - rect.top) / scale;
+
+    if (interactionType === 'moving') {
+      const newX = mouseX - dragStartOffset.x;
+      const newY = mouseY - dragStartOffset.y;
+      
+      const maxX = 800 - clipBox.width;
+      const maxY = 1100 - clipBox.height;
+
+      setClipBox(prev => ({
+        ...prev,
+        x: Math.max(0, Math.min(maxX, newX)),
+        y: Math.max(0, Math.min(maxY, newY))
+      }));
+    } else if (interactionType.startsWith('resizing-')) {
+      const handle = interactionType.replace('resizing-', '');
+      const minSize = 60;
+
+      setClipBox(prev => {
+        let { x, y, width, height } = prev;
+        
+        if (handle === 'br') {
+          const newWidth = Math.max(minSize, Math.min(800 - x, mouseX - x));
+          const newHeight = Math.max(minSize, Math.min(1100 - y, mouseY - y));
+          return { x, y, width: newWidth, height: newHeight };
+        }
+        
+        if (handle === 'tl') {
+          const rightEdge = x + width;
+          const bottomEdge = y + height;
+          const newX = Math.max(0, Math.min(rightEdge - minSize, mouseX));
+          const newY = Math.max(0, Math.min(bottomEdge - minSize, mouseY));
+          return {
+            x: newX,
+            y: newY,
+            width: rightEdge - newX,
+            height: bottomEdge - newY
+          };
+        }
+        
+        if (handle === 'tr') {
+          const bottomEdge = y + height;
+          const newWidth = Math.max(minSize, Math.min(800 - x, mouseX - x));
+          const newY = Math.max(0, Math.min(bottomEdge - minSize, mouseY));
+          return {
+            x,
+            y: newY,
+            width: newWidth,
+            height: bottomEdge - newY
+          };
+        }
+        
+        if (handle === 'bl') {
+          const rightEdge = x + width;
+          const newX = Math.max(0, Math.min(rightEdge - minSize, mouseX));
+          const newHeight = Math.max(minSize, Math.min(1100 - y, mouseY - y));
+          return {
+            x: newX,
+            y,
+            width: rightEdge - newX,
+            height: newHeight
+          };
+        }
+        
+        return prev;
+      });
+    }
+  };
+
+  const handleContainerMouseUp = () => {
+    setInteractionType('none');
+  };
+
+  // Escape key handler to cancel clipping mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isClipping) setIsClipping(false);
+        if (showShareModal) setShowShareModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isClipping, showShareModal]);
+
   return (
-    <div className="bg-gray-50 rounded-2xl border border-gray-200 p-4 md:p-6 shadow-sm">
-      {/* EPaper Toolbar Controls */}
-      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between mb-6 pb-6 border-b border-gray-200">
-        {/* Edition selector */}
-        <div className="w-full lg:w-auto flex flex-col sm:flex-row items-start sm:items-center gap-3">
-          <label className="text-sm font-bold text-gray-700 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-            ఎడిషన్ ఎంచుకోండి:
-          </label>
-          <select
-            value={selectedEdition}
-            onChange={(e) => setSelectedEdition(Number(e.target.value))}
-            className="w-full sm:w-72 bg-white text-sm font-semibold text-gray-800 px-3.5 py-2.5 border-2 border-gray-200 rounded-xl focus:border-[#C00000] focus:ring-0 outline-none transition-colors telugu-text"
-            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+    <div className="bg-[#e9eff4] rounded-2xl overflow-hidden border border-gray-200 shadow-lg flex flex-col min-h-[750px]">
+      
+      {/* 1. Main E-Paper Reader Header */}
+      <header className="bg-white border-b border-gray-200 px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm z-10">
+        
+        {/* Left Section: Home and Title */}
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <Link 
+            href="/" 
+            className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-gray-600 hover:text-[#66000c] hover:bg-gray-50 transition-colors shadow-sm"
           >
-            {editions.map((edition, idx) => (
-              <option key={idx} value={idx}>
-                {edition}
-              </option>
-            ))}
-          </select>
+            <Home size={18} />
+          </Link>
+          <div className="h-6 w-px bg-gray-200 hidden sm:block"></div>
+          <div>
+            <h1 className="text-sm md:text-base font-bold text-gray-900 leading-tight">
+              {editions[selectedEdition]}
+            </h1>
+            <p className="text-[10px] md:text-xs font-semibold text-gray-400 tracking-wider uppercase">
+              PAGE {activePageIdx + 1} OF {epaperPages.length}
+            </p>
+          </div>
         </div>
 
-        {/* Date Selector */}
-        <div className="w-full lg:w-auto flex items-center justify-between sm:justify-start gap-2.5">
-          <button
-            onClick={handlePrevDay}
-            className="bg-white hover:bg-gray-100 border border-gray-200 w-10 h-10 rounded-xl flex items-center justify-center text-gray-700 transition-colors shadow-sm"
-          >
-            <ChevronLeft size={20} />
-          </button>
+        {/* Right Section: Actions */}
+        <div className="flex flex-wrap items-center gap-2 md:gap-3 w-full md:w-auto justify-end">
           
-          <div className="flex items-center gap-2 bg-white border-2 border-gray-200 rounded-xl px-4 py-2 shadow-sm">
-            <Calendar size={16} className="text-[#C00000]" />
+          {/* Zoom controls */}
+          <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-gray-700 shadow-sm">
+            <button 
+              onClick={zoomOut} 
+              className="w-7 h-7 rounded hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-500 hover:text-gray-900"
+              title="Zoom Out"
+            >
+              <Minus size={14} />
+            </button>
+            <span className="text-xs font-bold w-12 text-center select-none text-gray-600">
+              {zoom}%
+            </span>
+            <button 
+              onClick={zoomIn} 
+              className="w-7 h-7 rounded hover:bg-gray-200 flex items-center justify-center transition-colors text-gray-500 hover:text-gray-900"
+              title="Zoom In"
+            >
+              <Plus size={14} />
+            </button>
+          </div>
+
+          {/* CLIP button */}
+          <button 
+            onClick={() => setIsClipping(!isClipping)}
+            className={`flex items-center gap-1.5 border rounded-lg px-3 py-2 text-xs font-bold transition-all shadow-sm ${
+              isClipping 
+                ? 'bg-red-50 border-red-200 text-[#66000c]' 
+                : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <Scissors size={14} className={isClipping ? 'text-[#66000c]' : 'text-gray-500'} />
+            <span>CLIP</span>
+          </button>
+
+          {/* SHARE EDITION button */}
+          <button 
+            onClick={handleShare}
+            className="flex items-center gap-1.5 bg-[#1e3a8a] hover:bg-[#172554] text-white rounded-lg px-4 py-2 text-xs font-bold transition-all shadow-md relative"
+          >
+            <Share2 size={14} />
+            <span>SHARE EDITION</span>
+            {copied && (
+              <span className="absolute -bottom-9 right-0 bg-green-700 text-white text-[10px] font-bold py-1 px-2.5 rounded shadow-lg whitespace-nowrap z-50">
+                Copied!
+              </span>
+            )}
+          </button>
+
+          {/* DOWNLOAD PDF button */}
+          <button 
+            onClick={handleDownload}
+            disabled={downloading}
+            className="flex items-center gap-1.5 bg-[#dc2626] hover:bg-[#b91c1c] disabled:bg-gray-400 text-white rounded-lg px-4 py-2 text-xs font-bold transition-all shadow-md"
+          >
+            <Download size={14} />
+            <span>{downloading ? 'DOWNLOADING...' : 'DOWNLOAD PDF'}</span>
+          </button>
+        </div>
+      </header>
+
+      {/* 2. Sub-Header: Edition selection, date selector, and view modes */}
+      <div className="bg-white/80 border-b border-gray-200/50 backdrop-blur-sm px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs z-9">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-gray-500 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఎడిషన్:</span>
+            <select
+              value={selectedEdition}
+              onChange={(e) => setSelectedEdition(Number(e.target.value))}
+              className="bg-white border border-gray-300 rounded-md px-2 py-1 text-gray-800 font-semibold outline-none focus:border-[#66000c] transition-colors"
+            >
+              {editions.map((edition, idx) => (
+                <option key={idx} value={idx}>{edition}</option>
+              ))}
+            </select>
+          </div>
+          
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="hidden lg:flex items-center gap-1 text-gray-600 hover:text-gray-900 font-bold"
+          >
+            <Layers size={14} />
+            <span>{isSidebarOpen ? 'పేజీల ప్యానెల్ దాచు (Hide Pages)' : 'పేజీల ప్యానెల్ చూపు (Show Pages)'}</span>
+          </button>
+        </div>
+
+        {/* Date switcher */}
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={handlePrevDay} 
+            className="bg-white border border-gray-300 hover:bg-gray-50 rounded p-1 text-gray-600"
+          >
+            <ChevronLeft size={14} />
+          </button>
+          <div className="flex items-center gap-1 bg-white border border-gray-300 rounded px-2 py-1">
+            <Calendar size={12} className="text-[#66000c]" />
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="text-sm font-bold text-gray-800 outline-none border-none p-0 cursor-pointer"
+              className="font-bold text-gray-700 outline-none border-none p-0 cursor-pointer text-xs"
             />
           </div>
-
-          <button
-            onClick={handleNextDay}
-            className="bg-white hover:bg-gray-100 border border-gray-200 w-10 h-10 rounded-xl flex items-center justify-center text-gray-700 transition-colors shadow-sm"
+          <button 
+            onClick={handleNextDay} 
+            className="bg-white border border-gray-300 hover:bg-gray-50 rounded p-1 text-gray-600"
           >
-            <ChevronRight size={20} />
+            <ChevronRight size={14} />
           </button>
         </div>
 
-        {/* Global actions */}
+        {/* View Mode Grid/Reader toggles */}
         <button
-          onClick={handleDownload}
-          disabled={downloading}
-          className="w-full lg:w-auto flex items-center justify-center gap-2 bg-[#C00000] hover:bg-[#8B0000] disabled:bg-gray-400 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors shadow-md telugu-text"
-          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          onClick={() => setViewMode(viewMode === 'reader' ? 'grid' : 'reader')}
+          className="flex items-center gap-1 bg-white border border-gray-300 hover:bg-gray-50 rounded px-3 py-1 text-gray-700 font-bold transition-colors"
         >
-          <Download size={16} />
-          {downloading ? 'డౌన్‌లోడ్ అవుతోంది...' : 'పూర్తి పేపర్ డౌన్‌లోడ్ (PDF)'}
+          <Grid size={13} />
+          <span>{viewMode === 'reader' ? 'గ్రిడ్ వ్యూ (Grid View)' : 'రీడర్ వ్యూ (Reader View)'}</span>
         </button>
       </div>
 
-      {/* Pages Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {epaperPages.map((page, idx) => (
-          <div
-            key={page.pageNum}
-            onClick={() => {
-              setActivePageIdx(idx);
-              setZoom(100);
-            }}
-            className="group cursor-pointer bg-white rounded-xl border border-gray-200 hover:border-[#C00000] overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col"
-          >
-            {/* Page Thumbnail */}
-            <div className="relative aspect-[3/4] bg-gray-100 w-full overflow-hidden">
-              <Image
-                src={page.image}
-                alt={page.title}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                <div className="bg-[#C00000] text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ZoomIn size={20} />
+      {/* 3. Main content workspace */}
+      <div className="flex-1 flex relative overflow-hidden">
+        
+        {/* Thumbnail Sidebar */}
+        {viewMode === 'reader' && isSidebarOpen && (
+          <aside className="w-44 bg-white border-r border-gray-200 hidden md:flex flex-col flex-shrink-0 animate-slide-in">
+            <div className="p-3 border-b border-gray-100 flex items-center justify-between">
+              <span className="font-bold text-xs text-gray-500 uppercase tracking-wider">All Pages</span>
+              <button 
+                onClick={() => setIsSidebarOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-thin">
+              {epaperPages.map((page, idx) => (
+                <button
+                  key={page.pageNum}
+                  onClick={() => {
+                    setActivePageIdx(idx);
+                    setIsClipping(false);
+                  }}
+                  className={`w-full text-left rounded-lg overflow-hidden border transition-all flex flex-col group ${
+                    idx === activePageIdx 
+                      ? 'border-[#66000c] ring-2 ring-[#66000c]/20' 
+                      : 'border-gray-200 hover:border-gray-400'
+                  }`}
+                >
+                  <div className="relative aspect-[3/4] w-full bg-gray-50">
+                    <Image
+                      src={page.image}
+                      alt={page.title}
+                      fill
+                      sizes="150px"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="p-1.5 bg-gray-50 text-[10px] font-bold text-gray-600 text-center w-full group-hover:bg-gray-100 transition-colors">
+                    పేజీ {page.pageNum}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </aside>
+        )}
+
+        {/* Workspace Display Area */}
+        <div className="flex-1 overflow-auto flex flex-col relative justify-center bg-[#e9eff4]" onMouseMove={handleContainerMouseMove} onMouseUp={handleContainerMouseUp}>
+          
+          {viewMode === 'reader' ? (
+            // Immersive Reader View
+            <div className="flex-1 overflow-auto flex items-center justify-center p-6 relative">
+              
+              {/* Floating Clipping Instructions Bar */}
+              {isClipping && (
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-gray-900/90 text-white border border-gray-700/50 backdrop-blur px-4 py-2 rounded-full text-xs font-semibold shadow-2xl flex items-center gap-3 animate-fade-in">
+                  <span>✂️ <strong>Clipping Mode:</strong> Drag the crop zone to select, click Download.</span>
+                  <button 
+                    onClick={() => setIsClipping(false)}
+                    className="bg-white/10 hover:bg-white/20 text-white rounded-full p-1"
+                  >
+                    <X size={12} />
+                  </button>
                 </div>
+              )}
+
+              {/* Page View Frame */}
+              <div 
+                ref={imageContainerRef}
+                className="relative shadow-2xl bg-white rounded-lg overflow-hidden select-none border border-gray-300"
+                style={{
+                  width: `${800 * (zoom / 100)}px`,
+                  height: `${1100 * (zoom / 100)}px`,
+                  transition: 'width 0.2s, height 0.2s',
+                  maxWidth: 'none',
+                }}
+              >
+                <Image
+                  src={epaperPages[activePageIdx].image}
+                  alt={epaperPages[activePageIdx].title}
+                  fill
+                  sizes="100vw"
+                  className="object-contain pointer-events-none"
+                  priority
+                />
+
+                {/* Interactive clipping crop-box overlay */}
+                {isClipping && (
+                  <div
+                    className="absolute border-2 border-dashed border-[#dc2626] bg-black/10 z-30 flex flex-col justify-between p-2 shadow-inner"
+                    style={{
+                      left: `${clipBox.x * (zoom / 100)}px`,
+                      top: `${clipBox.y * (zoom / 100)}px`,
+                      width: `${clipBox.width * (zoom / 100)}px`,
+                      height: `${clipBox.height * (zoom / 100)}px`,
+                    }}
+                  >
+                    {/* Draggable move overlay */}
+                    <div 
+                      onMouseDown={handleClipMouseDown}
+                      className="absolute inset-0 cursor-move z-10"
+                    />
+
+                    {/* Corner Resize Handles */}
+                    {/* Top-Left */}
+                    <div
+                      onMouseDown={(e) => handleResizeMouseDown(e, 'tl')}
+                      className="absolute w-3.5 h-3.5 bg-white border-2 border-[#dc2626] rounded-full cursor-nwse-resize z-40 hover:scale-125 transition-transform"
+                      style={{ left: '-7px', top: '-7px' }}
+                    />
+                    {/* Top-Right */}
+                    <div
+                      onMouseDown={(e) => handleResizeMouseDown(e, 'tr')}
+                      className="absolute w-3.5 h-3.5 bg-white border-2 border-[#dc2626] rounded-full cursor-nesw-resize z-40 hover:scale-125 transition-transform"
+                      style={{ right: '-7px', top: '-7px' }}
+                    />
+                    {/* Bottom-Left */}
+                    <div
+                      onMouseDown={(e) => handleResizeMouseDown(e, 'bl')}
+                      className="absolute w-3.5 h-3.5 bg-white border-2 border-[#dc2626] rounded-full cursor-nesw-resize z-40 hover:scale-125 transition-transform"
+                      style={{ left: '-7px', bottom: '-7px' }}
+                    />
+                    {/* Bottom-Right */}
+                    <div
+                      onMouseDown={(e) => handleResizeMouseDown(e, 'br')}
+                      className="absolute w-3.5 h-3.5 bg-white border-2 border-[#dc2626] rounded-full cursor-nwse-resize z-40 hover:scale-125 transition-transform"
+                      style={{ right: '-7px', bottom: '-7px' }}
+                    />
+
+                    {/* Content */}
+                    <div className="z-20 pointer-events-none flex flex-col justify-between h-full w-full">
+                      <div className="bg-[#dc2626] text-white text-[9px] font-black tracking-widest px-1.5 py-0.5 rounded shadow w-fit select-none">
+                        CROP AREA
+                      </div>
+                      
+                      <button
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={() => {
+                          const randomId = `${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+                          setGeneratedClipUrl(`https://hightv.com/clip/clip-${randomId}`);
+                          setShowShareModal(true);
+                          setIsClipping(false);
+                        }}
+                        className="self-end bg-green-600 hover:bg-green-700 text-white text-[10px] font-black px-2.5 py-1.5 rounded transition-colors shadow-md flex items-center gap-1 cursor-pointer pointer-events-auto"
+                      >
+                        <Scissors size={10} />
+                        <span>Download Clip</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Hover Page-Turning Overlay Arrows */}
+              {activePageIdx > 0 && !isClipping && (
+                <button
+                  onClick={() => {
+                    setActivePageIdx(activePageIdx - 1);
+                    setIsClipping(false);
+                  }}
+                  className="absolute left-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-[#1e3a8a]/80 hover:bg-[#66000c] text-white flex items-center justify-center transition-all shadow-xl hover:scale-110"
+                  title="Previous Page"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+              )}
+
+              {activePageIdx < epaperPages.length - 1 && !isClipping && (
+                <button
+                  onClick={() => {
+                    setActivePageIdx(activePageIdx + 1);
+                    setIsClipping(false);
+                  }}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-[#1e3a8a]/80 hover:bg-[#66000c] text-white flex items-center justify-center transition-all shadow-xl hover:scale-110"
+                  title="Next Page"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              )}
+            </div>
+          ) : (
+            // Thumbnail Grid View
+            <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
+                {epaperPages.map((page, idx) => (
+                  <div
+                    key={page.pageNum}
+                    onClick={() => {
+                      setActivePageIdx(idx);
+                      setViewMode('reader');
+                      setIsClipping(false);
+                    }}
+                    className="group cursor-pointer bg-white rounded-xl border border-gray-200 hover:border-[#66000c] overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col"
+                  >
+                    <div className="relative aspect-[3/4] bg-gray-100 w-full overflow-hidden">
+                      <Image
+                        src={page.image}
+                        alt={page.title}
+                        fill
+                        sizes="(max-width: 640px) 50vw, 20vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                        <div className="bg-[#66000c] text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100">
+                          <Grid size={18} />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-2 border-t border-gray-100 bg-gray-50 text-center text-xs font-bold text-gray-700">
+                      పేజీ {page.pageNum}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-            
-            {/* Page Footer Label */}
-            <div className="p-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
-              <span className="text-sm font-black text-gray-800 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                పేజీ {page.pageNum}
-              </span>
-              <span className="text-xs text-gray-500 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                {page.title.split(' ')[0]}
-              </span>
-            </div>
-          </div>
-        ))}
+          )}
+        </div>
       </div>
 
-      {/* Interactive Lightbox Viewer */}
-      {activePageIdx !== null && (
-        <div className="fixed inset-0 z-[100] bg-black/95 flex flex-col">
-          {/* Lightbox Toolbar */}
-          <div className="bg-gray-900 border-b border-gray-800 text-white px-4 py-3 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <FileText className="text-[#C00000] hidden sm:block" size={20} />
-              <div>
-                <h3 className="text-sm sm:text-base font-black telugu-text leading-tight" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  హై టీవీ ఈ-పేపర్ ({selectedDate})
-                </h3>
-                <p className="text-[10px] sm:text-xs text-gray-400 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  {editions[selectedEdition]} — పేజీ {epaperPages[activePageIdx].pageNum}
-                </p>
-              </div>
+      {/* 4. "Share It" Crop Confirmation Modal (matching the user's screenshot layout) */}
+      {showShareModal && (
+        <div className="fixed inset-0 z-[150] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md p-6 relative animate-fade-in flex flex-col gap-4">
+            
+            {/* Title & Close */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-extrabold text-gray-900">Share It</h3>
+              <button 
+                onClick={() => setShowShareModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-full hover:bg-gray-100"
+              >
+                <X size={20} />
+              </button>
             </div>
 
-            {/* Viewer Action Controls */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <button
-                onClick={() => setZoom(Math.max(75, zoom - 25))}
-                className="w-9 h-9 rounded-lg hover:bg-gray-800 flex items-center justify-center text-gray-300 transition-colors"
-                title="Zoom Out"
-              >
-                <ZoomOut size={18} />
-              </button>
-              <span className="text-xs text-gray-400 w-12 text-center font-semibold">{zoom}%</span>
-              <button
-                onClick={() => setZoom(Math.min(200, zoom + 25))}
-                className="w-9 h-9 rounded-lg hover:bg-gray-800 flex items-center justify-center text-gray-300 transition-colors"
-                title="Zoom In"
-              >
-                <ZoomIn size={18} />
-              </button>
+            {/* Scaled Dynamic Crop Preview */}
+            <div 
+              className="relative border border-gray-200 rounded-2xl overflow-hidden bg-gray-100 flex items-center justify-center p-4" 
+              style={{ height: '260px' }}
+            >
+              {(() => {
+                const previewMaxHeight = 228;
+                const previewMaxWidth = 340;
+                
+                // Determine scale factor based on clip width/height
+                const scale = Math.min(
+                  previewMaxWidth / clipBox.width,
+                  previewMaxHeight / clipBox.height
+                );
+                
+                const scaledW = clipBox.width * scale;
+                const scaledH = clipBox.height * scale;
+                
+                return (
+                  <div 
+                    className="relative overflow-y-auto rounded-xl border border-gray-200 shadow-md bg-white scrollbar-thin"
+                    style={{
+                      width: `${scaledW}px`,
+                      height: `${scaledH}px`,
+                      maxHeight: '100%',
+                    }}
+                  >
+                    <div className="relative" style={{ width: `${scaledW}px`, height: `${1100 * scale}px` }}>
+                      <img
+                        src={epaperPages[activePageIdx].image}
+                        alt="Clip Preview"
+                        className="max-w-none"
+                        style={{
+                          position: 'absolute',
+                          left: `-${clipBox.x * scale}px`,
+                          top: `-${clipBox.y * scale}px`,
+                          width: `${800 * scale}px`,
+                          height: `${1100 * scale}px`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
 
-              <div className="w-px h-6 bg-gray-800 mx-1 hidden sm:block"></div>
-
+            {/* Shareable Link Input with Copy Button */}
+            <div className="flex items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2 gap-2 shadow-inner">
+              <input
+                type="text"
+                readOnly
+                value={generatedClipUrl}
+                className="flex-1 bg-transparent text-xs font-semibold text-gray-600 outline-none select-all overflow-ellipsis"
+              />
               <button
-                onClick={handleDownload}
-                className="w-9 h-9 rounded-lg hover:bg-gray-800 flex items-center justify-center text-gray-300 transition-colors"
-                title="Download Page PDF"
+                onClick={() => {
+                  navigator.clipboard.writeText(generatedClipUrl);
+                  setClipCopied(true);
+                  setTimeout(() => setClipCopied(false), 2000);
+                }}
+                className="w-8 h-8 rounded-full bg-white border border-gray-200 hover:bg-gray-50 flex items-center justify-center text-gray-500 hover:text-gray-800 transition-colors shadow-sm relative flex-shrink-0"
+                title="Copy Link"
               >
-                <Download size={18} />
-              </button>
-              <button
-                onClick={handleShare}
-                className="w-9 h-9 rounded-lg hover:bg-gray-800 flex items-center justify-center text-gray-300 transition-colors relative"
-                title="Share Link"
-              >
-                <Share2 size={18} />
-                {copied && (
-                  <span className="absolute -bottom-8 right-0 bg-[#0f766e] text-white text-[9px] font-semibold py-1 px-2 rounded shadow-lg whitespace-nowrap z-50">
+                {clipCopied ? (
+                  <span className="text-[10px] text-green-600 font-bold">✓</span>
+                ) : (
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                )}
+                {clipCopied && (
+                  <span className="absolute -top-8 bg-green-700 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow whitespace-nowrap z-50">
                     Copied!
                   </span>
                 )}
               </button>
+            </div>
 
-              <div className="w-px h-6 bg-gray-800 mx-1"></div>
+            {/* Social Share Buttons */}
+            <div className="flex items-center justify-center gap-4 py-1">
+              
+              {/* Facebook */}
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(generatedClipUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-[#1877f2] hover:bg-[#166fe5] text-white flex items-center justify-center transition-all hover:scale-110 shadow"
+                title="Share on Facebook"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                </svg>
+              </a>
+              
+              {/* Twitter / X */}
+              <a
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(generatedClipUrl)}&text=${encodeURIComponent("Check out this news clip from High TV!")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-black hover:bg-gray-800 text-white flex items-center justify-center transition-all hover:scale-110 shadow"
+                title="Share on X (Twitter)"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+              </a>
+
+              {/* WhatsApp */}
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent("Check out this news clip from High TV: " + generatedClipUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-[#25d366] hover:bg-[#20ba5a] text-white flex items-center justify-center transition-all hover:scale-110 shadow"
+                title="Share on WhatsApp"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
+                </svg>
+              </a>
+
+              {/* Email */}
+              <a
+                href={`mailto:?subject=${encodeURIComponent("News Clip from High TV")}&body=${encodeURIComponent("Check out this news clip: " + generatedClipUrl)}`}
+                className="w-10 h-10 rounded-full bg-[#ea4335] hover:bg-[#d93025] text-white flex items-center justify-center transition-all hover:scale-110 shadow"
+                title="Share via Email"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+              </a>
+            </div>
+
+            {/* Bottom Actions: Open & Download */}
+            <div className="grid grid-cols-2 gap-4 mt-2">
+              <button
+                onClick={() => window.open(epaperPages[activePageIdx].image, '_blank')}
+                className="flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3.5 rounded-full text-sm transition-colors shadow-sm"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                <span>Open</span>
+              </button>
 
               <button
-                onClick={() => setActivePageIdx(null)}
-                className="w-9 h-9 rounded-lg bg-white/10 hover:bg-[#C00000] hover:text-white flex items-center justify-center text-white transition-colors"
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = epaperPages[activePageIdx].image;
+                  link.download = `hightv-clip-${Date.now()}.jpg`;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+                className="flex items-center justify-center gap-2 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-bold py-3.5 rounded-full text-sm transition-colors shadow-md"
               >
-                <X size={18} />
+                <Download size={15} />
+                <span>Download</span>
               </button>
             </div>
-          </div>
-
-          {/* Lightbox Main Reading Frame */}
-          <div className="flex-1 overflow-auto flex items-start justify-center p-4">
-            <div
-              className="relative transition-all duration-200 ease-out shadow-2xl bg-white rounded-lg overflow-hidden"
-              style={{
-                width: `${600 * (zoom / 100)}px`,
-                height: `${850 * (zoom / 100)}px`,
-                maxWidth: 'none',
-              }}
-            >
-              <Image
-                src={epaperPages[activePageIdx].image}
-                alt={epaperPages[activePageIdx].title}
-                fill
-                sizes="100vw"
-                className="object-contain"
-                priority
-              />
-            </div>
-          </div>
-
-          {/* Lightbox Footer Pagination */}
-          <div className="bg-gray-900 border-t border-gray-800 py-3 px-4 flex items-center justify-between text-white">
-            <button
-              onClick={() => setActivePageIdx(Math.max(0, activePageIdx - 1))}
-              disabled={activePageIdx === 0}
-              className="flex items-center gap-1 bg-white/5 disabled:bg-gray-900 disabled:text-gray-600 hover:bg-white/15 px-4 py-2 rounded-xl text-xs sm:text-sm transition-colors telugu-text"
-              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-            >
-              <ChevronLeft size={16} /> మునుపటి పేజీ
-            </button>
-            
-            <span className="text-xs sm:text-sm text-gray-400 font-semibold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-              పేజీ {activePageIdx + 1} / {epaperPages.length}
-            </span>
-
-            <button
-              onClick={() => setActivePageIdx(Math.min(epaperPages.length - 1, activePageIdx + 1))}
-              disabled={activePageIdx === epaperPages.length - 1}
-              className="flex items-center gap-1 bg-white/5 disabled:bg-gray-900 disabled:text-gray-600 hover:bg-white/15 px-4 py-2 rounded-xl text-xs sm:text-sm transition-colors telugu-text"
-              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-            >
-              తదుపరి పేజీ <ChevronRight size={16} />
-            </button>
           </div>
         </div>
       )}

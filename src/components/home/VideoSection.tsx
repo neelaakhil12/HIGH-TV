@@ -9,20 +9,20 @@ export default function VideoSection() {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
-          <div className="w-1 h-8 bg-[#C00000] rounded-full"></div>
+          <div className="w-1 h-8 bg-[#66000c] rounded-full"></div>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-[#C00000] rounded flex items-center justify-center">
+            <div className="w-5 h-5 bg-[#66000c] rounded flex items-center justify-center">
               <Play size={10} className="text-white fill-white ml-0.5" />
             </div>
             <h2
-              className="text-xl md:text-2xl font-black text-[#C00000] telugu-text"
+              className="text-xl md:text-2xl font-black text-[#66000c] telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               వీడియో వార్తలు
             </h2>
           </div>
         </div>
-        <Link href="/category/videos" className="flex items-center gap-1 text-xs font-semibold text-[#C00000]">
+        <Link href="/category/videos" className="flex items-center gap-1 text-xs font-semibold text-[#66000c]">
           అన్నీ చూడండి →
         </Link>
       </div>
@@ -42,7 +42,7 @@ export default function VideoSection() {
               <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors"></div>
               {/* Play button */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="play-button w-14 h-14 bg-[#C00000]/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
+                <div className="play-button w-14 h-14 bg-[#66000c]/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
                   <Play size={24} className="text-white fill-white ml-1" />
                 </div>
               </div>
@@ -63,7 +63,7 @@ export default function VideoSection() {
 
             <div className="p-3">
               <h3
-                className="text-sm font-bold text-gray-800 group-hover:text-[#C00000] transition-colors line-clamp-2 leading-snug mb-2 telugu-text"
+                className="text-sm font-bold text-gray-800 group-hover:text-[#66000c] transition-colors line-clamp-2 leading-snug mb-2 telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {video.title}

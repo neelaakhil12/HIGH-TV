@@ -10,7 +10,7 @@ export default function BreakingNewsSection() {
   return (
     <section className="mb-10">
       {/* Header */}
-      <div className="bg-[#C00000] rounded-t-xl px-5 py-3 flex items-center justify-between">
+      <div className="bg-[#66000c] rounded-t-xl px-5 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2 text-white">
           <AlertCircle size={18} className="breaking-badge" />
           <h2
@@ -19,7 +19,7 @@ export default function BreakingNewsSection() {
           >
             బ్రేకింగ్ న్యూస్
           </h2>
-          <span className="ml-2 bg-white text-[#C00000] text-xs font-black px-2 py-0.5 rounded-full breaking-badge">
+          <span className="ml-2 bg-white text-[#66000c] text-xs font-black px-2 py-0.5 rounded-full breaking-badge">
             LIVE
           </span>
         </div>
@@ -38,12 +38,12 @@ export default function BreakingNewsSection() {
                 href={`/news/${article.slug}`}
                 className="flex gap-3 p-4 border-b border-gray-50 hover:bg-red-50 transition-colors group last:border-b-0"
               >
-                <span className="flex-shrink-0 w-7 h-7 bg-[#C00000] text-white text-xs font-black rounded flex items-center justify-center">
+                <span className="flex-shrink-0 w-7 h-7 bg-[#66000c] text-white text-xs font-black rounded flex items-center justify-center">
                   {index + 1}
                 </span>
                 <div>
                   <span
-                    className="text-sm font-semibold text-gray-700 group-hover:text-[#C00000] transition-colors leading-snug block telugu-text"
+                    className="text-sm font-semibold text-gray-700 group-hover:text-[#66000c] transition-colors leading-snug block telugu-text"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {article.title}
@@ -70,7 +70,7 @@ export default function BreakingNewsSection() {
                 </div>
                 <div className="absolute inset-x-0 bottom-0 p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="bg-[#C00000] text-white text-xs font-black px-2 py-0.5 rounded breaking-badge">
+                    <span className="bg-[#66000c] text-white text-xs font-black px-2 py-0.5 rounded breaking-badge">
                       🔴 BREAKING
                     </span>
                   </div>
@@ -104,7 +104,7 @@ export default function BreakingNewsSection() {
                 </div>
                 <div className="flex-1">
                   <p
-                    className="text-xs font-semibold text-gray-700 group-hover:text-[#C00000] transition-colors line-clamp-2 telugu-text"
+                    className="text-xs font-semibold text-gray-700 group-hover:text-[#66000c] transition-colors line-clamp-2 telugu-text"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {article.title}

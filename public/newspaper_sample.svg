@@ -1,0 +1,204 @@
+<svg viewBox="0 0 800 1100" width="800" height="1100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Stylesheet for fonts -->
+  <style>
+    .title { font-family: 'Noto Sans Telugu', 'Arial', sans-serif; font-weight: 900; fill: #66000c; }
+    .headline { font-family: 'Noto Sans Telugu', 'Arial', sans-serif; font-weight: 800; fill: #111827; }
+    .subheadline { font-family: 'Noto Sans Telugu', 'Arial', sans-serif; font-weight: 600; fill: #4b5563; }
+    .body-text { font-family: 'Noto Sans Telugu', 'Arial', sans-serif; font-size: 11px; fill: #374151; line-height: 1.6; }
+    .meta-text { font-family: 'Noto Sans Telugu', 'Arial', sans-serif; font-size: 12px; font-weight: bold; fill: #4b5563; }
+    .accent { fill: #66000c; }
+  </style>
+
+  <!-- Paper Background -->
+  <rect width="800" height="1100" fill="#fcfbf7" />
+  
+  <!-- Outer Margin Border -->
+  <rect x="15" y="15" width="770" height="1070" fill="none" stroke="#66000c" stroke-width="2" />
+  <rect x="19" y="19" width="762" height="1062" fill="none" stroke="#111827" stroke-width="0.5" />
+
+  <!-- ================= HEADER SECTION ================= -->
+  <!-- Header Background Accent -->
+  <rect x="25" y="25" width="750" height="135" fill="#66000c" opacity="0.03" />
+  
+  <!-- Red header bar top -->
+  <rect x="25" y="25" width="750" height="4" fill="#66000c" />
+  
+  <!-- Logo Title -->
+  <text x="400" y="95" font-size="52" text-anchor="middle" class="title" letter-spacing="1">హై టీవీ దినపత్రిక</text>
+  <text x="400" y="125" font-size="14" text-anchor="middle" class="subheadline" letter-spacing="4">HIGH TV DAILY DIGITAL PAPER</text>
+  
+  <!-- Header separator line -->
+  <line x1="25" y1="135" x2="775" y2="135" stroke="#66000c" stroke-width="1.5" />
+  
+  <!-- Header Metadata Row -->
+  <text x="35" y="150" class="meta-text">సంపుటి 3 | సంచిక 142</text>
+  <text x="400" y="150" text-anchor="middle" class="meta-text">హైదరాబాద్ | శుక్రవారం, జూన్ 5, 2026</text>
+  <text x="765" y="150" text-anchor="end" class="meta-text">పేజీలు: 8 | వెల: రూ. 5.00</text>
+  
+  <!-- Header bottom double line -->
+  <line x1="25" y1="158" x2="775" y2="158" stroke="#111827" stroke-width="2" />
+  <line x1="25" y1="162" x2="775" y2="162" stroke="#111827" stroke-width="0.5" />
+
+  <!-- ================= MAIN HEADLINE (TOP HALF) ================= -->
+  <!-- Headline Title -->
+  <text x="35" y="205" font-size="28" class="headline">ఆదిలాబాద్ ఎయిర్ పోర్టుకు గ్రీన్ సిగ్నల్: పనులు ప్రారంభం</text>
+  <text x="35" y="232" font-size="16" class="subheadline">రన్ వే విస్తరణ, టెర్మినల్ నిర్మాణానికి రూ. 500 కోట్ల నిధులు మంజూరు చేసిన ప్రభుత్వం</text>
+  
+  <!-- Main Column Layout Grid Lines -->
+  <!-- Vertical divider 1 -->
+  <line x1="275" y1="250" x2="275" y2="600" stroke="#e5e7eb" stroke-width="1" />
+  <!-- Vertical divider 2 -->
+  <line x1="535" y1="250" x2="535" y2="600" stroke="#e5e7eb" stroke-width="1" />
+
+  <!-- Column 1 Text (Left) -->
+  <g transform="translate(35, 255)">
+    <text x="0" y="15" class="body-text" font-weight="bold" fill="#66000c">ఆదిలాబాద్ ప్రతినిధి:</text>
+    <text x="0" y="35" class="body-text">ఆదిలాబాద్ పౌర విమానయాన రంగానికి</text>
+    <text x="0" y="55" class="body-text">నూతన ఊపునిస్తూ ఇక్కడ సరికొత్త రన్ వే</text>
+    <text x="0" y="75" class="body-text">మరియు టెర్మినల్ బిల్డింగ్ నిర్మాణానికి</text>
+    <text x="0" y="95" class="body-text">రాష్ట్ర ప్రభుత్వం పచ్చజెండా ఊపింది. ఈ</text>
+    <text x="0" y="115" class="body-text">మేరకు అవసరమైన భూసేకరణ ప్రక్రియను</text>
+    <text x="0" y="135" class="body-text">వేగవంతం చేయాలని జిల్లా కలెక్టర్ ను సిఎం</text>
+    <text x="0" y="155" class="body-text">ఆదేశించారు. మొదటి దశ పనులలో భాగంగా</text>
+    <text x="0" y="175" class="body-text">రన్ వే విస్తరణతో పాటు అత్యాధునిక రక్షణ</text>
+    <text x="0" y="195" class="body-text">వ్యవస్థలు మరియు నేవిగేషన్ సాధనాలను</text>
+    <text x="0" y="215" class="body-text">అమర్చనున్నారు. దీని వల్ల ఉత్తర తెలంగాణ</text>
+    <text x="0" y="235" class="body-text">ప్రాంతాల ప్రజలకు రవాణా సౌకర్యాలు మెరుగై</text>
+    <text x="0" y="255" class="body-text">పరిశ్రమల స్థాపనకు మార్గం సుగమమవుతుంది.</text>
+    <text x="0" y="275" class="body-text">సుమారు 300 ఎకరాల భూమిని సేకరించి</text>
+    <text x="0" y="295" class="body-text">త్వరలోనే శంకుస్థాపన చేయనున్నారు.</text>
+  </g>
+
+  <!-- Column 2 (Center) - News Image Block -->
+  <g transform="translate(290, 255)">
+    <!-- Image Box Frame -->
+    <rect x="0" y="0" width="230" height="150" fill="#f3f4f6" stroke="#d1d5db" stroke-width="1" />
+    
+    <!-- Stylized Airport Illustration -->
+    <!-- Sky -->
+    <rect x="1" y="1" width="228" height="90" fill="#bae6fd" opacity="0.6" />
+    <!-- Sun -->
+    <circle cx="200" cy="30" r="15" fill="#fef08a" />
+    <!-- Runway -->
+    <polygon points="40,149 190,149 120,90 100,90" fill="#4b5563" />
+    <line x1="110" y1="90" x2="115" y2="149" stroke="#fef08a" stroke-width="2" stroke-dasharray="6,4" />
+    <!-- Plane Landing -->
+    <ellipse cx="115" cy="65" rx="30" ry="8" fill="#1e3a8a" /> <!-- Fuselage -->
+    <polygon points="100,65 130,65 140,50 120,65" fill="#1e3a8a" /> <!-- Tail -->
+    <polygon points="105,65 110,65 85,80 95,80" fill="#3b82f6" /> <!-- Wing Left -->
+    <polygon points="120,65 125,65 145,80 135,80" fill="#3b82f6" /> <!-- Wing Right -->
+    <!-- Terminal building background -->
+    <rect x="10" y="80" width="60" height="15" fill="#9ca3af" opacity="0.8" />
+    <polygon points="10,80 70,80 65,72 15,72" fill="#4b5563" />
+    
+    <!-- Image Caption -->
+    <text x="0" y="165" font-size="10" font-style="italic" class="body-text" fill="#4b5563">ఆదిలాబాద్ లో ప్రతిపాదిత విమానాశ్రయ నమూనా చిత్రం</text>
+    
+    <!-- Paragraph below image -->
+    <text x="0" y="190" class="body-text">గత కొన్నేళ్లుగా పెండింగ్ లో ఉన్న ఈ</text>
+    <text x="0" y="210" class="body-text">ప్రాజెక్టుకు నిధులు కేటాయించడం పట్ల</text>
+    <text x="0" y="230" class="body-text">స్థానిక ప్రజలు మరియు ప్రజా సంఘాలు</text>
+    <text x="0" y="250" class="body-text">హర్షం వ్యక్తం చేస్తున్నారు. త్వరితగతిన</text>
+    <text x="0" y="270" class="body-text">పనులు పూర్తి చేసి విమాన సర్వీసులు</text>
+    <text x="0" y="290" class="body-text">ప్రారంభించాలని వారు కోరుతున్నారు.</text>
+  </g>
+
+  <!-- Column 3 Text (Right) -->
+  <g transform="translate(550, 255)">
+    <text x="0" y="15" class="body-text">పర్యాటక రంగానికి కూడా ఈ ఎయిర్ పోర్టు</text>
+    <text x="0" y="35" class="body-text">మహర్దశ తీసుకురానుంది. కుంతల జలపాతం,</text>
+    <text x="0" y="55" class="body-text">కవ్వాల్ టైగర్ రిజర్వ్ సందర్శించేందుకు</text>
+    <text x="0" y="75" class="body-text">దేశవిదేశాల పర్యాటకులకు రవాణా మార్గం</text>
+    <text x="0" y="95" class="body-text">లభిస్తుంది. కేంద్ర ప్రాంతీయ విమానయాన</text>
+    <text x="0" y="115" class="body-text">కనెక్టివిటీ పథకం (ఉడాన్) కింద దీనిని</text>
+    <text x="0" y="135" class="body-text">అభివృద్ధి చేయడానికి కేంద్ర సాయం కూడా</text>
+    <text x="0" y="155" class="body-text">అందుతుందని సమాచారం. విమానాశ్రయం</text>
+    <text x="0" y="175" class="body-text">చుట్టుపక్కల ప్రత్యేక ఆర్థిక జోన్లు (SEZ)</text>
+    <text x="0" y="195" class="body-text">మరియు కోల్డ్ స్టోరేజ్ యూనిట్లు ఏర్పాటు</text>
+    <text x="0" y="215" class="body-text">చేయడం ద్వారా స్థానిక యువతకు ఉపాధి</text>
+    <text x="0" y="235" class="body-text">అవకాశాలు లభిస్తాయని ఆర్థిక నిపుణులు</text>
+    <text x="0" y="255" class="body-text">అంచనా వేస్తున్నారు. త్వరలోనే పనులు</text>
+    <text x="0" y="275" class="body-text">పర్యవేక్షించేందుకు విమానయాన శాఖకు</text>
+    <text x="0" y="295" class="body-text">చెందిన నిపుణుల బృందం రానుంది.</text>
+  </g>
+
+  <!-- Horizontal divider between top and bottom half -->
+  <line x1="25" y1="570" x2="775" y2="570" stroke="#66000c" stroke-width="1.5" />
+  
+  <!-- ================= BOTTOM HALF LEFT SECTION ================= -->
+  <!-- Headline 2 -->
+  <text x="35" y="605" font-size="22" class="headline">వ్యవసాయ రంగానికి భారీ ఊతం: రైతు బంధు నిధుల విడుదల</text>
+  <text x="35" y="625" font-size="13" class="subheadline">నేరుగా రైతుల ఖాతాల్లోకి రూ. 7500 కోట్లు జమ చేయనున్న సిఎం</text>
+  
+  <!-- Vertical divider bottom -->
+  <line x1="490" y1="640" x2="490" y2="1050" stroke="#e5e7eb" stroke-width="1" />
+
+  <!-- Bottom Left Column 1 -->
+  <g transform="translate(35, 645)">
+    <text x="0" y="15" class="body-text" font-weight="bold" fill="#66000c">హైదరాబాద్ వార్తలు:</text>
+    <text x="0" y="35" class="body-text">రాష్ట్రవ్యాప్తంగా వానాకాలం పంట పెట్టుబడి</text>
+    <text x="0" y="55" class="body-text">సహాయం కింద అర్హులైన రైతులందరికీ</text>
+    <text x="0" y="75" class="body-text">రైతు బంధు నిధులను నేరుగా వారి బ్యాంకు</text>
+    <text x="0" y="95" class="body-text">ఖాతాల్లో జమ చేయాలని ముఖ్యమంత్రి నిర్ణయం</text>
+    <text x="0" y="115" class="body-text">తీసుకున్నారు. ఈ పథకం ద్వారా సుమారు</text>
+    <text x="0" y="135" class="body-text">65 లక్షల మంది రైతులకు ప్రయోజనం చేకూరనుంది.</text>
+    <text x="0" y="155" class="body-text">ఒక్కో ఎకరానికి రూ. 5000 చొప్పున పెట్టుబడి</text>
+    <text x="0" y="175" class="body-text">సహాయాన్ని ప్రభుత్వం అందజేస్తుంది. ఇందుకోసం</text>
+    <text x="0" y="195" class="body-text">ఆర్థిక శాఖ నిధులను విడుదల చేసింది.</text>
+    <text x="0" y="215" class="body-text">బ్యాంకు అధికారులు రైతులకు ఎలాంటి ఇబ్బందులు</text>
+    <text x="0" y="235" class="body-text">లేకుండా నగదు విత్ డ్రా చేసుకునే విధంగా</text>
+    <text x="0" y="255" class="body-text">కౌంటర్లు ఏర్పాటు చేయాలని ఆదేశించారు.</text>
+  </g>
+
+  <!-- Bottom Left Column 2 -->
+  <g transform="translate(265, 645)">
+    <text x="0" y="15" class="body-text">ఈ సారి గతంలో కంటే మరింత పారదర్శకంగా</text>
+    <text x="0" y="35" class="body-text">ధరణి పోర్టల్ ద్వారా అర్హులను ఎంపిక</text>
+    <text x="0" y="55" class="body-text">చేసినట్లు అధికారులు తెలిపారు. కౌలు రైతులకు</text>
+    <text x="0" y="75" class="body-text">కూడా సాయం అందజేసే అంశాన్ని ప్రభుత్వం</text>
+    <text x="0" y="95" class="body-text">పరిశీలిస్తున్నట్లు సమాచారం. వ్యవసాయ</text>
+    <text x="0" y="115" class="body-text">అధికారులు గ్రామాల్లో ప్రత్యేక శిబిరాలు</text>
+    <text x="0" y="135" class="body-text">నిర్వహించి సాంకేతిక సమస్యల వల్ల నిధులు</text>
+    <text x="0" y="155" class="body-text">ఆగిన వారికి సత్వర సహాయం అందేలా</text>
+    <text x="0" y="175" class="body-text">చర్యలు చేపడుతున్నారు. ఎరువులు, విత్తనాలు</text>
+    <text x="0" y="195" class="body-text">సమయానికి అందుబాటులో ఉంచేలా చర్యలు</text>
+    <text x="0" y="215" class="body-text">తీసుకోవాలని మార్కెటింగ్ శాఖను కూడా</text>
+    <text x="0" y="235" class="body-text">ముఖ్యమంత్రి ఆదేశించడం విశేషం.</text>
+  </g>
+
+  <!-- ================= BOTTOM HALF RIGHT SECTION ================= -->
+  <!-- Headline 3 -->
+  <text x="510" y="605" font-size="18" class="headline">రాష్ట్రంలో వర్షాల హెచ్చరిక</text>
+  <text x="510" y="625" font-size="12" class="subheadline">రాబోయే మూడు రోజులు అప్రమత్తత అవసరం</text>
+  
+  <!-- Bottom Right Column -->
+  <g transform="translate(510, 645)">
+    <text x="0" y="15" class="body-text" font-weight="bold" fill="#66000c">వాతావరణ కేంద్రం:</text>
+    <text x="0" y="35" class="body-text">బంగాళాఖాతంలో ఏర్పడిన అల్పపీడన ద్రోణి</text>
+    <text x="0" y="55" class="body-text">ప్రభావంతో రాగల 72 గంటల్లో తెలంగాణలోని</text>
+    <text x="0" y="75" class="body-text">పలు జిల్లాల్లో మోస్తరు నుండి భారీ వర్షాలు</text>
+    <text x="0" y="95" class="body-text">కురిసే అవకాశం ఉందని హైదరాబాద్ వాతావరణ</text>
+    <text x="0" y="115" class="body-text">కేంద్రం హెచ్చరించింది. ముఖ్యంగా ఆదిలాబాద్,</text>
+    <text x="0" y="135" class="body-text">కరీంనగర్, వరంగల్ మరియు ఖమ్మం జిల్లాలకు</text>
+    <text x="0" y="155" class="body-text">ఎల్లో అలర్ట్ జారీ చేశారు. గంటకు 40 కి.మీ</text>
+    <text x="0" y="175" class="body-text">వేగంతో ఈదురుగాలులు వీచే అవకాశం ఉంది.</text>
+    <text x="0" y="195" class="body-text">లోతట్టు ప్రాంతాల ప్రజలు అప్రమత్తంగా</text>
+    <text x="0" y="215" class="body-text">ఉండాలని విపత్తుల నిర్వహణ సంస్థ సూచించింది.</text>
+    <text x="0" y="235" class="body-text">అవసరమైతే తప్ప బయటకు రావద్దని కోరారు.</text>
+    
+    <!-- Weather Small Icon illustration -->
+    <rect x="0" y="260" width="245" height="120" fill="#f3f4f6" stroke="#d1d5db" stroke-width="1" rx="8" />
+    <!-- Cloud & Rain Illustration -->
+    <path d="M50 300 a15 15 0 0 1 15 -15 a20 20 0 0 1 30 -5 a15 15 0 0 1 15 15 a15 15 0 0 1 -10 14 h-40 a15 15 0 0 1 -10 -14 z" fill="#9ca3af" />
+    <path d="M70 300 a15 15 0 0 1 15 -15 a20 20 0 0 1 30 -5 a15 15 0 0 1 15 15 a15 15 0 0 1 -10 14 h-40 a15 15 0 0 1 -10 -14 z" fill="#6b7280" transform="translate(15, -5)" />
+    <!-- Rain drops -->
+    <line x1="60" y1="315" x2="55" y2="330" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" />
+    <line x1="75" y1="315" x2="70" y2="330" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" />
+    <line x1="90" y1="315" x2="85" y2="330" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" />
+    <line x1="105" y1="315" x2="100" y2="330" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" />
+    <!-- Info Text -->
+    <text x="135" y="295" font-size="12" font-weight="bold" fill="#111827" class="body-text">భారీ వర్షాల సూచన</text>
+    <text x="135" y="315" font-size="10" fill="#4b5563" class="body-text">హైదరాబాద్ పరిసరాల్లో</text>
+    <text x="135" y="335" font-size="10" fill="#4b5563" class="body-text">నేడు ఉరుములతో కూడిన వాన</text>
+  </g>
+</svg>

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { categories } from '@/lib/mockData';
 
@@ -38,9 +39,13 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex-shrink-0 inline-flex items-center mb-4 group">
-              <div className="h-10 px-4 bg-[#C00000] rounded-lg flex items-center justify-center shadow-md group-hover:bg-[#8B0000] transition-colors">
-                <span className="text-white font-black text-base telugu-text" style={{ fontFamily: 'Noto Sans Telugu, serif' }}>హై టీవీ</span>
-              </div>
+              <Image
+                src="/logo.jpg"
+                alt="హై టీవీ లోగో"
+                width={140}
+                height={40}
+                className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
+              />
             </Link>
             <p className="text-sm leading-relaxed mb-5 text-gray-400 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
               హై టీవీ - తెలుగు వాసులకు వేగవంతమైన, విశ్వసనీయమైన వార్తలు అందించే ప్రముఖ డిజిటల్ వార్తా వేదిక.
@@ -56,7 +61,7 @@ export default function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#C00000] transition-colors"
+                  className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#66000c] transition-colors"
                 >
                   {icon}
                 </a>
@@ -66,7 +71,7 @@ export default function Footer() {
 
           {/* Categories 1 */}
           <div>
-            <h3 className="text-white font-bold text-base mb-4 telugu-text border-l-4 border-[#C00000] pl-3"
+            <h3 className="text-white font-bold text-base mb-4 telugu-text border-l-4 border-[#66000c] pl-3"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
               వర్గాలు
             </h3>
@@ -75,7 +80,7 @@ export default function Footer() {
                 <li key={cat.slug}>
                   <Link
                     href={`/category/${cat.slug}`}
-                    className="text-sm hover:text-[#C00000] transition-colors telugu-text flex items-center gap-1.5"
+                    className="text-sm hover:text-[#66000c] transition-colors telugu-text flex items-center gap-1.5"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
@@ -88,7 +93,7 @@ export default function Footer() {
 
           {/* Categories 2 */}
           <div>
-            <h3 className="text-white font-bold text-base mb-4 telugu-text border-l-4 border-[#C00000] pl-3"
+            <h3 className="text-white font-bold text-base mb-4 telugu-text border-l-4 border-[#66000c] pl-3"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
               మరిన్ని వర్గాలు
             </h3>
@@ -97,7 +102,7 @@ export default function Footer() {
                 <li key={cat.slug}>
                   <Link
                     href={`/category/${cat.slug}`}
-                    className="text-sm hover:text-[#C00000] transition-colors telugu-text flex items-center gap-1.5"
+                    className="text-sm hover:text-[#66000c] transition-colors telugu-text flex items-center gap-1.5"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
@@ -110,24 +115,24 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-white font-bold text-base mb-4 telugu-text border-l-4 border-[#C00000] pl-3"
+            <h3 className="text-white font-bold text-base mb-4 telugu-text border-l-4 border-[#66000c] pl-3"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
               సంప్రదించండి
             </h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm">
-                <MapPin size={14} className="text-[#C00000] mt-0.5 flex-shrink-0" />
+                <MapPin size={14} className="text-[#66000c] mt-0.5 flex-shrink-0" />
                 <span className="telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   3-4-396, నీలోఫర్ హాస్పిటల్ రోడ్, హైదరాబాద్ - 500044
                 </span>
               </li>
               <li className="flex items-center gap-2 text-sm">
-                <Phone size={14} className="text-[#C00000] flex-shrink-0" />
-                <a href="tel:+914023456789" className="hover:text-[#C00000] transition-colors">+91-40-2345-6789</a>
+                <Phone size={14} className="text-[#66000c] flex-shrink-0" />
+                <a href="tel:+914023456789" className="hover:text-[#66000c] transition-colors">+91-40-2345-6789</a>
               </li>
               <li className="flex items-center gap-2 text-sm">
-                <Mail size={14} className="text-[#C00000] flex-shrink-0" />
-                <a href="mailto:news@hightv.com" className="hover:text-[#C00000] transition-colors">news@hightv.com</a>
+                <Mail size={14} className="text-[#66000c] flex-shrink-0" />
+                <a href="mailto:news@hightv.com" className="hover:text-[#66000c] transition-colors">news@hightv.com</a>
               </li>
             </ul>
 
@@ -137,9 +142,9 @@ export default function Footer() {
                 <input
                   type="email"
                   placeholder="మీ ఇమెయిల్"
-                  className="w-full sm:flex-1 bg-gray-700 text-white text-xs px-3 py-2 rounded border border-gray-600 focus:border-[#C00000] outline-none"
+                  className="w-full sm:flex-1 bg-gray-700 text-white text-xs px-3 py-2 rounded border border-gray-600 focus:border-[#66000c] outline-none"
                 />
-                <button className="w-full sm:w-auto bg-[#C00000] text-white text-xs px-3 py-2 rounded hover:bg-[#8B0000] transition-colors font-semibold">
+                <button className="w-full sm:w-auto bg-[#66000c] text-white text-xs px-3 py-2 rounded hover:bg-[#4d0009] transition-colors font-semibold">
                   Subscribe
                 </button>
               </div>
@@ -155,10 +160,10 @@ export default function Footer() {
             © 2024 హై టీవీ. అన్ని హక్కులు నిల్వ చేయబడ్డాయి.
           </p>
           <div className="flex gap-4 text-xs text-gray-500">
-            <Link href="/privacy" className="hover:text-[#C00000] transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>గోప్యత విధానం</Link>
-            <Link href="/terms" className="hover:text-[#C00000] transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>నిబంధనలు</Link>
-            <Link href="/about" className="hover:text-[#C00000] transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>మా గురించి</Link>
-            <Link href="/contact" className="hover:text-[#C00000] transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>సంప్రదింపు</Link>
+            <Link href="/privacy" className="hover:text-[#66000c] transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>గోప్యత విధానం</Link>
+            <Link href="/terms" className="hover:text-[#66000c] transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>నిబంధనలు</Link>
+            <Link href="/about" className="hover:text-[#66000c] transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>మా గురించి</Link>
+            <Link href="/contact" className="hover:text-[#66000c] transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>సంప్రదింపు</Link>
           </div>
         </div>
       </div>

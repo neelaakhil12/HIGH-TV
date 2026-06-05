@@ -57,10 +57,10 @@ export default function TopBar() {
   const tickerContent = [...breakingNews, ...breakingNews].join('  ●  ');
 
   return (
-    <div className="bg-[#C00000] text-white text-xs">
+    <div className="bg-[#66000c] text-white text-xs">
       {/* Breaking news ticker row */}
       <div className="flex items-center border-b border-red-800">
-        <div className="flex-shrink-0 bg-[#8B0000] px-3 py-1.5 flex items-center gap-1.5 font-bold text-xs uppercase tracking-wider">
+        <div className="flex-shrink-0 bg-[#4d0009] px-3 py-1.5 flex items-center gap-1.5 font-bold text-xs uppercase tracking-wider">
           <span className="w-2 h-2 bg-white rounded-full breaking-badge inline-block"></span>
           బ్రేకింగ్
         </div>
@@ -110,7 +110,7 @@ export default function TopBar() {
           {/* Login */}
           <a
             href="/login"
-            className="flex items-center gap-1 bg-white text-[#C00000] font-bold px-3 py-0.5 rounded-full text-xs hover:bg-red-50 transition-colors"
+            className="flex items-center gap-1 bg-white text-[#66000c] font-bold px-3 py-0.5 rounded-full text-xs hover:bg-red-50 transition-colors"
           >
             <User size={11} />
             లాగిన్

@@ -6,7 +6,7 @@ export default function AdBanner({ position = 'leaderboard' }: { position?: 'lea
         <div className="text-gray-300 text-4xl font-black mb-1">AD</div>
         <div className="text-gray-400 text-xs">300 × 250</div>
         <div className="mt-3 text-gray-400 text-xs">ప్రకటనకు సంప్రదించండి</div>
-        <a href="mailto:ads@hightv.com" className="mt-2 text-[#C00000] text-xs font-semibold hover:underline">
+        <a href="mailto:ads@hightv.com" className="mt-2 text-[#66000c] text-xs font-semibold hover:underline">
           ads@hightv.com
         </a>
       </div>

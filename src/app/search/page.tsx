@@ -29,11 +29,11 @@ export default function SearchPage({
             <input
               type="text"
               placeholder="వార్తలు, విషయాలు లేదా కేటగిరీ వెతకండి..."
-              className="search-input w-full pl-5 pr-12 py-4 border-2 border-gray-200 rounded-xl text-base focus:border-[#C00000] transition-colors"
+              className="search-input w-full pl-5 pr-12 py-4 border-2 border-gray-200 rounded-xl text-base focus:border-[#66000c] transition-colors"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               autoFocus
             />
-            <button className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 bg-[#C00000] text-white rounded-lg flex items-center justify-center hover:bg-[#8B0000] transition-colors">
+            <button className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 bg-[#66000c] text-white rounded-lg flex items-center justify-center hover:bg-[#4d0009] transition-colors">
               <Search size={18} />
             </button>
           </div>

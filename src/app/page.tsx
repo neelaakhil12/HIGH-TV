@@ -151,12 +151,12 @@ export default function HomePage() {
                 <div className="divide-y divide-gray-50">
                   {featuredNews.map((article, index) => (
                     <div key={article.id} className="flex gap-3 p-3 hover:bg-red-50 transition-colors group">
-                      <span className="flex-shrink-0 w-7 h-7 bg-[#C00000] text-white text-xs font-black rounded flex items-center justify-center">
+                      <span className="flex-shrink-0 w-7 h-7 bg-[#66000c] text-white text-xs font-black rounded flex items-center justify-center">
                         {index + 1}
                       </span>
                       <Link href={`/news/${article.slug}`} className="flex-1">
                         <p
-                          className="text-xs font-semibold text-gray-700 group-hover:text-[#C00000] transition-colors line-clamp-2 leading-snug telugu-text"
+                          className="text-xs font-semibold text-gray-700 group-hover:text-[#66000c] transition-colors line-clamp-2 leading-snug telugu-text"
                           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                         >
                           {article.title}
@@ -180,7 +180,7 @@ export default function HomePage() {
                     <Link
                       key={tag}
                       href={`/search?q=${tag}`}
-                      className="text-xs bg-gray-100 hover:bg-[#C00000] hover:text-white text-gray-600 px-3 py-1.5 rounded-full transition-colors font-medium telugu-text"
+                      className="text-xs bg-gray-100 hover:bg-[#66000c] hover:text-white text-gray-600 px-3 py-1.5 rounded-full transition-colors font-medium telugu-text"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                     >
                       #{tag}
@@ -190,7 +190,7 @@ export default function HomePage() {
               </div>
 
               {/* Social Follow Box */}
-              <div className="bg-[#C00000] rounded-xl p-4 text-white">
+              <div className="bg-[#66000c] rounded-xl p-4 text-white">
                 <h3 className="font-black text-lg mb-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   మాతో అనుసంధానం
                 </h3>

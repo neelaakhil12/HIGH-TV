@@ -2,9 +2,9 @@
 @import "tailwindcss";
 
 :root {
-  --brand-red: #C00000;
-  --brand-dark-red: #8B0000;
-  --brand-hover: #A00000;
+  --brand-red: #66000c;
+  --brand-dark-red: #4d0009;
+  --brand-hover: #7a000e;
   --background: #ffffff;
   --foreground: #222222;
   --border: #E5E5E5;
@@ -70,7 +70,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #C00000;
+  background: #66000c;
   border-radius: 3px;
 }
 
@@ -120,7 +120,7 @@ body {
   left: 0;
   width: 100%;
   height: 3px;
-  background: #C00000;
+  background: #66000c;
   border-radius: 2px;
 }
 
@@ -157,7 +157,7 @@ body {
 
 .play-button:hover {
   transform: scale(1.1);
-  background: rgba(192,0,0,0.9) !important;
+  background: rgba(102, 0, 12,0.9) !important;
 }
 
 /* Masonry gallery */
@@ -187,7 +187,7 @@ body {
 .trending-number {
   font-size: 3.5rem;
   font-weight: 900;
-  color: rgba(192, 0, 0, 0.08);
+  color: rgba(102, 0, 12, 0.08);
   line-height: 1;
   user-select: none;
 }
@@ -216,7 +216,7 @@ body {
 /* Search bar focus */
 .search-input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(192, 0, 0, 0.3);
+  box-shadow: 0 0 0 2px rgba(102, 0, 12, 0.3);
 }
 
 /* Card category pill */

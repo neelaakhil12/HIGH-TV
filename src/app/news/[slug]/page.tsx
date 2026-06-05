@@ -67,11 +67,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       <main className="max-w-[1400px] mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-5 flex-wrap">
-          <Link href="/" className="hover:text-[#C00000] transition-colors flex items-center gap-1">
+          <Link href="/" className="hover:text-[#66000c] transition-colors flex items-center gap-1">
             <Home size={14} /> హోమ్
           </Link>
           <ChevronRight size={14} />
-          <Link href={`/category/${article.categorySlug}`} className="hover:text-[#C00000] transition-colors telugu-text"
+          <Link href={`/category/${article.categorySlug}`} className="hover:text-[#66000c] transition-colors telugu-text"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
             {article.category}
           </Link>
@@ -93,7 +93,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 {article.category}
               </span>
               {article.isBreaking && (
-                <span className="bg-[#C00000] text-white text-xs font-black px-3 py-0.5 rounded breaking-badge">
+                <span className="bg-[#66000c] text-white text-xs font-black px-3 py-0.5 rounded breaking-badge">
                   🔴 బ్రేకింగ్ న్యూస్
                 </span>
               )}
@@ -109,7 +109,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
             {/* Description */}
             <p
-              className="text-lg text-gray-600 leading-relaxed mb-5 telugu-text border-l-4 border-[#C00000] pl-4 bg-red-50 py-3 pr-4 rounded-r-lg"
+              className="text-lg text-gray-600 leading-relaxed mb-5 telugu-text border-l-4 border-[#66000c] pl-4 bg-red-50 py-3 pr-4 rounded-r-lg"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.description}
@@ -118,7 +118,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             {/* Meta */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-6 pb-4 border-b border-gray-100">
               <div className="flex items-center gap-1.5">
-                <div className="w-7 h-7 bg-[#C00000] rounded-full flex items-center justify-center">
+                <div className="w-7 h-7 bg-[#66000c] rounded-full flex items-center justify-center">
                   <span className="text-white text-xs font-bold">న</span>
                 </div>
                 <span className="font-medium text-gray-700">{article.author}</span>
@@ -197,7 +197,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                   <Link
                     key={tag}
                     href={`/search?q=${tag}`}
-                    className="text-xs bg-gray-100 hover:bg-[#C00000] hover:text-white text-gray-600 px-3 py-1.5 rounded-full transition-colors font-medium telugu-text"
+                    className="text-xs bg-gray-100 hover:bg-[#66000c] hover:text-white text-gray-600 px-3 py-1.5 rounded-full transition-colors font-medium telugu-text"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     #{tag}
@@ -208,10 +208,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
             {/* Like / Share */}
             <div className="mt-6 p-4 bg-gray-50 rounded-xl flex items-center justify-between">
-              <button className="flex items-center gap-2 text-gray-600 hover:text-[#C00000] transition-colors font-semibold text-sm">
+              <button className="flex items-center gap-2 text-gray-600 hover:text-[#66000c] transition-colors font-semibold text-sm">
                 <ThumbsUp size={18} /> ఈ వార్త ఇష్టమైందా? లైక్ చేయండి
               </button>
-              <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#C00000] transition-colors">
+              <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#66000c] transition-colors">
                 <Share2 size={16} /> షేర్
               </button>
             </div>
@@ -219,7 +219,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             {/* Related News */}
             <div className="mt-8">
               <h2
-                className="text-xl font-black text-gray-800 mb-5 telugu-text border-l-4 border-[#C00000] pl-3"
+                className="text-xl font-black text-gray-800 mb-5 telugu-text border-l-4 border-[#66000c] pl-3"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 సంబంధిత వార్తలు
@@ -241,13 +241,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </h2>
               <div className="bg-white rounded-xl border border-gray-200 p-4">
                 <textarea
-                  className="w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:outline-none focus:border-[#C00000] transition-colors"
+                  className="w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:outline-none focus:border-[#66000c] transition-colors"
                   rows={4}
                   placeholder="మీ అభిప్రాయం తెలపండి..."
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 />
                 <div className="flex justify-end mt-2">
-                  <button className="bg-[#C00000] text-white font-bold px-5 py-2 rounded-lg text-sm hover:bg-[#8B0000] transition-colors telugu-text"
+                  <button className="bg-[#66000c] text-white font-bold px-5 py-2 rounded-lg text-sm hover:bg-[#4d0009] transition-colors telugu-text"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                     వ్యాఖ్యను పంపండి
                   </button>
@@ -276,7 +276,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                   >
                     <Image src={a.image} alt={a.title} width={60} height={45} className="rounded flex-shrink-0 object-cover w-15 h-12" />
                     <p
-                      className="text-xs font-semibold text-gray-700 group-hover:text-[#C00000] transition-colors line-clamp-3 telugu-text"
+                      className="text-xs font-semibold text-gray-700 group-hover:text-[#66000c] transition-colors line-clamp-3 telugu-text"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                     >
                       {a.title}
