@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Search, Menu, X, ChevronDown, Newspaper } from 'lucide-react';
@@ -12,6 +12,25 @@ export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAPExpanded, setIsAPExpanded] = useState(false);
   const [isTGExpanded, setIsTGExpanded] = useState(false);
+  const [activeDesktopDropdown, setActiveDesktopDropdown] = useState<string | null>(null);
+
+  const apHeaderRef = useRef<HTMLDivElement>(null);
+  const tgHeaderRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        (apHeaderRef.current && !apHeaderRef.current.contains(event.target as Node)) &&
+        (tgHeaderRef.current && !tgHeaderRef.current.contains(event.target as Node))
+      ) {
+        setActiveDesktopDropdown(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <header className="bg-white border-b-2 border-[#66000c] sticky top-0 z-50 shadow-sm">
@@ -109,32 +128,55 @@ export default function Header() {
               const districts = isAP ? apDistricts : isTG ? tgDistricts : [];
 
               if (hasDropdown) {
+                const isOpen = activeDesktopDropdown === cat.slug;
+                const dropdownRef = isAP ? apHeaderRef : tgHeaderRef;
+
                 return (
                   <div
                     key={cat.slug}
-                    className="relative group flex-shrink-0"
+                    ref={dropdownRef}
+                    className="relative flex-shrink-0"
                   >
-                    <div className="flex items-center gap-1 px-3.5 py-2.5 text-sm font-semibold text-gray-700 hover:text-[#66000c] hover:bg-red-50 transition-colors cursor-pointer telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      <Link href={`/category/${cat.slug}`}>
-                        {cat.name}
-                      </Link>
-                      <ChevronDown size={14} className="text-gray-400 group-hover:text-[#66000c] transition-transform duration-200 group-hover:rotate-180" />
-                    </div>
+                    <button
+                      onClick={() => setActiveDesktopDropdown(isOpen ? null : cat.slug)}
+                      className={`flex items-center gap-1 px-3.5 py-2.5 text-sm font-semibold transition-colors cursor-pointer telugu-text ${
+                        isOpen ? 'text-[#66000c] bg-red-50' : 'text-gray-700 hover:text-[#66000c] hover:bg-red-50'
+                      }`}
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    >
+                      <span>{cat.name}</span>
+                      <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#66000c]' : ''}`} />
+                    </button>
                     
-                    {/* Hover Dropdown Panel */}
-                    <div className="opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 absolute top-full left-0 z-50 bg-white border border-gray-100 rounded-xl shadow-xl p-3 w-72 grid grid-cols-2 gap-1.5 mt-0.5 transform translate-y-1 group-hover:translate-y-0">
-                      {districts.map((dist) => (
+                    {/* Click Dropdown Panel */}
+                    {isOpen && (
+                      <div className="absolute top-full left-0 z-50 bg-white border border-gray-100 rounded-xl shadow-xl p-3 w-72 mt-0.5 animate-fade-in">
+                        {/* Option to view all news for this state */}
                         <Link
-                          key={dist.slug}
-                          href={`/category/${cat.slug}?district=${dist.slug}`}
-                          className="px-2.5 py-1.5 text-xs font-semibold text-gray-600 hover:text-[#66000c] hover:bg-red-50 rounded-lg transition-colors telugu-text block"
+                          href={`/category/${cat.slug}`}
+                          onClick={() => setActiveDesktopDropdown(null)}
+                          className="px-2.5 py-2 text-xs font-bold text-[#66000c] hover:bg-red-50 rounded-lg transition-colors telugu-text block mb-1 border-b border-gray-50 text-left"
                           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                         >
-                          {dist.name}
+                          {cat.slug === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్ అన్ని వార్తలు' : 'తెలంగాణ అన్ని వార్తలు'}
                         </Link>
-                      ))}
-                    </div>
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#66000c] group-hover:w-full transition-all duration-300"></span>
+                        
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {districts.map((dist) => (
+                            <Link
+                              key={dist.slug}
+                              href={`/category/${cat.slug}?district=${dist.slug}`}
+                              onClick={() => setActiveDesktopDropdown(null)}
+                              className="px-2.5 py-1.5 text-xs font-semibold text-gray-600 hover:text-[#66000c] hover:bg-red-50 rounded-lg transition-colors telugu-text block text-left"
+                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                            >
+                              {dist.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <span className={`absolute bottom-0 left-0 h-0.5 bg-[#66000c] transition-all duration-300 ${isOpen ? 'w-full' : 'w-0'}`}></span>
                   </div>
                 );
               }
@@ -170,26 +212,21 @@ export default function Header() {
               if (hasDropdown) {
                 return (
                   <div key={cat.slug} className="border-b border-gray-50">
-                    <div className="flex items-center justify-between px-4 py-3 hover:bg-red-50 transition-colors">
-                      <Link
-                        href={`/category/${cat.slug}`}
-                        onClick={() => setIsMenuOpen(false)}
-                        className="text-sm font-semibold text-gray-700 hover:text-[#66000c] telugu-text flex-1"
+                    <button
+                      onClick={() => setIsExpanded(!isExpanded)}
+                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-red-50 transition-colors text-left"
+                    >
+                      <span
+                        className={`text-sm font-semibold telugu-text ${isExpanded ? 'text-[#66000c]' : 'text-gray-700'}`}
                         style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                       >
                         {cat.name}
-                      </Link>
-                      <button
-                        onClick={() => setIsExpanded(!isExpanded)}
-                        className="p-1.5 text-gray-500 hover:text-[#66000c] transition-colors"
-                        aria-label={`${cat.name} జిల్లాల జాబితా`}
-                      >
-                        <ChevronDown
-                          size={18}
-                          className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-                        />
-                      </button>
-                    </div>
+                      </span>
+                      <ChevronDown
+                        size={18}
+                        className={`text-gray-500 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-[#66000c]' : ''}`}
+                      />
+                    </button>
 
                     {/* Collapsible Districts List */}
                     <div
@@ -197,13 +234,29 @@ export default function Header() {
                         isExpanded ? 'max-h-96 py-2 border-t border-gray-100' : 'max-h-0'
                       }`}
                     >
+                      <div className="px-4 mb-1.5 pb-1.5 border-b border-gray-200">
+                        <Link
+                          href={`/category/${cat.slug}`}
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            setIsExpanded(false);
+                          }}
+                          className="text-xs font-bold text-[#66000c] hover:bg-red-100 p-1.5 rounded block telugu-text block text-left"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        >
+                          {cat.slug === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్ అన్ని వార్తలు' : 'తెలంగాణ అన్ని వార్తలు'}
+                        </Link>
+                      </div>
                       <div className="grid grid-cols-2 gap-2 px-4 py-1">
                         {districts.map((dist) => (
                           <Link
                             key={dist.slug}
                             href={`/category/${cat.slug}?district=${dist.slug}`}
-                            onClick={() => setIsMenuOpen(false)}
-                            className="px-2.5 py-2 text-xs font-semibold text-gray-600 hover:text-[#66000c] hover:bg-red-100 rounded transition-colors telugu-text"
+                            onClick={() => {
+                              setIsMenuOpen(false);
+                              setIsExpanded(false);
+                            }}
+                            className="px-2.5 py-2 text-xs font-semibold text-gray-600 hover:text-[#66000c] hover:bg-red-100 rounded transition-colors telugu-text block text-left"
                             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                           >
                             {dist.name}
