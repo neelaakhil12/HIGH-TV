@@ -20,15 +20,15 @@ export interface NewsArticle {
 }
 
 export const categories = [
-  { name: 'హోమ్', slug: 'home', color: '#66000c' },
-  { name: 'తాజా వార్తలు', slug: 'latest', color: '#66000c' },
+  { name: 'హోమ్', slug: 'home', color: '#02599c' },
+  { name: 'తాజా వార్తలు', slug: 'latest', color: '#02599c' },
   { name: 'ఈ-పేపర్', slug: 'epaper', color: '#0f766e' },
   { name: 'రాజకీయాలు', slug: 'politics', color: '#1a6b3a' },
   { name: 'ఆంధ్రప్రదేశ్', slug: 'andhra-pradesh', color: '#d97706' },
   { name: 'తెలంగాణ', slug: 'telangana', color: '#7c3aed' },
-  { name: 'జాతీయ', slug: 'national', color: '#0369a1' },
-  { name: 'అంతర్జాతీయ', slug: 'international', color: '#0e7490' },
-  { name: 'వ్యాపారం', slug: 'business', color: '#15803d' },
+  { name: 'జాతీయం', slug: 'national', color: '#0369a1' },
+  { name: 'అంతర్జాతీయం', slug: 'international', color: '#0e7490' },
+  { name: 'బిజినెస్', slug: 'business', color: '#15803d' },
   { name: 'సినిమా', slug: 'entertainment', color: '#db2777' },
   { name: 'క్రీడలు', slug: 'sports', color: '#ea580c' },
   { name: 'టెక్నాలజీ', slug: 'technology', color: '#4f46e5' },
@@ -38,6 +38,17 @@ export const categories = [
   { name: 'రాశిఫలాలు', slug: 'rasipalalu', color: '#b45309' },
   { name: 'ఆల్బమ్‌లు', slug: 'photos', color: '#64748b' },
   { name: 'వీడియోలు', slug: 'videos', color: '#dc2626' },
+  { name: 'వెబ్ స్టోరీస్', slug: 'webstories', color: '#ec4899' },
+  { name: 'సంపాదకీయం', slug: 'sampadakiyam', color: '#be123c' },
+  { name: 'సంపాదకీయం', slug: 'editorial', color: '#be123c' },
+  { name: 'వైరల్ స్టోరీస్', slug: 'viral-stories', color: '#dc2626' },
+  { name: 'వసుంధర', slug: 'vasundhara', color: '#db2777' },
+  { name: 'మహిళలు', slug: 'women', color: '#ec4899' },
+  { name: 'షార్ట్స్', slug: 'shorts', color: '#f43f5e' },
+  { name: 'అంతర్మథనం', slug: 'antharmadanam', color: '#8b5cf6' },
+  { name: 'మా బృందం (Team)', slug: 'team', color: '#4b5563' },
+  { name: 'ఆధ్యాత్మికం', slug: 'adyathmikam', color: '#f59e0b' },
+  { name: 'ఆధ్యాత్మికం', slug: 'devotional', color: '#f59e0b' },
 ];
 
 export interface District {
@@ -122,7 +133,7 @@ export const districtNews: NewsArticle[] = [
     categorySlug: 'andhra-pradesh',
     categoryColor: '#d97706',
     image: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&h=450&fit=crop',
-    author: 'హై టీవీ రిపోర్టర్',
+    author: 'ఈనాడు రిపోర్టర్',
     publishedAt: '2026-06-05T08:30:00Z',
     isBreaking: false,
     isTrending: false,
@@ -141,7 +152,7 @@ export const districtNews: NewsArticle[] = [
     categorySlug: 'andhra-pradesh',
     categoryColor: '#d97706',
     image: 'https://images.unsplash.com/photo-1545137683-dfeb101c69be?w=800&h=450&fit=crop',
-    author: 'హై టీవీ బ్యూరో',
+    author: 'ఈనాడు బ్యూరో',
     publishedAt: '2026-06-05T07:15:00Z',
     isBreaking: false,
     isTrending: true,
@@ -178,7 +189,7 @@ export const districtNews: NewsArticle[] = [
     category: 'ఆంధ్రప్రదేశ్',
     categorySlug: 'andhra-pradesh',
     categoryColor: '#d97706',
-    image: 'https://images.unsplash.com/photo-1600100397608-f010e57bbf1f?w=800&h=450&fit=crop',
+    image: 'https://images.unsplash.com/photo-1542397284385-60101764553c?w=800&h=450&fit=crop',
     author: 'తిరుమల ప్రతినిధి',
     publishedAt: '2026-06-05T05:45:00Z',
     isBreaking: false,
@@ -197,7 +208,7 @@ export const districtNews: NewsArticle[] = [
     category: 'ఆంధ్రప్రదేశ్',
     categorySlug: 'andhra-pradesh',
     categoryColor: '#d97706',
-    image: 'https://images.unsplash.com/photo-1500937386664-56d159f8e9ad?w=800&h=450&fit=crop',
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=450&fit=crop',
     author: 'నెల్లూరు రిపోర్టర్',
     publishedAt: '2026-06-04T14:00:00Z',
     isBreaking: false,
@@ -441,7 +452,7 @@ export const featuredNews: NewsArticle[] = [
     categorySlug: 'andhra-pradesh',
     categoryColor: '#d97706',
     image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&h=675&fit=crop',
-    author: 'హై టీవీ రిపోర్టర్',
+    author: 'ఈనాడు రిపోర్టర్',
     publishedAt: '2024-06-05T08:30:00Z',
     isBreaking: true,
     isTrending: true,
@@ -459,7 +470,7 @@ export const featuredNews: NewsArticle[] = [
     categorySlug: 'telangana',
     categoryColor: '#7c3aed',
     image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1200&h=675&fit=crop',
-    author: 'హై టీవీ బ్యూరో',
+    author: 'ఈనాడు బ్యూరో',
     publishedAt: '2024-06-05T07:15:00Z',
     isBreaking: false,
     isTrending: true,
@@ -985,6 +996,241 @@ export const rasipalaluNews: NewsArticle[] = [
   },
 ];
 
+
+export const womenNews: NewsArticle[] = [
+  {
+    id: 'w-1',
+    slug: 'women-empowerment-loans',
+    title: 'మహిళా సాధికారత: స్వయం సహాయక సంఘాలకు రూ. 3,000 కోట్ల వడ్డీ లేని రుణాలు',
+    description: 'మహిళల ఆర్థిక స్వావలంబన కోసం ప్రభుత్వం విప్లవాత్మక నిర్ణయం తీసుకుంది. స్వయం సహాయక సంఘాలకు వడ్డీ లేని రుణాలను ప్రకటించింది.',
+    content: 'రాష్ట్రవ్యాప్తంగా ఉన్న కోట్లాది మంది మహిళల ఉపాధి అవకాశాలను పెంచేందుకు గాను, ప్రభుత్వం ఈ భారీ ప్యాకేజీని అమలు చేస్తోంది. దీని ద్వారా మహిళలు సొంతంగా వ్యాపారాలను ప్రారంభించుకునే అవకాశం లభిస్తుంది.',
+    category: 'మహిళలు',
+    categorySlug: 'women',
+    categoryColor: '#ec4899',
+    image: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&h=450&fit=crop',
+    author: 'హై టీవీ బ్యూరో',
+    publishedAt: '2026-06-05T09:00:00Z',
+    isBreaking: false,
+    isTrending: true,
+    isFeatured: false,
+    views: 28900,
+    tags: ['మహిళలు', 'రుణాలు', 'ఆర్థికం'],
+  },
+  {
+    id: 'w-2',
+    slug: 'free-gas-cylinders-scheme',
+    title: 'గృహిణులకు గుడ్ న్యూస్: ఉచిత గ్యాస్ సిలిండర్ల పంపిణీకి శ్రీకారం చుట్టిన ప్రభుత్వం',
+    description: 'రాష్ట్రంలోని అర్హులైన ప్రతి గృహిణికి సంవత్సరానికి మూడు ఉచిత గ్యాస్ సిలిండర్లు ఇచ్చే పథకాన్ని ఈ రోజు ప్రారంభించారు.',
+    content: 'ఈ పథకం వల్ల గ్రామీణ మరియు పట్టణ ప్రాంతాలలోని పేద మహిళలకు ఎంతో ప్రయోజనం చేకూరుతుంది. మొదటి విడత కింద నేడు వేలాది మందికి సిలిండర్లను మంత్రులు పంపిణీ చేశారు.',
+    category: 'మహిళలు',
+    categorySlug: 'women',
+    categoryColor: '#ec4899',
+    image: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop',
+    author: 'మహిళా ప్రతినిధి',
+    publishedAt: '2026-06-04T15:30:00Z',
+    isBreaking: false,
+    isTrending: false,
+    isFeatured: false,
+    views: 31200,
+    tags: ['మహిళలు', 'గ్యాస్ సిలిండర్', 'పథకాలు'],
+  }
+];
+
+export const lifestyleNews: NewsArticle[] = [
+  {
+    id: 'l-1',
+    slug: 'modern-lifestyle-stress-management',
+    title: 'ఆధునిక జీవనశైలి: ఒత్తిడిని జయించేందుకు నిపుణులు చెబుతున్న 5 సులువైన మార్గాలు',
+    description: 'ప్రస్తుత బిజీ లైఫ్‌లో ప్రతి ఒక్కరూ ఎదుర్కొంటున్న ప్రధాన సమస్య ఒత్తిడి. దీనిని అధిగమించడానికి జీవనశైలిలో చిన్న మార్పులు చేయాలి.',
+    content: 'ధ్యానం, సరైన నిద్ర, డిజిటల్ డిటాక్స్, మరియు క్రమం తప్పకుండా వ్యాయామం చేయడం ద్వారా మానసిక ప్రశాంతత లభిస్తుందని మానసిక నిపుణులు సూచిస్తున్నారు.',
+    category: 'లైఫ్ స్టైల్',
+    categorySlug: 'lifestyle',
+    categoryColor: '#9333ea',
+    image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&h=450&fit=crop',
+    author: 'లైఫ్ స్టైల్ డెస్క్',
+    publishedAt: '2026-06-05T08:00:00Z',
+    isBreaking: false,
+    isTrending: true,
+    isFeatured: false,
+    views: 45000,
+    tags: ['ఆరోగ్యం', 'జీవనశైలి', 'యోగా'],
+  },
+  {
+    id: 'l-2',
+    slug: 'home-decor-tips-low-budget',
+    title: 'ఇంటి అలంకరణ: తక్కువ బడ్జెట్‌లో మీ ఇల్లును అందంగా మార్చుకోవడానికి చిట్కాలు',
+    description: 'ఎక్కువ ఖర్చు లేకుండానే మీ ఇంటి లుక్‌ను మార్చేసే అద్భుతమైన గృహాలంకరణ ఐడియాలు మరియు చిట్కాలు ఇక్కడ తెలుసుకోండి.',
+    content: 'ఇండోర్ ప్లాంట్లు పెట్టడం, రంగుల కర్టెన్ల వాడకం, మరియు సృజనాత్మక లైటింగ్ ద్వారా మీ పడకగదిని లేదా హాల్‌ను సరికొత్తగా తీర్చిదిద్దవచ్చు.',
+    category: 'లైఫ్ స్టైల్',
+    categorySlug: 'lifestyle',
+    categoryColor: '#9333ea',
+    image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&h=450&fit=crop',
+    author: 'ఇంటీరియర్ డిజైనర్ విభాగం',
+    publishedAt: '2026-06-04T12:00:00Z',
+    isBreaking: false,
+    isTrending: false,
+    isFeatured: false,
+    views: 23100,
+    tags: ['ఇంటి అలంకరణ', 'చిట్కాలు', 'జీవనశైలి'],
+  }
+];
+
+export const webstoriesNews: NewsArticle[] = [
+  {
+    id: 'ws-1',
+    slug: 'webstories-healthy-skin-morning-drinks',
+    title: 'వెబ్ స్టోరీస్: ఆరోగ్యకరమైన చర్మం కోసం ఉదయాన్నే తీసుకోవాల్సిన హెల్తీ డ్రింక్స్ ఇవే!',
+    description: 'మెరిసే మరియు కాంతివంతమైన చర్మం కోసం ప్రతిరోజూ ఉదయాన్నే ఈ రసం లేదా పానీయాలు తీసుకోవడం వల్ల అద్భుత ఫలితాలు ఉంటాయి.',
+    content: 'తేనె-నిమ్మకాయ నీరు, గ్రీన్ టీ, లేదా కలబంద రసం వంటివి రోజూ తాగడం వల్ల మీ చర్మ సౌందర్యం మెరుగుపడుతుంది మరియు ముడతలు రాకుండా కాపాడుతుంది.',
+    category: 'వెబ్ స్టోరీస్',
+    categorySlug: 'webstories',
+    categoryColor: '#ec4899',
+    image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&h=450&fit=crop',
+    author: 'డిజిటల్ విలేఖరి',
+    publishedAt: '2026-06-05T07:15:00Z',
+    isBreaking: false,
+    isTrending: true,
+    isFeatured: false,
+    views: 78900,
+    tags: ['వెబ్ స్టోరీస్', 'చర్మ సంరక్షణ', 'సౌందర్యం'],
+  },
+  {
+    id: 'ws-2',
+    slug: 'webstories-weight-loss-superfoods',
+    title: 'వెబ్ స్టోరీస్: బరువు తగ్గాలనుకుంటున్నారా? ఈ సూపర్ ఫుడ్స్ మీ డైట్‌లో చేర్చుకోండి',
+    description: 'శరీరంలో అదనపు కొవ్వును కరిగించి చురుగ్గా ఉంచేందుకు సహాయపడే కొన్ని పోషక విలువలు ఉన్న ఆహారాల జాబితా.',
+    content: 'ఓట్స్, గుడ్లు, రాగులు, మరియు నట్స్ వంటి ఫైబర్ అధికంగా ఉండే ఆహారాలు రోజూ తీసుకోవడం వల్ల బరువు సులభంగా తగ్గుతారు.',
+    category: 'వెబ్ స్టోరీస్',
+    categorySlug: 'webstories',
+    categoryColor: '#ec4899',
+    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=450&fit=crop',
+    author: 'ఆరోగ్య డెస్క్',
+    publishedAt: '2026-06-04T18:45:00Z',
+    isBreaking: false,
+    isTrending: false,
+    isFeatured: false,
+    views: 65400,
+    tags: ['వెబ్ స్టోరీస్', 'బరువు తగ్గుట', 'డైట్'],
+  }
+];
+
+export const antharmadanamNews: NewsArticle[] = [
+  {
+    id: 'am-1',
+    slug: 'antharmadanam-success-mindset-shift',
+    title: 'అంతర్మథనం: జీవితంలో విజయం సాధించాలంటే మన ఆలోచనల్లో ఎలాంటి మార్పులు రావాలి?',
+    description: 'ఓటమిని అంగీకరిస్తూనే, వాటి నుంచి నేర్చుకుని ముందుకు సాగడమే నిజమైన విజయం. మన అంతరంగంలో జరిగే సంఘర్షణకు సమాధానం ఇక్కడే ఉంది.',
+    content: 'జీవిత ప్రయాణంలో ఎదురయ్యే సవాళ్లను అధిగమించడానికి అనుకూల దృక్పథం అవసరం. ఇతరులతో పోల్చుకోకుండా మీ వ్యక్తిత్వాన్ని మెరుగుపరుచుకోవడం పై దృష్టి పెట్టాలి.',
+    category: 'అంతర్మథనం',
+    categorySlug: 'antharmadanam',
+    categoryColor: '#8b5cf6',
+    image: 'https://images.unsplash.com/photo-1494172961521-33799ddd43a5?w=800&h=450&fit=crop',
+    author: 'తత్వ విశ్లేషణ విభాగం',
+    publishedAt: '2026-06-05T08:30:00Z',
+    isBreaking: false,
+    isTrending: false,
+    isFeatured: false,
+    views: 19800,
+    tags: ['అంతర్మథనం', 'జీవితం', 'ఆలోచనలు'],
+  },
+  {
+    id: 'am-2',
+    slug: 'build-self-confidence-inner-peace',
+    title: 'ఆత్మవిశ్వాసం పెంపొందించుకోవడం ఎలా? అంతరంగ శోధన ద్వారానే ప్రశాంతత సాధ్యం',
+    description: 'ఆందోళనను దూరం చేసి, మనశ్శాంతిని పొందడానికి రోజువారీ అలవాట్లలో మనం అవలంబించాల్సిన విలువలపై ప్రత్యేక విశ్లేషణ.',
+    content: 'బాహ్య ప్రపంచం ఎంతగా ప్రలోభ పెడుతున్నా, అంతర్గతంగా ప్రశాంతంగా ఉండడం ఒక కళ. క్రమం తప్పకుండా స్వీయ విశ్లేషణ చేసుకోవడం వల్ల మానసిక స్థిరత్వం లభిస్తుంది.',
+    category: 'అంతర్మథనం',
+    categorySlug: 'antharmadanam',
+    categoryColor: '#8b5cf6',
+    image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&h=450&fit=crop',
+    author: 'స్ఫూర్తిదాయక బృందం',
+    publishedAt: '2026-06-04T10:00:00Z',
+    isBreaking: false,
+    isTrending: true,
+    isFeatured: false,
+    views: 22000,
+    tags: ['ఆత్మవిశ్వాసం', 'ప్రశాంతత', 'అంతర్మథనం'],
+  }
+];
+
+export const adyathmikamNews: NewsArticle[] = [
+  {
+    id: 'ad-1',
+    slug: 'tirumala-srivari-temple-history-secrets',
+    title: 'ఆధ్యాత్మికం: తిరుమల శ్రీవారి ఆలయ విశిష్టత మరియు చరిత్ర.. తప్పక తెలుసుకోవాల్సిన రహస్యాలు!',
+    description: 'కలియుగ వైకుంఠమైన తిరుమలలో వెలసిన వెంకటేశ్వర స్వామి ఆలయానికి సంబంధించిన పురాణ గాథలు మరియు ఆచార విశేషాలు.',
+    content: 'శ్రీవారి ఆలయంలో నిత్యం జరిగే సేవలు, బ్రహ్మోత్సవాల ప్రాముఖ్యత మరియు భక్తుల విశ్వాసాలపై ప్రత్యేక కథనం.',
+    category: 'ఆధ్యాత్మికం',
+    categorySlug: 'adyathmikam',
+    categoryColor: '#f59e0b',
+    image: 'https://images.unsplash.com/photo-1600100397608-f010e57bbf1f?w=800&h=450&fit=crop',
+    author: 'భక్తి విభాగం',
+    publishedAt: '2026-06-05T05:30:00Z',
+    isBreaking: false,
+    isTrending: true,
+    isFeatured: false,
+    views: 54100,
+    tags: ['భక్తి', 'ఆధ్యాత్మికం', 'తిరుమల'],
+  },
+  {
+    id: 'ad-2',
+    slug: 'pooja-room-lamp-directions-lakshmi-devi',
+    title: 'పూజ గదిలో ఏ దిశలో దీపారాధన చేస్తే లక్ష్మీదేవి కటాక్షం లభిస్తుంది?',
+    description: 'పూజ గదిలో దీపం పెట్టేటప్పుడు ఎలాంటి నియమాలు పాటించాలి? ఏ దిశ వైపు దీపం ఉంచితే ఇంట్లో సిరిసంపదలు కలుగుతాయో శాస్త్రాల ప్రకారం ఇక్కడ తెలుసుకోండి.',
+    content: 'తూర్పు దిశగా దీపం వెలిగిస్తే ఆరోగ్యం, పడమర దిశగా వెలిగిస్తే గ్రహదోష నివారణ, మరియు ఉత్తర దిశగా వెలిగిస్తే అష్టైశ్వర్యాలు కలుగుతాయని ఆధ్యాత్మిక పండితులు చెబుతున్నారు.',
+    category: 'ఆధ్యాత్మికం',
+    categorySlug: 'adyathmikam',
+    categoryColor: '#f59e0b',
+    image: 'https://images.unsplash.com/photo-1542397284385-60101764553c?w=800&h=450&fit=crop',
+    author: 'ఆచార్య కృష్ణ శాస్త్రి',
+    publishedAt: '2026-06-04T06:30:00Z',
+    isBreaking: false,
+    isTrending: false,
+    isFeatured: false,
+    views: 38900,
+    tags: ['పూజ', 'దీపారాధన', 'శాస్త్రాలు'],
+  }
+];
+
+export const sampadakiyamNews: NewsArticle[] = [
+  {
+    id: 'sd-1',
+    slug: 'editorial-new-industrial-policies-progress',
+    title: 'సంపాదకీయం: నూతన పారిశ్రామిక విధానాలు - అభివృద్ధి పథంలో పురోగతి!',
+    description: 'రాష్ట్రంలో పరిశ్రమల స్థాపనకు నూతన సంస్కరణలు తోడ్పడుతున్నాయి. పారదర్శకమైన సింగిల్ విండో విధానంతో పెట్టుబడులు వెల్లువెత్తుతున్నాయి.',
+    content: 'యువతకు ఉపాధి కల్పించడంతో పాటు స్థానిక ఆర్థిక వ్యవస్థను పటిష్టం చేయడంలో కొత్త పారిశ్రామిక విధానాలు ఎంతవరకు సఫలీకృతం అవుతాయో పూర్తి విశ్లేషణ.',
+    category: 'సంపాదకీయం',
+    categorySlug: 'sampadakiyam',
+    categoryColor: '#be123c',
+    image: 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&h=450&fit=crop',
+    author: 'ఎడిటోరియల్ డెస్క్',
+    publishedAt: '2026-06-05T04:00:00Z',
+    isBreaking: false,
+    isTrending: false,
+    isFeatured: false,
+    views: 15600,
+    tags: ['సంపాదకీయం', 'పరిశ్రమలు', 'ఆర్థికం'],
+  },
+  {
+    id: 'sd-2',
+    slug: 'editorial-educational-system-reforms',
+    title: 'సంపాదకీయం: విద్యా వ్యవస్థలో సంస్కరణలు - నాణ్యమైన విద్యే లక్ష్యంగా ముందడుగు',
+    description: 'ప్రాథమిక స్థాయి నుంచి ఉన్నత విద్యా విధానాల వరకు సాంకేతికతను జోడించి బోధన అందించడం ద్వారా నేటి తరాన్ని గ్లోబల్ సిటిజన్లుగా తీర్చిదిద్దవచ్చు.',
+    content: 'ప్రభుత్వ పాఠశాలలలో మౌలిక వసతుల కల్పనతో పాటు ఉపాధ్యాయులకు నూతన శిక్షణ కార్యక్రమాలను అందించడం ద్వారా విద్యా నాణ్యతను పెంచవచ్చు.',
+    category: 'సంపాదకీయం',
+    categorySlug: 'sampadakiyam',
+    categoryColor: '#be123c',
+    image: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=800&h=450&fit=crop',
+    author: 'ప్రధాన సంపాదకుడు',
+    publishedAt: '2026-06-04T05:00:00Z',
+    isBreaking: false,
+    isTrending: false,
+    isFeatured: false,
+    views: 18400,
+    tags: ['సంపాదకీయం', 'విద్యా విధానం', 'సంస్కరణలు'],
+  }
+];
+
 export const galleryImages = [
   { id: 1, src: 'https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?w=600&h=400&fit=crop', alt: 'రాజకీయ సభ' },
   { id: 2, src: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=600&h=800&fit=crop', alt: 'క్రికెట్ మ్యాచ్' },
@@ -993,6 +1239,129 @@ export const galleryImages = [
   { id: 5, src: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&h=400&fit=crop', alt: 'సినిమా వేడుక' },
   { id: 6, src: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&h=800&fit=crop', alt: 'స్టాక్ మార్కెట్' },
 ];
+
+
+export interface ReporterProfile {
+  name: string;
+  slug: string;
+  role: string;
+  bio: string;
+  image: string;
+}
+
+export const reporterProfiles: Record<string, ReporterProfile> = {
+  'suresh': {
+    name: 'హై టీవీ రిపోర్టర్ సురేష్',
+    slug: 'suresh',
+    role: 'జాతీయ రాజకీయాల విశ్లేషకులు & ఢిల్లీ బ్యూరో ఇన్-చార్జ్',
+    bio: 'సురేష్ గారు జాతీయ రాజకీయాలు, పార్లమెంట్ వ్యవహారాలు మరియు కేంద్ర ప్రభుత్వ విధానాలపై గత 10 సంవత్సరాలుగా నిరంతరం విశ్లేషణాత్మక కథనాలు అందిస్తున్నారు.',
+    image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop'
+  },
+  'ramesh': {
+    name: 'హై టీవీ రిపోర్టర్ రమేష్',
+    slug: 'ramesh',
+    role: 'ముఖ్య రాజకీయ ప్రతినిధి',
+    bio: 'రమేష్ గారు తెలుగు రాష్ట్రాల రాజకీయాలు, ఎన్నికల విశ్లేషణలు మరియు ప్రజా సమస్యలపై ప్రత్యేక కథనాలకు పేరుగాంచారు.',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop'
+  },
+  'swapna': {
+    name: 'హై టీవీ రిపోర్టర్ స్వప్న',
+    slug: 'swapna',
+    role: 'సినిమా & ఎంటర్టైన్మెంట్ రిపోర్టర్',
+    bio: 'స్వప్న గారు టాలీవుడ్ చిత్ర పరిశ్రమ విశేషాలు, సినీ ప్రముఖుల ఇంటర్వ్యూలు మరియు చిత్ర సమీక్షలను వేగంగా అందిస్తారు.',
+    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop'
+  },
+  'kiran': {
+    name: 'హై టీవీ రిపోర్టర్ కిరణ్',
+    slug: 'kiran',
+    role: 'క్రీడా విశ్లేషకులు',
+    bio: 'కిరణ్ గారు క్రికెట్, బ్యాడ్మింటన్ మరియు ఒలింపిక్ క్రీడల వార్తలను ఎప్పటికప్పుడు పాఠకులకు విశ్లేషణాత్మకంగా చేరవేస్తారు.',
+    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop'
+  },
+  'dr-sarada': {
+    name: 'హై టీవీ ప్రతినిధి డా. శారద',
+    slug: 'dr-sarada',
+    role: 'ఆరోగ్య & జీవనశైలి నిపుణురాలు',
+    bio: 'డా. శారద గారు ప్రజా ఆరోగ్యం, వైద్య సలహాలు, ఆహార నియమాలు మరియు యోగా విశిష్టతలపై ఉపయోగకరమైన కథనాలు రాస్తుంటారు.',
+    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop'
+  },
+  'krishnaprasad': {
+    name: 'ఆచార్య కృష్ణప్రసాద్',
+    slug: 'krishnaprasad',
+    role: 'ఆధ్యాత్మిక సిద్దాంతి',
+    bio: 'కృష్ణప్రసాద్ గారు మన సంస్కృతి, పూజా విధానాలు, వ్రతాలు మరియు హిందూ పండుగల ప్రాముఖ్యతను శాస్త్రీయంగా వివరిస్తారు.',
+    image: 'https://images.unsplash.com/photo-1607990283143-e81e7a2c93ab?w=400&h=400&fit=crop'
+  },
+  'subrahmanyam': {
+    name: 'సిద్ధాంతి సుబ్రహ్మణ్య శర్మ',
+    slug: 'subrahmanyam',
+    role: 'ప్రముఖ జ్యోతిష్య నిపుణులు',
+    bio: 'సుబ్రహ్మణ్య శర్మ గారు జాతక విశ్లేషణ, గ్రహాల గోచారం మరియు రాశిఫలాలపై ఖచ్చితమైన విశ్లేషణలు అందిస్తూ ప్రజల మన్ననలు పొందారు.',
+    image: 'https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=400&h=400&fit=crop'
+  },
+  'default': {
+    name: 'హై టీవీ రిపోర్టర్ సురేష్',
+    slug: 'suresh',
+    role: 'స్టాఫ్ రిపోర్టర్',
+    bio: 'హై టీవీ వార్తా విభాగం నిరంతరం నిజాయితీతో కూడిన వార్తలను సేకరించి ప్రజల ముందుకు తెస్తుంది.',
+    image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop'
+  }
+};
+
+export const authorToReporterSlugMap: Record<string, string> = {
+  'ఢిల్లీ బ్యూరో': 'suresh',
+  'హై టీవీ బ్యూరో': 'suresh',
+  'ఈనాడు రిపోర్టర్': 'suresh',
+  'రాజమండ్రి ప్రతినిధి': 'suresh',
+  'నెల్లూరు రిపోర్టర్': 'suresh',
+  'ఖమ్మం రిపోర్టర్': 'suresh',
+  'విలేఖరి': 'suresh',
+  'డిజిటల్ విలేఖరి': 'suresh',
+
+  'రాజకీయ విభాగం': 'ramesh',
+  'ఈనాడు బ్యూరో': 'ramesh',
+  'కర్నూలు డెస్క్': 'ramesh',
+  'కడప బ్యూరో': 'ramesh',
+  'గుంటూరు ప్రతినిధి': 'ramesh',
+  'తిరుమల ప్రతినిధి': 'ramesh',
+  'హైదరాబాద్ రిపోర్టర్': 'ramesh',
+  'వరంగల్ ప్రతినిధి': 'ramesh',
+  'నిజామాబాద్ బ్యూరో': 'ramesh',
+  'కరీంనగర్ డెస్క్': 'ramesh',
+  'సాగర్ ప్రతినిధి': 'ramesh',
+  'మహబూబ్‌నగర్ ప్రతినిధి': 'ramesh',
+  'ఆదిలాబాద్ బ్యూరో': 'ramesh',
+  'ఎడిటోరియల్ డెస్క్': 'ramesh',
+  'ప్రధాన సంపాదకుడు': 'ramesh',
+
+  'సినిమా విభాగం': 'swapna',
+  'డిజిటల్ విభాగం': 'swapna',
+  'మహిళా ప్రతినిధి': 'swapna',
+  'తత్వ విశ్లేషణ విభాగం': 'swapna',
+  'స్ఫూర్తిదాయక బృందం': 'swapna',
+
+  'క్రీడా విభాగం': 'kiran',
+  'వైరల్': 'kiran',
+  'వైరల్ విభాగం': 'kiran',
+  'వీడియో విభాగం': 'kiran',
+
+  'ఆరోగ్య విభాగం': 'dr-sarada',
+  'ఆరోగ్య డెస్క్': 'dr-sarada',
+  'లైఫ్ స్టైల్ డెస్క్': 'dr-sarada',
+  'ఇంటీరియర్ డిజైనర్ విభాగం': 'dr-sarada',
+
+  'ఆచార్య కృష్ణప్రసాద్': 'krishnaprasad',
+  'భక్తి విభాగం': 'krishnaprasad',
+  'హై టీవీ భక్తి విభాగం': 'krishnaprasad',
+  'ఆచార్య కృష్ణ శాస్త్రి': 'krishnaprasad',
+
+  'సిద్ధాంతి సుబ్రహ్మణ్య శర్మ': 'subrahmanyam',
+};
+
+export function getReporterByAuthor(authorName: string): ReporterProfile {
+  const slug = authorToReporterSlugMap[authorName] || 'suresh';
+  return reporterProfiles[slug] || reporterProfiles['default'];
+}
 
 export function formatTimeAgo(dateStr: string): string {
   const date = new Date(dateStr);

@@ -80,7 +80,7 @@ export default function EPaperReader() {
       setDownloading(false);
       const link = document.createElement('a');
       link.href = '/newspaper_sample.svg';
-      link.download = `hightv-epaper-${selectedDate}.pdf`;
+      link.download = `eenadu-epaper-${selectedDate}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -225,7 +225,7 @@ export default function EPaperReader() {
         <div className="flex items-center gap-3 w-full md:w-auto">
           <Link 
             href="/" 
-            className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-gray-600 hover:text-[#66000c] hover:bg-gray-50 transition-colors shadow-sm"
+            className="w-10 h-10 border border-gray-200 rounded-lg flex items-center justify-center text-gray-600 hover:text-brand-blue hover:bg-gray-50 transition-colors shadow-sm"
           >
             <Home size={18} />
           </Link>
@@ -269,18 +269,18 @@ export default function EPaperReader() {
             onClick={() => setIsClipping(!isClipping)}
             className={`flex items-center gap-1.5 border rounded-lg px-3 py-2 text-xs font-bold transition-all shadow-sm ${
               isClipping 
-                ? 'bg-red-50 border-red-200 text-[#66000c]' 
+                ? 'bg-red-50 border-red-200 text-brand-red' 
                 : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
             }`}
           >
-            <Scissors size={14} className={isClipping ? 'text-[#66000c]' : 'text-gray-500'} />
+            <Scissors size={14} className={isClipping ? 'text-brand-red' : 'text-gray-500'} />
             <span>CLIP</span>
           </button>
 
           {/* SHARE EDITION button */}
           <button 
             onClick={handleShare}
-            className="flex items-center gap-1.5 bg-[#1e3a8a] hover:bg-[#172554] text-white rounded-lg px-4 py-2 text-xs font-bold transition-all shadow-md relative"
+            className="flex items-center gap-1.5 bg-brand-blue hover:bg-brand-dark-blue text-white rounded-lg px-4 py-2 text-xs font-bold transition-all shadow-md relative"
           >
             <Share2 size={14} />
             <span>SHARE EDITION</span>
@@ -311,7 +311,7 @@ export default function EPaperReader() {
             <select
               value={selectedEdition}
               onChange={(e) => setSelectedEdition(Number(e.target.value))}
-              className="bg-white border border-gray-300 rounded-md px-2 py-1 text-gray-800 font-semibold outline-none focus:border-[#66000c] transition-colors"
+              className="bg-white border border-gray-300 rounded-md px-2 py-1 text-gray-800 font-semibold outline-none focus:border-brand-blue transition-colors"
             >
               {editions.map((edition, idx) => (
                 <option key={idx} value={idx}>{edition}</option>
@@ -337,7 +337,7 @@ export default function EPaperReader() {
             <ChevronLeft size={14} />
           </button>
           <div className="flex items-center gap-1 bg-white border border-gray-300 rounded px-2 py-1">
-            <Calendar size={12} className="text-[#66000c]" />
+            <Calendar size={12} className="text-brand-red" />
             <input
               type="date"
               value={selectedDate}
@@ -388,7 +388,7 @@ export default function EPaperReader() {
                   }}
                   className={`w-full text-left rounded-lg overflow-hidden border transition-all flex flex-col group ${
                     idx === activePageIdx 
-                      ? 'border-[#66000c] ring-2 ring-[#66000c]/20' 
+                      ? 'border-brand-blue ring-2 ring-brand-blue/20' 
                       : 'border-gray-200 hover:border-gray-400'
                   }`}
                 >
@@ -503,7 +503,7 @@ export default function EPaperReader() {
                         onMouseDown={(e) => e.stopPropagation()}
                         onClick={() => {
                           const randomId = `${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
-                          setGeneratedClipUrl(`https://hightv.com/clip/clip-${randomId}`);
+                          setGeneratedClipUrl(`https://eenadu.net/clip/clip-${randomId}`);
                           setShowShareModal(true);
                           setIsClipping(false);
                         }}
@@ -524,7 +524,7 @@ export default function EPaperReader() {
                     setActivePageIdx(activePageIdx - 1);
                     setIsClipping(false);
                   }}
-                  className="absolute left-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-[#1e3a8a]/80 hover:bg-[#66000c] text-white flex items-center justify-center transition-all shadow-xl hover:scale-110"
+                  className="absolute left-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-brand-blue/80 hover:bg-brand-dark-blue text-white flex items-center justify-center transition-all shadow-xl hover:scale-110"
                   title="Previous Page"
                 >
                   <ChevronLeft size={24} />
@@ -537,7 +537,7 @@ export default function EPaperReader() {
                     setActivePageIdx(activePageIdx + 1);
                     setIsClipping(false);
                   }}
-                  className="absolute right-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-[#1e3a8a]/80 hover:bg-[#66000c] text-white flex items-center justify-center transition-all shadow-xl hover:scale-110"
+                  className="absolute right-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-brand-blue/80 hover:bg-brand-dark-blue text-white flex items-center justify-center transition-all shadow-xl hover:scale-110"
                   title="Next Page"
                 >
                   <ChevronRight size={24} />
@@ -556,7 +556,7 @@ export default function EPaperReader() {
                       setViewMode('reader');
                       setIsClipping(false);
                     }}
-                    className="group cursor-pointer bg-white rounded-xl border border-gray-200 hover:border-[#66000c] overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col"
+                    className="group cursor-pointer bg-white rounded-xl border border-gray-200 hover:border-brand-blue overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col"
                   >
                     <div className="relative aspect-[3/4] bg-gray-100 w-full overflow-hidden">
                       <Image
@@ -567,7 +567,7 @@ export default function EPaperReader() {
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                        <div className="bg-[#66000c] text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100">
+                        <div className="bg-brand-blue text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100">
                           <Grid size={18} />
                         </div>
                       </div>
@@ -696,7 +696,7 @@ export default function EPaperReader() {
               
               {/* Twitter / X */}
               <a
-                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(generatedClipUrl)}&text=${encodeURIComponent("Check out this news clip from High TV!")}`}
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(generatedClipUrl)}&text=${encodeURIComponent("Check out this news clip from Eenadu!")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-black hover:bg-gray-800 text-white flex items-center justify-center transition-all hover:scale-110 shadow"
@@ -709,7 +709,7 @@ export default function EPaperReader() {
 
               {/* WhatsApp */}
               <a
-                href={`https://api.whatsapp.com/send?text=${encodeURIComponent("Check out this news clip from High TV: " + generatedClipUrl)}`}
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent("Check out this news clip from Eenadu: " + generatedClipUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-[#25d366] hover:bg-[#20ba5a] text-white flex items-center justify-center transition-all hover:scale-110 shadow"
@@ -722,7 +722,7 @@ export default function EPaperReader() {
 
               {/* Email */}
               <a
-                href={`mailto:?subject=${encodeURIComponent("News Clip from High TV")}&body=${encodeURIComponent("Check out this news clip: " + generatedClipUrl)}`}
+                href={`mailto:?subject=${encodeURIComponent("News Clip from Eenadu")}&body=${encodeURIComponent("Check out this news clip: " + generatedClipUrl)}`}
                 className="w-10 h-10 rounded-full bg-[#ea4335] hover:bg-[#d93025] text-white flex items-center justify-center transition-all hover:scale-110 shadow"
                 title="Share via Email"
               >
@@ -750,7 +750,7 @@ export default function EPaperReader() {
                 onClick={() => {
                   const link = document.createElement('a');
                   link.href = epaperPages[activePageIdx].image;
-                  link.download = `hightv-clip-${Date.now()}.jpg`;
+                  link.download = `eenadu-clip-${Date.now()}.jpg`;
                   document.body.appendChild(link);
                   link.click();
                   document.body.removeChild(link);

@@ -10,7 +10,7 @@ export default function BreakingNewsSection() {
   return (
     <section className="mb-10">
       {/* Header */}
-      <div className="bg-[#66000c] rounded-t-xl px-5 py-3 flex items-center justify-between">
+      <div className="bg-brand-blue rounded-t-xl px-5 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2 text-white">
           <AlertCircle size={18} className="breaking-badge" />
           <h2
@@ -19,11 +19,11 @@ export default function BreakingNewsSection() {
           >
             బ్రేకింగ్ న్యూస్
           </h2>
-          <span className="ml-2 bg-white text-[#66000c] text-xs font-black px-2 py-0.5 rounded-full breaking-badge">
+          <span className="ml-2 bg-brand-red text-white text-xs font-black px-2 py-0.5 rounded-full breaking-badge">
             LIVE
           </span>
         </div>
-        <Link href="/category/latest" className="flex items-center gap-1 text-red-100 text-xs font-semibold hover:text-white transition-colors">
+        <Link href="/category/latest" className="flex items-center gap-1 text-blue-100 text-xs font-semibold hover:text-white transition-colors">
           అన్నీ <ArrowRight size={12} />
         </Link>
       </div>
@@ -36,14 +36,14 @@ export default function BreakingNewsSection() {
               <Link
                 key={`${article.id}-${index}`}
                 href={`/news/${article.slug}`}
-                className="flex gap-3 p-4 border-b border-gray-50 hover:bg-red-50 transition-colors group last:border-b-0"
+                className="flex gap-3 p-4 border-b border-gray-50 hover:bg-blue-50 transition-colors group last:border-b-0"
               >
-                <span className="flex-shrink-0 w-7 h-7 bg-[#66000c] text-white text-xs font-black rounded flex items-center justify-center">
+                <span className="flex-shrink-0 w-7 h-7 bg-brand-blue text-white text-xs font-black rounded flex items-center justify-center">
                   {index + 1}
                 </span>
                 <div>
                   <span
-                    className="text-sm font-semibold text-gray-700 group-hover:text-[#66000c] transition-colors leading-snug block telugu-text"
+                    className="text-sm font-semibold text-gray-700 group-hover:text-brand-blue transition-colors leading-snug block telugu-text"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {article.title}
@@ -70,13 +70,13 @@ export default function BreakingNewsSection() {
                 </div>
                 <div className="absolute inset-x-0 bottom-0 p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="bg-[#66000c] text-white text-xs font-black px-2 py-0.5 rounded breaking-badge">
+                    <span className="bg-brand-red text-white text-xs font-black px-2 py-0.5 rounded breaking-badge">
                       🔴 BREAKING
                     </span>
                   </div>
                   <Link href={`/news/${breaking[0].slug}`}>
                     <h3
-                      className="text-white text-base font-black leading-tight hover:text-red-200 transition-colors telugu-text"
+                      className="text-white text-base font-black leading-tight hover:text-hover-yellow transition-colors telugu-text"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                     >
                       {breaking[0].title}
@@ -97,14 +97,14 @@ export default function BreakingNewsSection() {
               <Link
                 key={`right-${article.id}-${index}`}
                 href={`/news/${article.slug}`}
-                className="flex gap-3 p-3 border-t border-gray-100 hover:bg-red-50 transition-colors group"
+                className="flex gap-3 p-3 border-t border-gray-100 hover:bg-blue-50 transition-colors group"
               >
                 <div className="flex-shrink-0 img-zoom-container rounded overflow-hidden w-16 h-12">
                   <Image src={article.image} alt={article.title} width={64} height={48} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1">
                   <p
-                    className="text-xs font-semibold text-gray-700 group-hover:text-[#66000c] transition-colors line-clamp-2 telugu-text"
+                    className="text-xs font-semibold text-gray-700 group-hover:text-brand-blue transition-colors line-clamp-2 telugu-text"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {article.title}

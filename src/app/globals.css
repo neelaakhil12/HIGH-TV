@@ -1,28 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mandali&family=Noto+Sans+Telugu:wght@300;400;500;600;700;800;900&family=Noto+Serif+Telugu:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 :root {
-  --brand-red: #66000c;
-  --brand-dark-red: #4d0009;
-  --brand-hover: #7a000e;
+  --brand-blue: #02599c;
+  --brand-dark-blue: #012d4a;
+  --brand-red: #fe0000;
+  --brand-hover: #02487e;
+  --hover-yellow: #FFAC1E;
   --background: #ffffff;
   --foreground: #222222;
   --border: #E5E5E5;
   --card-bg: #ffffff;
   --section-bg: #F8F8F8;
+  --astrology-bg: #ffedfd;
+  --panchangam-title: #b5009d;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-dark-blue: var(--brand-dark-blue);
   --color-brand-red: var(--brand-red);
-  --color-brand-dark: var(--brand-dark-red);
   --color-brand-hover: var(--brand-hover);
+  --color-hover-yellow: var(--hover-yellow);
   --color-border: var(--border);
+  --color-astrology-bg: var(--astrology-bg);
+  --color-panchangam-title: var(--panchangam-title);
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Override any inline Noto Sans Telugu styles to use Mandali */
+[style*="Noto Sans Telugu"] {
+  font-family: 'Mandali', 'Noto Sans Telugu', sans-serif !important;
 }
 
 html {
@@ -30,9 +43,9 @@ html {
 }
 
 body {
-  background: var(--background);
+  background: #f4f6f8; /* Soft light gray background outside the main content wrapper */
   color: var(--foreground);
-  font-family: 'Inter', 'Noto Sans Telugu', Arial, sans-serif;
+  font-family: 'Inter', 'Mandali', 'Noto Sans Telugu', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -41,7 +54,12 @@ body {
 /* Telugu font for all Telugu text */
 .telugu-text,
 [lang="te"] {
-  font-family: 'Noto Sans Telugu', 'Inter', sans-serif;
+  font-family: 'Mandali', 'Noto Sans Telugu', 'Inter', sans-serif !important;
+}
+
+/* Telugu Serif font for traditional print-style editorial headings */
+.telugu-serif {
+  font-family: 'Mandali', 'Noto Serif Telugu', serif !important;
 }
 
 /* Breaking news ticker animation */
@@ -70,7 +88,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #66000c;
+  background: #02599c;
   border-radius: 3px;
 }
 
@@ -120,7 +138,7 @@ body {
   left: 0;
   width: 100%;
   height: 3px;
-  background: #66000c;
+  background: #fe0000;
   border-radius: 2px;
 }
 
@@ -157,7 +175,7 @@ body {
 
 .play-button:hover {
   transform: scale(1.1);
-  background: rgba(102, 0, 12,0.9) !important;
+  background: rgba(2, 89, 156, 0.9) !important;
 }
 
 /* Masonry gallery */
@@ -187,7 +205,7 @@ body {
 .trending-number {
   font-size: 3.5rem;
   font-weight: 900;
-  color: rgba(102, 0, 12, 0.08);
+  color: rgba(2, 89, 156, 0.08);
   line-height: 1;
   user-select: none;
 }
@@ -216,7 +234,7 @@ body {
 /* Search bar focus */
 .search-input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(102, 0, 12, 0.3);
+  box-shadow: 0 0 0 2px rgba(2, 89, 156, 0.3);
 }
 
 /* Card category pill */
@@ -227,4 +245,24 @@ body {
   text-transform: uppercase;
   padding: 2px 8px;
   border-radius: 3px;
+}
+
+/* Mobile bottom sheet slide-up animation */
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.32s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+/* Fade-in for backdrop */
+@keyframes fade-in-overlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-fade-overlay {
+  animation: fade-in-overlay 0.25s ease forwards;
 }

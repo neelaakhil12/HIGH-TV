@@ -17,7 +17,7 @@ export default function NewsSection({
   titleTelugu,
   articles,
   viewAllLink,
-  accentColor = '#66000c',
+  accentColor = '#02599c',
   layout = 'grid3',
 }: NewsSectionProps) {
   if (layout === 'featured-left') {

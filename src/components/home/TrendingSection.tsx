@@ -93,7 +93,7 @@ export default function TrendingSection() {
                 </span>
                 <Link href={`/news/${article.slug}`}>
                   <p
-                    className="text-sm font-bold text-gray-800 hover:text-[#66000c] transition-colors line-clamp-2 leading-snug telugu-text"
+                    className="text-sm font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {article.title}

@@ -34,7 +34,7 @@ export default function HeroSlider() {
   const slide = slides[current];
 
   return (
-    <div className="relative bg-gray-900 overflow-hidden" style={{ height: '480px' }}>
+    <div className="relative bg-gray-900 overflow-hidden h-[260px] md:h-[380px] lg:h-[480px]">
       {/* Background Image */}
       <div className="absolute inset-0 img-zoom-container">
         <Image
@@ -51,17 +51,17 @@ export default function HeroSlider() {
       </div>
 
       {/* Content */}
-      <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 max-w-[1400px] mx-auto">
+      <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-10 max-w-[1400px] mx-auto">
         <div key={current} className="slide-fade-in max-w-2xl">
           {/* Category + Breaking badge */}
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-2 md:mb-3">
             {slide.isBreaking && (
-              <span className="bg-[#66000c] text-white text-xs font-black px-3 py-1 rounded breaking-badge uppercase tracking-wider">
+              <span className="bg-[#66000c] text-white text-[10px] md:text-xs font-black px-2 md:px-3 py-0.5 md:py-1 rounded breaking-badge uppercase tracking-wider">
                 🔴 బ్రేకింగ్
               </span>
             )}
             <span
-              className="text-white text-xs font-bold px-3 py-1 rounded"
+              className="text-white text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded"
               style={{ background: slide.categoryColor }}
             >
               {slide.category}
@@ -70,13 +70,13 @@ export default function HeroSlider() {
 
           {/* Headline */}
           <h1
-            className="text-white text-xl md:text-3xl font-black leading-tight mb-3 telugu-text drop-shadow-lg"
+            className="text-white text-base md:text-3xl font-black leading-tight mb-2 md:mb-3 telugu-text drop-shadow-lg line-clamp-3 md:line-clamp-none"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             {slide.title}
           </h1>
 
-          {/* Description */}
+          {/* Description — hidden on mobile */}
           <p
             className="text-gray-200 text-sm md:text-base leading-relaxed mb-4 telugu-text hidden md:block"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
@@ -85,16 +85,16 @@ export default function HeroSlider() {
           </p>
 
           {/* Meta + Read More */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Link
               href={`/news/${slide.slug}`}
-              className="bg-[#66000c] text-white font-bold px-5 py-2.5 rounded-lg hover:bg-[#4d0009] transition-colors text-sm telugu-text"
+              className="bg-[#66000c] text-white font-bold px-3 md:px-5 py-1.5 md:py-2.5 rounded-lg hover:bg-[#4d0009] transition-colors text-xs md:text-sm telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               పూర్తి వార్త చదవండి →
             </Link>
-            <div className="flex items-center gap-1 text-gray-300 text-xs">
-              <Clock size={12} />
+            <div className="flex items-center gap-1 text-gray-300 text-[10px] md:text-xs">
+              <Clock size={11} />
               <span>{formatTimeAgo(slide.publishedAt)}</span>
             </div>
           </div>

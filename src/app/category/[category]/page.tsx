@@ -5,7 +5,29 @@ import Link from 'next/link';
 import NewsCard from '@/components/cards/NewsCard';
 import AdBanner from '@/components/home/AdBanner';
 import EPaperReader from '@/components/epaper/EPaperReader';
-import { categories, politicsNews, entertainmentNews, sportsNews, technologyNews, businessNews, healthNews, viralNews, featuredNews, rasipalaluNews, apDistricts, tgDistricts, districtNews } from '@/lib/mockData';
+import FlashNewsBar from '@/components/home/FlashNewsBar';
+import DistrictSelector from '@/components/category/DistrictSelector';
+import { 
+  categories, 
+  politicsNews, 
+  entertainmentNews, 
+  sportsNews, 
+  technologyNews, 
+  businessNews, 
+  healthNews, 
+  viralNews, 
+  featuredNews, 
+  rasipalaluNews, 
+  apDistricts, 
+  tgDistricts, 
+  districtNews,
+  womenNews,
+  lifestyleNews,
+  webstoriesNews,
+  antharmadanamNews,
+  adyathmikamNews,
+  sampadakiyamNews
+} from '@/lib/mockData';
 import { Home, ChevronRight, X } from 'lucide-react';
 import type { Metadata } from 'next';
 
@@ -20,18 +42,44 @@ const allNews = [
   ...featuredNews,
   ...rasipalaluNews,
   ...districtNews,
+  ...womenNews,
+  ...lifestyleNews,
+  ...webstoriesNews,
+  ...antharmadanamNews,
+  ...adyathmikamNews,
+  ...sampadakiyamNews,
 ];
 
 export async function generateStaticParams() {
   return categories.map((cat) => ({ category: cat.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
+export async function generateMetadata({ 
+  params,
+  searchParams 
+}: { 
+  params: Promise<{ category: string }>;
+  searchParams: Promise<{ district?: string; view?: string }>;
+}): Promise<Metadata> {
   const { category } = await params;
+  const sParams = await searchParams;
+  const viewType = sParams?.view;
+  
   const cat = categories.find((c) => c.slug === category);
+  let titleName = cat?.name || category;
+
+  if (category === 'andhra-pradesh' || category === 'telangana') {
+    const stateName = category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్' : 'తెలంగాణ';
+    if (viewType === 'districts') {
+      titleName = `${stateName} జిల్లా వార్తలు`;
+    } else {
+      titleName = `${stateName} వార్తలు`;
+    }
+  }
+
   return {
-    title: `${cat?.name || category} వార్తలు | హై టీవీ`,
-    description: `${cat?.name} తాజా వార్తలు - హై టీవీ`,
+    title: `${titleName} | ఈనాడు క్లోన్`,
+    description: `${titleName} తాజా వార్తలు - ఈనాడు క్లోన్`,
   };
 }
 
@@ -40,11 +88,12 @@ export default async function CategoryPage({
   searchParams,
 }: {
   params: Promise<{ category: string }>;
-  searchParams: Promise<{ district?: string }>;
+  searchParams: Promise<{ district?: string; view?: string }>;
 }) {
   const { category } = await params;
   const sParams = await searchParams;
   const districtSlug = sParams?.district;
+  const viewType = sParams?.view;
 
   const cat = categories.find((c) => c.slug === category);
   
@@ -61,10 +110,57 @@ export default async function CategoryPage({
     }
   }
 
-  const allArticles = articles.length > 0 ? articles : allNews.filter((n) => n.categorySlug === category).slice(0, 12);
+  // If no articles match this category slug, adapt generic news items so the page displays a fully-populated grid
+  const allArticles = articles.length > 0 
+    ? articles 
+    : allNews.slice(0, 12).map((art, idx) => ({
+        ...art,
+        id: `fallback-${category}-${idx}`,
+        category: cat?.name || category,
+        categorySlug: category,
+      }));
+
+  const breadcrumbName = (category === 'andhra-pradesh' || category === 'telangana')
+    ? 'రాష్ట్ర వార్తలు'
+    : (cat?.name || category);
+
+  const isDistrictsView = viewType === 'districts' && (category === 'andhra-pradesh' || category === 'telangana');
+  const targetDistricts = category === 'andhra-pradesh' ? apDistricts : tgDistricts;
+
+  // Set up filtered district articles
+  let filteredDistrictArticles = districtNews.filter((n) => n.categorySlug === category);
+  if (districtSlug) {
+    filteredDistrictArticles = filteredDistrictArticles.filter((n) => n.districtSlug === districtSlug);
+  }
+
+  const activeDistrictObj = districtSlug ? targetDistricts.find((d) => d.slug === districtSlug) : null;
+
+  // Map district metadata and mock timestamps
+  const mappedDistrictArticles = filteredDistrictArticles.length > 0 
+    ? filteredDistrictArticles.map((art, idx) => {
+        const dist = targetDistricts.find((d) => d.slug === art.districtSlug) || targetDistricts[idx % targetDistricts.length];
+        return {
+          ...art,
+          districtName: dist?.name || '',
+          publishedTimeOnly: `[${19 - (idx % 3)}:${((50 - idx * 12) % 60 + 60) % 60}`.padEnd(7, '0').replace('NaN', '30') + ']'
+        };
+      })
+    : allNews.slice(0, 12).map((art, idx) => {
+        const dist = activeDistrictObj || targetDistricts[idx % targetDistricts.length];
+        return {
+          ...art,
+          id: `fallback-dist-${category}-${idx}`,
+          districtSlug: dist.slug,
+          districtName: dist.name,
+          publishedTimeOnly: `[${19 - (idx % 3)}:${((50 - idx * 12) % 60 + 60) % 60}`.padEnd(7, '0') + ']'
+        };
+      });
+
+  const topRow = mappedDistrictArticles.slice(0, 3);
+  const bottomRow = mappedDistrictArticles.slice(3, 12);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-[#f4f6f8] flex flex-col">
       <TopBar />
       <Header />
 
@@ -73,106 +169,224 @@ export default async function CategoryPage({
           <EPaperReader />
         </main>
       ) : (
-        <main className="max-w-[1400px] mx-auto px-4 py-6 flex-1">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-5">
-            <Link href="/" className="hover:text-[#66000c] transition-colors flex items-center gap-1">
-              <Home size={14} /> హోమ్
-            </Link>
-            <ChevronRight size={14} />
-            <span className="text-gray-800 font-semibold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-              {cat?.name || category}
-            </span>
-            {activeDistrictName && (
-              <>
+        <main className="max-w-[1005px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
+          {/* Flash News Strip */}
+          <FlashNewsBar />
+
+          {isDistrictsView ? (
+            <>
+              {/* Breadcrumb for districts view */}
+              <div className="flex items-center gap-2 text-sm text-gray-500 mb-5 border-b border-gray-100 pb-3">
+                <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1">
+                  <Home size={14} /> హోమ్
+                </Link>
                 <ChevronRight size={14} />
-                <span className="text-[#66000c] font-bold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  {activeDistrictName}
+                <Link href={`/category/${category}`} className="hover:text-brand-blue transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  {breadcrumbName}
+                </Link>
+                <ChevronRight size={14} />
+                <span className="text-gray-800 font-semibold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  జిల్లాల వారీగా వార్తలు
                 </span>
-              </>
-            )}
-          </div>
+                {activeDistrictName && (
+                  <>
+                    <ChevronRight size={14} />
+                    <span className="text-brand-blue font-bold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      {activeDistrictName}
+                    </span>
+                  </>
+                )}
+              </div>
 
-          {/* Category Header */}
-          <div className="mb-6 pb-4 border-b-2" style={{ borderColor: cat?.color || '#66000c' }}>
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
+              {/* District News Page Header Row */}
+              <div className="flex items-center justify-between border-b-2 border-[#e60000] pb-3 mb-6">
                 <h1
-                  className="text-3xl font-black telugu-text"
-                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif', color: cat?.color || '#66000c' }}
-                >
-                  {cat?.name || category} వార్తలు {activeDistrictName ? `- ${activeDistrictName}` : ''}
-                </h1>
-                <p className="text-gray-500 text-sm mt-1">
-                  {articles.length} వార్తలు అందుబాటులో ఉన్నాయి
-                </p>
-              </div>
-
-              {activeDistrictName && (
-                <div className="flex items-center gap-2 bg-red-50 text-[#66000c] border border-red-100 px-3.5 py-1.5 rounded-full text-sm font-semibold telugu-text shadow-sm transition-all hover:bg-red-100">
-                  <span>జిల్లా: {activeDistrictName}</span>
-                  <Link
-                    href={`/category/${category}`}
-                    className="hover:bg-[#66000c] hover:text-white rounded-full p-0.5 transition-colors"
-                    title="ఫిల్టర్ తొలగించు"
-                  >
-                    <X size={14} />
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <AdBanner position="leaderboard" />
-
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 mt-6">
-            {/* Articles Grid */}
-            <div className="xl:col-span-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {allArticles.map((article) => (
-                  <NewsCard key={article.id} article={article} />
-                ))}
-              </div>
-
-              {/* Load More */}
-              <div className="text-center mt-8">
-                <button
-                  className="bg-[#66000c] text-white font-bold px-8 py-3 rounded-lg hover:bg-[#4d0009] transition-colors telugu-text"
+                  className="text-2xl font-black text-[#e60000] telugu-text"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
-                  మరిన్ని వార్తలు లోడ్ చేయండి
-                </button>
+                  {category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్' : 'తెలంగాణ'} జిల్లా వార్తలు
+                </h1>
+                <DistrictSelector 
+                  category={category}
+                  districts={targetDistricts}
+                  activeDistrictSlug={districtSlug}
+                />
               </div>
-            </div>
 
-            {/* Sidebar */}
-            <aside className="xl:col-span-1 space-y-6">
-              <AdBanner position="sidebar" />
+              <AdBanner position="leaderboard" />
 
-              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-                <h3 className="font-black text-gray-800 text-base mb-3 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  వర్గాలు
-                </h3>
-                <div className="space-y-1">
-                  {categories.slice(0, 10).map((c) => (
-                    <Link
-                      key={c.slug}
-                      href={`/category/${c.slug}`}
-                      className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-red-50 group transition-colors"
-                    >
-                      <span
-                        className="text-sm font-medium text-gray-700 group-hover:text-[#66000c] transition-colors telugu-text"
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                      >
-                        {c.name}
-                      </span>
-                      <ChevronRight size={14} className="text-gray-300 group-hover:text-[#66000c] transition-colors" />
-                    </Link>
+              {/* Districts News Layout */}
+              <div className="space-y-8 mt-6">
+                {/* Top Row: 3 columns of prominent cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  {topRow.map((art) => (
+                    <div key={art.id} className="bg-white rounded-lg border border-gray-150 p-2.5 shadow-3xs hover:shadow-2xs transition-all flex flex-col group">
+                      {/* Image container */}
+                      <div className="relative aspect-video rounded-md overflow-hidden bg-black/5 mb-3">
+                        <img 
+                          src={art.image} 
+                          alt={art.title} 
+                          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200" 
+                          onError={(e) => {
+                            e.currentTarget.src = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop";
+                          }}
+                        />
+                        {/* District tag overlaid bottom-left */}
+                        <div className="absolute bottom-2 left-2 bg-white/95 border border-gray-250 px-2 py-0.5 rounded shadow-3xs flex items-center gap-1 select-none">
+                          <span className="text-[#fe0000] text-xs">📍</span>
+                          <span 
+                            className="text-[11px] font-bold text-gray-700 telugu-text"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          >
+                            {art.districtName}
+                          </span>
+                        </div>
+                      </div>
+                      {/* Title Link */}
+                      <Link href={`/news/${art.slug}`}>
+                        <h3 
+                          className="text-sm font-bold text-[#02599c] hover:text-[#013f70] hover:underline transition-colors leading-snug telugu-text text-center px-1"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        >
+                          {art.title}
+                        </h3>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Bottom Rows: 3 columns of smaller compact row list items */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-gray-100">
+                  {bottomRow.map((art) => (
+                    <div key={art.id} className="flex gap-3 items-start p-2 hover:bg-blue-50/35 rounded-lg transition-colors">
+                      {/* Left Thumbnail */}
+                      <div className="w-[100px] h-[68px] flex-shrink-0 rounded overflow-hidden bg-gray-50 border border-gray-150 relative">
+                        <img 
+                          src={art.image} 
+                          alt={art.title} 
+                          className="w-full h-full object-cover" 
+                          onError={(e) => {
+                            e.currentTarget.src = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop";
+                          }}
+                        />
+                      </div>
+                      {/* Right Text Content */}
+                      <div className="flex-1 flex flex-col text-left justify-between min-h-[68px]">
+                        <div>
+                          {/* Location Pin + District Name */}
+                          <div className="flex items-center gap-0.5 mb-1 select-none">
+                            <span className="text-[#fe0000] text-[10px]">📍</span>
+                            <span 
+                              className="text-[10.5px] font-extrabold text-[#e60000] telugu-text"
+                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                            >
+                              {art.districtName}
+                            </span>
+                          </div>
+                          {/* Article Title */}
+                          <Link href={`/news/${art.slug}`}>
+                            <h4 
+                              className="text-xs font-bold text-[#02599c] hover:text-[#013f70] hover:underline leading-snug line-clamp-2 telugu-text"
+                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                            >
+                              {art.title}
+                            </h4>
+                          </Link>
+                        </div>
+                        {/* Custom Time */}
+                        <span className="text-[10px] text-[#02599c] font-bold mt-1 block">
+                          {art.publishedTimeOnly}
+                        </span>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
-            </aside>
-          </div>
+            </>
+          ) : (
+            <>
+              {/* Breadcrumb */}
+              <div className="flex items-center gap-2 text-sm text-gray-500 mb-5 border-b border-gray-100 pb-3">
+                <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1">
+                  <Home size={14} /> హోమ్
+                </Link>
+                <ChevronRight size={14} />
+                <span className="text-gray-800 font-semibold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  {breadcrumbName}
+                </span>
+                {activeDistrictName && (
+                  <>
+                    <ChevronRight size={14} />
+                    <span className="text-brand-blue font-bold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      {activeDistrictName}
+                    </span>
+                  </>
+                )}
+              </div>
+
+              {/* Rastra News Page Header */}
+              <div className="mb-6 pb-3 border-b-2 border-[#e60000]">
+                <h1
+                  className="text-2xl md:text-3xl font-black text-[#e60000] telugu-text"
+                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                >
+                  {category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్ వార్తలు' : category === 'telangana' ? 'తెలంగాణ వార్తలు' : `${cat?.name || category} వార్తలు`}
+                </h1>
+              </div>
+
+              <AdBanner position="leaderboard" />
+
+              {/* 68% Left and 30% Right Layout */}
+              <div className="flex flex-col lg:flex-row justify-between gap-[2%] mt-6">
+                {/* Articles Grid (68%) */}
+                <div className="w-full lg:w-[68%] flex-shrink-0">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    {allArticles.map((article) => (
+                      <NewsCard key={article.id} article={article} />
+                    ))}
+                  </div>
+
+                  {/* Load More */}
+                  <div className="text-center mt-8">
+                    <button
+                      className="bg-brand-blue text-white font-bold px-8 py-3 rounded-lg hover:bg-brand-dark-blue transition-colors telugu-text cursor-pointer"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    >
+                      మరిన్ని వార్తలు లోడ్ చేయండి
+                    </button>
+                  </div>
+                </div>
+
+                {/* Sidebar (30%) */}
+                <aside className="w-full lg:w-[30%] flex-shrink-0 space-y-6">
+                  <AdBanner position="sidebar" />
+
+                  <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+                    <h3 className="font-black text-gray-800 text-base mb-3 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      వర్గాలు
+                    </h3>
+                    <div className="space-y-1">
+                      {categories.slice(0, 10).map((c) => (
+                        <Link
+                          key={c.slug}
+                          href={`/category/${c.slug}`}
+                          className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-blue-50 group transition-colors"
+                        >
+                          <span
+                            className="text-sm font-medium text-gray-700 group-hover:text-brand-blue transition-colors telugu-text"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          >
+                            {c.name}
+                          </span>
+                          <ChevronRight size={14} className="text-gray-300 group-hover:text-brand-blue transition-colors" />
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </aside>
+              </div>
+            </>
+          )}
         </main>
       )}
 

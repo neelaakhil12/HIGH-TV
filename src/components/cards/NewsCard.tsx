@@ -11,7 +11,7 @@ interface NewsCardProps {
 export default function NewsCard({ article, variant = 'default' }: NewsCardProps) {
   if (variant === 'horizontal') {
     return (
-      <article className="news-card flex gap-3 bg-white rounded-lg overflow-hidden border border-gray-100 hover:border-red-100 p-3">
+      <article className="news-card flex gap-3 bg-white rounded-lg overflow-hidden border border-gray-100 hover:border-blue-100 p-3">
         <Link href={`/news/${article.slug}`} className="flex-shrink-0 img-zoom-container rounded-md overflow-hidden w-28 h-20">
           <Image
             src={article.image}
@@ -30,7 +30,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
           </span>
           <Link href={`/news/${article.slug}`}>
             <h3
-              className="text-sm font-bold text-gray-800 hover:text-[#66000c] transition-colors line-clamp-2 leading-snug telugu-text"
+              className="text-sm font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.title}
@@ -60,7 +60,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
         <div className="flex-1">
           <Link href={`/news/${article.slug}`}>
             <p
-              className="text-xs font-semibold text-gray-800 group-hover:text-[#66000c] transition-colors line-clamp-2 leading-snug telugu-text"
+              className="text-xs font-semibold text-gray-800 group-hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.title}
@@ -117,7 +117,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
 
   // Default card
   return (
-    <article className="news-card bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:border-red-100 flex flex-col">
+    <article className="news-card bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:border-blue-100 flex flex-col">
       {/* Thumbnail */}
       <Link href={`/news/${article.slug}`} className="img-zoom-container block relative" style={{ paddingTop: '56.25%' }}>
         <Image
@@ -128,7 +128,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         {article.isBreaking && (
-          <div className="absolute top-2 left-2 bg-[#66000c] text-white text-[10px] font-black px-2 py-0.5 rounded breaking-badge uppercase">
+          <div className="absolute top-2 left-2 bg-brand-red text-white text-[10px] font-black px-2 py-0.5 rounded breaking-badge uppercase">
             🔴 Breaking
           </div>
         )}
@@ -145,7 +145,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
 
         <Link href={`/news/${article.slug}`} className="flex-1">
           <h2
-            className="text-sm md:text-base font-bold text-gray-800 hover:text-[#66000c] transition-colors leading-snug line-clamp-2 mb-2 telugu-text"
+            className="text-sm md:text-base font-bold text-gray-800 hover:text-brand-blue transition-colors leading-snug line-clamp-2 mb-2 telugu-text"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             {article.title}
@@ -170,7 +170,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
               <span>{(article.views / 1000).toFixed(1)}K</span>
             </div>
           </div>
-          <button className="text-gray-400 hover:text-[#66000c] transition-colors" aria-label="Share">
+          <button className="text-gray-400 hover:text-brand-blue transition-colors" aria-label="Share">
             <Share2 size={14} />
           </button>
         </div>
