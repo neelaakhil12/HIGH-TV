@@ -46,6 +46,20 @@ export default function EPaperReader() {
   const [zoom, setZoom] = useState(100);
   const [downloading, setDownloading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile on mount and set initial zoom
+  useEffect(() => {
+    const check = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      // On mobile default to 50% so page fits the screen width (800*0.5=400px)
+      if (mobile) setZoom(50);
+    };
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   
   // Sidebar state
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -61,6 +75,14 @@ export default function EPaperReader() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [generatedClipUrl, setGeneratedClipUrl] = useState('');
   const [clipCopied, setClipCopied] = useState(false);
+
+  // Unified pointer position helper (mouse + touch)
+  const getPointerPos = (e: React.MouseEvent | React.TouchEvent) => {
+    if ('touches' in e) {
+      return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+    }
+    return { clientX: e.clientX, clientY: e.clientY };
+  };
 
   const handlePrevDay = () => {
     const d = new Date(selectedDate);
@@ -93,115 +115,71 @@ export default function EPaperReader() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const zoomIn = () => {
-    setZoom(prev => Math.min(200, prev + 25));
-  };
+  const zoomIn  = () => setZoom(prev => Math.min(200, prev + 25));
+  const zoomOut = () => setZoom(prev => Math.max(25, prev - 25));
 
-  const zoomOut = () => {
-    setZoom(prev => Math.max(50, prev - 25));
-  };
-
-  // Clipping Drag / Resize Logic
-  const handleResizeMouseDown = (e: React.MouseEvent, handle: 'tl' | 'tr' | 'bl' | 'br') => {
-    setInteractionType(`resizing-${handle}`);
+  // Clipping Drag / Resize Logic — supports both mouse and touch
+  const handleResizeStart = (e: React.MouseEvent | React.TouchEvent, handle: 'tl' | 'tr' | 'bl' | 'br') => {
+    setInteractionType(`resizing-${handle}` as typeof interactionType);
     e.stopPropagation();
-    e.preventDefault();
+    if ('preventDefault' in e) e.preventDefault();
   };
 
-  const handleClipMouseDown = (e: React.MouseEvent) => {
+  const handleClipDragStart = (e: React.MouseEvent | React.TouchEvent) => {
     if (!imageContainerRef.current) return;
     const rect = imageContainerRef.current.getBoundingClientRect();
     const scale = zoom / 100;
-    const mouseX = (e.clientX - rect.left) / scale;
-    const mouseY = (e.clientY - rect.top) / scale;
-
+    const { clientX, clientY } = getPointerPos(e);
+    const pX = (clientX - rect.left) / scale;
+    const pY = (clientY - rect.top) / scale;
     setInteractionType('moving');
-    setDragStartOffset({
-      x: mouseX - clipBox.x,
-      y: mouseY - clipBox.y
-    });
+    setDragStartOffset({ x: pX - clipBox.x, y: pY - clipBox.y });
     e.stopPropagation();
-    e.preventDefault();
+    if ('preventDefault' in e) e.preventDefault();
   };
 
-  const handleContainerMouseMove = (e: React.MouseEvent) => {
+  const handleContainerPointerMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (interactionType === 'none') return;
     if (!imageContainerRef.current) return;
     const rect = imageContainerRef.current.getBoundingClientRect();
     const scale = zoom / 100;
-    const mouseX = (e.clientX - rect.left) / scale;
-    const mouseY = (e.clientY - rect.top) / scale;
+    const { clientX, clientY } = getPointerPos(e);
+    const pX = (clientX - rect.left) / scale;
+    const pY = (clientY - rect.top) / scale;
 
     if (interactionType === 'moving') {
-      const newX = mouseX - dragStartOffset.x;
-      const newY = mouseY - dragStartOffset.y;
-      
-      const maxX = 800 - clipBox.width;
-      const maxY = 1100 - clipBox.height;
-
+      const newX = pX - dragStartOffset.x;
+      const newY = pY - dragStartOffset.y;
       setClipBox(prev => ({
         ...prev,
-        x: Math.max(0, Math.min(maxX, newX)),
-        y: Math.max(0, Math.min(maxY, newY))
+        x: Math.max(0, Math.min(800 - prev.width, newX)),
+        y: Math.max(0, Math.min(1100 - prev.height, newY))
       }));
     } else if (interactionType.startsWith('resizing-')) {
       const handle = interactionType.replace('resizing-', '');
       const minSize = 60;
-
       setClipBox(prev => {
-        let { x, y, width, height } = prev;
-        
-        if (handle === 'br') {
-          const newWidth = Math.max(minSize, Math.min(800 - x, mouseX - x));
-          const newHeight = Math.max(minSize, Math.min(1100 - y, mouseY - y));
-          return { x, y, width: newWidth, height: newHeight };
-        }
-        
+        const { x, y, width, height } = prev;
+        if (handle === 'br') return { x, y, width: Math.max(minSize, Math.min(800 - x, pX - x)), height: Math.max(minSize, Math.min(1100 - y, pY - y)) };
         if (handle === 'tl') {
-          const rightEdge = x + width;
-          const bottomEdge = y + height;
-          const newX = Math.max(0, Math.min(rightEdge - minSize, mouseX));
-          const newY = Math.max(0, Math.min(bottomEdge - minSize, mouseY));
-          return {
-            x: newX,
-            y: newY,
-            width: rightEdge - newX,
-            height: bottomEdge - newY
-          };
+          const re = x + width, be = y + height;
+          const nx = Math.max(0, Math.min(re - minSize, pX)), ny = Math.max(0, Math.min(be - minSize, pY));
+          return { x: nx, y: ny, width: re - nx, height: be - ny };
         }
-        
         if (handle === 'tr') {
-          const bottomEdge = y + height;
-          const newWidth = Math.max(minSize, Math.min(800 - x, mouseX - x));
-          const newY = Math.max(0, Math.min(bottomEdge - minSize, mouseY));
-          return {
-            x,
-            y: newY,
-            width: newWidth,
-            height: bottomEdge - newY
-          };
+          const be = y + height, ny = Math.max(0, Math.min(be - minSize, pY));
+          return { x, y: ny, width: Math.max(minSize, Math.min(800 - x, pX - x)), height: be - ny };
         }
-        
         if (handle === 'bl') {
-          const rightEdge = x + width;
-          const newX = Math.max(0, Math.min(rightEdge - minSize, mouseX));
-          const newHeight = Math.max(minSize, Math.min(1100 - y, mouseY - y));
-          return {
-            x: newX,
-            y,
-            width: rightEdge - newX,
-            height: newHeight
-          };
+          const re = x + width, nx = Math.max(0, Math.min(re - minSize, pX));
+          return { x: nx, y, width: re - nx, height: Math.max(minSize, Math.min(1100 - y, pY - y)) };
         }
-        
         return prev;
       });
     }
   };
 
-  const handleContainerMouseUp = () => {
-    setInteractionType('none');
-  };
+  const handleContainerPointerUp = () => setInteractionType('none');
 
   // Escape key handler to cancel clipping mode
   useEffect(() => {
@@ -216,7 +194,7 @@ export default function EPaperReader() {
   }, [isClipping, showShareModal]);
 
   return (
-    <div className="bg-[#e9eff4] rounded-2xl overflow-hidden border border-gray-200 shadow-lg flex flex-col min-h-[750px]">
+    <div className="bg-[#e9eff4] overflow-hidden border border-gray-200 shadow-lg flex flex-col" style={{ minHeight: isMobile ? 'calc(100svh - 120px)' : '750px' }}>
       
       {/* 1. Main E-Paper Reader Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm z-10">
@@ -366,15 +344,12 @@ export default function EPaperReader() {
       {/* 3. Main content workspace */}
       <div className="flex-1 flex relative overflow-hidden">
         
-        {/* Thumbnail Sidebar */}
+        {/* Thumbnail Sidebar — desktop only */}
         {viewMode === 'reader' && isSidebarOpen && (
-          <aside className="w-44 bg-white border-r border-gray-200 hidden md:flex flex-col flex-shrink-0 animate-slide-in">
+          <aside className="w-44 bg-white border-r border-gray-200 hidden md:flex flex-col flex-shrink-0">
             <div className="p-3 border-b border-gray-100 flex items-center justify-between">
               <span className="font-bold text-xs text-gray-500 uppercase tracking-wider">All Pages</span>
-              <button 
-                onClick={() => setIsSidebarOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
+              <button onClick={() => setIsSidebarOpen(false)} className="text-gray-400 hover:text-gray-600">
                 <X size={14} />
               </button>
             </div>
@@ -382,24 +357,13 @@ export default function EPaperReader() {
               {epaperPages.map((page, idx) => (
                 <button
                   key={page.pageNum}
-                  onClick={() => {
-                    setActivePageIdx(idx);
-                    setIsClipping(false);
-                  }}
+                  onClick={() => { setActivePageIdx(idx); setIsClipping(false); }}
                   className={`w-full text-left rounded-lg overflow-hidden border transition-all flex flex-col group ${
-                    idx === activePageIdx 
-                      ? 'border-brand-blue ring-2 ring-brand-blue/20' 
-                      : 'border-gray-200 hover:border-gray-400'
+                    idx === activePageIdx ? 'border-brand-blue ring-2 ring-brand-blue/20' : 'border-gray-200 hover:border-gray-400'
                   }`}
                 >
                   <div className="relative aspect-[3/4] w-full bg-gray-50">
-                    <Image
-                      src={page.image}
-                      alt={page.title}
-                      fill
-                      sizes="150px"
-                      className="object-cover"
-                    />
+                    <Image src={page.image} alt={page.title} fill sizes="150px" className="object-cover" />
                   </div>
                   <div className="p-1.5 bg-gray-50 text-[10px] font-bold text-gray-600 text-center w-full group-hover:bg-gray-100 transition-colors">
                     పేజీ {page.pageNum}
@@ -410,12 +374,43 @@ export default function EPaperReader() {
           </aside>
         )}
 
+        {/* Mobile page switcher bar */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 flex overflow-x-auto hide-scrollbar gap-2 px-3 py-2 shadow-lg">
+          {epaperPages.map((page, idx) => (
+            <button
+              key={page.pageNum}
+              onClick={() => { setActivePageIdx(idx); setIsClipping(false); }}
+              className={`flex-shrink-0 w-9 h-9 rounded-lg text-[11px] font-black transition-all border ${
+                idx === activePageIdx ? 'bg-[#02599c] text-white border-[#02599c]' : 'bg-gray-100 text-gray-600 border-gray-200'
+              }`}
+            >
+              {page.pageNum}
+            </button>
+          ))}
+        </div>
+
         {/* Workspace Display Area */}
-        <div className="flex-1 overflow-auto flex flex-col relative justify-center bg-[#e9eff4]" onMouseMove={handleContainerMouseMove} onMouseUp={handleContainerMouseUp}>
-          
+        <div
+          className="flex-1 overflow-auto flex flex-col relative bg-[#e9eff4]"
+          onMouseMove={handleContainerPointerMove}
+          onMouseUp={handleContainerPointerUp}
+          onTouchMove={handleContainerPointerMove}
+          onTouchEnd={handleContainerPointerUp}
+        >
           {viewMode === 'reader' ? (
-            // Immersive Reader View
-            <div className="flex-1 overflow-auto flex items-center justify-center p-6 relative">
+            // Reader View — horizontally + vertically scrollable
+            <div
+              className="flex-1 overflow-auto"
+              style={{ paddingBottom: isMobile ? '60px' : '24px' }}
+            >
+              {/* Inner wrapper: sized to the newspaper frame, centered on desktop */}
+              <div
+                className="relative flex justify-center"
+                style={{
+                  minWidth: `${800 * (zoom / 100) + 32}px`,
+                  padding: isMobile ? '8px' : '24px',
+                }}
+              >
               
               {/* Floating Clipping Instructions Bar */}
               {isClipping && (
@@ -430,67 +425,67 @@ export default function EPaperReader() {
                 </div>
               )}
 
-              {/* Page View Frame */}
-              <div 
+              {/* Page View Frame — always zoom-based pixels, scrollable when wider than screen */}
+              <div
                 ref={imageContainerRef}
-                className="relative shadow-2xl bg-white rounded-lg overflow-hidden select-none border border-gray-300"
+                className="relative shadow-2xl bg-white rounded-lg overflow-hidden select-none border border-gray-300 flex-shrink-0"
                 style={{
-                  width: `${800 * (zoom / 100)}px`,
+                  width:  `${800  * (zoom / 100)}px`,
                   height: `${1100 * (zoom / 100)}px`,
                   transition: 'width 0.2s, height 0.2s',
-                  maxWidth: 'none',
                 }}
               >
                 <Image
                   src={epaperPages[activePageIdx].image}
                   alt={epaperPages[activePageIdx].title}
                   fill
-                  sizes="100vw"
+                  sizes="(max-width: 768px) 100vw, 800px"
                   className="object-contain pointer-events-none"
                   priority
                 />
 
-                {/* Interactive clipping crop-box overlay */}
+                {/* Interactive clipping crop-box overlay — mouse + touch */}
                 {isClipping && (
                   <div
-                    className="absolute border-2 border-dashed border-[#dc2626] bg-black/10 z-30 flex flex-col justify-between p-2 shadow-inner"
+                    className="absolute border-2 border-dashed border-[#dc2626] bg-black/10 z-30 flex flex-col justify-between p-2 shadow-inner touch-none"
                     style={{
-                      left: `${clipBox.x * (zoom / 100)}px`,
-                      top: `${clipBox.y * (zoom / 100)}px`,
-                      width: `${clipBox.width * (zoom / 100)}px`,
+                      left:   `${clipBox.x      * (zoom / 100)}px`,
+                      top:    `${clipBox.y      * (zoom / 100)}px`,
+                      width:  `${clipBox.width  * (zoom / 100)}px`,
                       height: `${clipBox.height * (zoom / 100)}px`,
                     }}
                   >
                     {/* Draggable move overlay */}
-                    <div 
-                      onMouseDown={handleClipMouseDown}
+                    <div
+                      onMouseDown={handleClipDragStart}
+                      onTouchStart={handleClipDragStart}
                       className="absolute inset-0 cursor-move z-10"
                     />
 
-                    {/* Corner Resize Handles */}
-                    {/* Top-Left */}
+                    {/* Corner Resize Handles — larger on mobile for finger tapping */}
                     <div
-                      onMouseDown={(e) => handleResizeMouseDown(e, 'tl')}
-                      className="absolute w-3.5 h-3.5 bg-white border-2 border-[#dc2626] rounded-full cursor-nwse-resize z-40 hover:scale-125 transition-transform"
-                      style={{ left: '-7px', top: '-7px' }}
+                      onMouseDown={(e) => handleResizeStart(e, 'tl')}
+                      onTouchStart={(e) => handleResizeStart(e, 'tl')}
+                      className="absolute w-5 h-5 bg-white border-2 border-[#dc2626] rounded-full cursor-nwse-resize z-40"
+                      style={{ left: '-10px', top: '-10px' }}
                     />
-                    {/* Top-Right */}
                     <div
-                      onMouseDown={(e) => handleResizeMouseDown(e, 'tr')}
-                      className="absolute w-3.5 h-3.5 bg-white border-2 border-[#dc2626] rounded-full cursor-nesw-resize z-40 hover:scale-125 transition-transform"
-                      style={{ right: '-7px', top: '-7px' }}
+                      onMouseDown={(e) => handleResizeStart(e, 'tr')}
+                      onTouchStart={(e) => handleResizeStart(e, 'tr')}
+                      className="absolute w-5 h-5 bg-white border-2 border-[#dc2626] rounded-full cursor-nesw-resize z-40"
+                      style={{ right: '-10px', top: '-10px' }}
                     />
-                    {/* Bottom-Left */}
                     <div
-                      onMouseDown={(e) => handleResizeMouseDown(e, 'bl')}
-                      className="absolute w-3.5 h-3.5 bg-white border-2 border-[#dc2626] rounded-full cursor-nesw-resize z-40 hover:scale-125 transition-transform"
-                      style={{ left: '-7px', bottom: '-7px' }}
+                      onMouseDown={(e) => handleResizeStart(e, 'bl')}
+                      onTouchStart={(e) => handleResizeStart(e, 'bl')}
+                      className="absolute w-5 h-5 bg-white border-2 border-[#dc2626] rounded-full cursor-nesw-resize z-40"
+                      style={{ left: '-10px', bottom: '-10px' }}
                     />
-                    {/* Bottom-Right */}
                     <div
-                      onMouseDown={(e) => handleResizeMouseDown(e, 'br')}
-                      className="absolute w-3.5 h-3.5 bg-white border-2 border-[#dc2626] rounded-full cursor-nwse-resize z-40 hover:scale-125 transition-transform"
-                      style={{ right: '-7px', bottom: '-7px' }}
+                      onMouseDown={(e) => handleResizeStart(e, 'br')}
+                      onTouchStart={(e) => handleResizeStart(e, 'br')}
+                      className="absolute w-5 h-5 bg-white border-2 border-[#dc2626] rounded-full cursor-nwse-resize z-40"
+                      style={{ right: '-10px', bottom: '-10px' }}
                     />
 
                     {/* Content */}
@@ -543,7 +538,8 @@ export default function EPaperReader() {
                   <ChevronRight size={24} />
                 </button>
               )}
-            </div>
+            </div>{/* end inner wrapper */}
+          </div>
           ) : (
             // Thumbnail Grid View
             <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
