@@ -35,7 +35,7 @@ export default function Header() {
     <header className="bg-white sticky top-0 z-40 w-full shadow-sm">
 
       {/* ── Row: Logo + GoDaddy Ad + Actions Dashboard ──────────────── */}
-      <div className="max-w-[1005px] mx-auto px-4 py-3">
+      <div className="max-w-[1200px] mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
 
           {/* Logo and Date (Left) */}
@@ -44,10 +44,10 @@ export default function Header() {
               <Image
                 src="/logo.jpg"
                 alt="హై టీవీ"
-                width={155}
-                height={45}
+                width={220}
+                height={65}
                 priority
-                className="h-10 md:h-[45px] w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
+                className="h-14 md:h-[65px] w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
               />
             </Link>
             {teluguDate && (
@@ -60,79 +60,70 @@ export default function Header() {
             )}
           </div>
 
-          {/* GoDaddy Mock Advertisement (Center — desktop only) */}
-          <div className="hidden md:flex flex-1 justify-center max-w-[468px] lg:max-w-[500px] h-[62px] bg-[#111111] rounded border border-gray-800 items-center justify-between px-3 py-1 relative overflow-hidden group mx-4 select-none">
+          {/* MSN Realty Wide Real Estate Ad Banner (Center — desktop only) */}
+          <div className="hidden md:flex flex-1 justify-between max-w-[650px] lg:max-w-[720px] h-[90px] bg-[#111113] border border-neutral-800 rounded overflow-hidden relative group mx-4 select-none px-4 items-center">
             {/* Adchoices icon */}
-            <div className="absolute top-0.5 right-0.5 flex items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+            <div className="absolute top-0.5 right-0.5 opacity-20 hover:opacity-100 transition-opacity z-10">
               <svg className="w-2.5 h-2.5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
               </svg>
-              <svg className="w-2.5 h-2.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
             </div>
-            {/* GoDaddy Brand */}
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <svg className="w-5.5 h-5.5 text-[#00dfc2]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50 82C40.6 82 31.8 77.8 25.8 70.8C18.8 62.8 15 52.4 15 41.5C15 22.5 30.5 7 49.5 7C58.8 7 67.5 10.7 73.8 17.5C75.8 19.5 75.8 22.8 73.8 24.8C71.8 26.8 68.5 26.8 66.5 24.8C62 20 56 17.2 49.5 17.2C36.1 17.2 25.2 28.1 25.2 41.5C25.2 49.2 27.9 56.6 32.8 62.2C37 67.1 43.2 70 49.8 70C51.5 70 53.2 69.8 54.8 69.4C59.3 68.2 63.3 65.5 66.3 61.8C69.3 58.1 71 53.5 71.1 48.7L71.1 42C71.1 38.7 73.8 36 77.1 36C80.4 36 83.1 38.7 83.1 42L83.1 48.7C83 56.9 80 64.7 74.8 70.9C69.6 77.2 62.5 81.3 54.6 82.5C53.1 82.8 51.5 83 50 82Z" fill="currentColor"/>
-                <path d="M50.1 82C48.6 82 47.1 81.9 45.6 81.6C37.7 80.4 30.6 76.3 25.4 70C20.2 63.8 17.2 56 17.1 47.8L17.1 42C17.1 38.7 19.8 36 23.1 36C26.4 36 29.1 38.7 29.1 42L29.1 48.7C29.2 53.5 30.9 58.1 33.9 61.8C36.9 65.5 40.9 68.2 45.4 69.4C47 69.8 48.7 70 50.4 70C57 70 63.2 67.1 67.4 62.2C72.3 56.6 75 49.2 75 41.5C75 28.1 64.1 17.2 50.7 17.2C44.2 17.2 38.2 20 33.7 24.8C31.7 26.8 28.4 26.8 26.4 24.8C24.4 22.8 24.4 19.5 26.4 17.5C32.7 10.7 41.4 7 50.7 7C69.7 7 85.2 22.5 85.2 41.5C85.2 52.4 81.4 62.8 74.4 70.8C68.4 77.8 59.6 82 50.1 82Z" fill="currentColor"/>
-              </svg>
-              <span className="font-extrabold text-[11px] tracking-tight text-white font-sans">GoDaddy</span>
-            </div>
-            {/* Slogan */}
-            <div className="flex-1 px-3 flex flex-col justify-center leading-tight">
-              <p className="text-[9px] lg:text-[10px] font-medium text-white/95 font-sans">Build, brand, and</p>
-              <p className="text-[9px] lg:text-[10px] font-semibold text-[#00dfc2] font-sans">back your business</p>
-              <p className="text-[9px] lg:text-[10px] font-medium text-white/95 font-sans">with GoDaddy.</p>
-            </div>
-            {/* Mock Preview + Photo */}
-            <div className="flex items-center gap-1.5 h-[50px] flex-shrink-0 overflow-hidden pr-1.5">
-              <div className="w-[54px] h-[40px] bg-[#1a1a1a] border border-gray-800 rounded p-0.5 flex flex-col justify-between hidden lg:flex">
-                <div className="flex items-center gap-0.5 border-b border-gray-900 pb-0.5 scale-75 origin-left">
-                  <span className="w-0.5 h-0.5 bg-red-500 rounded-full inline-block"></span>
-                  <span className="w-0.5 h-0.5 bg-yellow-500 rounded-full inline-block"></span>
-                  <span className="w-0.5 h-0.5 bg-green-500 rounded-full inline-block"></span>
-                </div>
-                <div className="text-[4px] text-gray-500 font-sans truncate scale-75 origin-left leading-none">AMERICAN POTS...</div>
-                <div className="bg-[#00dfc2] h-2.5 rounded-xs flex items-center justify-center scale-90">
-                  <span className="text-[3px] text-black font-extrabold font-sans">SHOP NOW</span>
-                </div>
-              </div>
-              <div className="w-[45px] h-[45px] rounded overflow-hidden relative">
+
+            {/* Left part: Building Image + "55 Floors" */}
+            <div className="flex items-center gap-3 h-full flex-shrink-0">
+              <div className="w-[70px] h-[70px] relative overflow-hidden rounded border border-neutral-800">
                 <img
-                  src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=80&h=80&fit=crop"
-                  alt="GoDaddy Campaign"
+                  src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=100&h=100&fit=crop"
+                  alt="MSN Neopolis Tower"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="flex flex-col justify-center leading-none text-left hidden lg:flex">
-                <span className="text-[5px] text-gray-400 font-medium font-sans">Ricardo de Tomás</span>
-                <span className="text-[7px] text-[#00dfc2] font-bold font-sans">9LIVES.ES</span>
+              <div className="flex flex-col text-left justify-center leading-none">
+                <span className="text-white font-extrabold text-[18px] font-sans">55</span>
+                <span className="text-neutral-500 font-bold text-[8px] tracking-widest font-sans uppercase">FLOORS</span>
+              </div>
+            </div>
+
+            {/* Center part: "ONE OF A KIND" branding */}
+            <div className="flex-1 flex flex-col justify-center text-center px-2.5 leading-tight">
+              <span className="text-amber-400 font-black text-[13px] font-sans tracking-widest uppercase">ONE OF A KIND</span>
+              <span className="text-white font-bold text-[10px] font-sans tracking-wide uppercase mt-0.5">EXPANSIVE 4 BHK RESIDENCES</span>
+              <span className="text-neutral-400 font-medium text-[8px] font-sans uppercase mt-0.5">📍 NEOPOLIS, HYDERABAD</span>
+            </div>
+
+            {/* Right part: MSN Logo / Phone / SFT */}
+            <div className="flex items-center gap-3 flex-shrink-0 border-l border-neutral-800/60 pl-3 h-[60px] text-right">
+              <div className="flex flex-col justify-center leading-tight">
+                <span className="text-[10px] text-neutral-300 font-bold font-sans">5,250 - 7,460 SFT</span>
+                <span className="text-[9.5px] text-amber-400 font-bold font-sans mt-0.5">📞 91426 45645</span>
+              </div>
+              <div className="flex flex-col justify-center leading-none text-left border-l border-neutral-800/60 pl-2.5">
+                <span className="text-[11px] text-amber-500 font-extrabold font-sans">MSN</span>
+                <span className="text-[7.5px] text-neutral-400 font-bold font-sans tracking-wider mt-0.5">REALTY</span>
               </div>
             </div>
           </div>
 
           {/* Actions Dashboard (Right — desktop only) */}
-          <div className="hidden md:flex flex-col w-[175px] h-[60px] border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs flex-shrink-0">
-            <div className="grid grid-cols-2 border-b border-gray-200 h-[36px]">
-              <Link href="/category/latest" className="flex flex-col items-center justify-center hover:bg-gray-50 transition-colors py-0.5 border-r border-gray-200 group/dash">
-                <svg className="w-4 h-4 text-gray-600 mb-0.5 group-hover/dash:text-[#07559a] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25">
+          <div className="hidden md:flex flex-col w-[170px] h-[90px] border border-gray-200 rounded-md overflow-hidden bg-white shadow-xs flex-shrink-0">
+            <div className="grid grid-cols-2 border-b border-gray-200 h-[54px]">
+              <Link href="/category/latest" className="flex flex-col items-center justify-center hover:bg-gray-50 transition-colors py-1 border-r border-gray-200 group/dash">
+                <svg className="w-5.5 h-5.5 text-gray-500 mb-0.5 group-hover/dash:text-[#07559a] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                   <path d="M16 8h2v8h-2z" /><path d="M6 8h6M6 12h6M6 16h6" />
                 </svg>
-                <span className="text-[8.5px] font-black text-gray-800 font-sans tracking-wide uppercase">Latest</span>
+                <span className="text-[10px] font-bold text-gray-600 font-sans tracking-wide uppercase">Latest</span>
               </Link>
-              <Link href="/category/latest?tab=breaking" className="flex flex-col items-center justify-center hover:bg-gray-50 transition-colors py-0.5 group/dash">
-                <svg className="w-4 h-4 text-gray-600 mb-0.5 breaking-badge group-hover/dash:text-red-600 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25">
+              <Link href="/category/latest?tab=breaking" className="flex flex-col items-center justify-center hover:bg-gray-50 transition-colors py-1 group/dash">
+                <svg className="w-5.5 h-5.5 text-gray-500 mb-0.5 group-hover/dash:text-red-600 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
                   <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                   <path d="M13.73 21a2 2 0 0 1-3.46 0" />
                 </svg>
-                <span className="text-[8.5px] font-black text-gray-800 font-sans tracking-wide uppercase">Breaking</span>
+                <span className="text-[10px] font-bold text-gray-600 font-sans tracking-wide uppercase">Breaking</span>
               </Link>
             </div>
-            <Link href="/category/epaper" className="flex items-center justify-center h-[24px] hover:bg-gray-50 transition-colors group/dash">
-              <span className="text-[9.5px] font-black text-gray-700 group-hover/dash:text-[#07559a] font-sans tracking-widest uppercase">E-PAPER</span>
+            <Link href="/category/epaper" className="flex items-center justify-center h-[36px] hover:bg-gray-50 transition-colors group/dash">
+              <span className="text-[11px] font-black text-gray-800 group-hover/dash:text-[#07559a] font-sans tracking-widest uppercase">E-PAPER</span>
             </Link>
           </div>
 
@@ -189,7 +180,7 @@ export default function Header() {
 
       {/* ── Desktop Navigation Bar ───────────────────────────────────── */}
       <div className="hidden md:block w-full border-t border-[#044a85] bg-[#07559a] shadow-md select-none">
-        <div className="max-w-[1005px] mx-auto">
+        <div className="max-w-[1200px] mx-auto">
           <nav className="flex items-center bg-gradient-to-b from-[#0a5ea7] to-[#05457e] h-10 overflow-visible">
 
             {/* Home icon */}

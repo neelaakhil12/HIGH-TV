@@ -74,7 +74,7 @@ export default async function ReporterPage({ params }: { params: Promise<{ slug:
       <TopBar />
       <Header />
 
-      <main className="max-w-[1005px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
+      <main className="max-w-[1200px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-6 border-b border-gray-100 pb-3 flex-wrap">
           <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1">

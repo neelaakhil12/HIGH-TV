@@ -34,7 +34,7 @@ export default function HeroSlider() {
   const slide = slides[current];
 
   return (
-    <div className="relative bg-gray-900 overflow-hidden h-[260px] md:h-[380px] lg:h-[480px]">
+    <div className="relative bg-gray-900 overflow-hidden h-[180px] md:h-[280px] lg:h-[340px]">
       {/* Background Image */}
       <div className="absolute inset-0 img-zoom-container">
         <Image
@@ -51,17 +51,17 @@ export default function HeroSlider() {
       </div>
 
       {/* Content */}
-      <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-10 max-w-[1400px] mx-auto">
-        <div key={current} className="slide-fade-in max-w-2xl">
+      <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto">
+        <div key={current} className="slide-fade-in max-w-2xl text-left">
           {/* Category + Breaking badge */}
-          <div className="flex items-center gap-2 mb-2 md:mb-3">
+          <div className="flex items-center gap-1.5 mb-1.5 md:mb-2">
             {slide.isBreaking && (
-              <span className="bg-[#66000c] text-white text-[10px] md:text-xs font-black px-2 md:px-3 py-0.5 md:py-1 rounded breaking-badge uppercase tracking-wider">
+              <span className="bg-[#66000c] text-white text-[9px] md:text-[10px] font-black px-1.5 md:px-2 py-0.5 rounded breaking-badge uppercase tracking-wider">
                 🔴 బ్రేకింగ్
               </span>
             )}
             <span
-              className="text-white text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded"
+              className="text-white text-[9px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded"
               style={{ background: slide.categoryColor }}
             >
               {slide.category}
@@ -70,31 +70,31 @@ export default function HeroSlider() {
 
           {/* Headline */}
           <h1
-            className="text-white text-base md:text-3xl font-black leading-tight mb-2 md:mb-3 telugu-text drop-shadow-lg line-clamp-3 md:line-clamp-none"
+            className="text-white text-xs md:text-xl lg:text-2xl font-black leading-tight mb-1.5 md:mb-2 telugu-text drop-shadow-lg line-clamp-2 md:line-clamp-none"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             {slide.title}
           </h1>
 
-          {/* Description — hidden on mobile */}
+          {/* Description — hidden on mobile/tablet */}
           <p
-            className="text-gray-200 text-sm md:text-base leading-relaxed mb-4 telugu-text hidden md:block"
+            className="text-gray-200 text-xs leading-relaxed mb-2.5 telugu-text hidden lg:block"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             {slide.description}
           </p>
 
           {/* Meta + Read More */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <Link
               href={`/news/${slide.slug}`}
-              className="bg-[#66000c] text-white font-bold px-3 md:px-5 py-1.5 md:py-2.5 rounded-lg hover:bg-[#4d0009] transition-colors text-xs md:text-sm telugu-text"
+              className="bg-[#66000c] text-white font-bold px-2.5 md:px-4 py-1 md:py-2 rounded-md hover:bg-[#4d0009] transition-colors text-[10px] md:text-xs telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               పూర్తి వార్త చదవండి →
             </Link>
-            <div className="flex items-center gap-1 text-gray-300 text-[10px] md:text-xs">
-              <Clock size={11} />
+            <div className="flex items-center gap-1 text-gray-300 text-[9px] md:text-[11px]">
+              <Clock size={10} />
               <span>{formatTimeAgo(slide.publishedAt)}</span>
             </div>
           </div>
@@ -104,17 +104,17 @@ export default function HeroSlider() {
       {/* Navigation Arrows */}
       <button
         onClick={prev}
-        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors z-10"
+        className="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 bg-black/40 backdrop-blur-xs text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors z-10"
         aria-label="Previous"
       >
-        <ChevronLeft size={20} />
+        <ChevronLeft size={15} />
       </button>
       <button
         onClick={next}
-        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors z-10"
+        className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 bg-black/40 backdrop-blur-xs text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors z-10"
         aria-label="Next"
       >
-        <ChevronRight size={20} />
+        <ChevronRight size={15} />
       </button>
 
       {/* Dot Indicators */}

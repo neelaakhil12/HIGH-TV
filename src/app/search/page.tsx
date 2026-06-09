@@ -51,7 +51,7 @@ export default function SearchPage({
       <TopBar />
       <Header />
 
-      <main className="max-w-[1005px] mx-auto bg-white px-4 py-8 flex-1 shadow-md border-x border-gray-200 w-full">
+      <main className="max-w-[1200px] mx-auto bg-white px-4 py-8 flex-1 shadow-md border-x border-gray-200 w-full">
         <div className="max-w-2xl mx-auto mb-8">
           <h1
             className="text-2xl font-black text-gray-800 mb-4 telugu-text text-center"

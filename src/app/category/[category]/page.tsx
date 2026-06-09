@@ -169,7 +169,7 @@ export default async function CategoryPage({
           <EPaperReader />
         </main>
       ) : (
-        <main className="max-w-[1005px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
+        <main className="max-w-[1200px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
           {/* Flash News Strip */}
           <FlashNewsBar />
 
@@ -201,7 +201,7 @@ export default async function CategoryPage({
               {/* District News Page Header Row */}
               <div className="flex items-center justify-between border-b-2 border-[#e60000] pb-3 mb-6">
                 <h1
-                  className="text-2xl font-black text-[#e60000] telugu-text"
+                  className="text-3xl md:text-4xl font-black text-[#e60000] telugu-text"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్' : 'తెలంగాణ'} జిల్లా వార్తలు
@@ -245,7 +245,7 @@ export default async function CategoryPage({
                       {/* Title Link */}
                       <Link href={`/news/${art.slug}`}>
                         <h3 
-                          className="text-sm font-bold text-[#02599c] hover:text-[#013f70] hover:underline transition-colors leading-snug telugu-text text-center px-1"
+                          className="text-base md:text-lg font-bold text-[#02599c] hover:text-[#013f70] hover:underline transition-colors leading-snug telugu-text text-center px-1"
                           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                         >
                           {art.title}
@@ -286,7 +286,7 @@ export default async function CategoryPage({
                           {/* Article Title */}
                           <Link href={`/news/${art.slug}`}>
                             <h4 
-                              className="text-xs font-bold text-[#02599c] hover:text-[#013f70] hover:underline leading-snug line-clamp-2 telugu-text"
+                              className="text-sm md:text-base font-bold text-[#02599c] hover:text-[#013f70] hover:underline leading-snug line-clamp-2 telugu-text"
                               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                             >
                               {art.title}
@@ -327,7 +327,7 @@ export default async function CategoryPage({
               {/* Rastra News Page Header */}
               <div className="mb-6 pb-3 border-b-2 border-[#e60000]">
                 <h1
-                  className="text-2xl md:text-3xl font-black text-[#e60000] telugu-text"
+                  className="text-3xl md:text-4xl font-black text-[#e60000] telugu-text"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్ వార్తలు' : category === 'telangana' ? 'తెలంగాణ వార్తలు' : `${cat?.name || category} వార్తలు`}

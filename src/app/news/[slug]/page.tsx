@@ -78,7 +78,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       <TopBar />
       <Header />
 
-      <main className="max-w-[1005px] mx-auto bg-white px-4 py-6 shadow-md border-x border-gray-200">
+      <main className="max-w-[1200px] mx-auto bg-white px-4 py-6 shadow-md border-x border-gray-200">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-5 flex-wrap">
           <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1">
@@ -116,7 +116,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
             {/* Headline */}
             <h1
-              className="text-2xl md:text-3xl font-black text-gray-900 leading-tight mb-4 telugu-text"
+              className="text-3xl md:text-4xl font-black text-gray-900 leading-tight mb-4 telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.title}
@@ -124,7 +124,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
             {/* Description */}
             <p
-              className="text-lg text-gray-600 leading-relaxed mb-5 telugu-text border-l-4 border-brand-blue pl-4 bg-blue-50/50 py-3 pr-4 rounded-r-lg"
+              className="text-xl text-gray-600 leading-relaxed mb-5 telugu-text border-l-4 border-brand-blue pl-4 bg-blue-50/50 py-3 pr-4 rounded-r-lg"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.description}
@@ -189,20 +189,20 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               className="prose prose-lg max-w-none telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
-              <p className="text-gray-700 leading-loose text-base mb-4">
+              <p className="text-gray-700 leading-loose text-lg md:text-xl mb-4">
                 {article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. ఈనాడు క్లోన్ డెస్క్ నుండి తాజా సమాచారం ఇక్కడ లభిస్తుంది.
               </p>
-              <p className="text-gray-700 leading-loose text-base mb-4">
+              <p className="text-gray-700 leading-loose text-lg md:text-xl mb-4">
                 అధికారులు తెలిపిన వివరాల ప్రకారం, ఈ నిర్ణయం రాష్ట్ర ప్రజలకు అత్యంత ప్రయోజనకరంగా ఉంటుందని భావిస్తున్నారు. ఈ పరిణామాలు భవిష్యత్తులో మరింత సానుకూలమైన ఫలితాలను ఇస్తాయని నిపుణులు అభిప్రాయపడుతున్నారు.
               </p>
 
               {/* Mid-article Ad */}
               <AdBanner position="rectangle" />
 
-              <p className="text-gray-700 leading-loose text-base mb-4">
+              <p className="text-gray-700 leading-loose text-lg md:text-xl mb-4">
                 ఈ అంశంపై స్థానిక ప్రజలు, నిపుణులు వివిధ అభిప్రాయాలు వ్యక్తం చేశారు. కొందరు ఈ నిర్ణయాన్ని స్వాగతిస్తున్నారు, మరికొందరు దీనిపై సందేహాలు వ్యక్తం చేస్తున్నారు. మొత్తంమీద, ఈ పరిస్థితి భవిష్యత్తులో ఎలా అభివృద్ధి చెందుతుందో అనే విషయంపై అందరి దృష్టి నెలకొని ఉంది.
               </p>
-              <p className="text-gray-700 leading-loose text-base">
+              <p className="text-gray-700 leading-loose text-lg md:text-xl">
                 ఈనాడు క్లోన్ ఈ అంశాన్ని నిరంతరం ట్రాక్ చేస్తూ తాజా అప్‌డేట్‌లను అందిస్తుంది. మరిన్ని వివరాలకు మా వెబ్‌సైట్‌ను అనుసరించండి.
               </p>
             </div>
@@ -293,7 +293,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                   >
                     <Image src={a.image} alt={a.title} width={60} height={45} className="rounded flex-shrink-0 object-cover w-15 h-12" />
                     <p
-                      className="text-xs font-semibold text-gray-700 group-hover:text-brand-blue transition-colors line-clamp-3 telugu-text"
+                      className="text-sm md:text-base font-bold text-gray-700 group-hover:text-brand-blue transition-colors line-clamp-3 telugu-text"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                     >
                       {a.title}

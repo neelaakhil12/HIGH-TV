@@ -28,7 +28,7 @@ export default function TopBar() {
 
   return (
     <div className="bg-[#07559a] text-white h-11 border-b border-[#05457e] shadow-sm select-none relative z-50">
-      <div className="max-w-[1005px] mx-auto px-4 h-full flex items-center justify-between">
+      <div className="max-w-[1200px] mx-auto px-4 h-full flex items-center justify-between">
         
         {/* Left: Trending Banner */}
         <div className="flex items-center gap-2 overflow-hidden h-full">
@@ -46,6 +46,8 @@ export default function TopBar() {
             </span>
           </div>
         </div>
+
+
 
       </div>
     </div>
