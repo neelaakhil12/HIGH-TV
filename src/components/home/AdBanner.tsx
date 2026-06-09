@@ -367,6 +367,10 @@ interface AdBannerProps {
 }
 
 export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
+  if (position === 'leaderboard') {
+    return null;
+  }
+
   if (position === 'holiday') {
     return null;
   }

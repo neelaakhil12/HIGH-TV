@@ -190,7 +190,7 @@ export default function Header() {
               </svg>
             </Link>
 
-            <div className="flex-1 flex items-center h-full text-[13px] font-bold text-white telugu-text">
+            <div className="flex-1 flex items-center h-full text-[15px] font-bold text-white telugu-text">
 
               {/* తాజా వార్తలు */}
               <Link href="/category/latest" className="px-4 h-full flex items-center hover:text-[#FFAC1E] hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
