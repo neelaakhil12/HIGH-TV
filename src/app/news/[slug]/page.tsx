@@ -1,10 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import AdBanner from '@/components/home/AdBanner';
 import NewsCard from '@/components/cards/NewsCard';
+import RightSidebar from '@/components/layout/RightSidebar';
 import {
   featuredNews,
   politicsNews,
@@ -75,10 +75,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="min-h-screen bg-[#f4f6f8]">
-      <TopBar />
       <Header />
 
-      <main className="max-w-[1200px] mx-auto bg-white px-4 py-6 shadow-md border-x border-gray-200">
+      <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 shadow-md border-x border-gray-200">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-5 flex-wrap">
           <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1">
@@ -95,10 +94,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           </span>
         </div>
 
-        {/* 68% Left and 30% Right Layout */}
-        <div className="flex flex-col lg:flex-row justify-between gap-[2%]">
-          {/* Article Main (68%) */}
-          <article className="w-full lg:w-[68%] flex-shrink-0">
+        {/* 70% Left and 30% Right Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-5">
+          {/* Article Main (70%) */}
+          <article className="w-full lg:col-span-7">
             {/* Category + Breaking */}
             <div className="flex items-center gap-2 mb-4">
               <span
@@ -275,34 +274,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           </article>
 
           {/* Sidebar (30%) */}
-          <aside className="w-full lg:w-[30%] flex-shrink-0 space-y-6">
-            <AdBanner position="sidebar" />
-
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden sticky top-24">
-              <div className="bg-brand-blue px-4 py-3">
-                <h3 className="text-white font-black text-base telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  తాజా వార్తలు
-                </h3>
-              </div>
-              <div className="divide-y divide-gray-50">
-                {allNews.slice(0, 6).map((a) => (
-                  <Link
-                    key={a.id}
-                    href={`/news/${a.slug}`}
-                    className="flex gap-2 p-3 hover:bg-blue-50 transition-colors group"
-                  >
-                    <Image src={a.image} alt={a.title} width={60} height={45} className="rounded flex-shrink-0 object-cover w-15 h-12" />
-                    <p
-                      className="text-sm md:text-base font-bold text-gray-700 group-hover:text-brand-blue transition-colors line-clamp-3 telugu-text"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                    >
-                      {a.title}
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </aside>
+          <RightSidebar />
         </div>
       </main>
 

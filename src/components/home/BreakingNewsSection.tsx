@@ -4,7 +4,7 @@ import { politicsNews, formatTimeAgo } from '@/lib/mockData';
 
 export default function BreakingNewsSection() {
   const breaking = politicsNews.filter((n) => n.isBreaking);
-  const latest = [...politicsNews, ...politicsNews].slice(0, 4);
+  const latest = [...politicsNews, ...politicsNews].slice(0, 3);
 
   return (
     <section className="mb-5">
@@ -27,16 +27,20 @@ export default function BreakingNewsSection() {
               <Link
                 key={`${article.id}-${index}`}
                 href={`/news/${article.slug}`}
-                className="flex gap-2.5 px-3 py-2 border-b border-gray-50 hover:bg-blue-50 transition-colors group last:border-b-0 flex-1"
+                className="flex items-center gap-3 px-3 py-2 border-b border-gray-50 hover:bg-blue-50 transition-colors group last:border-b-0 flex-1"
               >
-                <span className="flex-shrink-0 w-5 h-5 bg-brand-blue text-white text-[9px] font-black rounded flex items-center justify-center mt-0.5">
-                  {index + 1}
-                </span>
-                <div className="min-w-0">
+                <div className="w-14 h-10 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
+                  <img
+                    src={article.image}
+                    alt={article.title}
+                    className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
                   <span className="text-[11.5px] font-semibold text-gray-700 group-hover:text-brand-blue transition-colors leading-snug block telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                     {article.title}
                   </span>
-                  <span className="text-[9px] text-gray-400 mt-0.5 block">{formatTimeAgo(article.publishedAt)}</span>
+                  <span className="text-[9.5px] text-gray-400 mt-0.5 block">{formatTimeAgo(article.publishedAt)}</span>
                 </div>
               </Link>
             ))}

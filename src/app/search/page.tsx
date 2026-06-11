@@ -1,7 +1,7 @@
-import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import NewsCard from '@/components/cards/NewsCard';
+import RightSidebar from '@/components/layout/RightSidebar';
 import { 
   featuredNews, 
   politicsNews, 
@@ -48,10 +48,9 @@ export default function SearchPage({
 }) {
   return (
     <div className="min-h-screen bg-[#f4f6f8] flex flex-col">
-      <TopBar />
       <Header />
 
-      <main className="max-w-[1200px] mx-auto bg-white px-4 py-8 flex-1 shadow-md border-x border-gray-200 w-full">
+      <main className="max-w-[1050px] mx-auto bg-white px-4 py-8 flex-1 shadow-md border-x border-gray-200 w-full">
         <div className="max-w-2xl mx-auto mb-8">
           <h1
             className="text-2xl font-black text-gray-800 mb-4 telugu-text text-center"
@@ -73,16 +72,25 @@ export default function SearchPage({
           </div>
         </div>
 
-        <h2
-          className="text-lg font-bold text-gray-800 mb-5 telugu-text"
-          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-        >
-          తాజా వార్తలు
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {allNews.map((article) => (
-            <NewsCard key={article.id} article={article} />
-          ))}
+        {/* 2-column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-5">
+          {/* Main search results area (70%) */}
+          <div className="w-full lg:col-span-7">
+            <h2
+              className="text-lg font-bold text-gray-800 mb-5 telugu-text text-left"
+              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+            >
+              తాజా వార్తలు
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {allNews.map((article) => (
+                <NewsCard key={article.id} article={article} />
+              ))}
+            </div>
+          </div>
+
+          {/* Right Sidebar (30%) */}
+          <RightSidebar />
         </div>
       </main>
 

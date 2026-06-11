@@ -30,20 +30,20 @@ export default function PhotoGallery() {
         </Link>
       </div>
 
-      {/* Masonry Grid */}
-      <div className="masonry-grid">
+      {/* Uniform Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {galleryImages.map((img, index) => (
           <div
             key={img.id}
-            className="masonry-item relative rounded-xl overflow-hidden group cursor-pointer img-zoom-container shadow-sm border border-gray-100"
+            className="relative h-48 rounded-xl overflow-hidden group cursor-pointer img-zoom-container shadow-sm border border-gray-100"
             onClick={() => setLightbox(index)}
           >
             <Image
               src={img.src}
               alt={img.alt}
-              width={600}
-              height={400}
-              className="w-full h-auto"
+              fill
+              className="object-cover group-hover:scale-[1.04] transition-transform duration-300"
+              sizes="(max-width: 640px) 50vw, 33vw"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
               <ZoomIn size={28} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />

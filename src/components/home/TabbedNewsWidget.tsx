@@ -8,23 +8,23 @@ import { NewsArticle } from '@/lib/mockData';
 interface TabbedNewsWidgetProps {
   apNews: NewsArticle[];
   tgNews: NewsArticle[];
-  editorialNews: NewsArticle[];
-  devotionalNews: NewsArticle[];
+  adyathmikamNews: NewsArticle[];
+  businessNews: NewsArticle[];
 }
 
 export default function TabbedNewsWidget({
   apNews,
   tgNews,
-  editorialNews,
-  devotionalNews,
+  adyathmikamNews,
+  businessNews,
 }: TabbedNewsWidgetProps) {
-  const [activeTab, setActiveTab] = useState<'ap' | 'tg' | 'editorial' | 'devotional'>('ap');
+  const [activeTab, setActiveTab] = useState<'ap' | 'tg' | 'adyathmikam' | 'business'>('tg');
 
   const tabs = [
-    { id: 'ap', name: 'ఆంధ్రప్రదేశ్', data: apNews },
     { id: 'tg', name: 'తెలంగాణ', data: tgNews },
-    { id: 'editorial', name: 'సంపాదకీయం', data: editorialNews },
-    { id: 'devotional', name: 'అంతర్యామి', data: devotionalNews },
+    { id: 'ap', name: 'ఆంధ్రప్రదేశ్', data: apNews },
+    { id: 'adyathmikam', name: 'ఆధ్యాత్మికం', data: adyathmikamNews },
+    { id: 'business', name: 'బిజినెస్', data: businessNews },
   ] as const;
 
   const currentTab = tabs.find((t) => t.id === activeTab) || tabs[0];
@@ -120,7 +120,13 @@ export default function TabbedNewsWidget({
         {/* View All button */}
         <div className="mt-4 pt-3 border-t border-gray-50 text-center">
           <Link
-            href={`/category/${currentTab.id === 'editorial' ? 'politics' : currentTab.id === 'devotional' ? 'rasipalalu' : currentTab.id}`}
+            href={`/category/${
+              currentTab.id === 'tg'
+                ? 'telangana'
+                : currentTab.id === 'ap'
+                ? 'andhra-pradesh'
+                : currentTab.id
+            }`}
             className="inline-block text-xs font-bold text-brand-blue hover:text-brand-red transition-colors telugu-text"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >

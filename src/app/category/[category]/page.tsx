@@ -1,9 +1,9 @@
-import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import NewsCard from '@/components/cards/NewsCard';
 import AdBanner from '@/components/home/AdBanner';
+import RightSidebar from '@/components/layout/RightSidebar';
 import EPaperReader from '@/components/epaper/EPaperReader';
 import FlashNewsBar from '@/components/home/FlashNewsBar';
 import DistrictSelector from '@/components/category/DistrictSelector';
@@ -161,7 +161,6 @@ export default async function CategoryPage({
 
   return (
     <div className="min-h-screen bg-[#f4f6f8] flex flex-col">
-      <TopBar />
       <Header />
 
       {category === 'epaper' ? (
@@ -169,7 +168,7 @@ export default async function CategoryPage({
           <EPaperReader />
         </main>
       ) : (
-        <main className="max-w-[1200px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
+        <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
           {/* Flash News Strip */}
           <FlashNewsBar />
 
@@ -215,92 +214,92 @@ export default async function CategoryPage({
 
               <AdBanner position="leaderboard" />
 
-              {/* Districts News Layout */}
-              <div className="space-y-8 mt-6">
-                {/* Top Row: 3 columns of prominent cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  {topRow.map((art) => (
-                    <div key={art.id} className="bg-white rounded-lg border border-gray-150 p-2.5 shadow-3xs hover:shadow-2xs transition-all flex flex-col group">
-                      {/* Image container */}
-                      <div className="relative aspect-video rounded-md overflow-hidden bg-black/5 mb-3">
-                        <img 
-                          src={art.image} 
-                          alt={art.title} 
-                          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200" 
-                          onError={(e) => {
-                            e.currentTarget.src = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop";
-                          }}
-                        />
-                        {/* District tag overlaid bottom-left */}
-                        <div className="absolute bottom-2 left-2 bg-white/95 border border-gray-250 px-2 py-0.5 rounded shadow-3xs flex items-center gap-1 select-none">
-                          <span className="text-[#fe0000] text-xs">📍</span>
-                          <span 
-                            className="text-[11px] font-bold text-gray-700 telugu-text"
-                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                          >
-                            {art.districtName}
-                          </span>
-                        </div>
-                      </div>
-                      {/* Title Link */}
-                      <Link href={`/news/${art.slug}`}>
-                        <h3 
-                          className="text-base md:text-lg font-bold text-[#02599c] hover:text-[#013f70] hover:underline transition-colors leading-snug telugu-text text-center px-1"
-                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                        >
-                          {art.title}
-                        </h3>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Bottom Rows: 3 columns of smaller compact row list items */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-gray-100">
-                  {bottomRow.map((art) => (
-                    <div key={art.id} className="flex gap-3 items-start p-2 hover:bg-blue-50/35 rounded-lg transition-colors">
-                      {/* Left Thumbnail */}
-                      <div className="w-[100px] h-[68px] flex-shrink-0 rounded overflow-hidden bg-gray-50 border border-gray-150 relative">
-                        <img 
-                          src={art.image} 
-                          alt={art.title} 
-                          className="w-full h-full object-cover" 
-                          onError={(e) => {
-                            e.currentTarget.src = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop";
-                          }}
-                        />
-                      </div>
-                      {/* Right Text Content */}
-                      <div className="flex-1 flex flex-col text-left justify-between min-h-[68px]">
-                        <div>
-                          {/* Location Pin + District Name */}
-                          <div className="flex items-center gap-0.5 mb-1 select-none">
-                            <span className="text-[#fe0000] text-[10px]">📍</span>
+              {/* 70% Left and 30% Right Layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-6">
+                {/* Districts News Layout (70%) */}
+                <div className="w-full lg:col-span-7 space-y-8">
+                  {/* Top Row: 3 columns of prominent cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    {topRow.map((art) => (
+                      <div key={art.id} className="bg-white rounded-lg border border-gray-150 p-2.5 shadow-3xs hover:shadow-2xs transition-all flex flex-col group text-left">
+                        {/* Image container */}
+                        <div className="relative aspect-video rounded-md overflow-hidden bg-black/5 mb-3">
+                          <img 
+                            src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"} 
+                            alt={art.title} 
+                            className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200" 
+                          />
+                          {/* District tag overlaid bottom-left */}
+                          <div className="absolute bottom-2 left-2 bg-white/95 border border-gray-250 px-2 py-0.5 rounded shadow-3xs flex items-center gap-1 select-none">
+                            <span className="text-[#fe0000] text-xs">📍</span>
                             <span 
-                              className="text-[10.5px] font-extrabold text-[#e60000] telugu-text"
+                              className="text-[11px] font-bold text-gray-700 telugu-text"
                               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                             >
                               {art.districtName}
                             </span>
                           </div>
-                          {/* Article Title */}
-                          <Link href={`/news/${art.slug}`}>
-                            <h4 
-                              className="text-sm md:text-base font-bold text-[#02599c] hover:text-[#013f70] hover:underline leading-snug line-clamp-2 telugu-text"
-                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                            >
-                              {art.title}
-                            </h4>
-                          </Link>
                         </div>
-                        {/* Custom Time */}
-                        <span className="text-[10px] text-[#02599c] font-bold mt-1 block">
-                          {art.publishedTimeOnly}
-                        </span>
+                        {/* Title Link */}
+                        <Link href={`/news/${art.slug}`}>
+                          <h3 
+                            className="text-base md:text-lg font-bold text-[#02599c] hover:text-[#013f70] hover:underline transition-colors leading-snug telugu-text text-center px-1"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          >
+                            {art.title}
+                          </h3>
+                        </Link>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+
+                  {/* Bottom Rows: 3 columns of smaller compact row list items */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-gray-100">
+                    {bottomRow.map((art) => (
+                      <div key={art.id} className="flex gap-3 items-start p-2 hover:bg-blue-50/35 rounded-lg transition-colors">
+                        {/* Left Thumbnail */}
+                        <div className="w-[100px] h-[68px] flex-shrink-0 rounded overflow-hidden bg-gray-50 border border-gray-150 relative">
+                          <img 
+                            src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"} 
+                            alt={art.title} 
+                            className="w-full h-full object-cover" 
+                          />
+                        </div>
+                        {/* Right Text Content */}
+                        <div className="flex-1 flex flex-col text-left justify-between min-h-[68px]">
+                          <div>
+                            {/* Location Pin + District Name */}
+                            <div className="flex items-center gap-0.5 mb-1 select-none">
+                              <span className="text-[#fe0000] text-[10px]">📍</span>
+                              <span 
+                                className="text-[10.5px] font-extrabold text-[#e60000] telugu-text"
+                                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                              >
+                                {art.districtName}
+                              </span>
+                            </div>
+                            {/* Article Title */}
+                            <Link href={`/news/${art.slug}`}>
+                              <h4 
+                                className="text-sm md:text-base font-bold text-[#02599c] hover:text-[#013f70] hover:underline leading-snug line-clamp-2 telugu-text"
+                                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                              >
+                                {art.title}
+                              </h4>
+                            </Link>
+                          </div>
+                          {/* Custom Time */}
+                          <span className="text-[10px] text-[#02599c] font-bold mt-1 block">
+                            {art.publishedTimeOnly}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Sidebar (30%) */}
+                <RightSidebar />
               </div>
             </>
           ) : (
@@ -336,10 +335,10 @@ export default async function CategoryPage({
 
               <AdBanner position="leaderboard" />
 
-              {/* 68% Left and 30% Right Layout */}
-              <div className="flex flex-col lg:flex-row justify-between gap-[2%] mt-6">
-                {/* Articles Grid (68%) */}
-                <div className="w-full lg:w-[68%] flex-shrink-0">
+              {/* 70% Left and 30% Right Layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-6">
+                {/* Articles Grid (70%) */}
+                <div className="w-full lg:col-span-7">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     {allArticles.map((article) => (
                       <NewsCard key={article.id} article={article} />
@@ -358,32 +357,7 @@ export default async function CategoryPage({
                 </div>
 
                 {/* Sidebar (30%) */}
-                <aside className="w-full lg:w-[30%] flex-shrink-0 space-y-6">
-                  <AdBanner position="sidebar" />
-
-                  <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-                    <h3 className="font-black text-gray-800 text-base mb-3 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      వర్గాలు
-                    </h3>
-                    <div className="space-y-1">
-                      {categories.slice(0, 10).map((c) => (
-                        <Link
-                          key={c.slug}
-                          href={`/category/${c.slug}`}
-                          className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-blue-50 group transition-colors"
-                        >
-                          <span
-                            className="text-sm font-medium text-gray-700 group-hover:text-brand-blue transition-colors telugu-text"
-                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                          >
-                            {c.name}
-                          </span>
-                          <ChevronRight size={14} className="text-gray-300 group-hover:text-brand-blue transition-colors" />
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </aside>
+                <RightSidebar />
               </div>
             </>
           )}

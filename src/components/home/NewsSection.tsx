@@ -43,19 +43,10 @@ export default function NewsSection({
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Featured large card */}
-          {articles[0] && (
-            <div className="lg:col-span-2">
-              <NewsCard article={articles[0]} variant="featured" />
-            </div>
-          )}
-          {/* Side stack */}
-          <div className="flex flex-col gap-2">
-            {articles.slice(1, 4).map((article) => (
-              <NewsCard key={article.id} article={article} variant="horizontal" />
-            ))}
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {articles.slice(0, 4).map((article) => (
+            <NewsCard key={article.id} article={article} variant="horizontal" />
+          ))}
         </div>
       </section>
     );
