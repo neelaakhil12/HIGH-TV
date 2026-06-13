@@ -1302,15 +1302,6 @@ export default function EPaperReader() {
   return (
     <div className="bg-[#e9eff4] overflow-hidden border border-gray-200 shadow-lg flex flex-col" style={{ minHeight: isMobile ? 'calc(100svh - 120px)' : '750px' }}>
       
-      {/* Upper Brand Header Block */}
-      <div className="bg-[#b3bfd1] border-b border-gray-300 px-6 py-4 flex items-center justify-between z-10 select-none">
-        <Link href="/" className="flex items-center">
-          <img src="/logo.png" alt="High TV" className="h-10 w-auto object-contain" />
-        </Link>
-        <span className="text-[11px] font-bold text-gray-700 uppercase tracking-widest">
-          High TV Digital Paper
-        </span>
-      </div>
 
       {/* Main E-Paper Reader Sub-Header (Actions bar matching format) */}
       <header className="bg-white border-b border-gray-200 px-4 py-2 flex flex-col md:flex-row items-center justify-between gap-3 shadow-sm z-10">
