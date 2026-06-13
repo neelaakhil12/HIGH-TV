@@ -1211,19 +1211,26 @@ export default function EPaperReader() {
   if (viewMode === 'dashboard') {
     return (
       <div className="flex flex-col flex-1 bg-[#00285a]" style={{ minHeight: '800px' }}>
-        {/* Top Light Grey Brand Header */}
-        <div className="bg-[#b3bfd1] px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-gray-300 select-none">
-          <Link href="/" className="flex items-center">
-            <img src="/logo.png" alt="High TV" className="h-10 w-auto object-contain" />
-          </Link>
-          <div className="flex items-center gap-2 bg-white/40 border border-white/60 rounded-xl px-4 py-1.5 shadow-sm">
-            <Calendar size={15} className="text-red-600" />
-            <span className="font-bold text-xs text-gray-800">{formatDisplayDate(selectedDate)}</span>
-          </div>
-        </div>
-
         {/* Dark Blue Editions Grid Area */}
         <div className="flex-1 p-6 md:p-10 max-w-[1050px] mx-auto w-full">
+          {/* Dashboard Title & Date Row */}
+          <div className="flex flex-col sm:flex-row items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
+            <div>
+              <h1 className="text-3xl font-black tracking-wide text-white">ఈ-పేపర్ ఎడిషన్స్</h1>
+              <p className="text-sm text-gray-400 mt-1 uppercase font-semibold tracking-wider">High TV E-Paper Editions</p>
+            </div>
+            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2 relative cursor-pointer hover:bg-white/10 transition-colors">
+              <Calendar size={16} className="text-red-500" />
+              <span className="font-bold text-sm text-gray-200">{formatDisplayDate(selectedDate)}</span>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+              />
+            </div>
+          </div>
+
           {/* Section: MAIN EDITIONS */}
           <div className="mb-12">
             <h2 className="text-3xl font-extrabold tracking-wider uppercase mb-8 text-white border-l-4 border-red-600 pl-3">Main Editions</h2>
