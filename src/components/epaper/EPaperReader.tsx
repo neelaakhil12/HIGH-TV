@@ -1210,23 +1210,23 @@ export default function EPaperReader() {
   // ================= 1. DASHBOARD SELECTION VIEW =================
   if (viewMode === 'dashboard') {
     return (
-      <div className="bg-[#0b1f3c] text-white p-6 md:p-10 flex-1 overflow-y-auto" style={{ minHeight: '800px' }}>
-        <div className="max-w-[1050px] mx-auto">
-          {/* Dashboard Header */}
-          <div className="flex flex-col md:flex-row items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
-            <div>
-              <h1 className="text-3xl font-black tracking-wide">ఈ-పేపర్ ఎడిషన్స్</h1>
-              <p className="text-sm text-gray-400 mt-1 uppercase font-semibold tracking-wider">High TV E-Paper Editions</p>
-            </div>
-            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2">
-              <Calendar size={16} className="text-red-500" />
-              <span className="font-bold text-sm text-gray-200">{formatDisplayDate(selectedDate)}</span>
-            </div>
+      <div className="flex flex-col flex-1 bg-[#00285a]" style={{ minHeight: '800px' }}>
+        {/* Top Light Grey Brand Header */}
+        <div className="bg-[#b3bfd1] px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-gray-300 select-none">
+          <Link href="/" className="flex items-center">
+            <img src="/logo.png" alt="High TV" className="h-10 w-auto object-contain" />
+          </Link>
+          <div className="flex items-center gap-2 bg-white/40 border border-white/60 rounded-xl px-4 py-1.5 shadow-sm">
+            <Calendar size={15} className="text-red-600" />
+            <span className="font-bold text-xs text-gray-800">{formatDisplayDate(selectedDate)}</span>
           </div>
+        </div>
 
+        {/* Dark Blue Editions Grid Area */}
+        <div className="flex-1 p-6 md:p-10 max-w-[1050px] mx-auto w-full">
           {/* Section: MAIN EDITIONS */}
           <div className="mb-12">
-            <h2 className="text-xl font-bold tracking-wider uppercase mb-6 text-gray-300 border-l-4 border-red-600 pl-3">Main Editions</h2>
+            <h2 className="text-3xl font-extrabold tracking-wider uppercase mb-8 text-white border-l-4 border-red-600 pl-3">Main Editions</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
               {mainDashboardEditions.map((ed) => (
                 <div
@@ -1239,7 +1239,7 @@ export default function EPaperReader() {
                   }}
                   className="group cursor-pointer flex flex-col transition-all duration-300 hover:-translate-y-1.5"
                 >
-                  <div className="relative aspect-[3/4] rounded-xl overflow-hidden border border-white/10 bg-white/5 group-hover:border-red-500 group-hover:ring-4 group-hover:ring-red-500/10 shadow-lg transition-all">
+                  <div className="relative aspect-[3/4] rounded overflow-hidden border border-white/10 bg-white/5 group-hover:border-red-500 group-hover:ring-4 group-hover:ring-red-500/10 shadow-lg transition-all">
                     {/* Live styled thumbnail generator */}
                     <div className="absolute inset-0 scale-[0.25] origin-top-left w-[400%] h-[400%] pointer-events-none select-none">
                       <NewspaperSVG editionId={ed.id} page={1} date={selectedDate} zoom={100} isThumbnail={true} />
@@ -1250,9 +1250,9 @@ export default function EPaperReader() {
                       </div>
                     </div>
                   </div>
-                  <div className="mt-3 text-center md:text-left">
+                  <div className="mt-3 text-left">
                     <p className="font-bold text-sm text-white group-hover:text-red-400 transition-colors">{ed.name}</p>
-                    <p className="text-xs text-gray-400 mt-0.5 font-semibold uppercase">{ed.type}</p>
+                    <p className="text-xs text-gray-300 mt-0.5 font-semibold uppercase">{ed.type}</p>
                   </div>
                 </div>
               ))}
@@ -1261,7 +1261,7 @@ export default function EPaperReader() {
 
           {/* Section: MAGAZINES/PERIODICALS */}
           <div>
-            <h2 className="text-xl font-bold tracking-wider uppercase mb-6 text-gray-300 border-l-4 border-purple-600 pl-3">Magazines/Periodicals</h2>
+            <h2 className="text-3xl font-extrabold tracking-wider uppercase mb-8 text-white border-l-4 border-purple-600 pl-3">Magazines/Periodicals</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
               {magazineDashboardEditions.map((ed) => (
                 <div
@@ -1274,7 +1274,7 @@ export default function EPaperReader() {
                   }}
                   className="group cursor-pointer flex flex-col transition-all duration-300 hover:-translate-y-1.5"
                 >
-                  <div className="relative aspect-[3/4] rounded-xl overflow-hidden border border-white/10 bg-white/5 group-hover:border-purple-500 group-hover:ring-4 group-hover:ring-purple-500/10 shadow-lg transition-all">
+                  <div className="relative aspect-[3/4] rounded overflow-hidden border border-white/10 bg-white/5 group-hover:border-purple-500 group-hover:ring-4 group-hover:ring-purple-500/10 shadow-lg transition-all">
                     <div className="absolute inset-0 scale-[0.25] origin-top-left w-[400%] h-[400%] pointer-events-none select-none">
                       <NewspaperSVG editionId={ed.id} page={1} date={selectedDate} zoom={100} isThumbnail={true} />
                     </div>
@@ -1284,9 +1284,9 @@ export default function EPaperReader() {
                       </div>
                     </div>
                   </div>
-                  <div className="mt-3 text-center md:text-left">
+                  <div className="mt-3 text-left">
                     <p className="font-bold text-sm text-white group-hover:text-purple-400 transition-colors">{ed.name}</p>
-                    <p className="text-xs text-gray-400 mt-0.5 font-semibold uppercase telugu-text">{ed.type}</p>
+                    <p className="text-xs text-gray-300 mt-0.5 font-semibold uppercase telugu-text">{ed.type}</p>
                   </div>
                 </div>
               ))}
@@ -1303,11 +1303,11 @@ export default function EPaperReader() {
     <div className="bg-[#e9eff4] overflow-hidden border border-gray-200 shadow-lg flex flex-col" style={{ minHeight: isMobile ? 'calc(100svh - 120px)' : '750px' }}>
       
       {/* Upper Brand Header Block */}
-      <div className="bg-white border-b border-gray-100 px-4 py-2 flex items-center justify-between z-10 select-none">
+      <div className="bg-[#b3bfd1] border-b border-gray-300 px-6 py-4 flex items-center justify-between z-10 select-none">
         <Link href="/" className="flex items-center">
-          <img src="/logo.png" alt="High TV" className="h-9 w-auto object-contain" />
+          <img src="/logo.png" alt="High TV" className="h-10 w-auto object-contain" />
         </Link>
-        <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+        <span className="text-[11px] font-bold text-gray-700 uppercase tracking-widest">
           High TV Digital Paper
         </span>
       </div>
