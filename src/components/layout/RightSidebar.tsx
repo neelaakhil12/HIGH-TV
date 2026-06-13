@@ -133,7 +133,7 @@ export default function RightSidebar() {
         <div className="flex flex-wrap gap-2">
           {['రాజకీయాలు', 'ఆంధ్రప్రదేశ్', 'తెలంగాణ', 'క్రికెట్', 'సినిమా', 'AI', 'బడ్జెట్', 'వరదలు', 'IPL', 'మెట్రో', 'వ్యాపారం', 'ఆరోగ్యం'].map((tag) => (
             <Link key={tag} href={`/search?q=${tag}`} className="text-sm bg-gray-100 hover:bg-brand-blue hover:text-white text-gray-600 px-3 py-1.5 rounded-full transition-colors font-medium telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-              #{tag}
+              {tag}
             </Link>
           ))}
         </div>

@@ -44,7 +44,7 @@ export default function TrendingSection() {
             {/* Trending badge */}
             <div className="absolute top-3 left-3">
               <span className="flex items-center gap-1 bg-orange-500 text-white font-black text-sm px-2.5 py-1 rounded-full">
-                <Flame size={12} /> #1 ట్రెండింగ్
+                <Flame size={12} /> 1 ట్రెండింగ్
               </span>
             </div>
             <div className="absolute inset-x-0 bottom-0 p-5">

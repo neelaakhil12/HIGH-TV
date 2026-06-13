@@ -285,7 +285,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                     className="text-sm bg-gray-100 hover:bg-[#025390] hover:text-white text-gray-600 px-3 py-1 rounded-full transition-colors font-medium telugu-text"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
-                    #{tag}
+                    {tag}
                   </Link>
                 ))}
               </div>

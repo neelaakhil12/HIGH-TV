@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CloudSun, Sun, SunDim, Thermometer, CloudRain, ArrowRight } from 'lucide-react';
+import { CloudSun, Sun, SunDim, Thermometer, CloudRain, ArrowRight, Cloud } from 'lucide-react';
 
 const homeWeatherData = [
   {
@@ -10,18 +10,25 @@ const homeWeatherData = [
     bg: 'from-blue-50/50 to-sky-50/30'
   },
   {
-    city: 'విజయవాడ',
-    temp: 37,
-    condition: 'తీవ్రమైన ఎండ',
-    icon: <SunDim size={24} className="text-red-500" />,
-    bg: 'from-amber-50/50 to-orange-50/30'
+    city: 'రంగారెడ్డి',
+    temp: 31,
+    condition: 'ఉరుములతో కూడిన వర్షం',
+    icon: <CloudRain size={24} className="text-blue-500" />,
+    bg: 'from-blue-50/50 to-indigo-50/30'
   },
   {
-    city: 'విశాఖపట్నం',
-    temp: 34,
-    condition: 'ఎండగా ఉంది',
+    city: 'వరంగల్',
+    temp: 33,
+    condition: 'మేఘావృతం',
+    icon: <Cloud size={24} className="text-gray-400" />,
+    bg: 'from-gray-50/50 to-slate-50/30'
+  },
+  {
+    city: 'ఖమ్మం',
+    temp: 35,
+    condition: 'ఎండగా ఉంటుంది',
     icon: <Sun size={24} className="text-amber-500" />,
-    bg: 'from-blue-50/50 to-indigo-50/30'
+    bg: 'from-amber-50/50 to-orange-50/30'
   }
 ];
 
@@ -49,7 +56,7 @@ export default function WeatherWidget() {
       </div>
 
       {/* Grid of cities */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {homeWeatherData.map((data, index) => (
           <div 
             key={index} 

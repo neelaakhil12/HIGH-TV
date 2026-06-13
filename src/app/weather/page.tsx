@@ -29,6 +29,54 @@ const weatherData = [
     ]
   },
   {
+    city: 'రంగారెడ్డి',
+    temp: 31,
+    condition: 'ఉరుములతో కూడిన వర్షం',
+    humidity: 68,
+    wind: 14,
+    high: 33,
+    low: 22,
+    icon: <CloudRain size={36} className="text-blue-500" />,
+    forecast: [
+      { day: 'శుక్రవారం', temp: 32, cond: 'తేలికపాటి వర్షం', icon: <CloudRain size={20} className="text-blue-400" /> },
+      { day: 'శనివారం', temp: 31, cond: 'ఉరుములతో కూడిన వర్షం', icon: <CloudRain size={20} className="text-blue-500" /> },
+      { day: 'ఆదివారం', temp: 29, cond: 'భారీ వర్షం', icon: <CloudRain size={20} className="text-blue-600" /> },
+      { day: 'సోమవారం', temp: 32, cond: 'పాక్షికంగా మేఘావృతం', icon: <CloudSun size={20} className="text-blue-400" /> },
+    ]
+  },
+  {
+    city: 'వరంగల్',
+    temp: 33,
+    condition: 'మేఘావృతం',
+    humidity: 62,
+    wind: 11,
+    high: 35,
+    low: 23,
+    icon: <Cloud size={36} className="text-gray-400" />,
+    forecast: [
+      { day: 'శుక్రవారం', temp: 32, cond: 'తేలికపాటి వర్షం', icon: <CloudRain size={20} className="text-blue-400" /> },
+      { day: 'శనివారం', temp: 30, cond: 'భారీ వర్షం', icon: <CloudRain size={20} className="text-blue-600" /> },
+      { day: 'ఆదివారం', temp: 31, cond: 'మేఘావృతం', icon: <Cloud size={20} className="text-gray-400" /> },
+      { day: 'సోమవారం', temp: 33, cond: 'పాక్షికంగా మేఘావృతం', icon: <CloudSun size={20} className="text-blue-400" /> },
+    ]
+  },
+  {
+    city: 'ఖమ్మం',
+    temp: 35,
+    condition: 'ఎండగా ఉంటుంది',
+    humidity: 52,
+    wind: 9,
+    high: 37,
+    low: 25,
+    icon: <Sun size={36} className="text-amber-500" />,
+    forecast: [
+      { day: 'శుక్రవారం', temp: 36, cond: 'ఎండగా ఉంటుంది', icon: <Sun size={20} className="text-amber-500" /> },
+      { day: 'శనివారం', temp: 35, cond: 'ఎండగా ఉంటుంది', icon: <Sun size={20} className="text-amber-500" /> },
+      { day: 'ఆదివారం', temp: 34, cond: 'పాక్షికంగా మేఘావృతం', icon: <CloudSun size={20} className="text-blue-400" /> },
+      { day: 'సోమవారం', temp: 34, cond: 'మేఘావృతం', icon: <Cloud size={20} className="text-gray-400" /> },
+    ]
+  },
+  {
     city: 'విశాఖపట్నం',
     temp: 34,
     condition: 'ఎండగా మరియు ఉక్కపోత',
@@ -58,22 +106,6 @@ const weatherData = [
       { day: 'శనివారం', temp: 37, cond: 'ఎండగా ఉంటుంది', icon: <Sun size={20} className="text-amber-500" /> },
       { day: 'ఆదివారం', temp: 35, cond: 'పాక్షికంగా మేఘావృతం', icon: <CloudSun size={20} className="text-blue-400" /> },
       { day: 'సోమవారం', temp: 36, cond: 'ఎండగా ఉంటుంది', icon: <Sun size={20} className="text-amber-500" /> },
-    ]
-  },
-  {
-    city: 'వరంగల్',
-    temp: 33,
-    condition: 'మేఘావృతం',
-    humidity: 62,
-    wind: 11,
-    high: 35,
-    low: 23,
-    icon: <Cloud size={36} className="text-gray-400" />,
-    forecast: [
-      { day: 'శుక్రవారం', temp: 32, cond: 'తేలికపాటి వర్షం', icon: <CloudRain size={20} className="text-blue-400" /> },
-      { day: 'శనివారం', temp: 30, cond: 'భారీ వర్షం', icon: <CloudRain size={20} className="text-blue-600" /> },
-      { day: 'ఆదివారం', temp: 31, cond: 'మేఘావృతం', icon: <Cloud size={20} className="text-gray-400" /> },
-      { day: 'సోమవారం', temp: 33, cond: 'పాక్షికంగా మేఘావృతం', icon: <CloudSun size={20} className="text-blue-400" /> },
     ]
   },
   {
