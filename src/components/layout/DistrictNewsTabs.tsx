@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function DistrictNewsTabs({ apNews, tgNews }: Props) {
-  const [active, setActive] = useState<'ap' | 'tg'>('ap');
+  const [active, setActive] = useState<'ap' | 'tg'>('tg');
   const news = active === 'ap' ? apNews : tgNews;
 
   return (
@@ -31,17 +31,6 @@ export default function DistrictNewsTabs({ apNews, tgNews }: Props) {
       {/* Slide Toggle */}
       <div className="flex bg-gray-100 p-1 gap-1 m-2 rounded-lg">
         <button
-          onClick={() => setActive('ap')}
-          className={`flex-1 py-1.5 text-[15px] font-black rounded-md transition-all duration-200 telugu-text ${
-            active === 'ap'
-              ? 'bg-[#e60000] text-white shadow-sm'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-        >
-          ఆంధ్రప్రదేశ్
-        </button>
-        <button
           onClick={() => setActive('tg')}
           className={`flex-1 py-1.5 text-[15px] font-black rounded-md transition-all duration-200 telugu-text ${
             active === 'tg'
@@ -51,6 +40,17 @@ export default function DistrictNewsTabs({ apNews, tgNews }: Props) {
           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
         >
           తెలంగాణ
+        </button>
+        <button
+          onClick={() => setActive('ap')}
+          className={`flex-1 py-1.5 text-[15px] font-black rounded-md transition-all duration-200 telugu-text ${
+            active === 'ap'
+              ? 'bg-[#e60000] text-white shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+        >
+          ఆంధ్రప్రదేశ్
         </button>
       </div>
 
@@ -70,7 +70,7 @@ export default function DistrictNewsTabs({ apNews, tgNews }: Props) {
                 />
               </div>
               <p
-                className="text-[16px] font-semibold text-gray-700 group-hover:text-[#025390] leading-snug line-clamp-2 telugu-text"
+                className="flex-1 min-w-0 text-[16px] font-semibold text-gray-700 group-hover:text-[#025390] leading-snug line-clamp-2 telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {item.title}
