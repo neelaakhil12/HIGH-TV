@@ -3,8 +3,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Clock, Share2, Eye } from 'lucide-react';
-import { NewsArticle, formatTimeAgo } from '@/lib/mockData';
+import { Clock, Share2 } from 'lucide-react';
+import { NewsArticle } from '@/lib/mockData';
+
+function formatTime(dateStr: string) {
+  const d = new Date(dateStr);
+  const hours = d.getHours();
+  const mins = String(d.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const h = hours % 12 || 12;
+  return `${h}:${mins} ${ampm}`;
+}
 
 function ShareButton({ articleTitle, slug }: { articleTitle: string; slug: string }) {
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -158,7 +167,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
           </div>
           <div className="flex items-center gap-1.5 mt-2 text-xs text-gray-400">
             <Clock size={10} />
-            <span>{formatTimeAgo(article.publishedAt)}</span>
+            <span>{formatTime(article.publishedAt)}</span>
           </div>
         </div>
       </article>
@@ -186,7 +195,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
               {article.title}
             </p>
           </Link>
-          <span className="text-xs text-gray-400 mt-1 block">{formatTimeAgo(article.publishedAt)}</span>
+          <span className="text-xs text-gray-400 mt-1 block">{formatTime(article.publishedAt)}</span>
         </div>
       </article>
     );
@@ -231,11 +240,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
             <div className="flex items-center gap-3 text-xs text-gray-400">
               <div className="flex items-center gap-1">
                 <Clock size={10} />
-                <span>{formatTimeAgo(article.publishedAt)}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Eye size={10} />
-                <span>{(article.views / 1000).toFixed(1)}K</span>
+                <span>{formatTime(article.publishedAt)}</span>
               </div>
             </div>
             <ShareButton articleTitle={article.title} slug={article.slug} />
@@ -293,11 +298,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
           <div className="flex items-center gap-3 text-xs text-gray-400">
             <div className="flex items-center gap-1">
               <Clock size={10} />
-              <span>{formatTimeAgo(article.publishedAt)}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Eye size={10} />
-              <span>{(article.views / 1000).toFixed(1)}K</span>
+              <span>{formatTime(article.publishedAt)}</span>
             </div>
           </div>
           <ShareButton articleTitle={article.title} slug={article.slug} />

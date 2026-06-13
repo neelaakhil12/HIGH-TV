@@ -102,7 +102,7 @@ export default function EPaperReader() {
       setDownloading(false);
       const link = document.createElement('a');
       link.href = '/newspaper_sample.svg';
-      link.download = `eenadu-epaper-${selectedDate}.pdf`;
+      link.download = `hightv-epaper-${selectedDate}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -498,7 +498,7 @@ export default function EPaperReader() {
                         onMouseDown={(e) => e.stopPropagation()}
                         onClick={() => {
                           const randomId = `${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
-                          setGeneratedClipUrl(`https://eenadu.net/clip/clip-${randomId}`);
+                          setGeneratedClipUrl(`https://hightv.in/clip/clip-${randomId}`);
                           setShowShareModal(true);
                           setIsClipping(false);
                         }}
@@ -692,7 +692,7 @@ export default function EPaperReader() {
               
               {/* Twitter / X */}
               <a
-                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(generatedClipUrl)}&text=${encodeURIComponent("Check out this news clip from Eenadu!")}`}
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(generatedClipUrl)}&text=${encodeURIComponent("Check out this news clip from High TV!")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-black hover:bg-gray-800 text-white flex items-center justify-center transition-all hover:scale-110 shadow"
@@ -705,7 +705,7 @@ export default function EPaperReader() {
 
               {/* WhatsApp */}
               <a
-                href={`https://api.whatsapp.com/send?text=${encodeURIComponent("Check out this news clip from Eenadu: " + generatedClipUrl)}`}
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent("Check out this news clip from High TV: " + generatedClipUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-[#25d366] hover:bg-[#20ba5a] text-white flex items-center justify-center transition-all hover:scale-110 shadow"
@@ -718,7 +718,7 @@ export default function EPaperReader() {
 
               {/* Email */}
               <a
-                href={`mailto:?subject=${encodeURIComponent("News Clip from Eenadu")}&body=${encodeURIComponent("Check out this news clip: " + generatedClipUrl)}`}
+                href={`mailto:?subject=${encodeURIComponent("News Clip from High TV")}&body=${encodeURIComponent("Check out this news clip: " + generatedClipUrl)}`}
                 className="w-10 h-10 rounded-full bg-[#ea4335] hover:bg-[#d93025] text-white flex items-center justify-center transition-all hover:scale-110 shadow"
                 title="Share via Email"
               >
@@ -746,7 +746,7 @@ export default function EPaperReader() {
                 onClick={() => {
                   const link = document.createElement('a');
                   link.href = epaperPages[activePageIdx].image;
-                  link.download = `eenadu-clip-${Date.now()}.jpg`;
+                  link.download = `hightv-clip-${Date.now()}.jpg`;
                   document.body.appendChild(link);
                   link.click();
                   document.body.removeChild(link);

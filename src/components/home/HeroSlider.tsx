@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
-import { featuredNews, formatTimeAgo } from '@/lib/mockData';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { featuredNews } from '@/lib/mockData';
 
 export default function HeroSlider() {
   const [current, setCurrent] = useState(0);
@@ -79,69 +78,49 @@ export default function HeroSlider() {
       </div>
 
       {/* Slide Text Content Container (Placed directly under the image) */}
-      <div className="p-4 flex-1 flex flex-col justify-between text-left select-none bg-white">
-        <div key={current} className="slide-fade-in flex-1">
-          {/* Top Row: Badges & Time Info */}
-          <div className="flex items-center gap-1.5 mb-2">
-            {slide.isBreaking && (
-              <span className="bg-[#66000c] text-white text-[9px] md:text-[10px] font-black px-1.5 md:px-2 py-0.5 rounded breaking-badge uppercase tracking-wider">
-                🔴 బ్రేకింగ్
+      <div className="p-3.5 select-none bg-white">
+        <div key={current} className="slide-fade-in flex flex-col gap-2">
+          {/* Top Row: Badges & Dots */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              {slide.isBreaking && (
+                <span className="bg-[#66000c] text-white text-[9px] md:text-[10px] font-black px-1.5 md:px-2 py-0.5 rounded breaking-badge uppercase tracking-wider">
+                  🔴 బ్రేకింగ్
+                </span>
+              )}
+              <span
+                className="text-white text-[9px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded"
+                style={{ background: slide.categoryColor }}
+              >
+                {slide.category}
               </span>
-            )}
-            <span
-              className="text-white text-[9px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded"
-              style={{ background: slide.categoryColor }}
-            >
-              {slide.category}
-            </span>
-            <div className="flex items-center gap-1 text-gray-400 text-[10px] md:text-[11px] ml-auto">
-              <Clock size={10} />
-              <span>{formatTimeAgo(slide.publishedAt)}</span>
+            </div>
+
+            {/* Dots Indicator */}
+            <div className="flex gap-1.5">
+              {slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrent(idx)}
+                  className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                    idx === current ? 'w-5 bg-[#66000c]' : 'w-1.5 bg-gray-200 hover:bg-gray-350'
+                  }`}
+                  aria-label={`Slide ${idx + 1}`}
+                />
+              ))}
             </div>
           </div>
 
-          {/* News Headline */}
-          <Link href={`/news/${slide.slug}`} className="block group mb-2">
+          {/* News Headline - exactly one line */}
+          <Link href={`/news/${slide.slug}`} className="block group">
             <h2
-              className="text-gray-800 text-sm md:text-[17px] lg:text-[19px] font-black leading-snug group-hover:text-[#02599c] transition-colors telugu-text line-clamp-2"
+              className="text-gray-800 text-sm md:text-base font-black leading-snug group-hover:text-[#02599c] transition-colors telugu-text truncate"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+              title={slide.title}
             >
               {slide.title}
             </h2>
           </Link>
-
-          {/* News Description */}
-          <p
-            className="text-gray-500 text-[11px] md:text-xs leading-relaxed telugu-text line-clamp-2 md:line-clamp-3"
-            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-          >
-            {slide.description}
-          </p>
-        </div>
-
-        {/* Bottom Actions Row: Link & Dots */}
-        <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-          <Link
-            href={`/news/${slide.slug}`}
-            className="text-[#66000c] hover:text-[#4d0009] font-black text-xs flex items-center gap-1 transition-colors telugu-text"
-            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-          >
-            పూర్తి వార్త చదవండి →
-          </Link>
-
-          {/* Dots Indicator */}
-          <div className="flex gap-1.5">
-            {slides.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrent(idx)}
-                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  idx === current ? 'w-5 bg-[#66000c]' : 'w-1.5 bg-gray-200 hover:bg-gray-350'
-                }`}
-                aria-label={`Slide ${idx + 1}`}
-              />
-            ))}
-          </div>
         </div>
       </div>
     </div>

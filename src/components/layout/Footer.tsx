@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { categories } from '@/lib/mockData';
+import BackToTopBar from '@/components/layout/BackToTopBar';
+import ScrollToTopButton from '@/components/layout/ScrollToTopButton';
 
 // Inline SVG social icons
 const FacebookIcon = () => (
@@ -33,7 +35,12 @@ export default function Footer() {
   ).slice(0, 18); // Show top 18 categories to keep the height compact
 
   return (
+    <>
     <footer className="bg-[#025390] text-blue-100 border-t border-brand-dark-blue">
+
+      {/* Back to Top Bar */}
+      <BackToTopBar />
+
       {/* Main Footer */}
       <div className="max-w-[1050px] mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
@@ -73,10 +80,6 @@ export default function Footer() {
 
           {/* Categories Grid Column (Spans 4/12 on desktop) */}
           <div className="md:col-span-4">
-            <h3 className="text-white font-bold text-base mb-4 telugu-text border-l-4 border-hover-yellow pl-3"
-              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-              వర్గాలు
-            </h3>
             <ul className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-blue-200">
               {uniqueCategories.map((cat) => (
                 <li key={cat.slug}>
@@ -137,19 +140,21 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="bg-[#003e67] border-t border-brand-dark-blue/40 text-blue-200">
         <div className="max-w-[1050px] mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-xs telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-            © 2026 హై టీవీ. అన్ని హక్కులు నిల్వ చేయబడ్డాయి.
+          <p className="text-xs font-sans">
+            © 2026 High TV. All rights reserved.
           </p>
-          <div className="flex gap-4 text-xs">
-            <Link href="/privacy" className="hover:text-hover-yellow transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>గోప్యత విధానం</Link>
-            <Link href="/terms" className="hover:text-hover-yellow transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>నిబంధనలు</Link>
-            <Link href="/about" className="hover:text-hover-yellow transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>మా గురించి</Link>
-            <Link href="/team" className="hover:text-hover-yellow transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>మా టీమ్</Link>
-            <Link href="/weather" className="hover:text-hover-yellow transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వాతావరణం</Link>
-            <Link href="/contact" className="hover:text-hover-yellow transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>సంప్రదింపు</Link>
+          <div className="flex gap-4 text-xs font-sans">
+            <Link href="/privacy" className="hover:text-hover-yellow transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-hover-yellow transition-colors">Terms of Service</Link>
+            <Link href="/about" className="hover:text-hover-yellow transition-colors">About Us</Link>
+            <Link href="/team" className="hover:text-hover-yellow transition-colors">Our Team</Link>
+            <Link href="/weather" className="hover:text-hover-yellow transition-colors">Weather</Link>
+            <Link href="/contact" className="hover:text-hover-yellow transition-colors">Contact</Link>
           </div>
         </div>
       </div>
     </footer>
+    <ScrollToTopButton />
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import Header from '@/components/layout/Header';
+import BackButton from '@/components/layout/BackButton';
 import Footer from '@/components/layout/Footer';
 import NewsCard from '@/components/cards/NewsCard';
 import RightSidebar from '@/components/layout/RightSidebar';
@@ -51,6 +52,7 @@ export default function SearchPage({
       <Header />
 
       <main className="max-w-[1050px] mx-auto bg-white px-4 py-8 flex-1 shadow-md border-x border-gray-200 w-full">
+        <BackButton />
         <div className="max-w-2xl mx-auto mb-8">
           <h1
             className="text-2xl font-black text-gray-800 mb-4 telugu-text text-center"

@@ -21,7 +21,7 @@ export default function BreakingNewsSection() {
         </Link>
       </div>
       <div className="bg-white rounded-b-xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-2" style={{ height: '210px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[270px]">
           <div className="border-r border-gray-100 overflow-hidden flex flex-col">
             {latest.map((article, index) => (
               <Link
@@ -37,15 +37,15 @@ export default function BreakingNewsSection() {
                   />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-[11.5px] font-semibold text-gray-700 group-hover:text-brand-blue transition-colors leading-snug block telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  <span className="text-[16px] font-black text-gray-800 group-hover:text-brand-blue transition-colors leading-snug block telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                     {article.title}
                   </span>
-                  <span className="text-[9.5px] text-gray-400 mt-0.5 block">{formatTimeAgo(article.publishedAt)}</span>
+                  <span className="text-[11px] text-gray-400 mt-0.5 block">{formatTimeAgo(article.publishedAt)}</span>
                 </div>
               </Link>
             ))}
           </div>
-          <div className="relative overflow-hidden h-full">
+          <div className="relative overflow-hidden h-[180px] lg:h-full">
             {breaking[0] && (
               <>
                 <img src={breaking[0].image} alt={breaking[0].title} className="w-full h-full object-cover" loading="eager" />
@@ -53,7 +53,7 @@ export default function BreakingNewsSection() {
                 <div className="absolute inset-x-0 bottom-0 p-3">
                   <span className="bg-brand-red text-white text-[9px] font-black px-1.5 py-0.5 rounded breaking-badge mb-1 inline-block">🔴 BREAKING</span>
                   <Link href={`/news/${breaking[0].slug}`}>
-                    <h3 className="text-white text-[12px] font-black leading-snug hover:text-hover-yellow transition-colors telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    <h3 className="text-white text-[18px] font-black leading-snug hover:text-hover-yellow transition-colors telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       {breaking[0].title}
                     </h3>
                   </Link>

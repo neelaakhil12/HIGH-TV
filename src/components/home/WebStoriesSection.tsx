@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { X, Play, Pause, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
+import Link from 'next/link';
 
 interface StorySlide {
   image: string;
@@ -113,12 +114,39 @@ export default function WebStoriesSection() {
   const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [typedText, setTypedText] = useState('');
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const SLIDE_DURATION = 4000; // 4 seconds per slide
 
-  // Outlined Text Styles matching Eenadu Telugu fonts
+  // Typewriter effect triggered on slide index or story changes
+  useEffect(() => {
+    if (activeStoryIndex === null) {
+      setTypedText('');
+      return;
+    }
+    const fullText = storiesData[activeStoryIndex].slides[currentSlideIndex].text;
+    setTypedText('');
+    
+    let currentIdx = 0;
+    const intervalTime = 30; // 30ms per character
+    
+    const charInterval = setInterval(() => {
+      if (currentIdx < fullText.length) {
+        currentIdx++;
+        setTypedText(fullText.slice(0, currentIdx));
+      } else {
+        clearInterval(charInterval);
+      }
+    }, intervalTime);
+
+    return () => {
+      clearInterval(charInterval);
+    };
+  }, [activeStoryIndex, currentSlideIndex]);
+
+  // Outlined Text Styles matching Telugu fonts
   const getTextStyle = (style: 'red-white' | 'white-black') => {
     if (style === 'red-white') {
       return {
@@ -223,6 +251,13 @@ export default function WebStoriesSection() {
 
   const activeStory = activeStoryIndex !== null ? storiesData[activeStoryIndex] : null;
 
+  // Dynamic Circle sizing calculations based on slide text length
+  const currentText = activeStory?.slides[currentSlideIndex]?.text || '';
+  const textLength = currentText.length;
+  const circleSize = Math.max(460, Math.min(560, 420 + textLength * 2));
+  const bottomOffset = -circleSize * 0.26;
+  const ptPadding = Math.round(circleSize * 0.06);
+
   return (
     <div className="mb-6 select-none">
       {/* Section Header */}
@@ -233,6 +268,13 @@ export default function WebStoriesSection() {
             వెబ్ స్టోరీస్
           </h3>
         </div>
+        <Link 
+          href="/category/webstories" 
+          className="text-xs md:text-sm font-extrabold text-[#02599c] hover:text-[#e60000] transition-colors flex items-center gap-1 telugu-text" 
+          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+        >
+          మరిన్ని చూడండి <ChevronRight size={14} />
+        </Link>
       </div>
 
       {/* Grid of Web Stories (3 Columns) */}
@@ -279,6 +321,25 @@ export default function WebStoriesSection() {
           className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center backdrop-blur-xs p-4 animate-fade-in"
           onClick={handleCloseStory}
         >
+          <style dangerouslySetInnerHTML={{ __html: `
+            @keyframes storyCirclePop {
+              0% {
+                opacity: 0;
+                transform: translate(-50%, 250px) scale(0.9);
+              }
+              70% {
+                opacity: 1;
+                transform: translate(-50%, -12px) scale(1.02);
+              }
+              100% {
+                opacity: 1;
+                transform: translate(-50%, 0) scale(1);
+              }
+            }
+            .animate-story-circle-pop {
+              animation: storyCirclePop 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            }
+          `}} />
           {/* Main Story Container */}
           <div
             className="relative w-full max-w-sm aspect-[9/16] bg-neutral-950 rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between"
@@ -349,13 +410,21 @@ export default function WebStoriesSection() {
               </div>
             </div>
 
-            {/* Slide Outlined Text Overlay (Center/Top) */}
-            <div className="absolute top-[20%] left-0 right-0 px-4 text-center z-20 pointer-events-none">
+            {/* Slide Circle Text Overlay (Centered dome at the bottom, clips into a curved bottom block, sizes dynamically) */}
+            <div 
+              style={{
+                width: `${circleSize}px`,
+                height: `${circleSize}px`,
+                bottom: `${bottomOffset}px`,
+                paddingTop: `${ptPadding}px`,
+              }}
+              className="absolute left-1/2 rounded-full bg-black/65 backdrop-blur-xs shadow-2xl z-20 pointer-events-none flex flex-col justify-start items-center px-6 text-center animate-story-circle-pop border border-white/10 transition-all duration-500 ease-in-out"
+            >
               <h3
-                className="text-[18px] md:text-[21px] font-extrabold leading-tight tracking-wide block break-words"
-                style={getTextStyle(activeStory.slides[currentSlideIndex].textStyle)}
+                className="text-[20px] md:text-[22px] font-black leading-relaxed text-white telugu-text max-w-[270px] mx-auto"
+                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
-                {activeStory.slides[currentSlideIndex].text}
+                {typedText}
               </h3>
             </div>
 

@@ -100,6 +100,26 @@ function SidebarLatestVideos() {
         ))}
       </div>
 
+      {/* E-Paper Promo Link */}
+      <div className="mt-5 pt-4 border-t border-gray-100 flex flex-col items-center">
+        <Link
+          href="/category/epaper"
+          className="flex flex-col items-center group w-full"
+        >
+          {/* Logo container */}
+          <div className="w-full max-w-[200px] h-[64px] bg-white hover:bg-gray-50/50 border border-gray-150 rounded-lg flex items-center justify-center p-2.5 transition-colors shadow-2xs">
+            <img
+              src="/epaper-logo.png"
+              alt="ఈ-పేపర్ లోగో"
+              className="h-10 w-auto object-contain"
+            />
+          </div>
+          <span className="text-[11.5px] font-black text-gray-800 group-hover:text-red-600 font-sans tracking-widest uppercase mt-2">
+            E-PAPER
+          </span>
+        </Link>
+      </div>
+
       {/* Video Play Modal Overlay */}
       {selectedVideo && (
         <div 
@@ -210,14 +230,14 @@ export default function HomePage() {
                 <div className="grid grid-cols-3 gap-2">
                   <Link
                     href="/category/telangana?view=districts"
-                    className="bg-[#02599c] hover:bg-[#02487e] text-white font-black py-2 px-1 rounded text-center text-[10px] md:text-[11px] lg:text-xs transition-colors shadow-xs telugu-text flex items-center justify-center"
+                    className="bg-[#16a34a] hover:bg-[#15803d] text-white font-black py-2 px-1 rounded text-center text-[10px] md:text-[11px] lg:text-xs transition-colors shadow-xs telugu-text flex items-center justify-center"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     తెలంగాణ జిల్లాల వార్తలు
                   </Link>
                   <Link
                     href="/category/andhra-pradesh?view=districts"
-                    className="bg-[#e60000] hover:bg-[#c80000] text-white font-black py-2 px-1 rounded text-center text-[10px] md:text-[11px] lg:text-xs transition-colors shadow-xs telugu-text flex items-center justify-center"
+                    className="bg-[#ea580c] hover:bg-[#c2410c] text-white font-black py-2 px-1 rounded text-center text-[10px] md:text-[11px] lg:text-xs transition-colors shadow-xs telugu-text flex items-center justify-center"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     ఆంధ్రప్రదేశ్ జిల్లాల వార్తలు
@@ -282,33 +302,6 @@ export default function HomePage() {
               adyathmikamNews={adyathmikamFeed}
               businessNews={businessFeed}
             />
-
-            {/* Editorial Cartoon */}
-            <div className="bg-red-50/40 rounded-xl border border-red-100 p-4 mb-8">
-              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-red-100">
-                <div className="w-1.5 h-6 bg-brand-red rounded-full"></div>
-                <h3 className="font-black text-brand-red text-base telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  ఇదీ సంగతి (Daily Cartoon)
-                </h3>
-              </div>
-              <div className="flex flex-col md:flex-row gap-4 items-center">
-                <div className="w-full md:w-1/2 relative h-48 rounded-lg overflow-hidden border border-gray-100 bg-white p-2 flex items-center justify-center">
-                  <Image
-                    src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=500&h=400&fit=crop"
-                    alt="ఇదీ సంగతి కార్టూన్"
-                    width={300}
-                    height={200}
-                    className="h-full w-auto object-contain rounded"
-                  />
-                </div>
-                <div className="w-full md:w-1/2 flex flex-col justify-center">
-                  <p className="text-gray-700 font-black text-sm md:text-base leading-relaxed telugu-text italic" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                    &ldquo;వర్షాలు వస్తే కరెంటు పోతుంది... వర్షాలు రాకపోతే నీళ్లు పోతాయి... రెండింటికీ ప్రజల ప్రాణాలు పోతాయి!&rdquo;
-                  </p>
-                  <span className="text-xs text-gray-400 mt-2 block font-medium">&mdash; ఈనాడు వ్యంగ్య చిత్రం</span>
-                </div>
-              </div>
-            </div>
 
             <WeatherWidget />
 

@@ -39,7 +39,7 @@ export default function RightSidebar() {
               className="flex items-center gap-2.5 pb-2.5 last:pb-0 last:border-b-0 border-b border-gray-50 group cursor-pointer"
             >
               {/* Image thumbnail */}
-              <div className="w-12 h-9 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
+              <div className="w-14 h-10 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
                 <img
                   src={article.image}
                   alt={article.title}
@@ -49,12 +49,12 @@ export default function RightSidebar() {
               {/* Text */}
               <div className="min-w-0 flex-1">
                 <h4
-                  className="text-[12px] font-black text-gray-800 leading-snug group-hover:text-[#02599c] transition-colors telugu-text line-clamp-2"
+                  className="text-[16px] font-black text-gray-800 leading-snug group-hover:text-[#02599c] transition-colors telugu-text line-clamp-2"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {article.title}
                 </h4>
-                <span className="text-[8.5px] text-gray-400 mt-0.5 block">{formatTimeAgo(article.publishedAt)}</span>
+                <span className="text-[10px] text-gray-400 mt-0.5 block">{formatTimeAgo(article.publishedAt)}</span>
               </div>
             </Link>
           ))}
@@ -142,7 +142,7 @@ export default function RightSidebar() {
       {/* 10. Social Follow Box */}
       <div className="bg-brand-blue rounded-xl p-4 text-white text-left">
         <h3 className="font-black text-lg mb-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>మాతో అనుసంధానం</h3>
-        <p className="text-blue-100 text-xs mb-4 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>सोशल मीडियालो ईनाडुनु फालो चेयండి</p>
+        <p className="text-blue-100 text-xs mb-4 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>సోషల్ మీడియాలో హై టీవీని ఫాలో అవ్వండి</p>
         <div className="space-y-2">
           {[
             { name: 'Facebook', count: '2.4L' },

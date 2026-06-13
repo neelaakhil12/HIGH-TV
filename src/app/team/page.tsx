@@ -1,4 +1,5 @@
 import Header from '@/components/layout/Header';
+import BackButton from '@/components/layout/BackButton';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import RightSidebar from '@/components/layout/RightSidebar';
@@ -22,14 +23,15 @@ export default function TeamPage() {
       <Header />
 
       <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
+        <BackButton />
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-6 border-b border-gray-100 pb-3 flex-wrap">
-          <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1">
-            <Home size={14} /> హోమ్
+        <div className="flex items-center gap-2 text-sm text-gray-500 mb-6 border-b border-gray-100 pb-3 flex-wrap font-sans">
+          <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1 font-bold">
+            <Home size={14} /> Home
           </Link>
           <ChevronRight size={14} />
-          <span className="text-gray-800 font-semibold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-            మా టీమ్
+          <span className="text-gray-800 font-bold">
+            Our Team
           </span>
         </div>
 

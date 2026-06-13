@@ -42,7 +42,6 @@ export const categories = [
   { name: 'సంపాదకీయం', slug: 'sampadakiyam', color: '#be123c' },
   { name: 'సంపాదకీయం', slug: 'editorial', color: '#be123c' },
   { name: 'వైరల్ స్టోరీస్', slug: 'viral-stories', color: '#dc2626' },
-  { name: 'వసుంధర', slug: 'vasundhara', color: '#db2777' },
   { name: 'మహిళలు', slug: 'women', color: '#ec4899' },
   { name: 'షార్ట్స్', slug: 'shorts', color: '#f43f5e' },
   { name: 'అంతర్మథనం', slug: 'antharmadanam', color: '#8b5cf6' },
@@ -133,7 +132,7 @@ export const districtNews: NewsArticle[] = [
     categorySlug: 'andhra-pradesh',
     categoryColor: '#d97706',
     image: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&h=450&fit=crop',
-    author: 'ఈనాడు రిపోర్టర్',
+    author: 'హై టీవీ రిపోర్టర్',
     publishedAt: '2026-06-05T08:30:00Z',
     isBreaking: false,
     isTrending: false,
@@ -152,7 +151,7 @@ export const districtNews: NewsArticle[] = [
     categorySlug: 'andhra-pradesh',
     categoryColor: '#d97706',
     image: '/vijayawada_flyover.png',
-    author: 'ఈనాడు బ్యూరో',
+    author: 'హై టీవీ డెస్క్',
     publishedAt: '2026-06-05T07:15:00Z',
     isBreaking: false,
     isTrending: true,
@@ -452,7 +451,7 @@ export const featuredNews: NewsArticle[] = [
     categorySlug: 'andhra-pradesh',
     categoryColor: '#d97706',
     image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&h=675&fit=crop',
-    author: 'ఈనాడు రిపోర్టర్',
+    author: 'హై టీవీ రిపోర్టర్',
     publishedAt: '2024-06-05T08:30:00Z',
     isBreaking: true,
     isTrending: true,
@@ -470,7 +469,7 @@ export const featuredNews: NewsArticle[] = [
     categorySlug: 'telangana',
     categoryColor: '#7c3aed',
     image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1200&h=675&fit=crop',
-    author: 'ఈనాడు బ్యూరో',
+    author: 'హై టీవీ డెస్క్',
     publishedAt: '2024-06-05T07:15:00Z',
     isBreaking: false,
     isTrending: true,
@@ -1311,7 +1310,7 @@ export const reporterProfiles: Record<string, ReporterProfile> = {
 export const authorToReporterSlugMap: Record<string, string> = {
   'ఢిల్లీ బ్యూరో': 'suresh',
   'హై టీవీ బ్యూరో': 'suresh',
-  'ఈనాడు రిపోర్టర్': 'suresh',
+  'హై టీవీ రిపోర్టర్': 'suresh',
   'రాజమండ్రి ప్రతినిధి': 'suresh',
   'నెల్లూరు రిపోర్టర్': 'suresh',
   'ఖమ్మం రిపోర్టర్': 'suresh',
@@ -1319,7 +1318,7 @@ export const authorToReporterSlugMap: Record<string, string> = {
   'డిజిటల్ విలేఖరి': 'suresh',
 
   'రాజకీయ విభాగం': 'ramesh',
-  'ఈనాడు బ్యూరో': 'ramesh',
+  'హై టీవీ డెస్క్': 'ramesh',
   'కర్నూలు డెస్క్': 'ramesh',
   'కడప బ్యూరో': 'ramesh',
   'గుంటూరు ప్రతినిధి': 'ramesh',
@@ -1366,13 +1365,30 @@ export function getReporterByAuthor(authorName: string): ReporterProfile {
 export function formatTimeAgo(dateStr: string): string {
   const date = new Date(dateStr);
   const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
+  
+  // Transform 2024 dates dynamically to today or yesterday
+  // to show a live dynamic "hours ago" / "minutes ago" state.
+  const articleTimeToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds()
+  );
+  
+  if (articleTimeToday.getTime() > now.getTime()) {
+    articleTimeToday.setDate(articleTimeToday.getDate() - 1);
+  }
+  
+  const diffMs = now.getTime() - articleTimeToday.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
+  
   if (diffMins < 1) return 'ఇప్పుడే';
+  if (diffMins === 1) return 'ఒక నిమిషం క్రితం';
   if (diffMins < 60) return `${diffMins} నిమిషాల క్రితం`;
+  if (diffHours === 1) return 'ఒక గంట క్రితం';
   if (diffHours < 24) return `${diffHours} గంటల క్రితం`;
-  return `${diffDays} రోజుల క్రితం`;
+  return 'ఒక రోజు క్రితం';
 }

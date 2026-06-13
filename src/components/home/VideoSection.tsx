@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Play, Clock, Eye } from 'lucide-react';
+import { Play, Clock } from 'lucide-react';
 import { videoNews, formatTimeAgo } from '@/lib/mockData';
 
 export default function VideoSection() {
@@ -72,10 +72,6 @@ export default function VideoSection() {
                 <div className="flex items-center gap-1">
                   <Clock size={10} />
                   <span>{formatTimeAgo(video.publishedAt)}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Eye size={10} />
-                  <span>{(video.views / 1000).toFixed(0)}K వీక్షణలు</span>
                 </div>
               </div>
             </div>

@@ -41,12 +41,12 @@ export default function FlashNewsBar() {
   return (
     <div className="w-full bg-white border-y border-gray-200 py-2 px-3 flex items-center mb-5 select-none">
       {/* Red Flash News Label */}
-      <span className="font-extrabold text-[#fe0000] text-sm md:text-base tracking-wide flex-shrink-0">
+      <span className="font-extrabold text-[#fe0000] text-[13px] md:text-[15px] tracking-wide flex-shrink-0 uppercase">
         Flash News
       </span>
       
       {/* Vertical divider */}
-      <div className="h-4.5 w-[1px] bg-gray-300 mx-3 flex-shrink-0"></div>
+      <div className="h-4 w-[1px] bg-gray-300 mx-3 flex-shrink-0"></div>
       
       {/* Content wrapper */}
       <div className="flex-1 flex items-center overflow-hidden h-6">
@@ -56,15 +56,15 @@ export default function FlashNewsBar() {
           }`}
         >
           {/* Pulsing Live indicator */}
-          <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
+          <span className="relative flex h-2 w-2 flex-shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
           </span>
           
           {/* Headline Link */}
           <Link 
             href={flashNewsItems[currentIndex].link}
-            className="text-[13px] md:text-sm font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-1 telugu-text text-left pr-4 cursor-pointer"
+            className="text-[12px] md:text-[13.5px] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-1 telugu-text text-left pr-4 cursor-pointer"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             {flashNewsItems[currentIndex].text}

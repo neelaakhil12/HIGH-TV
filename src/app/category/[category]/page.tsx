@@ -1,4 +1,6 @@
 import Header from '@/components/layout/Header';
+import { MapPin } from 'lucide-react';
+import BackButton from '@/components/layout/BackButton';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import NewsCard from '@/components/cards/NewsCard';
@@ -50,6 +52,30 @@ const allNews = [
   ...sampadakiyamNews,
 ];
 
+const englishCategories: Record<string, string> = {
+  'latest': 'Latest News',
+  'telangana': 'Telangana',
+  'andhra-pradesh': 'Andhra Pradesh',
+  'national': 'National',
+  'international': 'International',
+  'business': 'Business',
+  'sports': 'Sports',
+  'entertainment': 'Entertainment',
+  'technology': 'Technology',
+  'health': 'Health',
+  'viral': 'Viral',
+  'rasipalalu': 'Astrology',
+  'photos': 'Photos',
+  'videos': 'Videos',
+  'webstories': 'Web Stories',
+  'antharmadanam': 'Opinion',
+  'adyathmikam': 'Devotional',
+  'sampadakiyam': 'Editorial',
+  'women': 'Women',
+  'lifestyle': 'Lifestyle',
+  'epaper': 'E-Paper'
+};
+
 export async function generateStaticParams() {
   return categories.map((cat) => ({ category: cat.slug }));
 }
@@ -78,8 +104,8 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${titleName} | ఈనాడు క్లోన్`,
-    description: `${titleName} తాజా వార్తలు - ఈనాడు క్లోన్`,
+    title: `${titleName} | హై టీవీ`,
+    description: `${titleName} తాజా వార్తలు - హై టీవీ`,
   };
 }
 
@@ -165,33 +191,37 @@ export default async function CategoryPage({
 
       {category === 'epaper' ? (
         <main className="flex-1 w-full bg-[#e9eff4]">
+          <div className="max-w-[1050px] mx-auto px-4 pt-4">
+            <BackButton />
+          </div>
           <EPaperReader />
         </main>
       ) : (
         <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
+          <BackButton />
           {/* Flash News Strip */}
           <FlashNewsBar />
 
           {isDistrictsView ? (
             <>
               {/* Breadcrumb for districts view */}
-              <div className="flex items-center gap-2 text-sm text-gray-500 mb-5 border-b border-gray-100 pb-3">
-                <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1">
-                  <Home size={14} /> హోమ్
+              <div className="flex items-center gap-2 text-sm text-gray-500 mb-5 border-b border-gray-100 pb-3 font-sans">
+                <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1 font-bold">
+                  <Home size={14} /> Home
                 </Link>
                 <ChevronRight size={14} />
-                <Link href={`/category/${category}`} className="hover:text-brand-blue transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  {breadcrumbName}
+                <Link href={`/category/${category}`} className="hover:text-brand-blue transition-colors font-bold">
+                  {englishCategories[category] || category}
                 </Link>
                 <ChevronRight size={14} />
-                <span className="text-gray-800 font-semibold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  జిల్లాల వారీగా వార్తలు
+                <span className="text-gray-800 font-bold">
+                  District News
                 </span>
-                {activeDistrictName && (
+                {activeDistrictObj && (
                   <>
                     <ChevronRight size={14} />
-                    <span className="text-brand-blue font-bold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      {activeDistrictName}
+                    <span className="text-brand-blue font-extrabold capitalize">
+                      {activeDistrictObj.slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                     </span>
                   </>
                 )}
@@ -222,8 +252,8 @@ export default async function CategoryPage({
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     {topRow.map((art) => (
                       <div key={art.id} className="bg-white rounded-lg border border-gray-150 p-2.5 shadow-3xs hover:shadow-2xs transition-all flex flex-col group text-left">
-                        {/* Image container */}
-                        <div className="relative aspect-video rounded-md overflow-hidden bg-black/5 mb-3">
+                        {/* Image container — fully clickable */}
+                        <Link href={`/news/${art.slug}`} className="block relative aspect-video rounded-md overflow-hidden bg-black/5 mb-3">
                           <img 
                             src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"} 
                             alt={art.title} 
@@ -231,7 +261,7 @@ export default async function CategoryPage({
                           />
                           {/* District tag overlaid bottom-left */}
                           <div className="absolute bottom-2 left-2 bg-white/95 border border-gray-250 px-2 py-0.5 rounded shadow-3xs flex items-center gap-1 select-none">
-                            <span className="text-[#fe0000] text-xs">📍</span>
+                            <MapPin size={11} className="text-[#e60000] flex-shrink-0" />
                             <span 
                               className="text-[11px] font-bold text-gray-700 telugu-text"
                               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
@@ -239,7 +269,7 @@ export default async function CategoryPage({
                               {art.districtName}
                             </span>
                           </div>
-                        </div>
+                        </Link>
                         {/* Title Link */}
                         <Link href={`/news/${art.slug}`}>
                           <h3 
@@ -257,20 +287,20 @@ export default async function CategoryPage({
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-gray-100">
                     {bottomRow.map((art) => (
                       <div key={art.id} className="flex gap-3 items-start p-2 hover:bg-blue-50/35 rounded-lg transition-colors">
-                        {/* Left Thumbnail */}
-                        <div className="w-[100px] h-[68px] flex-shrink-0 rounded overflow-hidden bg-gray-50 border border-gray-150 relative">
+                        {/* Left Thumbnail — fully clickable */}
+                        <Link href={`/news/${art.slug}`} className="w-[100px] h-[68px] flex-shrink-0 rounded overflow-hidden bg-gray-50 border border-gray-150 relative block">
                           <img 
                             src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"} 
                             alt={art.title} 
-                            className="w-full h-full object-cover" 
+                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-200" 
                           />
-                        </div>
+                        </Link>
                         {/* Right Text Content */}
                         <div className="flex-1 flex flex-col text-left justify-between min-h-[68px]">
                           <div>
                             {/* Location Pin + District Name */}
                             <div className="flex items-center gap-0.5 mb-1 select-none">
-                              <span className="text-[#fe0000] text-[10px]">📍</span>
+                              <MapPin size={11} className="text-[#e60000] flex-shrink-0" />
                               <span 
                                 className="text-[10.5px] font-extrabold text-[#e60000] telugu-text"
                                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
@@ -305,19 +335,19 @@ export default async function CategoryPage({
           ) : (
             <>
               {/* Breadcrumb */}
-              <div className="flex items-center gap-2 text-sm text-gray-500 mb-5 border-b border-gray-100 pb-3">
-                <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1">
-                  <Home size={14} /> హోమ్
+              <div className="flex items-center gap-2 text-sm text-gray-500 mb-5 border-b border-gray-100 pb-3 font-sans">
+                <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1 font-bold">
+                  <Home size={14} /> Home
                 </Link>
                 <ChevronRight size={14} />
-                <span className="text-gray-800 font-semibold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  {breadcrumbName}
+                <span className="text-gray-800 font-bold">
+                  {englishCategories[category] || category}
                 </span>
-                {activeDistrictName && (
+                {activeDistrictObj && (
                   <>
                     <ChevronRight size={14} />
-                    <span className="text-brand-blue font-bold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      {activeDistrictName}
+                    <span className="text-brand-blue font-extrabold capitalize">
+                      {activeDistrictObj.slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                     </span>
                   </>
                 )}
@@ -337,12 +367,47 @@ export default async function CategoryPage({
 
               {/* 70% Left and 30% Right Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-6">
-                {/* Articles Grid (70%) */}
+                {/* Articles List (70%) — horizontal 2-column format */}
                 <div className="w-full lg:col-span-7">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    {allArticles.map((article) => (
-                      <NewsCard key={article.id} article={article} />
-                    ))}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-0">
+                    {allArticles.map((article) => {
+                      const d = new Date(article.publishedAt);
+                      const h = d.getHours() % 12 || 12;
+                      const m = String(d.getMinutes()).padStart(2, '0');
+                      const timeStr = `${h}:${m}`;
+                      return (
+                        <Link
+                          key={article.id}
+                          href={`/news/${article.slug}`}
+                          className="flex gap-3 items-start py-3 px-2 border-b border-gray-100 hover:bg-blue-50/40 transition-colors group"
+                        >
+                          {/* Thumbnail */}
+                          <div className="w-[120px] h-[80px] flex-shrink-0 rounded overflow-hidden bg-gray-100 border border-gray-150 relative">
+                            <img
+                              src={article.image}
+                              alt={article.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                            />
+                          </div>
+                          {/* Text */}
+                          <div className="flex-1 min-w-0">
+                            <h3
+                              className="text-[18px] font-bold text-[#02599c] group-hover:text-[#013f70] leading-snug line-clamp-2 telugu-text"
+                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                            >
+                              {article.title}{' '}
+                              <span className="text-[#e60000] font-black text-[14px] font-sans">[{timeStr}]</span>
+                            </h3>
+                            <p
+                              className="text-[14px] text-gray-500 mt-1 line-clamp-2 telugu-text leading-snug"
+                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                            >
+                              {article.description}
+                            </p>
+                          </div>
+                        </Link>
+                      );
+                    })}
                   </div>
 
                   {/* Load More */}

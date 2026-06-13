@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronDown, Menu, X, Search } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { ChevronDown, Menu, X, Search, TrendingUp } from 'lucide-react';
 
 export default function Header() {
+  const pathname = usePathname();
+  const isHome = pathname === '/';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [teluguDate, setTeluguDate] = useState('');
   const [isAPMobileExpanded, setIsAPMobileExpanded] = useState(false);
@@ -58,6 +61,12 @@ export default function Header() {
   }, [isMenuOpen]);
 
   const closeMenu = () => setIsMenuOpen(false);
+
+  // Returns baby-pink text class when the link is the active page
+  const navCls = (href: string) =>
+    pathname === href || (href !== '/' && pathname.startsWith(href))
+      ? 'text-[#ffb3d1]'
+      : 'text-white hover:text-[#ffb3d1]';
 
   return (
     <header className="bg-white sticky top-0 z-40 w-full shadow-sm">
@@ -170,58 +179,57 @@ export default function Header() {
       </div>
 
       {/* ── Mobile Horizontal Scrollable Nav Strip ───────────────────── */}
-      <div className="md:hidden w-full bg-[#0b2545] border-t border-[#081d37] shadow-xs select-none">
+      <div className="md:hidden w-full bg-[#025390] border-t border-[#013d6e] shadow-xs select-none">
         <div className="max-w-full overflow-x-auto whitespace-nowrap hide-scrollbar flex items-center h-10 text-[16px] font-extrabold text-white telugu-text">
           {/* Home icon */}
-          <Link href="/" className="px-3.5 h-full flex items-center justify-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0" aria-label="హోమ్">
+          <Link href="/" className="group px-3.5 h-full flex items-center justify-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0" aria-label="హోమ్">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
-              <path d="M12 3L3 11H5V21H10V14H14V21H19V11H21L12 3Z" fill="#ffb3d1" />
+              <path d="M12 3L3 11H5V21H10V14H14V21H19V11H21L12 3Z" fill="currentColor" className={`transition-colors ${isHome ? 'text-[#ffb3d1]' : 'text-white group-hover:text-[#ffb3d1]'}`} />
             </svg>
           </Link>
-          <Link href="/category/latest"        className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">తాజా వార్తలు</Link>
-          <Link href="/category/telangana"      className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">తెలంగాణ</Link>
-          <Link href="/category/andhra-pradesh" className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">ఆంధ్రప్రదేశ్</Link>
-          <Link href="/category/national"       className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">జాతీయం</Link>
-          <Link href="/category/international"  className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">అంతర్జాతీయం</Link>
-          <Link href="/category/business"       className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">బిజినెస్</Link>
-          <Link href="/category/sports"         className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">క్రీడలు</Link>
-          <Link href="/category/entertainment"  className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">సినిమా</Link>
-          <Link href="/category/lifestyle"      className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">వసుంధర</Link>
-          <Link href="/category/women"          className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">మహిళలు</Link>
-          <Link href="/category/lifestyle"      className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">లైఫ్ స్టైల్</Link>
-          <Link href="/category/webstories"     className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">వెబ్ స్టోరీస్</Link>
-          <Link href="/category/antharmadanam"  className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">అంతర్మథనం</Link>
-          <Link href="/category/adyathmikam"    className="px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0">ఆధ్యాత్మికం</Link>
-          <Link href="/category/sampadakiyam"   className="px-3.5 h-full flex items-center hover:bg-black/15 flex-shrink-0">సంపాదకీయం</Link>
+          <Link href="/category/latest"        className={`px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/latest')}`}>తాజా వార్తలు</Link>
+          <Link href="/category/telangana"      className={`px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/telangana')}`}>తెలంగాణ</Link>
+          <Link href="/category/andhra-pradesh" className={`px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/andhra-pradesh')}`}>ఆంధ్రప్రదేశ్</Link>
+          <Link href="/category/national"       className={`px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/national')}`}>జాతీయం</Link>
+          <Link href="/category/international"  className={`px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/international')}`}>అంతర్జాతీయం</Link>
+          <Link href="/category/business"       className={`px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/business')}`}>బిజినెస్</Link>
+          <Link href="/category/sports"         className={`px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/sports')}`}>క్రీడలు</Link>
+          <Link href="/category/entertainment"  className={`px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/entertainment')}`}>సినిమా</Link>
+          <Link href="/category/women"          className={`px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/women')}`}>మహిళలు</Link>
+          <Link href="/category/lifestyle"      className={`px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/lifestyle')}`}>లైఫ్ స్టైల్</Link>
+          <Link href="/category/webstories"     className={`px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/webstories')}`}>వెబ్ స్టోరీస్</Link>
+          <Link href="/category/antharmadanam"  className={`px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/antharmadanam')}`}>అంతర్మథనం</Link>
+          <Link href="/category/adyathmikam"    className={`px-3.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/adyathmikam')}`}>ఆధ్యాత్మికం</Link>
+          <Link href="/category/sampadakiyam"   className={`px-3.5 h-full flex items-center hover:bg-black/15 flex-shrink-0 ${navCls('/category/sampadakiyam')}`}>సంపాదకీయం</Link>
         </div>
       </div>
 
       {/* ── Desktop Navigation Bar ───────────────────────────────────── */}
-      <div className="hidden md:block w-full border-t border-[#081d37] bg-[#0b2545] shadow-md select-none">
+      <div className="hidden md:block w-full border-t border-[#013d6e] bg-[#025390] shadow-md select-none">
         <div className="max-w-[1050px] mx-auto">
-          <nav className="flex items-center bg-gradient-to-b from-[#0e2f56] to-[#0b2545] h-10 overflow-visible">
+          <nav className="flex items-center bg-gradient-to-b from-[#0269b3] to-[#025390] h-10 overflow-visible">
 
             {/* Home icon */}
-            <Link href="/" className="px-4.5 h-full flex items-center justify-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0" aria-label="హోమ్">
+            <Link href="/" className="group px-4.5 h-full flex items-center justify-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0" aria-label="హోమ్">
               <svg className="w-[24px] h-[24px]" viewBox="0 0 24 24" fill="none">
-                <path d="M12 3L3 11H5V21H10V14H14V21H19V11H21L12 3Z" fill="#ffb3d1" />
+                <path d="M12 3L3 11H5V21H10V14H14V21H19V11H21L12 3Z" fill="currentColor" className={`transition-colors ${isHome ? 'text-[#ffb3d1]' : 'text-white group-hover:text-[#ffb3d1]'}`} />
               </svg>
             </Link>
 
             <div className="flex-1 flex items-center h-full text-[18px] font-extrabold text-white telugu-text">
 
               {/* తాజా వార్తలు */}
-              <Link href="/category/latest" className="px-4 h-full flex items-center hover:text-[#ffb3d1] hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              <Link href="/category/latest" className={`px-4 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/latest')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                 తాజా వార్తలు
               </Link>
 
               {/* తెలంగాణ Dropdown */}
               <div className="relative group border-r border-white/20 h-full flex-shrink-0">
-                <button className="px-4 h-full flex items-center gap-1 hover:text-[#ffb3d1] hover:bg-black/15 transition-colors cursor-pointer" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <button className={`px-4 h-full flex items-center gap-1 hover:bg-black/15 transition-colors cursor-pointer ${navCls('/category/telangana')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   తెలంగాణ
                   <ChevronDown size={11} className="text-[#ffb3d1] group-hover:rotate-180 transition-transform duration-200" />
                 </button>
-                <div className="absolute top-full left-0 hidden group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-2.5 w-52 z-50 animate-fade-in border-t-2 border-[#0b2545]">
+                <div className="absolute top-full left-0 hidden group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-2.5 w-52 z-50 animate-fade-in border-t-2 border-[#025390]">
                   <div className="flex flex-col gap-0.5 text-left">
                     <Link href="/category/telangana" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>రాష్ట్ర స్థాయి వార్తలు</Link>
                     <Link href="/category/telangana?view=districts" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>జిల్లాల వారీగా వార్తలు</Link>
@@ -231,11 +239,11 @@ export default function Header() {
 
               {/* ఆంధ్రప్రదేశ్ Dropdown */}
               <div className="relative group border-r border-white/20 h-full flex-shrink-0">
-                <button className="px-4 h-full flex items-center gap-1 hover:text-[#ffb3d1] hover:bg-black/15 transition-colors cursor-pointer" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <button className={`px-4 h-full flex items-center gap-1 hover:bg-black/15 transition-colors cursor-pointer ${navCls('/category/andhra-pradesh')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   ఆంధ్రప్రదేశ్
                   <ChevronDown size={11} className="text-[#ffb3d1] group-hover:rotate-180 transition-transform duration-200" />
                 </button>
-                <div className="absolute top-full left-0 hidden group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-2.5 w-52 z-50 animate-fade-in border-t-2 border-[#0b2545]">
+                <div className="absolute top-full left-0 hidden group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-2.5 w-52 z-50 animate-fade-in border-t-2 border-[#025390]">
                   <div className="flex flex-col gap-0.5 text-left">
                     <Link href="/category/andhra-pradesh" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>రాష్ట్ర స్థాయి వార్తలు</Link>
                     <Link href="/category/andhra-pradesh?view=districts" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>జిల్లాల వారీగా వార్తలు</Link>
@@ -244,19 +252,19 @@ export default function Header() {
               </div>
 
               {/* జాతీయం */}
-              <Link href="/category/national" className="px-4 h-full flex items-center hover:text-[#ffb3d1] hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>జాతీయం</Link>
+              <Link href="/category/national" className={`px-4 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/national')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>జాతీయం</Link>
 
               {/* అంతర్జాతీయం */}
-              <Link href="/category/international" className="px-4 h-full flex items-center hover:text-[#ffb3d1] hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>అంతర్జాతీయం</Link>
+              <Link href="/category/international" className={`px-4 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/international')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>అంతర్జాతీయం</Link>
 
               {/* బిజినెస్ */}
-              <Link href="/category/business" className="px-4 h-full flex items-center hover:text-[#ffb3d1] hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>బిజినెస్</Link>
+              <Link href="/category/business" className={`px-4 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/business')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>బిజినెస్</Link>
 
               {/* క్రీడలు */}
-              <Link href="/category/sports" className="px-4 h-full flex items-center hover:text-[#ffb3d1] hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>క్రీడలు</Link>
+              <Link href="/category/sports" className={`px-4 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/sports')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>క్రీడలు</Link>
 
               {/* సినిమా */}
-              <Link href="/category/entertainment" className="px-4 h-full flex items-center hover:text-[#ffb3d1] hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>సినిమా</Link>
+              <Link href="/category/entertainment" className={`px-4 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/entertainment')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>సినిమా</Link>
 
               {/* ఇంకా... Dropdown */}
               <div className="relative group h-full flex-shrink-0">
@@ -264,7 +272,7 @@ export default function Header() {
                   ఇంకా...
                   <ChevronDown size={11} className="text-[#ffb3d1] group-hover:rotate-180 transition-transform duration-200" />
                 </button>
-                <div className="absolute top-full right-0 hidden group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-3 w-80 z-50 animate-fade-in border-t-2 border-[#0b2545]">
+                <div className="absolute top-full right-0 hidden group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-3 w-80 z-50 animate-fade-in border-t-2 border-[#025390]">
                   <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
                     <Link href="/category/technology"    className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>టెక్నాలజీ</Link>
                     <Link href="/category/health"        className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఆరోగ్యం</Link>
@@ -274,7 +282,6 @@ export default function Header() {
                     <Link href="/category/videos"        className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వీడియోలు</Link>
                     <Link href="/category/women"         className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>మహిళలు</Link>
                     <Link href="/category/lifestyle"     className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>లైఫ్ స్టైల్</Link>
-                    <Link href="/category/lifestyle"     className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వసుంధర</Link>
                     <Link href="/category/webstories"    className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వెబ్ స్టోరీస్</Link>
                     <Link href="/category/antharmadanam" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>అంతర్మథనం</Link>
                     <Link href="/category/adyathmikam"   className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఆధ్యాత్మికం</Link>
@@ -298,10 +305,7 @@ export default function Header() {
           {/* Left: Trending Label + Election Results */}
           <div className="flex items-center gap-1.5 overflow-hidden">
             <span className="font-extrabold text-[10px] tracking-wider text-[#e60000] uppercase font-sans flex items-center gap-1.5 flex-shrink-0">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-600"></span>
-              </span>
+              <TrendingUp size={12} className="stroke-[2.5] animate-pulse" />
               TRENDING :
             </span>
             <Link 
@@ -380,7 +384,7 @@ export default function Header() {
             </div>
 
             {/* Panel body */}
-            <div className="bg-[#0b2545] text-white rounded-t-2xl max-h-[82vh] overflow-y-auto p-5 shadow-2xl">
+            <div className="bg-[#025390] text-white rounded-t-2xl max-h-[82vh] overflow-y-auto p-5 shadow-2xl">
 
               {/* Main categories 2-column grid */}
               <nav className="grid grid-cols-2 gap-x-6 gap-y-3 text-[18px] font-extrabold telugu-text mb-5" style={{ fontFamily: 'Mandali, sans-serif' }}>
@@ -431,7 +435,6 @@ export default function Header() {
                 </h3>
                 <div className="grid grid-cols-3 gap-x-3 gap-y-3 text-[16px] font-extrabold telugu-text" style={{ fontFamily: 'Mandali, sans-serif' }}>
                   {[
-                    { href: '/category/lifestyle',     label: 'వసుంధర'       },
                     { href: '/category/women',         label: 'మహిళలు'       },
                     { href: '/category/lifestyle',     label: 'లైఫ్ స్టైల్' },
                     { href: '/category/webstories',    label: 'వెబ్ స్టోరీస్'},
