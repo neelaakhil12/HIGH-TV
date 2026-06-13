@@ -88,7 +88,7 @@ export default function Header() {
             </Link>
             {teluguDate && (
               <div
-                className="text-[10px] md:text-[11px] font-bold text-gray-700 mt-1 telugu-text tracking-wide select-none"
+                className="text-[13px] md:text-[14px] font-bold text-gray-700 mt-1 telugu-text tracking-wide select-none"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {teluguDate}
@@ -150,7 +150,7 @@ export default function Header() {
               />
             </Link>
             <Link href="/category/epaper" className="flex items-center justify-center h-[36px] hover:bg-gray-50 transition-colors group/dash">
-              <span className="text-[11px] font-black text-gray-800 group-hover/dash:text-[#0b2545] font-sans tracking-widest uppercase">E-PAPER</span>
+              <span className="text-[13px] font-black text-gray-800 group-hover/dash:text-[#0b2545] font-sans tracking-widest uppercase">E-PAPER</span>
             </Link>
           </div>
 
@@ -304,13 +304,13 @@ export default function Header() {
           
           {/* Left: Trending Label + Election Results */}
           <div className="flex items-center gap-1.5 overflow-hidden">
-            <span className="font-extrabold text-[10px] tracking-wider text-[#e60000] uppercase font-sans flex items-center gap-1.5 flex-shrink-0">
+            <span className="font-extrabold text-[12px] tracking-wider text-[#e60000] uppercase font-sans flex items-center gap-1.5 flex-shrink-0">
               <TrendingUp size={12} className="stroke-[2.5] animate-pulse" />
               TRENDING :
             </span>
             <Link 
               href={trendingItems[trendingIndex].link}
-              className={`text-[12px] font-black text-gray-800 hover:text-[#0b2545] transition-all duration-300 telugu-text truncate block ${
+              className={`text-[14px] font-black text-gray-800 hover:text-[#0b2545] transition-all duration-300 telugu-text truncate block ${
                 trendingFade ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'
               }`}
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
@@ -430,7 +430,7 @@ export default function Header() {
 
               {/* Feature pages 3-column */}
               <div className="space-y-3">
-                <h3 className="text-[11px] font-black text-[#ffb3d1] tracking-widest uppercase" style={{ fontFamily: 'Mandali, sans-serif' }}>
+                <h3 className="text-[14px] font-black text-[#ffb3d1] tracking-widest uppercase" style={{ fontFamily: 'Mandali, sans-serif' }}>
                   ఫీచర్ పేజీలు
                 </h3>
                 <div className="grid grid-cols-3 gap-x-3 gap-y-3 text-[16px] font-extrabold telugu-text" style={{ fontFamily: 'Mandali, sans-serif' }}>

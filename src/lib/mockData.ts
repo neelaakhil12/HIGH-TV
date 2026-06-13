@@ -1363,32 +1363,10 @@ export function getReporterByAuthor(authorName: string): ReporterProfile {
 }
 
 export function formatTimeAgo(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  
-  // Transform 2024 dates dynamically to today or yesterday
-  // to show a live dynamic "hours ago" / "minutes ago" state.
-  const articleTimeToday = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    date.getHours(),
-    date.getMinutes(),
-    date.getSeconds()
-  );
-  
-  if (articleTimeToday.getTime() > now.getTime()) {
-    articleTimeToday.setDate(articleTimeToday.getDate() - 1);
-  }
-  
-  const diffMs = now.getTime() - articleTimeToday.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMins / 60);
-  
-  if (diffMins < 1) return 'ఇప్పుడే';
-  if (diffMins === 1) return 'ఒక నిమిషం క్రితం';
-  if (diffMins < 60) return `${diffMins} నిమిషాల క్రితం`;
-  if (diffHours === 1) return 'ఒక గంట క్రితం';
-  if (diffHours < 24) return `${diffHours} గంటల క్రితం`;
-  return 'ఒక రోజు క్రితం';
+  const d = new Date(dateStr);
+  const hours = d.getHours();
+  const mins = String(d.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const h = hours % 12 || 12;
+  return `${h}:${mins} ${ampm}`;
 }

@@ -36,7 +36,7 @@ export default function NewsSection({
           </div>
           <Link
             href={viewAllLink}
-            className="flex items-center gap-1 text-xs font-semibold hover:gap-2 transition-all"
+            className="flex items-center gap-1 text-sm font-semibold hover:gap-2 transition-all"
             style={{ color: accentColor }}
           >
             అన్నీ చూడండి <ArrowRight size={14} />
@@ -65,7 +65,7 @@ export default function NewsSection({
               {titleTelugu}
             </h2>
           </div>
-          <Link href={viewAllLink} className="text-xs font-semibold flex items-center gap-1" style={{ color: accentColor }}>
+          <Link href={viewAllLink} className="text-sm font-semibold flex items-center gap-1" style={{ color: accentColor }}>
             అన్నీ <ArrowRight size={12} />
           </Link>
         </div>
@@ -91,7 +91,7 @@ export default function NewsSection({
               {titleTelugu}
             </h2>
           </div>
-          <Link href={viewAllLink} className="flex items-center gap-1 text-xs font-semibold hover:gap-2 transition-all" style={{ color: accentColor }}>
+          <Link href={viewAllLink} className="flex items-center gap-1 text-sm font-semibold hover:gap-2 transition-all" style={{ color: accentColor }}>
             అన్నీ చూడండి <ArrowRight size={14} />
           </Link>
         </div>
@@ -117,7 +117,7 @@ export default function NewsSection({
             {titleTelugu}
           </h2>
         </div>
-        <Link href={viewAllLink} className="flex items-center gap-1 text-xs font-semibold hover:gap-2 transition-all" style={{ color: accentColor }}>
+        <Link href={viewAllLink} className="flex items-center gap-1 text-sm font-semibold hover:gap-2 transition-all" style={{ color: accentColor }}>
           అన్నీ చూడండి <ArrowRight size={14} />
         </Link>
       </div>

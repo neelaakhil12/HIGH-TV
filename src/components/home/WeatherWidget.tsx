@@ -41,7 +41,7 @@ export default function WeatherWidget() {
         </div>
         <Link 
           href="/weather" 
-          className="text-xs font-extrabold text-blue-500 hover:text-blue-700 flex items-center gap-0.5 transition-colors telugu-text"
+          className="text-sm font-extrabold text-blue-500 hover:text-blue-700 flex items-center gap-0.5 transition-colors telugu-text"
           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
         >
           పూర్తి వివరాలు చూడండి →
@@ -57,13 +57,13 @@ export default function WeatherWidget() {
           >
             <div className="space-y-1 text-left">
               <h4 
-                className="font-black text-sm text-gray-900 telugu-text"
+                className="font-black text-[15.5px] text-gray-900 telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {data.city}
               </h4>
               <p 
-                className="text-[10px] text-gray-500 font-bold telugu-text"
+                className="text-[12px] text-gray-500 font-bold telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {data.condition}
@@ -84,7 +84,7 @@ export default function WeatherWidget() {
       <div className="mt-3 block md:hidden">
         <Link 
           href="/weather" 
-          className="w-full py-2 bg-blue-50 hover:bg-blue-100 border border-blue-100 rounded-lg text-xs font-bold text-blue-600 flex items-center justify-center gap-1.5 transition-all active:scale-98 telugu-text"
+          className="w-full py-2 bg-blue-50 hover:bg-blue-100 border border-blue-100 rounded-lg text-sm font-bold text-blue-600 flex items-center justify-center gap-1.5 transition-all active:scale-98 telugu-text"
           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
         >
           పూర్తి వాతావరణ నివేదిక చూడండి

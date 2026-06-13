@@ -14,9 +14,9 @@ export default function BreakingNewsSection() {
           <h2 className="text-base font-black telugu-text tracking-wide" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
             బ్రేకింగ్ న్యూస్
           </h2>
-          <span className="ml-1.5 bg-brand-red text-white text-[10px] font-black px-1.5 py-0.5 rounded-full breaking-badge">LIVE</span>
+          <span className="ml-1.5 bg-brand-red text-white text-[12px] font-black px-1.5 py-0.5 rounded-full breaking-badge">LIVE</span>
         </div>
-        <Link href="/category/latest" className="flex items-center gap-1 text-blue-100 text-xs font-semibold hover:text-white transition-colors">
+        <Link href="/category/latest" className="flex items-center gap-1 text-blue-100 text-sm font-semibold hover:text-white transition-colors">
           అన్నీ <ArrowRight size={11} />
         </Link>
       </div>
@@ -40,7 +40,7 @@ export default function BreakingNewsSection() {
                   <span className="text-[16px] font-black text-gray-800 group-hover:text-brand-blue transition-colors leading-snug block telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                     {article.title}
                   </span>
-                  <span className="text-[11px] text-gray-400 mt-0.5 block">{formatTimeAgo(article.publishedAt)}</span>
+                  <span className="text-[13px] text-gray-400 mt-0.5 block">{formatTimeAgo(article.publishedAt)}</span>
                 </div>
               </Link>
             ))}
@@ -51,7 +51,7 @@ export default function BreakingNewsSection() {
                 <img src={breaking[0].image} alt={breaking[0].title} className="w-full h-full object-cover" loading="eager" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-3">
-                  <span className="bg-brand-red text-white text-[9px] font-black px-1.5 py-0.5 rounded breaking-badge mb-1 inline-block">🔴 BREAKING</span>
+                  <span className="bg-brand-red text-white text-[11px] font-black px-1.5 py-0.5 rounded breaking-badge mb-1 inline-block">🔴 BREAKING</span>
                   <Link href={`/news/${breaking[0].slug}`}>
                     <h3 className="text-white text-[18px] font-black leading-snug hover:text-hover-yellow transition-colors telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       {breaking[0].title}

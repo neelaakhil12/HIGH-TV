@@ -158,14 +158,14 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
             </span>
             <Link href={`/news/${article.slug}`}>
               <h3
-                className="text-sm font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
+                className="text-[15.5px] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {article.title}
               </h3>
             </Link>
           </div>
-          <div className="flex items-center gap-1.5 mt-2 text-xs text-gray-400">
+          <div className="flex items-center gap-1.5 mt-2 text-[13px] text-gray-400">
             <Clock size={10} />
             <span>{formatTime(article.publishedAt)}</span>
           </div>
@@ -189,13 +189,13 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
         <div className="flex-1">
           <Link href={`/news/${article.slug}`}>
             <p
-              className="text-xs font-semibold text-gray-800 group-hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
+              className="text-[14px] font-semibold text-gray-800 group-hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.title}
             </p>
           </Link>
-          <span className="text-xs text-gray-400 mt-1 block">{formatTime(article.publishedAt)}</span>
+          <span className="text-[13px] text-gray-400 mt-1 block">{formatTime(article.publishedAt)}</span>
         </div>
       </article>
     );
@@ -230,14 +230,14 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
               </h3>
             </Link>
             <p
-              className="text-xs md:text-sm text-gray-500 leading-relaxed mt-2 line-clamp-2 telugu-text"
+              className="text-sm md:text-[15px] text-gray-500 leading-relaxed mt-2 line-clamp-2 telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.description}
             </p>
           </div>
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50">
-            <div className="flex items-center gap-3 text-xs text-gray-400">
+            <div className="flex items-center gap-3 text-[13px] text-gray-400">
               <div className="flex items-center gap-1">
                 <Clock size={10} />
                 <span>{formatTime(article.publishedAt)}</span>
@@ -263,7 +263,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         {article.isBreaking && (
-          <div className="absolute top-2 left-2 bg-brand-red text-white text-[10px] font-black px-2 py-0.5 rounded breaking-badge uppercase">
+          <div className="absolute top-2 left-2 bg-brand-red text-[12px] font-black px-2 py-0.5 rounded breaking-badge uppercase">
             🔴 Breaking
           </div>
         )}
@@ -280,13 +280,13 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
 
         <Link href={`/news/${article.slug}`} className="flex-1">
           <h2
-            className="text-sm md:text-base font-bold text-gray-800 hover:text-brand-blue transition-colors leading-snug line-clamp-2 mb-2 telugu-text"
+            className="text-[15px] md:text-[17px] font-bold text-gray-800 hover:text-brand-blue transition-colors leading-snug line-clamp-2 mb-2 telugu-text"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             {article.title}
           </h2>
           <p
-            className="text-xs text-gray-500 leading-relaxed line-clamp-2 telugu-text"
+            className="text-sm text-gray-500 leading-relaxed line-clamp-2 telugu-text"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             {article.description}
@@ -295,7 +295,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
 
         {/* Meta */}
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
-          <div className="flex items-center gap-3 text-xs text-gray-400">
+          <div className="flex items-center gap-3 text-[13px] text-gray-400">
             <div className="flex items-center gap-1">
               <Clock size={10} />
               <span>{formatTime(article.publishedAt)}</span>

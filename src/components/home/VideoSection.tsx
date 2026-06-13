@@ -22,7 +22,7 @@ export default function VideoSection() {
             </h2>
           </div>
         </div>
-        <Link href="/category/videos" className="flex items-center gap-1 text-xs font-semibold text-[#66000c]">
+        <Link href="/category/videos" className="flex items-center gap-1 text-sm font-semibold text-[#66000c]">
           అన్నీ చూడండి →
         </Link>
       </div>
@@ -63,12 +63,12 @@ export default function VideoSection() {
 
             <div className="p-3">
               <h3
-                className="text-sm font-bold text-gray-800 group-hover:text-[#66000c] transition-colors line-clamp-2 leading-snug mb-2 telugu-text"
+                className="text-[15.5px] font-bold text-gray-800 group-hover:text-[#66000c] transition-colors line-clamp-2 leading-snug mb-2 telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {video.title}
               </h3>
-              <div className="flex items-center gap-3 text-xs text-gray-400">
+              <div className="flex items-center gap-3 text-[13.5px] text-gray-400">
                 <div className="flex items-center gap-1">
                   <Clock size={10} />
                   <span>{formatTimeAgo(video.publishedAt)}</span>

@@ -22,7 +22,7 @@ export default function TrendingSection() {
             </h2>
           </div>
         </div>
-        <Link href="/category/trending" className="flex items-center gap-1 text-xs font-semibold text-orange-500 hover:gap-2 transition-all">
+        <Link href="/category/trending" className="flex items-center gap-1 text-sm font-semibold text-orange-500 hover:gap-2 transition-all">
           అన్నీ చూడండి <ArrowRight size={14} />
         </Link>
       </div>
@@ -43,7 +43,7 @@ export default function TrendingSection() {
             </div>
             {/* Trending badge */}
             <div className="absolute top-3 left-3">
-              <span className="flex items-center gap-1 bg-orange-500 text-white font-black text-xs px-2.5 py-1 rounded-full">
+              <span className="flex items-center gap-1 bg-orange-500 text-white font-black text-sm px-2.5 py-1 rounded-full">
                 <Flame size={12} /> #1 ట్రెండింగ్
               </span>
             </div>
@@ -59,7 +59,7 @@ export default function TrendingSection() {
                   {trending[0].title}
                 </h3>
               </Link>
-              <p className="text-gray-300 text-xs mt-1">{formatTimeAgo(trending[0].publishedAt)}</p>
+              <p className="text-gray-300 text-[13px] mt-1">{formatTimeAgo(trending[0].publishedAt)}</p>
             </div>
           </div>
         )}
@@ -93,13 +93,13 @@ export default function TrendingSection() {
                 </span>
                 <Link href={`/news/${article.slug}`}>
                   <p
-                    className="text-sm font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
+                    className="text-[15px] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {article.title}
                   </p>
                 </Link>
-                <span className="text-xs text-gray-400 mt-1 block">{formatTimeAgo(article.publishedAt)}</span>
+                <span className="text-[13px] text-gray-400 mt-1 block">{formatTimeAgo(article.publishedAt)}</span>
               </div>
             </article>
           ))}

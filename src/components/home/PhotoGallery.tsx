@@ -25,7 +25,7 @@ export default function PhotoGallery() {
             </h2>
           </div>
         </div>
-        <Link href="/category/photos" className="text-xs font-semibold text-[#64748b] flex items-center gap-1">
+        <Link href="/category/photos" className="text-sm font-semibold text-[#64748b] flex items-center gap-1">
           అన్నీ చూడండి →
         </Link>
       </div>
@@ -49,7 +49,7 @@ export default function PhotoGallery() {
               <ZoomIn size={28} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-              <p className="text-white text-xs font-medium truncate telugu-text">{img.alt}</p>
+              <p className="text-white text-sm font-medium truncate telugu-text">{img.alt}</p>
             </div>
           </div>
         ))}

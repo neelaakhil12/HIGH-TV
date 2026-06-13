@@ -90,7 +90,7 @@ function SidebarLatestVideos() {
             {/* Bottom: Title */}
             <div className="py-0.5">
               <h4 
-                className="text-[13px] font-black text-gray-800 leading-snug group-hover:text-red-600 transition-colors telugu-text"
+                className="text-[15px] font-black text-gray-800 leading-snug group-hover:text-red-600 transition-colors telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {vid.title}
@@ -114,7 +114,7 @@ function SidebarLatestVideos() {
               className="h-10 w-auto object-contain"
             />
           </div>
-          <span className="text-[11.5px] font-black text-gray-800 group-hover:text-red-600 font-sans tracking-widest uppercase mt-2">
+          <span className="text-[13px] font-black text-gray-800 group-hover:text-red-600 font-sans tracking-widest uppercase mt-2">
             E-PAPER
           </span>
         </Link>
@@ -184,7 +184,7 @@ function LatestNewsFeed() {
           >
             <span className="text-gray-400 mt-1 flex-shrink-0 text-[10px]">▪</span>
             <p 
-              className="text-[12px] font-bold text-gray-800 leading-normal group-hover:text-[#02599c] transition-colors telugu-text" 
+              className="text-[14px] font-bold text-gray-800 leading-normal group-hover:text-[#02599c] transition-colors telugu-text" 
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.title}
@@ -230,21 +230,21 @@ export default function HomePage() {
                 <div className="grid grid-cols-3 gap-2">
                   <Link
                     href="/category/telangana?view=districts"
-                    className="bg-[#16a34a] hover:bg-[#15803d] text-white font-black py-2 px-1 rounded text-center text-[10px] md:text-[11px] lg:text-xs transition-colors shadow-xs telugu-text flex items-center justify-center"
+                    className="bg-[#16a34a] hover:bg-[#15803d] text-white font-black py-2 px-1 rounded text-center text-[12px] md:text-[13px] lg:text-sm transition-colors shadow-xs telugu-text flex items-center justify-center"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     తెలంగాణ జిల్లాల వార్తలు
                   </Link>
                   <Link
                     href="/category/andhra-pradesh?view=districts"
-                    className="bg-[#ea580c] hover:bg-[#c2410c] text-white font-black py-2 px-1 rounded text-center text-[10px] md:text-[11px] lg:text-xs transition-colors shadow-xs telugu-text flex items-center justify-center"
+                    className="bg-[#ea580c] hover:bg-[#c2410c] text-white font-black py-2 px-1 rounded text-center text-[12px] md:text-[13px] lg:text-sm transition-colors shadow-xs telugu-text flex items-center justify-center"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     ఆంధ్రప్రదేశ్ జిల్లాల వార్తలు
                   </Link>
                   <Link
                     href="/category/latest"
-                    className="bg-[#5c2d91] hover:bg-[#4a2078] text-white font-black py-2 px-1 rounded text-center text-[10px] md:text-[11px] lg:text-xs transition-colors shadow-xs flex items-center justify-center gap-2 telugu-text cursor-pointer"
+                    className="bg-[#5c2d91] hover:bg-[#4a2078] text-white font-black py-2 px-1 rounded text-center text-[12px] md:text-[13px] lg:text-sm transition-colors shadow-xs flex items-center justify-center gap-2 telugu-text cursor-pointer"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     <span className="relative flex h-2 w-2 flex-shrink-0">
@@ -272,7 +272,7 @@ export default function HomePage() {
                       </div>
                       <div className="flex-1 min-w-0 py-0.5">
                         <h4
-                          className="text-[15px] font-black text-gray-700 leading-snug line-clamp-3 group-hover:text-[#02599c] transition-colors telugu-text"
+                          className="text-[16.5px] font-black text-gray-700 leading-snug line-clamp-3 group-hover:text-[#02599c] transition-colors telugu-text"
                           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                         >
                           {article.title}

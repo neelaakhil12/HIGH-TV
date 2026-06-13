@@ -270,7 +270,7 @@ export default function WebStoriesSection() {
         </div>
         <Link 
           href="/category/webstories" 
-          className="text-xs md:text-sm font-extrabold text-[#02599c] hover:text-[#e60000] transition-colors flex items-center gap-1 telugu-text" 
+          className="text-sm md:text-[15px] font-extrabold text-[#02599c] hover:text-[#e60000] transition-colors flex items-center gap-1 telugu-text" 
           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
         >
           మరిన్ని చూడండి <ChevronRight size={14} />

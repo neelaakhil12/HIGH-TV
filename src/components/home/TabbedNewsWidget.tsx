@@ -39,7 +39,7 @@ export default function TabbedNewsWidget({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 min-w-[110px] text-center py-3 text-xs md:text-sm font-black telugu-text transition-colors border-b-2 outline-none cursor-pointer ${
+              className={`flex-1 min-w-[110px] text-center py-3 text-sm md:text-base font-black telugu-text transition-colors border-b-2 outline-none cursor-pointer ${
                 isActive
                   ? 'border-brand-red text-brand-red bg-white'
                   : 'border-transparent text-gray-500 hover:text-brand-blue hover:bg-gray-100/50'
@@ -67,19 +67,19 @@ export default function TabbedNewsWidget({
                   className="w-full h-44 object-cover"
                 />
               </Link>
-              <span className="text-[10px] uppercase font-bold text-brand-blue tracking-wide mb-1 block">
+              <span className="text-xs uppercase font-bold text-brand-blue tracking-wide mb-1 block">
                 {currentTab.data[0].category}
               </span>
               <Link href={`/news/${currentTab.data[0].slug}`}>
                 <h3
-                  className="font-black text-gray-900 group-hover:text-brand-blue transition-colors text-sm md:text-base mb-2 line-clamp-2 telugu-text"
+                  className="font-black text-gray-900 group-hover:text-brand-blue transition-colors text-[15px] md:text-[17px] mb-2 line-clamp-2 telugu-text"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {currentTab.data[0].title}
                 </h3>
               </Link>
               <p
-                className="text-gray-500 text-xs line-clamp-3 leading-relaxed telugu-text"
+                className="text-gray-500 text-sm line-clamp-3 leading-relaxed telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {currentTab.data[0].description}
@@ -106,7 +106,7 @@ export default function TabbedNewsWidget({
                 </div>
                 <div className="flex-1">
                   <p
-                    className="text-xs font-bold text-gray-800 group-hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
+                    className="text-sm font-bold text-gray-800 group-hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {article.title}
@@ -127,7 +127,7 @@ export default function TabbedNewsWidget({
                 ? 'andhra-pradesh'
                 : currentTab.id
             }`}
-            className="inline-block text-xs font-bold text-brand-blue hover:text-brand-red transition-colors telugu-text"
+            className="inline-block text-sm font-bold text-brand-blue hover:text-brand-red transition-colors telugu-text"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             {currentTab.name} వార్తలు అన్నీ చూడండి &raquo;

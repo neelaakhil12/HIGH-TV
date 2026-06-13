@@ -54,7 +54,7 @@ export default function RightSidebar() {
                 >
                   {article.title}
                 </h4>
-                <span className="text-[10px] text-gray-400 mt-0.5 block">{formatTimeAgo(article.publishedAt)}</span>
+                <span className="text-[12px] text-gray-400 mt-0.5 block">{formatTimeAgo(article.publishedAt)}</span>
               </div>
             </Link>
           ))}
@@ -132,7 +132,7 @@ export default function RightSidebar() {
         <h3 className="font-black text-gray-800 text-[15px] mb-3 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ట్రెండింగ్ ట్యాగ్స్</h3>
         <div className="flex flex-wrap gap-2">
           {['రాజకీయాలు', 'ఆంధ్రప్రదేశ్', 'తెలంగాణ', 'క్రికెట్', 'సినిమా', 'AI', 'బడ్జెట్', 'వరదలు', 'IPL', 'మెట్రో', 'వ్యాపారం', 'ఆరోగ్యం'].map((tag) => (
-            <Link key={tag} href={`/search?q=${tag}`} className="text-xs bg-gray-100 hover:bg-brand-blue hover:text-white text-gray-600 px-3 py-1.5 rounded-full transition-colors font-medium telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+            <Link key={tag} href={`/search?q=${tag}`} className="text-sm bg-gray-100 hover:bg-brand-blue hover:text-white text-gray-600 px-3 py-1.5 rounded-full transition-colors font-medium telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
               #{tag}
             </Link>
           ))}
@@ -142,7 +142,7 @@ export default function RightSidebar() {
       {/* 10. Social Follow Box */}
       <div className="bg-brand-blue rounded-xl p-4 text-white text-left">
         <h3 className="font-black text-lg mb-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>మాతో అనుసంధానం</h3>
-        <p className="text-blue-100 text-xs mb-4 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>సోషల్ మీడియాలో హై టీవీని ఫాలో అవ్వండి</p>
+        <p className="text-blue-100 text-sm mb-4 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>సోషల్ మీడియాలో హై టీవీని ఫాలో అవ్వండి</p>
         <div className="space-y-2">
           {[
             { name: 'Facebook', count: '2.4L' },
@@ -151,8 +151,8 @@ export default function RightSidebar() {
             { name: 'Instagram', count: '67K' },
           ].map((social) => (
             <a key={social.name} href="#" className="flex items-center justify-between bg-white/15 hover:bg-white/25 transition-colors rounded-lg px-3 py-2">
-              <span className="font-bold text-sm">{social.name}</span>
-              <span className="text-blue-100 text-xs">{social.count} followers</span>
+              <span className="font-bold text-[15px]">{social.name}</span>
+              <span className="text-blue-100 text-sm">{social.count} followers</span>
             </a>
           ))}
         </div>

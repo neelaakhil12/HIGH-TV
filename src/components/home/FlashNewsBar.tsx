@@ -41,7 +41,7 @@ export default function FlashNewsBar() {
   return (
     <div className="w-full bg-white border-y border-gray-200 py-2 px-3 flex items-center mb-5 select-none">
       {/* Red Flash News Label */}
-      <span className="font-extrabold text-[#fe0000] text-[13px] md:text-[15px] tracking-wide flex-shrink-0 uppercase">
+      <span className="font-extrabold text-[#fe0000] text-[15px] md:text-[17px] tracking-wide flex-shrink-0 uppercase">
         Flash News
       </span>
       
@@ -64,7 +64,7 @@ export default function FlashNewsBar() {
           {/* Headline Link */}
           <Link 
             href={flashNewsItems[currentIndex].link}
-            className="text-[12px] md:text-[13.5px] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-1 telugu-text text-left pr-4 cursor-pointer"
+            className="text-[14px] md:text-[15.5px] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-1 telugu-text text-left pr-4 cursor-pointer"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             {flashNewsItems[currentIndex].text}

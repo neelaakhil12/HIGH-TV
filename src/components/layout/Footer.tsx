@@ -56,7 +56,7 @@ export default function Footer() {
                 className="h-8 w-auto object-contain transition-transform group-hover:scale-105"
               />
             </Link>
-            <p className="text-xs leading-relaxed mb-5 text-blue-200 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+            <p className="text-sm leading-relaxed mb-5 text-blue-200 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
               హై టీవీ – జెన్-జీ యాజమాన్యంలోని దేశపు మొట్టమొదటి జాతీయ డిజిటల్ వార్తా నెట్వర్క్. అత్యున్నత సాంకేతిక ప్రమాణాలు, నిష్పక్షపాత విశ్లేషణలతో సమకాలీన రాజకీయాలు, ప్రజా సమస్యలపై వాస్తవాధారిత జర్నలిజానికి విశ్వసనీయ వేదిక. విలువలతో కూడిన పత్రికారంగానికి ప్రతిరూపమై ప్రతి సామాన్యుడి గుండె చప్పుడును వినిపించే నిఖార్సైన గళం— హై స్వరం
             </p>
             <div className="flex gap-3">
@@ -85,7 +85,7 @@ export default function Footer() {
                 <li key={cat.slug}>
                   <Link
                     href={`/category/${cat.slug}`}
-                    className="text-xs hover:text-hover-yellow transition-colors telugu-text flex items-center gap-1.5"
+                    className="text-sm hover:text-hover-yellow transition-colors telugu-text flex items-center gap-1.5"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     <span className="w-1 h-1 bg-blue-400 rounded-full flex-shrink-0"></span>
@@ -103,31 +103,31 @@ export default function Footer() {
               సంప్రదించండి
             </h3>
             <ul className="space-y-3 text-blue-200">
-              <li className="flex items-start gap-2 text-xs">
-                <MapPin size={13} className="text-hover-yellow mt-0.5 flex-shrink-0" />
+              <li className="flex items-start gap-2 text-sm">
+                <MapPin size={15} className="text-hover-yellow mt-0.5 flex-shrink-0" />
                 <span className="telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   జుబ్లీ హిల్స్, రోడ్ నెం. 86, హైదరాబాద్, తెలంగాణ, భారతదేశం - 500096
                 </span>
               </li>
-              <li className="flex items-center gap-2 text-xs">
-                <Phone size={13} className="text-hover-yellow flex-shrink-0" />
+              <li className="flex items-center gap-2 text-sm">
+                <Phone size={15} className="text-hover-yellow flex-shrink-0" />
                 <a href="tel:+919985450001" className="hover:text-hover-yellow transition-colors">+91-99854-50001</a>
               </li>
-              <li className="flex items-center gap-2 text-xs">
-                <Mail size={13} className="text-hover-yellow flex-shrink-0" />
+              <li className="flex items-center gap-2 text-sm">
+                <Mail size={15} className="text-hover-yellow flex-shrink-0" />
                 <a href="mailto:contact@hightv.in" className="hover:text-hover-yellow transition-colors">contact@hightv.in</a>
               </li>
             </ul>
 
             <div className="mt-5 p-3.5 bg-brand-dark-blue/40 rounded-lg border border-blue-800">
-              <p className="text-[10px] font-semibold text-blue-300 uppercase tracking-wider mb-1.5">వార్తా సూచన</p>
+              <p className="text-xs font-semibold text-blue-300 uppercase tracking-wider mb-1.5">వార్తా సూచన</p>
               <div className="flex flex-col sm:flex-row gap-1.5">
                 <input
                   type="email"
                   placeholder="మీ ఇమెయిల్"
-                  className="w-full sm:flex-1 bg-white/10 text-white placeholder-blue-300 text-xs px-2.5 py-1.5 rounded border border-blue-800 focus:border-hover-yellow outline-none"
+                  className="w-full sm:flex-1 bg-white/10 text-white placeholder-blue-300 text-sm px-2.5 py-1.5 rounded border border-blue-800 focus:border-hover-yellow outline-none"
                 />
-                <button className="w-full sm:w-auto bg-brand-red text-white text-xs px-2.5 py-1.5 rounded hover:bg-[#d00000] transition-colors font-semibold">
+                <button className="w-full sm:w-auto bg-brand-red text-white text-sm px-2.5 py-1.5 rounded hover:bg-[#d00000] transition-colors font-semibold">
                   Subscribe
                 </button>
               </div>
@@ -140,10 +140,10 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="bg-[#003e67] border-t border-brand-dark-blue/40 text-blue-200">
         <div className="max-w-[1050px] mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-xs font-sans">
+          <p className="text-[13.5px] font-sans">
             © 2026 High TV. All rights reserved.
           </p>
-          <div className="flex gap-4 text-xs font-sans">
+          <div className="flex gap-4 text-[13.5px] font-sans">
             <Link href="/privacy" className="hover:text-hover-yellow transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-hover-yellow transition-colors">Terms of Service</Link>
             <Link href="/about" className="hover:text-hover-yellow transition-colors">About Us</Link>

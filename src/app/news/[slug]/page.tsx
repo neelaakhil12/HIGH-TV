@@ -129,7 +129,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       <main className="max-w-[1050px] mx-auto bg-white shadow-md border-x border-gray-200 px-4 py-4">
 
         {/* Breadcrumb */}
-        <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3 flex-wrap font-sans border-b border-gray-100 pb-3">
+        <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-3 flex-wrap font-sans border-b border-gray-100 pb-3">
           <Link href="/" className="hover:text-[#025390] transition-colors flex items-center gap-1 font-bold">
             <Home size={12} /> Home
           </Link>
@@ -165,7 +165,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             <div className="bg-white border border-gray-200 rounded overflow-hidden">
               <div className="flex items-center gap-2 bg-[#025390] text-white px-3 py-2.5">
                 <TrendingUp size={14} />
-                <span className="font-black text-sm telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <span className="font-black text-base telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   ట్రెండింగ్ వార్తలు
                 </span>
               </div>
@@ -209,13 +209,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               {/* Category pill */}
               <div className="flex items-center gap-2 mb-3">
                 <span
-                  className="category-pill text-white text-xs"
+                  className="category-pill text-white text-sm"
                   style={{ background: article.categoryColor }}
                 >
                   {article.category}
                 </span>
                 {article.isBreaking && (
-                  <span className="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded breaking-badge">
+                  <span className="bg-red-600 text-white text-[12px] font-black px-2 py-0.5 rounded breaking-badge">
                     🔴 Breaking
                   </span>
                 )}
@@ -230,10 +230,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </h1>
 
               {/* Meta row */}
-              <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 mb-4 pb-3 border-b border-gray-100 font-sans">
+              <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100 font-sans">
                 <div className="flex items-center gap-1.5">
                   <div className="w-6 h-6 bg-[#025390] rounded-full flex items-center justify-center">
-                    <span className="text-white text-[10px] font-black">హై</span>
+                    <span className="text-white text-[12px] font-black">హై</span>
                   </div>
                   <Link href={`/reporter/${reporter.slug}`} className="font-bold text-[#025390] hover:text-red-600 transition-colors telugu-text" style={{ fontFamily: 'Mandali, sans-serif' }}>
                     {reporter.name}
@@ -282,7 +282,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                   <Link
                     key={tag}
                     href={`/search?q=${tag}`}
-                    className="text-xs bg-gray-100 hover:bg-[#025390] hover:text-white text-gray-600 px-3 py-1 rounded-full transition-colors font-medium telugu-text"
+                    className="text-sm bg-gray-100 hover:bg-[#025390] hover:text-white text-gray-600 px-3 py-1 rounded-full transition-colors font-medium telugu-text"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     #{tag}
@@ -292,7 +292,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
               {/* Like / Share bar */}
               <div className="mt-4 p-3 bg-gray-50 rounded-lg flex items-center justify-between border border-gray-100">
-                <button className="flex items-center gap-2 text-gray-600 hover:text-[#025390] transition-colors font-semibold text-sm cursor-pointer">
+                <button className="flex items-center gap-2 text-gray-600 hover:text-[#025390] transition-colors font-semibold text-[15.5px] cursor-pointer">
                   <ThumbsUp size={16} />
                   <span className="telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>లైక్ చేయండి</span>
                 </button>
@@ -319,7 +319,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             {/* Latest News */}
             <div className="bg-white border border-gray-200 rounded overflow-hidden">
               <div className="bg-[#e60000] text-white px-3 py-2.5">
-                <span className="font-black text-sm telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <span className="font-black text-base telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   తాజా వార్తలు
                 </span>
               </div>

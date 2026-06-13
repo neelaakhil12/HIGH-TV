@@ -72,7 +72,7 @@ export default function HeroSlider() {
         </button>
 
         {/* Slide Counter (Overlaid on image top-right) */}
-        <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-md z-10 select-none">
+        <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[12px] font-bold px-2 py-0.5 rounded-md z-10 select-none">
           {current + 1} / {slides.length}
         </div>
       </div>
@@ -84,12 +84,12 @@ export default function HeroSlider() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               {slide.isBreaking && (
-                <span className="bg-[#66000c] text-white text-[9px] md:text-[10px] font-black px-1.5 md:px-2 py-0.5 rounded breaking-badge uppercase tracking-wider">
+                <span className="bg-[#66000c] text-white text-[11px] md:text-[12px] font-black px-1.5 md:px-2 py-0.5 rounded breaking-badge uppercase tracking-wider">
                   🔴 బ్రేకింగ్
                 </span>
               )}
               <span
-                className="text-white text-[9px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded"
+                className="text-white text-[11px] md:text-[12px] font-bold px-1.5 md:px-2 py-0.5 rounded"
                 style={{ background: slide.categoryColor }}
               >
                 {slide.category}
@@ -114,7 +114,7 @@ export default function HeroSlider() {
           {/* News Headline - exactly one line */}
           <Link href={`/news/${slide.slug}`} className="block group">
             <h2
-              className="text-gray-800 text-sm md:text-base font-black leading-snug group-hover:text-[#02599c] transition-colors telugu-text truncate"
+              className="text-gray-800 text-[15.5px] md:text-base font-black leading-snug group-hover:text-[#02599c] transition-colors telugu-text truncate"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               title={slide.title}
             >

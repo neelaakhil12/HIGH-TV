@@ -205,7 +205,7 @@ export default async function CategoryPage({
           {isDistrictsView ? (
             <>
               {/* Breadcrumb for districts view */}
-              <div className="flex items-center gap-2 text-sm text-gray-500 mb-5 border-b border-gray-100 pb-3 font-sans">
+              <div className="flex items-center gap-2 text-[15.5px] text-gray-500 mb-5 border-b border-gray-100 pb-3 font-sans">
                 <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1 font-bold">
                   <Home size={14} /> Home
                 </Link>
@@ -263,7 +263,7 @@ export default async function CategoryPage({
                           <div className="absolute bottom-2 left-2 bg-white/95 border border-gray-250 px-2 py-0.5 rounded shadow-3xs flex items-center gap-1 select-none">
                             <MapPin size={11} className="text-[#e60000] flex-shrink-0" />
                             <span 
-                              className="text-[11px] font-bold text-gray-700 telugu-text"
+                              className="text-[13px] font-bold text-gray-700 telugu-text"
                               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                             >
                               {art.districtName}
@@ -302,7 +302,7 @@ export default async function CategoryPage({
                             <div className="flex items-center gap-0.5 mb-1 select-none">
                               <MapPin size={11} className="text-[#e60000] flex-shrink-0" />
                               <span 
-                                className="text-[10.5px] font-extrabold text-[#e60000] telugu-text"
+                                className="text-[12.5px] font-extrabold text-[#e60000] telugu-text"
                                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                               >
                                 {art.districtName}
@@ -319,7 +319,7 @@ export default async function CategoryPage({
                             </Link>
                           </div>
                           {/* Custom Time */}
-                          <span className="text-[10px] text-[#02599c] font-bold mt-1 block">
+                          <span className="text-[12px] text-[#02599c] font-bold mt-1 block">
                             {art.publishedTimeOnly}
                           </span>
                         </div>
@@ -335,7 +335,7 @@ export default async function CategoryPage({
           ) : (
             <>
               {/* Breadcrumb */}
-              <div className="flex items-center gap-2 text-sm text-gray-500 mb-5 border-b border-gray-100 pb-3 font-sans">
+              <div className="flex items-center gap-2 text-[15.5px] text-gray-500 mb-5 border-b border-gray-100 pb-3 font-sans">
                 <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1 font-bold">
                   <Home size={14} /> Home
                 </Link>
@@ -396,10 +396,10 @@ export default async function CategoryPage({
                               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                             >
                               {article.title}{' '}
-                              <span className="text-[#e60000] font-black text-[14px] font-sans">[{timeStr}]</span>
+                              <span className="text-[#e60000] font-black text-[15.5px] font-sans">[{timeStr}]</span>
                             </h3>
                             <p
-                              className="text-[14px] text-gray-500 mt-1 line-clamp-2 telugu-text leading-snug"
+                              className="text-[15.5px] text-gray-500 mt-1 line-clamp-2 telugu-text leading-snug"
                               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                             >
                               {article.description}
