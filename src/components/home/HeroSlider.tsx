@@ -82,19 +82,11 @@ export default function HeroSlider() {
         <div key={current} className="slide-fade-in flex flex-col gap-2">
           {/* Top Row: Badges & Dots */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
               {slide.isBreaking && (
                 <span className="bg-[#66000c] text-white text-[11px] md:text-[12px] font-black px-1.5 md:px-2 py-0.5 rounded breaking-badge uppercase tracking-wider">
                   🔴 బ్రేకింగ్
                 </span>
               )}
-              <span
-                className="text-white text-[11px] md:text-[12px] font-bold px-1.5 md:px-2 py-0.5 rounded"
-                style={{ background: slide.categoryColor }}
-              >
-                {slide.category}
-              </span>
-            </div>
 
             {/* Dots Indicator */}
             <div className="flex gap-1.5">

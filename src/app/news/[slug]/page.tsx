@@ -206,20 +206,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           <article className="bg-white border border-gray-200 rounded overflow-hidden flex-1 max-w-[750px] mx-auto">
             <div className="p-4 md:p-5">
 
-              {/* Category pill */}
-              <div className="flex items-center gap-2 mb-3">
-                <span
-                  className="category-pill text-white text-sm"
-                  style={{ background: article.categoryColor }}
-                >
-                  {article.category}
-                </span>
-                {article.isBreaking && (
+              {article.isBreaking && (
+                <div className="flex items-center gap-2 mb-3">
                   <span className="bg-red-600 text-white text-[12px] font-black px-2 py-0.5 rounded breaking-badge">
                     🔴 Breaking
                   </span>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Headline */}
               <h1
@@ -272,8 +265,33 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <div className="telugu-text space-y-4 text-[20px] text-gray-800 leading-loose" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                 <p>{article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. హై టీవీ డెస్క్ నుండి తాజా సమాచారం ఇక్కడ లభిస్తుంది.</p>
                 <p>అధికారులు తెలిపిన వివరాల ప్రకారం, ఈ నిర్ణయం రాష్ట్ర ప్రజలకు అత్యంత ప్రయోజనకరంగా ఉంటుందని భావిస్తున్నారు. ఈ పరిణామాలు భవిష్యత్తులో మరింత సానుకూలమైన ఫలితాలను ఇస్తాయని నిపుణులు అభిప్రాయపడుతున్నారు.</p>
+
+                {/* ఈ వార్తా చదవండి promo 1 — after 2 paragraphs */}
+                {trendingNews[0] && (
+                  <div className="flex items-start gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4">
+                    <span className="text-[#e60000] font-black text-[18px] flex-shrink-0 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      ఈ వార్తా చదవండి:
+                    </span>
+                    <Link href={`/news/${trendingNews[0].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug text-[18px]" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      {trendingNews[0].title}
+                    </Link>
+                  </div>
+                )}
+
                 <p>ఈ అంశంపై స్థానిక ప్రజలు, నిపుణులు వివిధ అభిప్రాయాలు వ్యక్తం చేశారు. కొందరు ఈ నిర్ణయాన్ని స్వాగతిస్తున్నారు, మరికొందరు దీనిపై సందేహాలు వ్యక్తం చేస్తున్నారు.</p>
                 <p>హై టీవీ ఈ అంశాన్ని నిరంతరం ట్రాక్ చేస్తూ తాజా అప్‌డేట్‌లను అందిస్తుంది. మరిన్ని వివరాలకు మా వెబ్‌సైట్‌ను అనుసరించండి.</p>
+
+                {/* ఈ వార్తా చదవండి promo 2 — after 4 paragraphs */}
+                {trendingNews[1] && (
+                  <div className="flex items-start gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4">
+                    <span className="text-[#e60000] font-black text-[18px] flex-shrink-0 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      ఈ వార్తా చదవండి:
+                    </span>
+                    <Link href={`/news/${trendingNews[1].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug text-[18px]" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      {trendingNews[1].title}
+                    </Link>
+                  </div>
+                )}
               </div>
 
               {/* Tags */}

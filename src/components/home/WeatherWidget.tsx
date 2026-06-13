@@ -56,30 +56,30 @@ export default function WeatherWidget() {
       </div>
 
       {/* Grid of cities */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {homeWeatherData.map((data, index) => (
           <div 
             key={index} 
-            className={`bg-gradient-to-br ${data.bg} border border-gray-100 rounded-lg p-3.5 flex items-center justify-between hover:shadow-xs hover:border-blue-100 transition-all duration-200`}
+            className={`bg-gradient-to-br ${data.bg} border border-gray-100 rounded-lg p-3 flex items-center justify-between hover:shadow-xs hover:border-blue-100 transition-all duration-200 min-w-0`}
           >
-            <div className="space-y-1 text-left">
+            <div className="space-y-1 text-left min-w-0 flex-1 mr-2">
               <h4 
-                className="font-black text-[15.5px] text-gray-900 telugu-text"
+                className="font-black text-[13px] text-gray-900 telugu-text leading-tight"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {data.city}
               </h4>
               <p 
-                className="text-[12px] text-gray-500 font-bold telugu-text"
+                className="text-[11px] text-gray-500 font-bold telugu-text leading-tight"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {data.condition}
               </p>
             </div>
             
-            <div className="flex items-center gap-2">
-              <div className="scale-105">{data.icon}</div>
-              <span className="text-xl font-black text-gray-800 font-sans tracking-tight">
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <div className="scale-90">{data.icon}</div>
+              <span className="text-base font-black text-gray-800 font-sans tracking-tight whitespace-nowrap">
                 {data.temp}°C
               </span>
             </div>

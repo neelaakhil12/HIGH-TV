@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Play, Clock } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { videoNews, formatTimeAgo } from '@/lib/mockData';
 
 export default function VideoSection() {
@@ -50,15 +50,7 @@ export default function VideoSection() {
               <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs font-bold px-2 py-0.5 rounded">
                 4:32
               </div>
-              {/* Category */}
-              <div className="absolute top-2 left-2">
-                <span
-                  className="category-pill text-white"
-                  style={{ background: video.categoryColor }}
-                >
-                  {video.category}
-                </span>
-              </div>
+
             </div>
 
             <div className="p-3">
@@ -68,12 +60,7 @@ export default function VideoSection() {
               >
                 {video.title}
               </h3>
-              <div className="flex items-center gap-3 text-[13.5px] text-gray-400">
-                <div className="flex items-center gap-1">
-                  <Clock size={10} />
-                  <span>{formatTimeAgo(video.publishedAt)}</span>
-                </div>
-              </div>
+
             </div>
           </article>
         ))}

@@ -48,9 +48,7 @@ export default function TrendingSection() {
               </span>
             </div>
             <div className="absolute inset-x-0 bottom-0 p-5">
-              <span className="category-pill text-white mb-2 inline-block" style={{ background: trending[0].categoryColor }}>
-                {trending[0].category}
-              </span>
+
               <Link href={`/news/${trending[0].slug}`}>
                 <h3
                   className="text-white text-lg font-black leading-tight hover:text-orange-200 transition-colors telugu-text"
@@ -59,7 +57,7 @@ export default function TrendingSection() {
                   {trending[0].title}
                 </h3>
               </Link>
-              <p className="text-gray-300 text-[13px] mt-1">{formatTimeAgo(trending[0].publishedAt)}</p>
+
             </div>
           </div>
         )}
@@ -85,12 +83,7 @@ export default function TrendingSection() {
                 />
               </div>
               <div className="flex-1 min-w-0 relative z-10">
-                <span
-                  className="category-pill text-white mb-1 inline-block"
-                  style={{ background: article.categoryColor }}
-                >
-                  {article.category}
-                </span>
+
                 <Link href={`/news/${article.slug}`}>
                   <p
                     className="text-[15px] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
@@ -99,7 +92,7 @@ export default function TrendingSection() {
                     {article.title}
                   </p>
                 </Link>
-                <span className="text-[13px] text-gray-400 mt-1 block">{formatTimeAgo(article.publishedAt)}</span>
+
               </div>
             </article>
           ))}

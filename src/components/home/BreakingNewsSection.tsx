@@ -40,7 +40,7 @@ export default function BreakingNewsSection() {
                   <span className="text-[16px] font-black text-gray-800 group-hover:text-brand-blue transition-colors leading-snug block telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                     {article.title}
                   </span>
-                  <span className="text-[13px] text-gray-400 mt-0.5 block">{formatTimeAgo(article.publishedAt)}</span>
+
                 </div>
               </Link>
             ))}

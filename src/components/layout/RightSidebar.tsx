@@ -54,7 +54,7 @@ export default function RightSidebar() {
                 >
                   {article.title}
                 </h4>
-                <span className="text-[12px] text-gray-400 mt-0.5 block">{formatTimeAgo(article.publishedAt)}</span>
+                <span className="text-[12px] text-gray-400 mt-0.5 block"></span>
               </div>
             </Link>
           ))}

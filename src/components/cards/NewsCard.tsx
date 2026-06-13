@@ -3,17 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Clock, Share2 } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 import { NewsArticle } from '@/lib/mockData';
-
-function formatTime(dateStr: string) {
-  const d = new Date(dateStr);
-  const hours = d.getHours();
-  const mins = String(d.getMinutes()).padStart(2, '0');
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  const h = hours % 12 || 12;
-  return `${h}:${mins} ${ampm}`;
-}
 
 function ShareButton({ articleTitle, slug }: { articleTitle: string; slug: string }) {
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -150,25 +141,17 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
         </Link>
         <div className="flex-1 min-w-0 flex flex-col justify-between">
           <div>
-            <span
-              className="category-pill text-white mb-1.5 inline-block w-fit"
-              style={{ background: article.categoryColor }}
-            >
-              {article.category}
-            </span>
+
             <Link href={`/news/${article.slug}`}>
               <h3
-                className="text-[15.5px] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
+                className="text-[15.5px] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-3 leading-snug telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {article.title}
               </h3>
             </Link>
           </div>
-          <div className="flex items-center gap-1.5 mt-2 text-[13px] text-gray-400">
-            <Clock size={10} />
-            <span>{formatTime(article.publishedAt)}</span>
-          </div>
+
         </div>
       </article>
     );
@@ -195,7 +178,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
               {article.title}
             </p>
           </Link>
-          <span className="text-[13px] text-gray-400 mt-1 block">{formatTime(article.publishedAt)}</span>
+
         </div>
       </article>
     );
@@ -215,12 +198,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
         </Link>
         <div className="p-4 flex flex-col flex-1 justify-between">
           <div>
-            <span
-              className="category-pill text-white mb-2.5 w-fit inline-block"
-              style={{ background: article.categoryColor }}
-            >
-              {article.category}
-            </span>
+
             <Link href={`/news/${article.slug}`}>
               <h3
                 className="text-base md:text-lg lg:text-xl font-black text-gray-950 leading-snug hover:text-brand-blue transition-colors telugu-text"
@@ -238,10 +216,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
           </div>
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50">
             <div className="flex items-center gap-3 text-[13px] text-gray-400">
-              <div className="flex items-center gap-1">
-                <Clock size={10} />
-                <span>{formatTime(article.publishedAt)}</span>
-              </div>
+
             </div>
             <ShareButton articleTitle={article.title} slug={article.slug} />
           </div>
@@ -271,12 +246,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
 
       {/* Content */}
       <div className="p-4 flex flex-col flex-1">
-        <span
-          className="category-pill text-white mb-2 w-fit"
-          style={{ background: article.categoryColor }}
-        >
-          {article.category}
-        </span>
+
 
         <Link href={`/news/${article.slug}`} className="flex-1">
           <h2
@@ -296,10 +266,7 @@ export default function NewsCard({ article, variant = 'default' }: NewsCardProps
         {/* Meta */}
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
           <div className="flex items-center gap-3 text-[13px] text-gray-400">
-            <div className="flex items-center gap-1">
-              <Clock size={10} />
-              <span>{formatTime(article.publishedAt)}</span>
-            </div>
+
           </div>
           <ShareButton articleTitle={article.title} slug={article.slug} />
         </div>
