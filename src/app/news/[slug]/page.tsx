@@ -241,7 +241,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock size={12} />
-                  <span className="font-semibold">Updated: {formatDate(article.publishedAt)} IST</span>
+                  <span className="font-semibold">Published: {formatDate(article.publishedAt)} IST</span>
                 </div>
                 <div className="ml-auto">
                   <ShareButton title={article.title} />
