@@ -1,8 +1,150 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import AdBanner from '@/components/home/AdBanner';
 import { politicsNews, featuredNews, formatTimeAgo } from '@/lib/mockData';
+
+function LatestPollWidget() {
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [hasVoted, setHasVoted] = useState(false);
+
+  const options = [
+    { id: 'yes', text: 'అవును' },
+    { id: 'no', text: 'కాదు' },
+    { id: 'unsure', text: 'చెప్పలేం' }
+  ];
+
+  const handleVoteSubmit = () => {
+    if (selectedOption) {
+      setHasVoted(true);
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left">
+      {/* Poll Header */}
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-50">
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-6 bg-[#e60000] rounded-full"></div>
+          <h3 className="font-black text-gray-900 text-[16px] md:text-[18px] telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+            తాజా పోల్స్
+          </h3>
+        </div>
+        <Link 
+          href="/polls" 
+          className="text-[12px] font-bold text-gray-500 hover:text-[#e60000] transition-colors telugu-text"
+          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+        >
+          మరిన్ని పోల్స్ ›
+        </Link>
+      </div>
+
+      {/* Poll Body */}
+      <div className="space-y-4 font-sans">
+        <p 
+          className="text-[15.5px] font-black text-gray-850 leading-snug telugu-text"
+          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+        >
+          కాంగ్రెస్‌లో టీఎన్ఎస్ పార్టీని విలీనం చేస్తారని మీరు భావిస్తున్నారా?
+        </p>
+
+        {!hasVoted ? (
+          <div className="space-y-2.5">
+            {options.map((opt) => {
+              const isSelected = selectedOption === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  onClick={() => setSelectedOption(opt.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-full border text-left transition-all duration-200 cursor-pointer ${
+                    isSelected
+                      ? 'border-[#02599c] bg-blue-50/20 text-[#02599c] font-black'
+                      : 'border-gray-200 text-gray-750 hover:border-gray-300 hover:bg-gray-50/40 font-bold'
+                  }`}
+                >
+                  <div className={`w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 ${
+                    isSelected ? 'border-[#02599c]' : 'border-gray-300'
+                  }`}>
+                    {isSelected && (
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#02599c]"></div>
+                    )}
+                  </div>
+                  <span className="text-[15px] telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    {opt.text}
+                  </span>
+                </button>
+              );
+            })}
+
+            <button
+              onClick={handleVoteSubmit}
+              disabled={!selectedOption}
+              className={`w-full text-white text-[15px] font-black py-2.5 rounded-full transition-all mt-4 cursor-pointer shadow-md text-center ${
+                selectedOption 
+                  ? 'bg-[#0b2545] hover:bg-[#02599c] hover:scale-[1.01] active:scale-95' 
+                  : 'bg-gray-300 cursor-not-allowed opacity-80'
+              }`}
+            >
+              Submit Vote
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3.5 animate-fade-in pt-1">
+            {/* Yes Option Result */}
+            <div>
+              <div className="flex justify-between text-[14px] font-bold text-gray-700 mb-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <span>అవును</span>
+                <span className="font-sans">62%</span>
+              </div>
+              <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                <div className="bg-[#02599c] h-2 rounded-full transition-all duration-500 animate-slide-right" style={{ width: '62%' }}></div>
+              </div>
+            </div>
+
+            {/* No Option Result */}
+            <div>
+              <div className="flex justify-between text-[14px] font-bold text-gray-700 mb-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <span>కాదు</span>
+                <span className="font-sans">28%</span>
+              </div>
+              <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                <div className="bg-red-500 h-2 rounded-full transition-all duration-500 animate-slide-right" style={{ width: '28%' }}></div>
+              </div>
+            </div>
+
+            {/* Unsure Option Result */}
+            <div>
+              <div className="flex justify-between text-[14px] font-bold text-gray-700 mb-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <span>చెప్పలేం</span>
+                <span className="font-sans">10%</span>
+              </div>
+              <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                <div className="bg-gray-450 h-2 rounded-full transition-all duration-500 animate-slide-right" style={{ width: '10%' }}></div>
+              </div>
+            </div>
+
+            <div 
+              className="text-center text-[12px] text-gray-500 font-bold mt-4 pt-1.5 border-t border-gray-50 telugu-text" 
+              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+            >
+              మొత్తం ఓట్లు: 12,482
+            </div>
+          </div>
+        )}
+
+        {/* Footer Poll Active Badge */}
+        <div className={`mt-3 py-1 px-4 text-center rounded-full text-[11px] font-black tracking-wider uppercase border select-none transition-colors ${
+          hasVoted 
+            ? 'bg-blue-50 text-[#02599c] border-blue-100' 
+            : 'bg-emerald-50 text-emerald-700 border-emerald-100'
+        }`}>
+          {hasVoted ? 'Vote Submitted' : 'Poll Active'}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function RightSidebar() {
   // Select 5 popular articles to display as Trending News in the sidebar
@@ -60,6 +202,9 @@ export default function RightSidebar() {
           ))}
         </div>
       </div>
+
+      {/* 3b. Latest Polls Widget (తాజా పోల్స్) */}
+      <LatestPollWidget />
 
       {/* 4. Astrology / Sidebar Ads */}
       <AdBanner position="astrology" />
