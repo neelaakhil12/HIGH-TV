@@ -190,10 +190,7 @@ export default async function CategoryPage({
       <Header />
 
       {category === 'epaper' ? (
-        <main className="flex-1 w-full bg-[#e9eff4]">
-          <div className="max-w-[1050px] mx-auto px-4 pt-4">
-            <BackButton />
-          </div>
+        <main className="flex-1 w-full">
           <EPaperReader />
         </main>
       ) : (
