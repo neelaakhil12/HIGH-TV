@@ -179,7 +179,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                     >
                       <span className="text-[#025390] font-black text-base mt-0.5 flex-shrink-0">■</span>
                       <p
-                        className="text-[17px] font-semibold text-gray-700 group-hover:text-[#025390] leading-snug line-clamp-2 telugu-text"
+                        className="flex-1 min-w-0 text-[15.5px] font-semibold text-gray-700 group-hover:text-[#025390] leading-snug line-clamp-2 telugu-text"
                         style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                       >
                         {item.title}
@@ -351,7 +351,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                     >
                       <span className="text-[#e60000] font-black text-base mt-0.5 flex-shrink-0">■</span>
                       <p
-                        className="text-[17px] font-semibold text-gray-700 group-hover:text-[#e60000] leading-snug line-clamp-2 telugu-text"
+                        className="flex-1 min-w-0 text-[15.5px] font-semibold text-gray-700 group-hover:text-[#e60000] leading-snug line-clamp-2 telugu-text"
                         style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                       >
                         {item.title}

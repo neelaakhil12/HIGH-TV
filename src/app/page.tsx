@@ -185,7 +185,7 @@ function LatestNewsFeed() {
           >
             <span className="text-gray-400 mt-1 flex-shrink-0 text-[10px]">▪</span>
             <p 
-              className="text-[14px] font-bold text-gray-800 leading-normal group-hover:text-[#02599c] transition-colors telugu-text" 
+              className="flex-1 min-w-0 text-[14px] font-bold text-gray-800 leading-normal group-hover:text-[#02599c] transition-colors telugu-text" 
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.title}
