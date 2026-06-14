@@ -79,30 +79,7 @@ export default function HeroSlider() {
 
       {/* Slide Text Content Container (Placed directly under the image) */}
       <div className="p-3.5 select-none bg-white">
-        <div key={current} className="slide-fade-in flex flex-col gap-2">
-          {/* Top Row: Badges & Dots */}
-          <div className="flex items-center justify-between">
-              {slide.isBreaking && (
-                <span className="bg-[#66000c] text-white text-[11px] md:text-[12px] font-black px-1.5 md:px-2 py-0.5 rounded breaking-badge uppercase tracking-wider">
-                  🔴 బ్రేకింగ్
-                </span>
-              )}
-
-            {/* Dots Indicator */}
-            <div className="flex gap-1.5">
-              {slides.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrent(idx)}
-                  className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                    idx === current ? 'w-5 bg-[#66000c]' : 'w-1.5 bg-gray-200 hover:bg-gray-350'
-                  }`}
-                  aria-label={`Slide ${idx + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-
+        <div key={current} className="slide-fade-in">
           {/* News Headline - exactly one line */}
           <Link href={`/news/${slide.slug}`} className="block group">
             <h2

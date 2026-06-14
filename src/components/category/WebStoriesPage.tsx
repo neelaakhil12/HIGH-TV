@@ -2,11 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { X, Play, Pause, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
-import Link from 'next/link';
-
 import { storiesData } from '@/lib/webstoriesData';
 
-export default function WebStoriesSection() {
+export default function WebStoriesPage() {
   const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
@@ -96,7 +94,7 @@ export default function WebStoriesSection() {
       setProgress(0);
     } else {
       // If last slide, go to next story or close if last story
-      if (activeStoryIndex < 2) {
+      if (activeStoryIndex < storiesData.length - 1) {
         setActiveStoryIndex(activeStoryIndex + 1);
         setCurrentSlideIndex(0);
         setProgress(0);
@@ -156,37 +154,20 @@ export default function WebStoriesSection() {
   const ptPadding = Math.round(circleSize * 0.06);
 
   return (
-    <div className="mb-6 select-none">
-      {/* Section Header */}
-      <div className="flex items-center justify-between mb-4 border-b border-gray-150 pb-2">
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-6 bg-[#02599c] rounded-full"></div>
-          <h3 className="font-black text-[#02599c] text-[16px] md:text-[18px] telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-            వెబ్ స్టోరీస్
-          </h3>
-        </div>
-        <Link 
-          href="/category/webstories" 
-          className="text-sm md:text-[15px] font-extrabold text-[#02599c] hover:text-[#e60000] transition-colors flex items-center gap-1 telugu-text" 
-          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-        >
-          మరిన్ని చూడండి <ChevronRight size={14} />
-        </Link>
-      </div>
-
-      {/* Grid of Web Stories (3 Columns) */}
-      <div className="grid grid-cols-3 gap-4">
-        {storiesData.slice(0, 3).map((story, idx) => (
+    <div className="select-none">
+      {/* Grid of Web Stories (2 Columns on Mobile, 4 on Desktop) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {storiesData.map((story, idx) => (
           <div key={story.id} className="flex flex-col group cursor-pointer" onClick={() => handleOpenStory(idx)}>
             {/* Story Card Image */}
-            <div className="relative aspect-[9/16] rounded-xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50 flex items-center justify-center">
+            <div className="relative aspect-[9/16] rounded-2xl overflow-hidden shadow-md border border-gray-150 bg-gray-50 flex items-center justify-center">
               <img
                 src={story.coverImage}
                 alt={story.title}
                 className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
               />
               {/* Stack overlay icon indicating story */}
-              <div className="absolute bottom-2.5 right-2.5 bg-black/40 text-white rounded p-1 backdrop-blur-xs flex items-center justify-center">
+              <div className="absolute bottom-2.5 right-2.5 bg-black/40 text-white rounded p-1.5 backdrop-blur-xs flex items-center justify-center">
                 <Layers size={13} className="stroke-[2.5]" />
               </div>
               {/* Image text overlay */}
@@ -200,9 +181,9 @@ export default function WebStoriesSection() {
               </div>
             </div>
             {/* Bottom Title Text */}
-            <div className="mt-2 text-left">
+            <div className="mt-3 text-left px-1">
               <h4
-                className="text-[12.5px] font-black text-gray-800 group-hover:text-[#02599c] leading-snug line-clamp-2 telugu-text"
+                className="text-[14px] font-bold text-gray-800 group-hover:text-[#02599c] leading-snug line-clamp-2 telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {story.title}

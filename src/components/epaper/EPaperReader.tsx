@@ -341,8 +341,25 @@ export default function EPaperReader() {
   // Custom states for ABN-style selectors
   const [showCalendarModal, setShowCalendarModal] = useState<boolean>(false);
   const [showEditionModal, setShowEditionModal] = useState<boolean>(false);
-  const [selectedEdition, setSelectedEdition] = useState<string>('Hyderabad Main');
+  const [selectedEdition, setSelectedEdition] = useState<string>('Hyderabad');
   const [urlParams, setUrlParams] = useState<URLSearchParams | null>(null);
+
+  const [activeStateTab, setActiveStateTab] = useState<'TS' | 'AP'>('TS');
+
+  // Auto-set the active state tab when modal opens based on current selection
+  useEffect(() => {
+    if (showEditionModal) {
+      const isAP = [
+        'Alluri Sitharama Raju', 'Anakapalli', 'Ananthapuramu', 'Annamayya',
+        'Bapatla', 'Chittoor', 'Dr. B.R. Ambedkar Konaseema', 'East Godavari',
+        'Eluru', 'Guntur', 'Kakinada', 'Krishna', 'Kurnool', 'Nandyal',
+        'NTR', 'Palnadu', 'Parvathipuram Manyam', 'Prakasam', 'Rajamahendravaram',
+        'Sri Potti Sriramulu Nellore', 'Sri Sathya Sai', 'Srikakulam', 'Tirupati',
+        'Vijayawada', 'Visakhapatnam', 'Vizianagaram', 'West Godavari', 'YSR Kadapa'
+      ].includes(selectedEdition);
+      setActiveStateTab(isAP ? 'AP' : 'TS');
+    }
+  }, [showEditionModal, selectedEdition]);
 
   // States for standalone article view
   const [activeArticleId, setActiveArticleId] = useState<string | null>(null);
@@ -957,15 +974,15 @@ export default function EPaperReader() {
           </div>
 
           {/* Grid of Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
             {currentDatesPage.map((dateObj, idx) => (
               <div
                 key={idx}
                 onClick={() => handleSelectEdition(dateObj.isoValue)}
-                className="group cursor-pointer flex flex-col bg-white rounded-2xl border border-gray-200 p-3 shadow-sm hover:shadow-md hover:border-gray-300 transition-all duration-200 hover:-translate-y-1"
+                className="group cursor-pointer flex flex-col transition-all duration-200 hover:-translate-y-1"
               >
                 <div 
-                  className="relative overflow-hidden bg-white border border-gray-200 shadow-sm rounded-none"
+                  className="relative overflow-hidden bg-white border border-gray-200/80 shadow-md rounded-xl group-hover:shadow-xl group-hover:border-gray-300 transition-all duration-200"
                   style={{ aspectRatio: `1 / ${defaultPageAspectRatio}` }}
                 >
                   {defaultPdfDoc ? (
@@ -982,8 +999,8 @@ export default function EPaperReader() {
                     </div>
                   )}
                 </div>
-                <div className="mt-3 text-left">
-                  <p className="font-bold text-sm text-gray-900">Main Edition</p>
+                <div className="mt-4 text-center sm:text-left px-1">
+                  <p className="font-bold text-sm text-gray-900 group-hover:text-[#cc0000] transition-colors">Main Edition</p>
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">{dateObj.label}</p>
                 </div>
               </div>
@@ -1892,7 +1909,7 @@ export default function EPaperReader() {
           {/* Edition Selector Modal */}
           {showEditionModal && (
             <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in text-left">
-              <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md p-6 relative flex flex-col gap-4 border border-gray-100 max-h-[85vh]">
+              <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md md:max-w-2xl p-6 relative flex flex-col gap-4 border border-gray-100 max-h-[85vh]">
                 <div className="flex items-center justify-between border-b border-gray-100 pb-3">
                   <h3 className="text-lg font-extrabold text-gray-900">Select District Edition</h3>
                   <button 
@@ -1903,79 +1920,151 @@ export default function EPaperReader() {
                   </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-thin">
-                  {/* Category: Telangana */}
-                  <div className="border border-gray-200 rounded-2xl overflow-hidden">
-                    <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-b border-gray-200 select-none">
-                      <span className="font-extrabold text-xs text-gray-700 uppercase tracking-wider">Telangana Editions</span>
-                      <span className="text-[10px] text-gray-400 font-bold">7 Districts</span>
-                    </div>
-                    <div className="p-3 grid grid-cols-2 gap-2 bg-white">
-                      {[
-                        'Hyderabad Main',
-                        'Karimnagar Main',
-                        'Warangal Main',
-                        'Nizamabad Main',
-                        'Khammam Main',
-                        'Mahaboobnagar Main',
-                        'Nalgonda Main'
-                      ].map((ed) => (
-                        <button
-                          key={ed}
-                          onClick={() => {
-                            setSelectedEdition(ed);
-                            setShowEditionModal(false);
-                            setActivePageIdx(0);
-                            setIsClipping(false);
-                          }}
-                          className={`text-[11px] font-bold py-2 px-3 rounded-lg border text-left transition-all ${
-                            selectedEdition === ed 
-                              ? 'border-[#cc0000] bg-red-50/50 text-[#cc0000]' 
-                              : 'border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          {ed}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                {/* State Toggle Tabs */}
+                <div className="flex bg-gray-100 p-1 rounded-xl select-none">
+                  <button
+                    onClick={() => setActiveStateTab('TS')}
+                    className={`flex-1 text-center py-2.5 rounded-lg text-xs font-black transition-all ${
+                      activeStateTab === 'TS'
+                        ? 'bg-[#cc0000] text-white shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50/50'
+                    }`}
+                  >
+                    తెలంగాణ (Telangana)
+                  </button>
+                  <button
+                    onClick={() => setActiveStateTab('AP')}
+                    className={`flex-1 text-center py-2.5 rounded-lg text-xs font-black transition-all ${
+                      activeStateTab === 'AP'
+                        ? 'bg-[#cc0000] text-white shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50/50'
+                    }`}
+                  >
+                    ఆంధ్రప్రదేశ్ (Andhra Pradesh)
+                  </button>
+                </div>
 
-                  {/* Category: Andhra Pradesh */}
-                  <div className="border border-gray-200 rounded-2xl overflow-hidden">
-                    <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-b border-gray-200 select-none">
-                      <span className="font-extrabold text-xs text-gray-700 uppercase tracking-wider">Andhra Pradesh Editions</span>
-                      <span className="text-[10px] text-gray-400 font-bold">8 Districts</span>
+                <div className="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-thin">
+                  {activeStateTab === 'TS' ? (
+                    /* Category: Telangana */
+                    <div className="border border-gray-200 rounded-2xl overflow-hidden animate-fade-in">
+                      <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-b border-gray-200 select-none">
+                        <span className="font-extrabold text-xs text-gray-700 uppercase tracking-wider">Telangana Editions</span>
+                        <span className="text-[10px] text-gray-400 font-bold">33 Districts</span>
+                      </div>
+                      <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white">
+                        {[
+                          'Adilabad',
+                          'Bhadradri Kothagudem',
+                          'Hanamkonda',
+                          'Hyderabad',
+                          'Jagtial',
+                          'Jangaon',
+                          'Jayashankar Bhupalpally',
+                          'Jogulamba Gadwal',
+                          'Kamareddy',
+                          'Karimnagar',
+                          'Khammam',
+                          'Kumuram Bheem Asifabad',
+                          'Mahabubabad',
+                          'Mahabubnagar',
+                          'Mancherial',
+                          'Medak',
+                          'Medchal-Malkajgiri',
+                          'Mulugu',
+                          'Nagarkurnool',
+                          'Nalgonda',
+                          'Narayanpet',
+                          'Nirmal',
+                          'Nizamabad',
+                          'Peddapalli',
+                          'Rajanna Sircilla',
+                          'Rangareddy',
+                          'Sangareddy',
+                          'Siddipet',
+                          'Suryapet',
+                          'Vikarabad',
+                          'Wanaparthy',
+                          'Warangal',
+                          'Yadadri Bhuvanagiri'
+                        ].map((ed) => (
+                          <button
+                            key={ed}
+                            onClick={() => {
+                              setSelectedEdition(ed);
+                              setShowEditionModal(false);
+                              setActivePageIdx(0);
+                              setIsClipping(false);
+                            }}
+                            className={`text-[11px] font-bold py-2 px-3 rounded-lg border text-left transition-all ${
+                              selectedEdition === ed 
+                                ? 'border-[#cc0000] bg-red-50/50 text-[#cc0000]' 
+                                : 'border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50'
+                            }`}
+                          >
+                            {ed}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    <div className="p-3 grid grid-cols-2 gap-2 bg-white">
-                      {[
-                        'Vijayawada Main',
-                        'Visakhapatnam Main',
-                        'Tirupathi Main',
-                        'Guntur Main',
-                        'Nellore Main',
-                        'Kurnool Main',
-                        'Ananthapuramu Main',
-                        'Rajamahendravaram Main'
-                      ].map((ed) => (
-                        <button
-                          key={ed}
-                          onClick={() => {
-                            setSelectedEdition(ed);
-                            setShowEditionModal(false);
-                            setActivePageIdx(0);
-                            setIsClipping(false);
-                          }}
-                          className={`text-[11px] font-bold py-2 px-3 rounded-lg border text-left transition-all ${
-                            selectedEdition === ed 
-                              ? 'border-[#cc0000] bg-red-50/50 text-[#cc0000]' 
-                              : 'border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          {ed}
-                        </button>
-                      ))}
+                  ) : (
+                    /* Category: Andhra Pradesh */
+                    <div className="border border-gray-200 rounded-2xl overflow-hidden animate-fade-in">
+                      <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-b border-gray-200 select-none">
+                        <span className="font-extrabold text-xs text-gray-700 uppercase tracking-wider">Andhra Pradesh Editions</span>
+                        <span className="text-[10px] text-gray-400 font-bold">26 Districts</span>
+                      </div>
+                      <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white">
+                        {[
+                          'Alluri Sitharama Raju',
+                          'Anakapalli',
+                          'Ananthapuramu',
+                          'Annamayya',
+                          'Bapatla',
+                          'Chittoor',
+                          'Dr. B.R. Ambedkar Konaseema',
+                          'East Godavari',
+                          'Eluru',
+                          'Guntur',
+                          'Kakinada',
+                          'Krishna',
+                          'Kurnool',
+                          'Nandyal',
+                          'NTR',
+                          'Palnadu',
+                          'Parvathipuram Manyam',
+                          'Prakasam',
+                          'Rajamahendravaram',
+                          'Sri Potti Sriramulu Nellore',
+                          'Sri Sathya Sai',
+                          'Srikakulam',
+                          'Tirupati',
+                          'Vijayawada',
+                          'Visakhapatnam',
+                          'Vizianagaram',
+                          'West Godavari',
+                          'YSR Kadapa'
+                        ].map((ed) => (
+                          <button
+                            key={ed}
+                            onClick={() => {
+                              setSelectedEdition(ed);
+                              setShowEditionModal(false);
+                              setActivePageIdx(0);
+                              setIsClipping(false);
+                            }}
+                            className={`text-[11px] font-bold py-2 px-3 rounded-lg border text-left transition-all ${
+                              selectedEdition === ed 
+                                ? 'border-[#cc0000] bg-red-50/50 text-[#cc0000]' 
+                                : 'border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50'
+                            }`}
+                          >
+                            {ed}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -9,6 +9,7 @@ import RightSidebar from '@/components/layout/RightSidebar';
 import EPaperReader from '@/components/epaper/EPaperReader';
 import FlashNewsBar from '@/components/home/FlashNewsBar';
 import DistrictSelector from '@/components/category/DistrictSelector';
+import WebStoriesPage from '@/components/category/WebStoriesPage';
 import { 
   categories, 
   politicsNews, 
@@ -192,6 +193,26 @@ export default async function CategoryPage({
       {category === 'epaper' ? (
         <main className="flex-1 w-full">
           <EPaperReader />
+        </main>
+      ) : category === 'webstories' ? (
+        <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full text-left">
+          <BackButton />
+          <FlashNewsBar />
+          
+          <div className="flex items-center gap-2 mb-6 border-b-2 border-[#e60000] pb-3">
+            <h1
+              className="text-3xl md:text-4xl font-black text-[#e60000] telugu-text"
+              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+            >
+              వెబ్ స్టోరీస్
+            </h1>
+          </div>
+
+          <AdBanner position="leaderboard" />
+          
+          <div className="mt-6">
+            <WebStoriesPage />
+          </div>
         </main>
       ) : (
         <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">

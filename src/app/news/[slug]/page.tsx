@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
+
 import BackButton from '@/components/layout/BackButton';
 import ShareButton from '@/components/layout/ShareButton';
 import Footer from '@/components/layout/Footer';
@@ -216,14 +217,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
               {/* Headline */}
               <h1
-                className="text-2xl md:text-3xl font-black text-[#cc0000] leading-tight mb-3 telugu-text"
-                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                className="font-black text-[#cc0000] leading-tight mb-3 telugu-text"
+                style={{ fontFamily: 'Noto Sans Telugu, sans-serif', fontSize: '33px' }}
               >
                 {article.title}
               </h1>
 
               {/* Meta row */}
-              <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100 font-sans">
+              <div className="flex flex-wrap items-center gap-3 text-gray-500 mb-4 pb-3 border-b border-gray-100 font-sans" style={{ fontSize: '14px' }}>
                 <div className="flex items-center gap-1.5">
                   <div className="w-6 h-6 bg-[#025390] rounded-full flex items-center justify-center">
                     <span className="text-white text-[12px] font-black">హై</span>
@@ -241,10 +242,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 </div>
               </div>
 
-              {/* Description pull-quote */}
+              {/* Description pull-quote (Summary) */}
               <p
-                className="text-base text-gray-700 leading-relaxed mb-4 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r telugu-text"
-                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                className="leading-relaxed mb-4 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r telugu-text text-gray-700"
+                style={{ fontFamily: 'Noto Sans Telugu, sans-serif', fontSize: '19px' }}
               >
                 {article.description}
               </p>
@@ -262,17 +263,17 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </div>
 
               {/* Article Body */}
-              <div className="telugu-text space-y-4 text-[20px] text-gray-800 leading-loose" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              <div className="telugu-text space-y-4 text-gray-800 leading-loose" style={{ fontFamily: 'Noto Sans Telugu, sans-serif', fontSize: '18px' }}>
                 <p>{article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. హై టీవీ డెస్క్ నుండి తాజా సమాచారం ఇక్కడ లభిస్తుంది.</p>
                 <p>అధికారులు తెలిపిన వివరాల ప్రకారం, ఈ నిర్ణయం రాష్ట్ర ప్రజలకు అత్యంత ప్రయోజనకరంగా ఉంటుందని భావిస్తున్నారు. ఈ పరిణామాలు భవిష్యత్తులో మరింత సానుకూలమైన ఫలితాలను ఇస్తాయని నిపుణులు అభిప్రాయపడుతున్నారు.</p>
 
                 {/* ఈ వార్తా చదవండి promo 1 — after 2 paragraphs */}
                 {trendingNews[0] && (
-                  <div className="flex items-start gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4">
-                    <span className="text-[#e60000] font-black text-[18px] flex-shrink-0 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  <div className="flex items-start gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4" style={{ fontSize: '18px' }}>
+                    <span className="text-[#e60000] font-black flex-shrink-0 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       ఈ వార్తా చదవండి:
                     </span>
-                    <Link href={`/news/${trendingNews[0].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug text-[18px]" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    <Link href={`/news/${trendingNews[0].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       {trendingNews[0].title}
                     </Link>
                   </div>
@@ -283,11 +284,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
                 {/* ఈ వార్తా చదవండి promo 2 — after 4 paragraphs */}
                 {trendingNews[1] && (
-                  <div className="flex items-start gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4">
-                    <span className="text-[#e60000] font-black text-[18px] flex-shrink-0 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  <div className="flex items-start gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4" style={{ fontSize: '18px' }}>
+                    <span className="text-[#e60000] font-black flex-shrink-0 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       ఈ వార్తా చదవండి:
                     </span>
-                    <Link href={`/news/${trendingNews[1].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug text-[18px]" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    <Link href={`/news/${trendingNews[1].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       {trendingNews[1].title}
                     </Link>
                   </div>

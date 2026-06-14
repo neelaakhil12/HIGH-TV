@@ -16,6 +16,7 @@ import AdBanner from '@/components/home/AdBanner';
 import TabbedNewsWidget from '@/components/home/TabbedNewsWidget';
 import FlashNewsBar from '@/components/home/FlashNewsBar';
 import WeatherWidget from '@/components/home/WeatherWidget';
+
 import {
   politicsNews,
   entertainmentNews,

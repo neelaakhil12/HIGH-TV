@@ -9,6 +9,11 @@ import { NewsArticle } from '@/lib/mockData';
 function ShareButton({ articleTitle, slug }: { articleTitle: string; slug: string }) {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!showShareMenu) return;
@@ -19,7 +24,7 @@ function ShareButton({ articleTitle, slug }: { articleTitle: string; slug: strin
     return () => document.removeEventListener('click', handleOutsideClick);
   }, [showShareMenu]);
 
-  const shareUrl = typeof window !== 'undefined'
+  const shareUrl = mounted
     ? `${window.location.origin}/news/${slug}`
     : `https://hightv.in/news/${slug}`;
 

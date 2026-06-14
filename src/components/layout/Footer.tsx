@@ -146,7 +146,6 @@ export default function Footer() {
           <div className="flex gap-4 text-[13.5px] font-sans">
             <Link href="/privacy" className="hover:text-hover-yellow transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-hover-yellow transition-colors">Terms of Service</Link>
-            <Link href="/about" className="hover:text-hover-yellow transition-colors">About Us</Link>
             <Link href="/team" className="hover:text-hover-yellow transition-colors">Our Team</Link>
             <Link href="/weather" className="hover:text-hover-yellow transition-colors">Weather</Link>
             <Link href="/contact" className="hover:text-hover-yellow transition-colors">Contact</Link>
