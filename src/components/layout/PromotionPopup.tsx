@@ -60,12 +60,19 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
     // Check session storage to show it once per session (specifically for this ID)
     const hasSeenPopup = sessionStorage.getItem(`hasSeenPromoPopup_${id}`);
 
-    if (!hasSeenPopup && isActuallyEnabled) {
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-        sessionStorage.setItem(`hasSeenPromoPopup_${id}`, 'true');
-      }, 1500); // 1.5 seconds delay on load
-      return () => clearTimeout(timer);
+    if (isActuallyEnabled) {
+      if (id === 'article') {
+        const timer = setTimeout(() => {
+          setIsOpen(true);
+        }, 1500); // 1.5 seconds delay on load
+        return () => clearTimeout(timer);
+      } else if (!hasSeenPopup) {
+        const timer = setTimeout(() => {
+          setIsOpen(true);
+          sessionStorage.setItem(`hasSeenPromoPopup_${id}`, 'true');
+        }, 1500); // 1.5 seconds delay on load
+        return () => clearTimeout(timer);
+      }
     }
   }, [id]);
 

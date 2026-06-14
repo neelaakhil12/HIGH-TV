@@ -17,5 +17,5 @@ export default function GlobalPromotionPopup() {
   }
 
   // All other pages (news articles, category feeds, reporter profiles, etc.) use the 'article' popup settings
-  return <PromotionPopup id="article" />;
+  return <PromotionPopup id="article" key={pathname} />;
 }
