@@ -27,6 +27,7 @@
   --color-border: var(--border);
   --color-astrology-bg: var(--astrology-bg);
   --color-panchangam-title: var(--panchangam-title);
+  --breakpoint-lg: 60rem;
 }
 
 * {
