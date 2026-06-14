@@ -267,6 +267,17 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 <p>{article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. హై టీవీ డెస్క్ నుండి తాజా సమాచారం ఇక్కడ లభిస్తుంది.</p>
                 <p>అధికారులు తెలిపిన వివరాల ప్రకారం, ఈ నిర్ణయం రాష్ట్ర ప్రజలకు అత్యంత ప్రయోజనకరంగా ఉంటుందని భావిస్తున్నారు. ఈ పరిణామాలు భవిష్యత్తులో మరింత సానుకూలమైన ఫలితాలను ఇస్తాయని నిపుణులు అభిప్రాయపడుతున్నారు.</p>
 
+                {/* Mobile Ad 1 */}
+                <div className="lg:hidden my-5 border border-gray-150 rounded overflow-hidden">
+                  <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
+                  <div className="bg-gradient-to-br from-[#7b2d00] to-[#c0392b] p-4 text-white text-center flex flex-col items-center justify-center gap-2">
+                    <div className="text-2xl">💍</div>
+                    <div className="text-base font-black leading-tight">CMR జ్యువెల్లరీ — Gold & Diamond Sale</div>
+                    <div className="text-[10px] opacity-80 telugu-text" style={{fontFamily:'Noto Sans Telugu,sans-serif'}}>వేసవి ఆఫర్లు — 30% వరకు తగ్గింపు</div>
+                    <a href="#" className="mt-2 bg-yellow-400 text-[#7b2d00] rounded-full px-3 py-1 text-[10px] font-black hover:bg-yellow-350 transition-colors">Shop Now →</a>
+                  </div>
+                </div>
+
                 {/* ఈ వార్తా చదవండి promo 1 — after 2 paragraphs */}
                 {trendingNews[0] && (
                   <div className="flex items-start gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4" style={{ fontSize: '18px' }}>
@@ -293,6 +304,18 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                     </Link>
                   </div>
                 )}
+
+                {/* Mobile Ad 2 */}
+                <div className="lg:hidden my-5 border border-gray-150 rounded overflow-hidden">
+                  <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
+                  <div className="bg-gradient-to-br from-[#1a237e] to-[#283593] p-4 text-white text-center flex flex-col items-center justify-center gap-2">
+                    <div className="text-2xl">🎓</div>
+                    <div className="text-base font-black leading-tight text-center">NARAYANA IIT Academy</div>
+                    <div className="text-[11px] font-bold opacity-90 telugu-text" style={{fontFamily:'Noto Sans Telugu,sans-serif'}}>JEE • NEET • EAMCET</div>
+                    <div className="text-[10px] opacity-80">Admissions Open 2026</div>
+                    <a href="#" className="mt-2 bg-yellow-350 text-[#1a237e] rounded-full px-3 py-1 text-[10px] font-black hover:bg-yellow-300 transition-colors">Enroll Now</a>
+                  </div>
+                </div>
               </div>
 
               {/* Tags */}

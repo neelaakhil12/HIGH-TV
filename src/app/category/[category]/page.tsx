@@ -283,6 +283,11 @@ export default async function CategoryPage({
 
               <AdBanner position="leaderboard" />
 
+              {/* Mobile Ad Block */}
+              <div className="lg:hidden my-4">
+                <AdBanner position="rectangle" />
+              </div>
+
               {/* 70% Left and 30% Right Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-6">
                 {/* Districts News Layout (70%) */}
@@ -404,47 +409,60 @@ export default async function CategoryPage({
 
               <AdBanner position="leaderboard" />
 
+              {/* Mobile Ad Block */}
+              <div className="lg:hidden my-4">
+                <AdBanner position="rectangle" />
+              </div>
+
               {/* 70% Left and 30% Right Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-6">
                 {/* Articles List (70%) — horizontal 2-column format */}
                 <div className="w-full lg:col-span-7">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-0">
-                    {allArticles.map((article) => {
+                    {allArticles.map((article, index) => {
                       const d = new Date(article.publishedAt);
                       const h = d.getHours() % 12 || 12;
                       const m = String(d.getMinutes()).padStart(2, '0');
                       const timeStr = `${h}:${m}`;
                       return (
-                        <Link
-                          key={article.id}
-                          href={`/news/${article.slug}`}
-                          className="flex gap-3 items-start py-3 px-2 border-b border-gray-100 hover:bg-blue-50/40 transition-colors group"
-                        >
-                          {/* Thumbnail */}
-                          <div className="w-[120px] h-[80px] flex-shrink-0 rounded overflow-hidden bg-gray-100 border border-gray-150 relative">
-                            <img
-                              src={article.image}
-                              alt={article.title}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                            />
-                          </div>
-                          {/* Text */}
-                          <div className="flex-1 min-w-0">
-                            <h3
-                              className="text-[18px] font-bold text-[#02599c] group-hover:text-[#013f70] leading-snug line-clamp-2 telugu-text"
-                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                            >
-                              {article.title}{' '}
-                              <span className="text-[#e60000] font-black text-[15.5px] font-sans">[{timeStr}]</span>
-                            </h3>
-                            <p
-                              className="text-[15.5px] text-gray-500 mt-1 line-clamp-2 telugu-text leading-snug"
-                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                            >
-                              {article.description}
-                            </p>
-                          </div>
-                        </Link>
+                        <div key={article.id} className="contents">
+                          <Link
+                            href={`/news/${article.slug}`}
+                            className="flex gap-3 items-start py-3 px-2 border-b border-gray-100 hover:bg-blue-50/40 transition-colors group"
+                          >
+                            {/* Thumbnail */}
+                            <div className="w-[120px] h-[80px] flex-shrink-0 rounded overflow-hidden bg-gray-100 border border-gray-150 relative">
+                              <img
+                                src={article.image}
+                                alt={article.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                              />
+                            </div>
+                            {/* Text */}
+                            <div className="flex-1 min-w-0">
+                              <h3
+                                className="text-[18px] font-bold text-[#02599c] group-hover:text-[#013f70] leading-snug line-clamp-2 telugu-text"
+                                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                              >
+                                {article.title}{' '}
+                                <span className="text-[#e60000] font-black text-[15.5px] font-sans">[{timeStr}]</span>
+                              </h3>
+                              <p
+                                className="text-[15.5px] text-gray-500 mt-1 line-clamp-2 telugu-text leading-snug"
+                                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                              >
+                                {article.description}
+                              </p>
+                            </div>
+                          </Link>
+
+                          {/* Mobile-only inline ad after the 4th article */}
+                          {index === 3 && (
+                            <div className="col-span-1 sm:col-span-2 lg:hidden my-4">
+                              <AdBanner position="gold-loan" />
+                            </div>
+                          )}
+                        </div>
                       );
                     })}
                   </div>

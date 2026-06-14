@@ -290,6 +290,12 @@ export default function HomePage() {
               </div>
             </div>
 
+            {/* Mobile Ads Block 1 */}
+            <div className="lg:hidden grid grid-cols-1 gap-4 my-5">
+              <AdBanner position="sidebar" />
+              <AdBanner position="astrology" />
+            </div>
+
             {/* Breaking News */}
             <BreakingNewsSection />
 
@@ -304,6 +310,11 @@ export default function HomePage() {
               businessNews={businessFeed}
             />
 
+            {/* Mobile Ad Block 2 */}
+            <div className="lg:hidden my-5">
+              <AdBanner position="gold-loan" />
+            </div>
+
             <WeatherWidget />
 
             <TrendingSection />
@@ -317,6 +328,11 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
               <NewsSection title="Business" titleTelugu="వ్యాపారం" articles={businessNews} viewAllLink="/category/business" accentColor="#15803d" layout="list" />
               <NewsSection title="Technology" titleTelugu="టెక్నాలజీ" articles={technologyNews} viewAllLink="/category/technology" accentColor="#02599c" layout="list" />
+            </div>
+
+            {/* Mobile Ad Block 3 */}
+            <div className="lg:hidden my-5">
+              <AdBanner position="coaching" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
