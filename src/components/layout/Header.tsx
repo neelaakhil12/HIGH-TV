@@ -17,6 +17,47 @@ export default function Header() {
   const [trendingIndex, setTrendingIndex] = useState(0);
   const [trendingFade, setTrendingFade] = useState(true);
 
+  // States for desktop dropdowns (to support touch screens in desktop mode)
+  const [isAPDropdownOpen, setIsAPDropdownOpen] = useState(false);
+  const [isTGDropdownOpen, setIsTGDropdownOpen] = useState(false);
+  const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
+
+  const closeAllDropdowns = () => {
+    setIsAPDropdownOpen(false);
+    setIsTGDropdownOpen(false);
+    setIsMoreDropdownOpen(false);
+  };
+
+  const handleAPClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsAPDropdownOpen(!isAPDropdownOpen);
+    setIsTGDropdownOpen(false);
+    setIsMoreDropdownOpen(false);
+  };
+
+  const handleTGClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsTGDropdownOpen(!isTGDropdownOpen);
+    setIsAPDropdownOpen(false);
+    setIsMoreDropdownOpen(false);
+  };
+
+  const handleMoreClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsMoreDropdownOpen(!isMoreDropdownOpen);
+    setIsAPDropdownOpen(false);
+    setIsTGDropdownOpen(false);
+  };
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleOutsideClick = () => {
+      closeAllDropdowns();
+    };
+    window.addEventListener('click', handleOutsideClick);
+    return () => window.removeEventListener('click', handleOutsideClick);
+  }, []);
+
   const trendingItems = [
     { text: "ఎన్నికల ఫలితాలు", link: "/search?q=ఎన్నికల ఫలితాలు" },
     { text: "ఆంధ్రప్రదేశ్‌లో భారీ వర్షాలు", link: "/search?q=వర్షాలు" },
@@ -225,28 +266,36 @@ export default function Header() {
 
               {/* తెలంగాణ Dropdown */}
               <div className="relative group border-r border-white/20 h-full flex-shrink-0">
-                <button className={`px-4 h-full flex items-center gap-1 hover:bg-black/15 transition-colors cursor-pointer ${navCls('/category/telangana')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <button 
+                  onClick={handleTGClick}
+                  className={`px-4 h-full flex items-center gap-1 hover:bg-black/15 transition-colors cursor-pointer ${navCls('/category/telangana')}`} 
+                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                >
                   తెలంగాణ
-                  <ChevronDown size={11} className="text-[#ffb3d1] group-hover:rotate-180 transition-transform duration-200" />
+                  <ChevronDown size={11} className={`text-[#ffb3d1] transition-transform duration-200 ${isTGDropdownOpen ? 'rotate-180' : 'group-hover:rotate-180'}`} />
                 </button>
-                <div className="absolute top-full left-0 hidden group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-2.5 w-52 z-50 animate-fade-in border-t-2 border-[#025390]">
+                <div className={`absolute top-full left-0 ${isTGDropdownOpen ? 'block' : 'hidden'} group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-2.5 w-52 z-50 animate-fade-in border-t-2 border-[#025390]`}>
                   <div className="flex flex-col gap-0.5 text-left">
-                    <Link href="/category/telangana" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>రాష్ట్ర స్థాయి వార్తలు</Link>
-                    <Link href="/category/telangana?view=districts" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>జిల్లాల వారీగా వార్తలు</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/telangana" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>రాష్ట్ర స్థాయి వార్తలు</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/telangana?view=districts" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>జిల్లాల వారీగా వార్తలు</Link>
                   </div>
                 </div>
               </div>
 
               {/* ఆంధ్రప్రదేశ్ Dropdown */}
               <div className="relative group border-r border-white/20 h-full flex-shrink-0">
-                <button className={`px-4 h-full flex items-center gap-1 hover:bg-black/15 transition-colors cursor-pointer ${navCls('/category/andhra-pradesh')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <button 
+                  onClick={handleAPClick}
+                  className={`px-4 h-full flex items-center gap-1 hover:bg-black/15 transition-colors cursor-pointer ${navCls('/category/andhra-pradesh')}`} 
+                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                >
                   ఆంధ్రప్రదేశ్
-                  <ChevronDown size={11} className="text-[#ffb3d1] group-hover:rotate-180 transition-transform duration-200" />
+                  <ChevronDown size={11} className={`text-[#ffb3d1] transition-transform duration-200 ${isAPDropdownOpen ? 'rotate-180' : 'group-hover:rotate-180'}`} />
                 </button>
-                <div className="absolute top-full left-0 hidden group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-2.5 w-52 z-50 animate-fade-in border-t-2 border-[#025390]">
+                <div className={`absolute top-full left-0 ${isAPDropdownOpen ? 'block' : 'hidden'} group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-2.5 w-52 z-50 animate-fade-in border-t-2 border-[#025390]`}>
                   <div className="flex flex-col gap-0.5 text-left">
-                    <Link href="/category/andhra-pradesh" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>రాష్ట్ర స్థాయి వార్తలు</Link>
-                    <Link href="/category/andhra-pradesh?view=districts" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>జిల్లాల వారీగా వార్తలు</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/andhra-pradesh" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>రాష్ట్ర స్థాయి వార్తలు</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/andhra-pradesh?view=districts" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>జిల్లాల వారీగా వార్తలు</Link>
                   </div>
                 </div>
               </div>
@@ -268,27 +317,31 @@ export default function Header() {
 
               {/* ఇంకా... Dropdown */}
               <div className="relative group h-full flex-shrink-0">
-                <button className="px-4 h-full flex items-center gap-1 hover:text-[#ffb3d1] hover:bg-black/15 transition-colors cursor-pointer" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <button 
+                  onClick={handleMoreClick}
+                  className="px-4 h-full flex items-center gap-1 hover:text-[#ffb3d1] hover:bg-black/15 transition-colors cursor-pointer" 
+                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                >
                   ఇంకా...
-                  <ChevronDown size={11} className="text-[#ffb3d1] group-hover:rotate-180 transition-transform duration-200" />
+                  <ChevronDown size={11} className={`text-[#ffb3d1] transition-transform duration-200 ${isMoreDropdownOpen ? 'rotate-180' : 'group-hover:rotate-180'}`} />
                 </button>
-                <div className="absolute top-full right-0 hidden group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-3 w-80 z-50 animate-fade-in border-t-2 border-[#025390]">
+                <div className={`absolute top-full right-0 ${isMoreDropdownOpen ? 'block' : 'hidden'} group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-3 w-80 z-50 animate-fade-in border-t-2 border-[#025390]`}>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
-                    <Link href="/category/technology"    className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>టెక్నాలజీ</Link>
-                    <Link href="/category/health"        className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఆరోగ్యం</Link>
-                    <Link href="/category/rasipalalu"    className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>రాశిఫలాలు</Link>
-                    <Link href="/category/viral"         className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వైరల్</Link>
-                    <Link href="/category/photos"        className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఆల్బమ్‌లు</Link>
-                    <Link href="/category/videos"        className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వీడియోలు</Link>
-                    <Link href="/category/women"         className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>మహిళలు</Link>
-                    <Link href="/category/lifestyle"     className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>లైఫ్ స్టైల్</Link>
-                    <Link href="/category/webstories"    className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వెబ్ స్టోరీస్</Link>
-                    <Link href="/category/antharmadanam" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>అంతర్మథనం</Link>
-                    <Link href="/category/adyathmikam"   className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఆధ్యాత్మికం</Link>
-                    <Link href="/category/sampadakiyam"  className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>సంపాదకీయం</Link>
-                    <Link href="/category/shorts"        className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>షార్ట్స్</Link>
-                    <Link href="/team"                   className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>మా టీమ్</Link>
-                    <Link href="/weather"                className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వాతావరణం</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/technology"    className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>టెక్నాలజీ</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/health"        className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఆరోగ్యం</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/rasipalalu"    className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>రాశిఫలాలు</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/viral"         className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వైరల్</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/photos"        className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఆల్బమ్‌లు</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/videos"        className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వీడియోలు</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/women"         className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>మహిళలు</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/lifestyle"     className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>లైఫ్ స్టైల్</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/webstories"    className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వెబ్ స్టోరీస్</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/antharmadanam" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>అంతర్మథనం</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/adyathmikam"   className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఆధ్యాత్మికం</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/sampadakiyam"  className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>సంపాదకీయం</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/shorts"        className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>షార్ట్స్</Link>
+                    <Link onClick={closeAllDropdowns} href="/team"                   className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>మా టీమ్</Link>
+                    <Link onClick={closeAllDropdowns} href="/weather"                className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వాతావరణం</Link>
                   </div>
                 </div>
               </div>
