@@ -31,8 +31,8 @@ export default function PhotoGallery() {
       </div>
 
       {/* Uniform Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {galleryImages.map((img, index) => (
+      <div className="grid grid-cols-3 gap-3">
+        {galleryImages.slice(0, 3).map((img, index) => (
           <div
             key={img.id}
             className="relative h-48 rounded-xl overflow-hidden group cursor-pointer img-zoom-container shadow-sm border border-gray-100"

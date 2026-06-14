@@ -1237,6 +1237,12 @@ export const galleryImages = [
   { id: 4, src: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&h=600&fit=crop', alt: 'హైదరాబాద్ నగరం' },
   { id: 5, src: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&h=400&fit=crop', alt: 'సినిమా వేడుక' },
   { id: 6, src: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&h=800&fit=crop', alt: 'స్టాక్ మార్కెట్' },
+  { id: 7, src: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&h=400&fit=crop', alt: 'వంటశాల & ఆహార రుచులు' },
+  { id: 8, src: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=600&h=400&fit=crop', alt: 'నూతన సాంకేతిక ఆవిష్కరణలు' },
+  { id: 9, src: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&h=400&fit=crop', alt: 'వ్యవసాయం మరియు పాడి పంటలు' },
+  { id: 10, src: 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=600&h=400&fit=crop', alt: 'పాఠశాల విద్యా వ్యవస్థ' },
+  { id: 11, src: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&h=400&fit=crop', alt: 'ప్రకృతి దృశ్యాలు' },
+  { id: 12, src: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=400&fit=crop', alt: 'వైద్య సేవలు - ఆరోగ్యం' },
 ];
 
 
