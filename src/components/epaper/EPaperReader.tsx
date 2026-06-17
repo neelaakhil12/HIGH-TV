@@ -374,19 +374,38 @@ export default function EPaperReader() {
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const lastTapRef = useRef<number>(0);
-  const handleDoubleTap = (e: React.TouchEvent) => {
-    const now = Date.now();
-    const DOUBLE_PRESS_DELAY = 300;
-    if (now - lastTapRef.current < DOUBLE_PRESS_DELAY) {
-      e.preventDefault();
-      if (zoom > fitZoom) {
-        setZoom(fitZoom);
-      } else {
-        setZoom(150);
+  const pageFrameRef = useRef<HTMLDivElement>(null);
+  const zoomRef = useRef(zoom);
+  const fitZoomRef = useRef(fitZoom);
+
+  useEffect(() => {
+    zoomRef.current = zoom;
+    fitZoomRef.current = fitZoom;
+  }, [zoom, fitZoom]);
+
+  useEffect(() => {
+    const pageFrame = pageFrameRef.current;
+    if (!pageFrame) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      const now = Date.now();
+      const DOUBLE_PRESS_DELAY = 300;
+      if (now - lastTapRef.current < DOUBLE_PRESS_DELAY) {
+        e.preventDefault();
+        if (zoomRef.current > fitZoomRef.current) {
+          setZoom(fitZoomRef.current);
+        } else {
+          setZoom(150);
+        }
       }
-    }
-    lastTapRef.current = now;
-  };
+      lastTapRef.current = now;
+    };
+
+    pageFrame.addEventListener('touchstart', onTouchStart, { passive: false });
+    return () => {
+      pageFrame.removeEventListener('touchstart', onTouchStart);
+    };
+  }, []);
 
   const handleDoubleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -1733,8 +1752,8 @@ export default function EPaperReader() {
 
                 {/* Page View Frame Wrapper */}
                 <div
+                  ref={pageFrameRef}
                   className="relative flex-shrink-0"
-                  onTouchStart={handleDoubleTap}
                   onDoubleClick={handleDoubleClick}
                   style={{
                     width:  `${paperWidth}px`,
