@@ -275,7 +275,7 @@ export default async function CategoryPage({
               {/* District News Page Header Row */}
               <div className="flex items-center justify-between border-b-2 border-[#e60000] pb-3 mb-6">
                 <h1
-                  className="text-xl md:text-4xl font-black text-[#e60000] telugu-text leading-snug"
+                  className="text-lg md:text-4xl font-black text-[#e60000] telugu-text leading-snug"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్' : 'తెలంగాణ'} జిల్లా వార్తలు
@@ -387,18 +387,18 @@ export default async function CategoryPage({
           ) : (
             <>
               {/* Breadcrumb */}
-              <div className="flex items-center gap-2 text-[15.5px] text-gray-500 mb-5 border-b border-gray-100 pb-3 font-sans">
-                <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1 font-bold">
-                  <Home size={14} /> Home
+              <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 mb-5 border-b border-gray-100 pb-3 font-sans whitespace-nowrap overflow-hidden">
+                <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
+                  <Home className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" /> Home
                 </Link>
-                <ChevronRight size={14} />
-                <span className="text-gray-800 font-bold">
+                <ChevronRight className="w-3 h-3 md:w-3.5 md:h-3.5 text-gray-400 flex-shrink-0" />
+                <span className="text-gray-800 font-bold flex-shrink-0">
                   {englishCategories[category] || category}
                 </span>
                 {activeDistrictObj && (
                   <>
-                    <ChevronRight size={14} />
-                    <span className="text-brand-blue font-extrabold capitalize">
+                    <ChevronRight className="w-3 h-3 md:w-3.5 md:h-3.5 text-gray-400 flex-shrink-0" />
+                    <span className="text-brand-blue font-extrabold capitalize truncate">
                       {activeDistrictObj.slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                     </span>
                   </>
@@ -408,7 +408,7 @@ export default async function CategoryPage({
               {/* Rastra News Page Header */}
               <div className="mb-6 pb-3 border-b-2 border-[#e60000]">
                 <h1
-                  className="text-xl md:text-4xl font-black text-[#e60000] telugu-text leading-snug"
+                  className="text-lg md:text-4xl font-black text-[#e60000] telugu-text leading-snug"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్ వార్తలు' : category === 'telangana' ? 'తెలంగాణ వార్తలు' : `${cat?.name || category} వార్తలు`}
