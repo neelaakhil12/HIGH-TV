@@ -1714,18 +1714,6 @@ export default function EPaperReader() {
                   padding: isMobile ? '4px 0 80px 0' : '24px 24px 48px 24px',
                 }}
               >
-                {/* Floating Clipping Instructions Bar */}
-                {isClipping && (
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-gray-900/90 text-white border border-gray-700/50 backdrop-blur px-4 py-2 rounded-full text-xs font-semibold shadow-2xl flex items-center gap-3 animate-fade-in">
-                    <span>✂️ <strong>Clipping Mode:</strong> Drag the crop zone to select, click Download Clip.</span>
-                    <button 
-                      onClick={() => setIsClipping(false)}
-                      className="bg-white/10 hover:bg-white/20 text-white rounded-full p-1"
-                    >
-                      <X size={12} />
-                    </button>
-                  </div>
-                )}
 
                 {/* Left Skyscraper Ad */}
                 {!isMobile && !isClipping && (
