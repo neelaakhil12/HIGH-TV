@@ -251,8 +251,8 @@ export function NewspaperPDFPage({ pdfDoc, pageNum, zoom, onRenderSuccess, class
         const originalViewport = page.getViewport({ scale: 1.0 });
         // Increased target width inside NewspaperPDFPage to 1800 for HD resolution
         const targetWidth = 1800;
-        // If highRes is active, ensure we render at at least 120% zoom for extreme legibility
-        const renderZoom = highRes ? Math.max(120, zoom) : zoom;
+        // If highRes is active, render at a constant 150% scale to prevent dynamic canvas redraws on zoom changes
+        const renderZoom = highRes ? 150 : zoom;
         
         // Use devicePixelRatio for high-res screens, capped at 3 for high-density Retina mobile/desktop screens
         const dpr = (highRes && typeof window !== 'undefined') ? Math.min(3, window.devicePixelRatio || 1) : 1;
@@ -302,7 +302,8 @@ export function NewspaperPDFPage({ pdfDoc, pageNum, zoom, onRenderSuccess, class
         renderTaskRef.current.cancel();
       }
     };
-  }, [pdfDoc, pageNum, zoom, highRes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pdfDoc, pageNum, highRes]);
 
   return <canvas ref={canvasRef} className={className || "w-full h-full object-contain"} />;
 }
