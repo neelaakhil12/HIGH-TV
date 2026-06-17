@@ -941,7 +941,7 @@ export default function EPaperReader() {
                   </div>
                 )}
               </div>
-              <div className="w-full bg-[#fcc419] py-1.5 px-2 text-center text-[10.5px] font-black text-gray-900 truncate uppercase border-t border-yellow-600 rounded-b-lg">
+              <div className="w-full bg-[#e60000] py-1.5 px-2 text-center text-[10.5px] font-black text-white truncate uppercase border-t border-red-700 rounded-b-lg">
                 {item.name}
               </div>
             </div>
@@ -1448,7 +1448,7 @@ export default function EPaperReader() {
                       className="group cursor-pointer flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
                     >
                       <div 
-                        className="relative overflow-hidden bg-white border border-gray-250 shadow-md rounded-t-lg group-hover:border-yellow-400 transition-all duration-200"
+                        className="relative overflow-hidden bg-white border border-gray-250 shadow-md rounded-t-lg group-hover:border-red-500 transition-all duration-200"
                         style={{ aspectRatio: `1 / ${defaultPageAspectRatio}` }}
                       >
                         {defaultPdfDoc ? (
@@ -1465,7 +1465,7 @@ export default function EPaperReader() {
                           </div>
                         )}
                       </div>
-                      <div className="w-full bg-[#fcc419] py-2 px-3 text-center text-xs font-black text-gray-900 truncate uppercase border-t border-yellow-600 rounded-b-lg">
+                      <div className="w-full bg-[#e60000] py-2 px-3 text-center text-xs font-black text-white truncate uppercase border-t border-red-700 rounded-b-lg">
                         {item.name}
                       </div>
                     </div>
@@ -1660,7 +1660,7 @@ export default function EPaperReader() {
                       onClick={() => { setActivePageIdx(idx); setIsClipping(false); }}
                       className={`w-full text-left rounded-lg overflow-hidden border transition-all flex flex-col group shadow-xs ${
                         idx === activePageIdx 
-                          ? 'border-[#fcc419] ring-4 ring-[#fcc419]/25 shadow-md scale-[1.02]' 
+                          ? 'border-[#e60000] ring-4 ring-[#e60000]/25 shadow-md scale-[1.02]' 
                           : 'border-gray-200 hover:border-gray-300 bg-white'
                       }`}
                     >
