@@ -22,6 +22,7 @@ import {
   Search,
   ArrowLeft
 } from 'lucide-react';
+import AdBanner from '@/components/home/AdBanner';
 
 interface EpaperPageData {
   pageNum: number;
@@ -1302,11 +1303,10 @@ export default function EPaperReader() {
   }
 
   const paperHeight = paperWidth * pageAspectRatio;
-  const arrowHeight = 48;
-  const topPadding = isMobile ? 8 : 24;
+  const arrowHeight = isMobile ? 36 : 48;
 
   let targetArrowTop = 0;
-  if (typeof window !== 'undefined' && scrollContainerRef.current) {
+  if (typeof window !== 'undefined' && scrollContainerRef.current && pageFrameRef.current) {
     const container = scrollContainerRef.current;
     const containerRect = container.getBoundingClientRect();
     const isContainerScrollable = container.scrollHeight > container.clientHeight;
@@ -1318,9 +1318,11 @@ export default function EPaperReader() {
       relativeCenter = window.innerHeight / 2 - containerRect.top;
     }
 
+    const frameOffsetTop = pageFrameRef.current.offsetTop;
+
     targetArrowTop = Math.min(
       paperHeight - arrowHeight,
-      Math.max(0, relativeCenter - topPadding - arrowHeight / 2)
+      Math.max(0, relativeCenter - frameOffsetTop - arrowHeight / 2)
     );
   } else {
     targetArrowTop = paperHeight / 2 - arrowHeight / 2;
@@ -1750,69 +1752,76 @@ export default function EPaperReader() {
                   </div>
                 )}
 
-                {/* Page View Frame Wrapper */}
-                <div
-                  ref={pageFrameRef}
-                  className="relative flex-shrink-0"
-                  onDoubleClick={handleDoubleClick}
-                  style={{
-                    width:  `${paperWidth}px`,
-                    height: `${paperWidth * pageAspectRatio}px`,
-                    transition: 'width 0.2s, height 0.2s',
-                  }}
-                >
-                  {/* Floating Navigation Arrows - Constrained Vertically via Scroll Tracking, Scrollable Horizontally with paper */}
-                  {activePageIdx > 0 && !isClipping && (
-                    <div 
-                      style={{
-                        top: `${targetArrowTop}px`
-                      }}
-                      className={`absolute w-8 h-12 pointer-events-none z-40 ${
-                        isMobile ? 'left-1' : 'right-full'
-                      }`}
-                    >
-                      <button
-                        onClick={() => {
-                          setActivePageIdx(prev => prev - 1);
-                          setIsClipping(false);
-                        }}
-                        className={`pointer-events-auto w-8 h-12 text-white flex items-center justify-center transition-all shadow-md group border cursor-pointer ${
-                          isMobile 
-                            ? 'bg-[#fcc419]/80 backdrop-blur-xs hover:bg-[#e0b014] rounded-md border-yellow-500/35' 
-                            : 'bg-[#fcc419] hover:bg-[#e0b014] rounded-l-md border-y border-l border-yellow-600'
-                        }`}
-                        title="Previous Page"
-                      >
-                        <ChevronLeft size={18} className="stroke-[3] text-white group-hover:scale-110 transition-transform" />
-                      </button>
+                {/* Page View Frame Wrapper and Mobile Ads */}
+                <div className="flex flex-col items-center gap-2">
+                  {isMobile && (
+                    <div className="w-full flex justify-center mb-1" style={{ maxWidth: `${paperWidth}px` }}>
+                      <AdBanner position="leaderboard" />
                     </div>
                   )}
 
-                  {activePageIdx < epaperPages.length - 1 && !isClipping && (
-                    <div 
-                      style={{
-                        top: `${targetArrowTop}px`
-                      }}
-                      className={`absolute w-8 h-12 pointer-events-none z-40 ${
-                        isMobile ? 'right-1' : 'left-full'
-                      }`}
-                    >
-                      <button
-                        onClick={() => {
-                          setActivePageIdx(prev => prev + 1);
-                          setIsClipping(false);
+                  <div
+                    ref={pageFrameRef}
+                    className="relative flex-shrink-0"
+                    onDoubleClick={handleDoubleClick}
+                    style={{
+                      width:  `${paperWidth}px`,
+                      height: `${paperWidth * pageAspectRatio}px`,
+                      transition: 'width 0.2s, height 0.2s',
+                    }}
+                  >
+                    {/* Floating Navigation Arrows - Constrained Vertically via Scroll Tracking, Scrollable Horizontally with paper */}
+                    {activePageIdx > 0 && !isClipping && (
+                      <div 
+                        style={{
+                          top: `${targetArrowTop}px`
                         }}
-                        className={`pointer-events-auto w-8 h-12 text-white flex items-center justify-center transition-all shadow-md group border cursor-pointer ${
-                          isMobile 
-                            ? 'bg-[#fcc419]/80 backdrop-blur-xs hover:bg-[#e0b014] rounded-md border-yellow-500/35' 
-                            : 'bg-[#fcc419] hover:bg-[#e0b014] rounded-r-md border-y border-r border-yellow-600'
+                        className={`absolute pointer-events-none z-40 ${
+                          isMobile ? 'left-1 w-6 h-9' : 'right-full w-8 h-12'
                         }`}
-                        title="Next Page"
                       >
-                        <ChevronRight size={18} className="stroke-[3] text-white group-hover:scale-110 transition-transform" />
-                      </button>
-                    </div>
-                  )}
+                        <button
+                          onClick={() => {
+                            setActivePageIdx(prev => prev - 1);
+                            setIsClipping(false);
+                          }}
+                          className={`pointer-events-auto text-white flex items-center justify-center transition-all shadow-md group border cursor-pointer ${
+                            isMobile 
+                              ? 'w-6 h-9 bg-[#fcc419]/80 backdrop-blur-xs hover:bg-[#e0b014] rounded-md border-yellow-500/35' 
+                              : 'w-8 h-12 bg-[#fcc419] hover:bg-[#e0b014] rounded-l-md border-y border-l border-yellow-600'
+                          }`}
+                          title="Previous Page"
+                        >
+                          <ChevronLeft size={isMobile ? 14 : 18} className="stroke-[3] text-white group-hover:scale-110 transition-transform" />
+                        </button>
+                      </div>
+                    )}
+
+                    {activePageIdx < epaperPages.length - 1 && !isClipping && (
+                      <div 
+                        style={{
+                          top: `${targetArrowTop}px`
+                        }}
+                        className={`absolute pointer-events-none z-40 ${
+                          isMobile ? 'right-1 w-6 h-9' : 'left-full w-8 h-12'
+                        }`}
+                      >
+                        <button
+                          onClick={() => {
+                            setActivePageIdx(prev => prev + 1);
+                            setIsClipping(false);
+                          }}
+                          className={`pointer-events-auto text-white flex items-center justify-center transition-all shadow-md group border cursor-pointer ${
+                            isMobile 
+                              ? 'w-6 h-9 bg-[#fcc419]/80 backdrop-blur-xs hover:bg-[#e0b014] rounded-md border-yellow-500/35' 
+                              : 'w-8 h-12 bg-[#fcc419] hover:bg-[#e0b014] rounded-r-md border-y border-r border-yellow-600'
+                          }`}
+                          title="Next Page"
+                        >
+                          <ChevronRight size={isMobile ? 14 : 18} className="stroke-[3] text-white group-hover:scale-110 transition-transform" />
+                        </button>
+                      </div>
+                    )}
 
                   {/* Inner Page View Frame */}
                   <div
@@ -2008,6 +2017,13 @@ export default function EPaperReader() {
                   )}
                 </div>
               </div>
+
+              {isMobile && (
+                <div className="w-full flex justify-center mt-1" style={{ maxWidth: `${paperWidth}px` }}>
+                  <AdBanner position="rectangle" />
+                </div>
+              )}
+            </div>
 
                 {/* Right Skyscraper Ad */}
                 {!isMobile && !isClipping && (
