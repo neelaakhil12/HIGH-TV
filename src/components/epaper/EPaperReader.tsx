@@ -1614,7 +1614,7 @@ export default function EPaperReader() {
             )}
 
             {/* Mobile Page Navigator Bar */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 flex overflow-x-auto hide-scrollbar gap-2 px-3 py-2 shadow-lg">
+            <div className="md:hidden fixed bottom-14 left-0 right-0 z-40 bg-white border-t border-gray-200 flex overflow-x-auto hide-scrollbar gap-2 px-3 py-2 shadow-lg">
               {epaperPages.map((page, idx) => (
                 <button
                   key={page.pageNum}

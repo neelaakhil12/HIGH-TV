@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import GlobalPromotionPopup from "@/components/layout/GlobalPromotionPopup";
+import BottomNavBar from "@/components/layout/BottomNavBar";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -42,6 +43,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full antialiased bg-white text-[#222222]">
         {children}
+        <BottomNavBar />
         <GlobalPromotionPopup />
       </body>
     </html>
