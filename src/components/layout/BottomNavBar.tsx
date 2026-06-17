@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Menu as MenuIcon, Newspaper, Search, X } from 'lucide-react';
+import { Menu as MenuIcon, Newspaper, Search, X, Heart } from 'lucide-react';
 
 export default function BottomNavBar() {
   const pathname = usePathname();
@@ -54,6 +54,7 @@ export default function BottomNavBar() {
   ];
 
   const isEPaperActive = pathname?.startsWith('/category/epaper') || false;
+  const isHealthActive = pathname?.startsWith('/category/health') || false;
   const isSearchActive = pathname === '/search';
 
   return (
@@ -99,10 +100,10 @@ export default function BottomNavBar() {
                 <Link
                   key={idx}
                   href={item.href}
-                  className={`flex items-center justify-center text-center py-3.5 px-1 rounded-xl text-xs font-bold transition-all border leading-tight telugu-text cursor-pointer select-none active:scale-[0.97] ${
+                  className={`flex items-center justify-center text-center py-3 px-0.5 rounded-xl text-[10.5px] sm:text-xs font-bold transition-all border leading-tight telugu-text cursor-pointer select-none active:scale-[0.97] ${
                     isActive
-                      ? 'bg-blue-50/70 border-blue-200 text-[#02599c] font-black shadow-xs'
-                      : 'bg-gray-50/90 border-gray-200/60 text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                      ? 'bg-[#ffb3d1] border-transparent text-[#025390] font-black shadow-xs'
+                      : 'bg-[#025390] border-transparent text-white hover:bg-[#0269b3]'
                   }`}
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
@@ -118,14 +119,14 @@ export default function BottomNavBar() {
       </div>
 
       {/* ── Persistent Bottom Navigation Bar ─────────────────────────── */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[120] bg-white border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.08)] h-14 flex items-center justify-around px-2 pb-safe">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[120] bg-[#025390] border-t border-[#013d6e] shadow-[0_-2px_10px_rgba(0,0,0,0.15)] h-14 flex items-center justify-around px-2 pb-safe">
         {/* Menu Tab */}
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center transition-colors cursor-pointer select-none ${
             isOpen 
-              ? 'text-[#02599c] font-black' 
-              : 'text-gray-500 hover:text-gray-900 font-semibold'
+              ? 'text-[#ffb3d1] font-black' 
+              : 'text-white/80 hover:text-white font-semibold'
           }`}
         >
           <MenuIcon 
@@ -145,8 +146,8 @@ export default function BottomNavBar() {
           href="/category/epaper"
           className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center transition-colors cursor-pointer select-none ${
             isEPaperActive 
-              ? 'text-[#02599c] font-black' 
-              : 'text-gray-500 hover:text-gray-900 font-semibold'
+              ? 'text-[#ffb3d1] font-black' 
+              : 'text-white/80 hover:text-white font-semibold'
           }`}
         >
           <Newspaper 
@@ -161,13 +162,34 @@ export default function BottomNavBar() {
           </span>
         </Link>
 
+        {/* Health Tab */}
+        <Link
+          href="/category/health"
+          className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center transition-colors cursor-pointer select-none ${
+            isHealthActive 
+              ? 'text-[#ffb3d1] font-black' 
+              : 'text-white/80 hover:text-white font-semibold'
+          }`}
+        >
+          <Heart 
+            size={20} 
+            className={`transition-transform duration-200 ${isHealthActive ? 'scale-110 stroke-[2.5]' : 'stroke-[2]'}`} 
+          />
+          <span 
+            className="text-[9.5px] mt-0.5 telugu-text tracking-tight leading-none truncate w-full"
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            ఆరోగ్యం
+          </span>
+        </Link>
+
         {/* Search Tab */}
         <Link
           href="/search"
           className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center transition-colors cursor-pointer select-none ${
             isSearchActive 
-              ? 'text-[#02599c] font-black' 
-              : 'text-gray-500 hover:text-gray-900 font-semibold'
+              ? 'text-[#ffb3d1] font-black' 
+              : 'text-white/80 hover:text-white font-semibold'
           }`}
         >
           <Search 
