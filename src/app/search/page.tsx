@@ -63,8 +63,8 @@ export default function SearchPage({
           <div className="relative">
             <input
               type="text"
-              placeholder="వార్తలు, విషయాలు లేదా కేటగరీ వెతకండి..."
-              className="search-input w-full pl-4 md:pl-5 pr-12 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm md:text-base focus:border-brand-blue transition-colors"
+              placeholder="వార్తలు, కేటగిరీ వెతకండి..."
+              className="search-input w-full pl-4 md:pl-5 pr-12 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-[13px] md:text-base focus:border-brand-blue transition-colors"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               autoFocus
             />
