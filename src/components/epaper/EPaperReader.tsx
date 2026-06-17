@@ -136,86 +136,23 @@ const generateMockZonesForPage = (pageIdx: number): ArticleZone[] => {
 };
 
 interface EditionCardThumbnailProps {
-  pdfjs: any;
-  dateIso: string;
-  defaultPdfDoc: any;
+  pdfDoc: any;
   cardIdx: number;
   totalPages: number;
 }
 
-export function EditionCardThumbnail({ pdfjs, dateIso, defaultPdfDoc, cardIdx, totalPages }: EditionCardThumbnailProps) {
-  const [pdfDoc, setPdfDoc] = useState<any>(null);
-  const [pageNum, setPageNum] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    if (!pdfjs) return;
-    let isCancelled = false;
-
-    const loadPdf = async () => {
-      const url = getPdfUrlForDate(dateIso);
-      
-      let exists = false;
-      try {
-        const res = await fetch(url, { method: 'HEAD' });
-        if (res.ok) {
-          exists = true;
-        } else if (res.status === 405) {
-          const resGet = await fetch(url);
-          exists = resGet.ok;
-        }
-      } catch {
-        exists = false;
-      }
-
-      if (isCancelled) return;
-
-      if (exists) {
-        try {
-          const loadingTask = pdfjs.getDocument({ url });
-          const pdf = await loadingTask.promise;
-          if (!isCancelled) {
-            setPdfDoc(pdf);
-            setPageNum(1);
-            setLoading(false);
-          }
-        } catch (err) {
-          console.error(`Failed to load pdf for ${dateIso}:`, err);
-          if (!isCancelled) {
-            setPdfDoc(defaultPdfDoc);
-            setPageNum((cardIdx % totalPages) + 1);
-            setLoading(false);
-          }
-        }
-      } else {
-        if (!isCancelled) {
-          setPdfDoc(defaultPdfDoc);
-          setPageNum((cardIdx % totalPages) + 1);
-          setLoading(false);
-        }
-      }
-    };
-
-    loadPdf();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [pdfjs, dateIso, defaultPdfDoc, cardIdx, totalPages]);
-
-  if (loading) {
-    return <div className="text-gray-400 text-xs font-semibold animate-pulse">Loading preview...</div>;
-  }
-
+export function EditionCardThumbnail({ pdfDoc, cardIdx, totalPages }: EditionCardThumbnailProps) {
   if (!pdfDoc) {
     return (
       <div className="flex flex-col items-center justify-center p-4 text-center select-none">
         <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-[#cc0000] font-black text-lg mb-2">B</div>
         <span className="text-[10px] text-gray-500 font-bold uppercase">Balagam TV</span>
-        <span className="text-[8px] text-red-500 font-bold mt-1 uppercase tracking-wider">Not Uploaded</span>
+        <span className="text-[8px] text-red-500 font-bold mt-1 uppercase tracking-wider">Loading...</span>
       </div>
     );
   }
+
+  const pageNum = (cardIdx % totalPages) + 1;
 
   return <NewspaperPDFPage pdfDoc={pdfDoc} pageNum={pageNum} zoom={25} className="w-full h-full block" />;
 }
@@ -929,11 +866,9 @@ export default function EPaperReader() {
               >
                 {defaultPdfDoc ? (
                   <EditionCardThumbnail
-                    pdfjs={pdfjs}
-                    dateIso={selectedDate}
-                    defaultPdfDoc={defaultPdfDoc}
+                    pdfDoc={pdfDoc || defaultPdfDoc}
                     cardIdx={idx}
-                    totalPages={defaultTotalPages}
+                    totalPages={pdfDoc ? pdfDoc.numPages : defaultTotalPages}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-semibold animate-pulse">
@@ -1453,11 +1388,9 @@ export default function EPaperReader() {
                       >
                         {defaultPdfDoc ? (
                           <EditionCardThumbnail
-                            pdfjs={pdfjs}
-                            dateIso={selectedDate}
-                            defaultPdfDoc={defaultPdfDoc}
+                            pdfDoc={pdfDoc || defaultPdfDoc}
                             cardIdx={idx}
-                            totalPages={defaultTotalPages}
+                            totalPages={pdfDoc ? pdfDoc.numPages : defaultTotalPages}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-semibold animate-pulse">
