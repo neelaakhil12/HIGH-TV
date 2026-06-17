@@ -55,7 +55,7 @@ export default function SearchPage({
         <BackButton />
         <div className="max-w-2xl mx-auto mb-8">
           <h1
-            className="text-2xl font-black text-gray-800 mb-4 telugu-text text-center"
+            className="text-xl md:text-2xl font-black text-gray-800 mb-4 telugu-text text-center"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             వార్తలు వెతకండి
@@ -64,12 +64,12 @@ export default function SearchPage({
             <input
               type="text"
               placeholder="వార్తలు, విషయాలు లేదా కేటగరీ వెతకండి..."
-              className="search-input w-full pl-5 pr-12 py-4 border-2 border-gray-200 rounded-xl text-base focus:border-brand-blue transition-colors"
+              className="search-input w-full pl-4 md:pl-5 pr-12 py-3 md:py-4 border-2 border-gray-200 rounded-xl text-sm md:text-base focus:border-brand-blue transition-colors"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               autoFocus
             />
-            <button className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 bg-brand-blue text-white rounded-lg flex items-center justify-center hover:bg-brand-dark-blue transition-colors cursor-pointer">
-              <Search size={18} />
+            <button className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-8 h-8 md:w-9 md:h-9 bg-brand-blue text-white rounded-lg flex items-center justify-center hover:bg-brand-dark-blue transition-colors cursor-pointer">
+              <Search className="w-4 h-4 md:w-[18px] md:h-[18px]" />
             </button>
           </div>
         </div>
