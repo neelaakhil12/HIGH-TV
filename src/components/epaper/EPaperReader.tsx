@@ -1476,6 +1476,12 @@ export default function EPaperReader() {
                 </div>
               </div>
 
+              {isMobile && (
+                <div className="w-full flex justify-center">
+                  <AdBanner position="rectangle" />
+                </div>
+              )}
+
               {/* Section: TELANGANA */}
               <div id="tg-editions-section" className="flex flex-col text-left">
                 <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
