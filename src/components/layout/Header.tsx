@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { ChevronDown, X, Search, TrendingUp } from 'lucide-react';
@@ -8,8 +8,6 @@ import FlashNewsBar from '@/components/home/FlashNewsBar';
 
 export default function Header() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const viewParam = searchParams ? searchParams.get('view') : null;
 
   const isHome = pathname === '/';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -277,47 +275,13 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Sub-pages strip for Telangana */}
-      {isTGMobileExpanded && (
-        <div className="md:hidden w-full bg-[#013d6e] border-t border-[#012f5c] text-[13.5px] font-extrabold text-white telugu-text flex items-center justify-around py-2 shadow-xs">
-          <Link 
-            href="/category/telangana" 
-            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/telangana' && viewParam !== 'districts' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
-            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-          >
-            రాష్ట్ర స్థాయి వార్తలు
-          </Link>
-          <div className="h-4 w-[1px] bg-white/20" />
-          <Link 
-            href="/category/telangana?view=districts" 
-            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/telangana' && viewParam === 'districts' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
-            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-          >
-            జిల్లాల వారీగా వార్తలు
-          </Link>
-        </div>
-      )}
-
-      {/* Mobile Sub-pages strip for Andhra Pradesh */}
-      {isAPMobileExpanded && (
-        <div className="md:hidden w-full bg-[#013d6e] border-t border-[#012f5c] text-[13.5px] font-extrabold text-white telugu-text flex items-center justify-around py-2 shadow-xs">
-          <Link 
-            href="/category/andhra-pradesh" 
-            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/andhra-pradesh' && viewParam !== 'districts' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
-            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-          >
-            రాష్ట్ర స్థాయి వార్తలు
-          </Link>
-          <div className="h-4 w-[1px] bg-white/20" />
-          <Link 
-            href="/category/andhra-pradesh?view=districts" 
-            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/andhra-pradesh' && viewParam === 'districts' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
-            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-          >
-            జిల్లాల వారీగా వార్తలు
-          </Link>
-        </div>
-      )}
+      <Suspense fallback={null}>
+        <MobileSubNav
+          isTGMobileExpanded={isTGMobileExpanded}
+          isAPMobileExpanded={isAPMobileExpanded}
+          pathname={pathname}
+        />
+      </Suspense>
 
       {/* ── Desktop Navigation Bar ───────────────────────────────────── */}
       <div className="hidden md:block w-full border-t border-[#013d6e] bg-[#025390] shadow-md select-none">
@@ -586,5 +550,65 @@ export default function Header() {
       )}
 
     </header>
+  );
+}
+
+// Sub-component to wrap search params in a suspense boundary
+function MobileSubNav({
+  isTGMobileExpanded,
+  isAPMobileExpanded,
+  pathname,
+}: {
+  isTGMobileExpanded: boolean;
+  isAPMobileExpanded: boolean;
+  pathname: string;
+}) {
+  const searchParams = useSearchParams();
+  const viewParam = searchParams ? searchParams.get('view') : null;
+
+  return (
+    <>
+      {/* Mobile Sub-pages strip for Telangana */}
+      {isTGMobileExpanded && (
+        <div className="md:hidden w-full bg-[#013d6e] border-t border-[#012f5c] text-[13.5px] font-extrabold text-white telugu-text flex items-center justify-around py-2 shadow-xs">
+          <Link 
+            href="/category/telangana" 
+            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/telangana' && viewParam !== 'districts' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            రాష్ట్ర స్థాయి వార్తలు
+          </Link>
+          <div className="h-4 w-[1px] bg-white/20" />
+          <Link 
+            href="/category/telangana?view=districts" 
+            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/telangana' && viewParam === 'districts' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            జిల్లాల వారీగా వార్తలు
+          </Link>
+        </div>
+      )}
+
+      {/* Mobile Sub-pages strip for Andhra Pradesh */}
+      {isAPMobileExpanded && (
+        <div className="md:hidden w-full bg-[#013d6e] border-t border-[#012f5c] text-[13.5px] font-extrabold text-white telugu-text flex items-center justify-around py-2 shadow-xs">
+          <Link 
+            href="/category/andhra-pradesh" 
+            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/andhra-pradesh' && viewParam !== 'districts' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            రాష్ట్ర స్థాయి వార్తలు
+          </Link>
+          <div className="h-4 w-[1px] bg-white/20" />
+          <Link 
+            href="/category/andhra-pradesh?view=districts" 
+            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/andhra-pradesh' && viewParam === 'districts' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            జిల్లాల వారీగా వార్తలు
+          </Link>
+        </div>
+      )}
+    </>
   );
 }
