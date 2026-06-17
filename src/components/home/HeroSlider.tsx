@@ -33,9 +33,9 @@ export default function HeroSlider() {
   const slide = slides[current];
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden flex flex-col shadow-xs w-full">
+    <div className="bg-white md:rounded-lg md:border md:border-gray-200 overflow-hidden flex flex-col md:shadow-xs w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 border-y border-gray-150 md:border-y-0">
       {/* Slider Image Container */}
-      <div className="relative w-full aspect-[16/9] bg-neutral-950 overflow-hidden group">
+      <div className="relative w-full aspect-[3/2] md:aspect-[16/9] bg-neutral-950 overflow-hidden group">
         <Link href={`/news/${slide.slug}`} className="absolute inset-0 block cursor-pointer">
           {/* Blurred background image */}
           <div className="absolute inset-0 opacity-45 blur-lg scale-105 pointer-events-none">
@@ -50,7 +50,7 @@ export default function HeroSlider() {
             <img
               src={slide.image}
               alt={slide.title}
-              className="max-w-full max-h-full object-contain"
+              className="w-full h-full object-cover md:max-w-full md:max-h-full md:object-contain"
             />
           </div>
         </Link>
@@ -78,12 +78,12 @@ export default function HeroSlider() {
       </div>
 
       {/* Slide Text Content Container (Placed directly under the image) */}
-      <div className="p-3.5 select-none bg-white">
+      <div className="p-3.5 px-4 md:px-3.5 select-none bg-white">
         <div key={current} className="slide-fade-in">
           {/* News Headline - exactly one line */}
           <Link href={`/news/${slide.slug}`} className="block group">
             <h2
-              className="text-gray-800 text-[15.5px] md:text-base font-black leading-snug group-hover:text-[#02599c] transition-colors telugu-text truncate"
+              className="text-gray-800 text-[15.5px] md:text-base font-black leading-snug group-hover:text-[#02599c] transition-colors telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               title={slide.title}
             >

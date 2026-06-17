@@ -10,6 +10,7 @@ export default function WebStoriesPage() {
   const [progress, setProgress] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [typedText, setTypedText] = useState('');
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -40,6 +41,17 @@ export default function WebStoriesPage() {
       clearInterval(charInterval);
     };
   }, [activeStoryIndex, currentSlideIndex]);
+
+  // Responsive layout check for mobile viewport
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Outlined Text Styles matching Telugu fonts
   const getTextStyle = (style: 'red-white' | 'white-black') => {
@@ -149,9 +161,19 @@ export default function WebStoriesPage() {
   // Dynamic Circle sizing calculations based on slide text length
   const currentText = activeStory?.slides[currentSlideIndex]?.text || '';
   const textLength = currentText.length;
-  const circleSize = Math.max(460, Math.min(560, 420 + textLength * 2));
-  const bottomOffset = -circleSize * 0.26;
-  const ptPadding = Math.round(circleSize * 0.06);
+
+  // Mobile vs Desktop dynamic sizing
+  const circleSize = isMobile
+    ? Math.max(400, Math.min(450, 370 + textLength * 1.0))
+    : Math.max(460, Math.min(560, 420 + textLength * 2));
+
+  const bottomOffset = isMobile
+    ? -circleSize * 0.48
+    : -circleSize * 0.26;
+
+  const ptPadding = isMobile
+    ? Math.round(circleSize * 0.08)
+    : Math.round(circleSize * 0.06);
 
   return (
     <div className="select-none">
@@ -196,7 +218,7 @@ export default function WebStoriesPage() {
       {/* WhatsApp Status Modal Player */}
       {activeStory && (
         <div
-          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center backdrop-blur-xs p-4 animate-fade-in"
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center backdrop-blur-xs p-0 md:p-4 animate-fade-in"
           onClick={handleCloseStory}
         >
           <style dangerouslySetInnerHTML={{ __html: `
@@ -220,7 +242,7 @@ export default function WebStoriesPage() {
           `}} />
           {/* Main Story Container */}
           <div
-            className="relative w-full max-w-sm aspect-[9/16] bg-neutral-950 rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between"
+            className="relative w-full h-full md:h-auto md:max-w-sm md:aspect-[9/16] bg-neutral-950 rounded-none md:rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between"
             onClick={(e) => e.stopPropagation()}
             onMouseDown={() => setIsPaused(true)}
             onMouseUp={() => setIsPaused(false)}
@@ -299,7 +321,7 @@ export default function WebStoriesPage() {
               className="absolute left-1/2 rounded-full bg-black/65 backdrop-blur-xs shadow-2xl z-20 pointer-events-none flex flex-col justify-start items-center px-6 text-center animate-story-circle-pop border border-white/10 transition-all duration-500 ease-in-out"
             >
               <h3
-                className="text-[20px] md:text-[22px] font-black leading-relaxed text-white telugu-text max-w-[270px] mx-auto"
+                className="text-[17px] md:text-[22px] font-black leading-relaxed text-white telugu-text max-w-[240px] md:max-w-[270px] mx-auto"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {typedText}
@@ -349,12 +371,6 @@ export default function WebStoriesPage() {
               </button>
             </div>
 
-            {/* Bottom Space Footer indicator */}
-            <div className="absolute bottom-4 inset-x-0 text-center z-20 pointer-events-none">
-              <span className="text-[10px] font-black tracking-widest uppercase text-white/50 font-sans">
-                Slide {currentSlideIndex + 1} of {activeStory.slides.length}
-              </span>
-            </div>
           </div>
         </div>
       )}

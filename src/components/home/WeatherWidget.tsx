@@ -34,52 +34,55 @@ const homeWeatherData = [
 
 export default function WeatherWidget() {
   return (
-    <div className="bg-white border border-gray-150 rounded-xl p-4 mb-8 shadow-3xs select-none">
+    <div className="bg-white border border-gray-150 rounded-xl p-4 mb-3.5 md:mb-8 shadow-3xs select-none">
       {/* Title */}
       <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div>
           <h3 
-            className="font-black text-blue-600 text-base telugu-text" 
+            className="font-black text-blue-600 text-[15px] md:text-base telugu-text" 
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
-            వాతావరణ సమాచారం (Weather Updates)
+            <span className="md:hidden">వాతావరణ సమాచారం</span>
+            <span className="hidden md:inline">వాతావరణ సమాచారం (Weather Updates)</span>
           </h3>
         </div>
         <Link 
           href="/weather" 
-          className="text-sm font-extrabold text-blue-500 hover:text-blue-700 flex items-center gap-0.5 transition-colors telugu-text"
+          className="hidden md:flex text-sm font-extrabold text-blue-500 hover:text-blue-700 items-center gap-0.5 transition-colors telugu-text"
           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
         >
           పూర్తి వివరాలు చూడండి →
         </Link>
       </div>
 
-      {/* Grid of cities */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* Horizontally scrollable on mobile, Grid on desktop */}
+      <div className="flex overflow-x-auto gap-3 pb-2.5 snap-x hide-scrollbar md:grid md:grid-cols-4 md:pb-0">
         {homeWeatherData.map((data, index) => (
           <div 
             key={index} 
-            className={`bg-gradient-to-br ${data.bg} border border-gray-100 rounded-lg p-3 flex items-center justify-between hover:shadow-xs hover:border-blue-100 transition-all duration-200 min-w-0`}
+            className={`bg-gradient-to-br ${data.bg} border border-gray-100 rounded-lg p-2.5 flex items-center justify-between hover:shadow-xs hover:border-blue-100 transition-all duration-200 flex-shrink-0 w-[155px] snap-start md:w-auto min-w-0`}
           >
-            <div className="space-y-1 text-left min-w-0 flex-1 mr-2">
+            <div className="space-y-0.5 text-left min-w-0 flex-1 mr-1.5">
               <h4 
-                className="font-black text-[13px] text-gray-900 telugu-text leading-tight"
+                className="font-black text-[12px] md:text-[13px] text-gray-900 telugu-text leading-tight truncate"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {data.city}
               </h4>
               <p 
-                className="text-[11px] text-gray-500 font-bold telugu-text leading-tight"
+                className="text-[10px] md:text-[11px] text-gray-500 font-bold telugu-text leading-tight truncate"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {data.condition}
               </p>
             </div>
             
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <div className="scale-90">{data.icon}</div>
-              <span className="text-base font-black text-gray-800 font-sans tracking-tight whitespace-nowrap">
+            <div className="flex items-center gap-0.5 flex-shrink-0">
+              <div className="scale-80 md:scale-90 flex-shrink-0">
+                {data.icon}
+              </div>
+              <span className="text-[13px] md:text-base font-black text-gray-800 font-sans tracking-tight whitespace-nowrap ml-0.5">
                 {data.temp}°C
               </span>
             </div>

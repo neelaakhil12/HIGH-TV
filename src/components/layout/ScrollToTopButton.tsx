@@ -22,7 +22,7 @@ export default function ScrollToTopButton() {
     <button
       onClick={goTop}
       title="పైకి వెళ్ళండి"
-      className="fixed bottom-6 right-6 z-50 w-11 h-11 bg-[#025390] hover:bg-[#013d6b] text-white rounded-full shadow-lg flex items-center justify-center transition-colors duration-200 cursor-pointer"
+      className="fixed bottom-6 right-6 z-50 w-11 h-11 bg-[#025390] hover:bg-[#013d6b] text-white rounded-full shadow-lg hidden md:flex items-center justify-center transition-colors duration-200 cursor-pointer"
     >
       <ArrowUp size={20} />
     </button>

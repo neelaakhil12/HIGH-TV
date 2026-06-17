@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Play } from 'lucide-react';
-import { videoNews, formatTimeAgo } from '@/lib/mockData';
+import { videoNews } from '@/lib/mockData';
 
 export default function VideoSection() {
   return (
@@ -27,9 +27,12 @@ export default function VideoSection() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Scrollable Container */}
+      <div 
+        className="flex overflow-x-auto gap-4 pb-2.5 snap-x hide-scrollbar md:grid md:grid-cols-3 md:pb-0"
+      >
         {videoNews.map((video) => (
-          <article key={video.id} className="news-card bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 group cursor-pointer">
+          <article key={video.id} className="news-card bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 group cursor-pointer flex-shrink-0 w-full snap-start md:w-auto">
             <div className="relative img-zoom-container" style={{ paddingTop: '56.25%' }}>
               <Image
                 src={video.image}
@@ -50,17 +53,15 @@ export default function VideoSection() {
               <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs font-bold px-2 py-0.5 rounded">
                 4:32
               </div>
-
             </div>
 
             <div className="p-3">
               <h3
-                className="text-[15.5px] font-bold text-gray-800 group-hover:text-[#66000c] transition-colors line-clamp-2 leading-snug mb-2 telugu-text"
+                className="text-[15.5px] font-bold text-gray-800 group-hover:text-[#66000c] transition-colors line-clamp-2 leading-snug mb-2 telugu-text px-1.5"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {video.title}
               </h3>
-
             </div>
           </article>
         ))}
@@ -68,3 +69,5 @@ export default function VideoSection() {
     </section>
   );
 }
+
+

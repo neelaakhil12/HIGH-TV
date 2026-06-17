@@ -30,7 +30,7 @@ export default function TabbedNewsWidget({
   const currentTab = tabs.find((t) => t.id === activeTab) || tabs[0];
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-8">
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-3 md:mb-8">
       {/* Tab Headers */}
       <div className="flex border-b border-gray-100 bg-gray-50 overflow-x-auto hide-scrollbar">
         {tabs.map((tab) => {

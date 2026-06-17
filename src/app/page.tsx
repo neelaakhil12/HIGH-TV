@@ -57,17 +57,17 @@ function SidebarLatestVideos() {
   ];
 
   return (
-    <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-xs mb-4 select-none">
-      <h3 className="font-black text-gray-900 text-[16px] md:text-[18px] mb-3 text-left tracking-tight telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+    <div className="bg-white rounded-lg border border-gray-100 p-3 md:p-4 shadow-xs mb-1 md:mb-4 select-none">
+      <h3 className="font-black text-[#fe0000] md:text-gray-900 text-[16px] md:text-[18px] mb-3 text-left tracking-tight telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
         హై టీవీ వీడియోలు
       </h3>
       
-      <div className="space-y-4">
+      <div className="flex md:flex-col overflow-x-auto md:overflow-x-visible gap-3.5 md:gap-0 md:space-y-4 pb-2 md:pb-0 snap-x snap-mandatory scroll-smooth hide-scrollbar">
         {videos.slice(0, 3).map((vid, idx) => (
           <div 
             key={`${vid.id}-${idx}`} 
             onClick={() => setSelectedVideo(vid.id)}
-            className="flex flex-col gap-2 text-left group cursor-pointer pb-4 border-b border-gray-100 last:border-b-0 last:pb-0"
+            className="flex-shrink-0 w-[180px] md:w-full snap-start flex flex-col gap-2 text-left group cursor-pointer pb-0 md:pb-4 border-b-0 md:border-b border-gray-100 last:border-b-0 last:pb-0"
           >
             {/* Top: Thumbnail with Play Overlay */}
             <div 
@@ -80,8 +80,8 @@ function SidebarLatestVideos() {
               />
               {/* Red play icon overlay */}
               <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
-                <div className="w-10 h-10 bg-red-650 rounded-full flex items-center justify-center text-white shadow-md transform group-hover:scale-110 transition-transform duration-200">
-                  <svg className="w-4.5 h-4.5 fill-white text-white ml-0.5" viewBox="0 0 24 24">
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-red-650 rounded-full flex items-center justify-center text-white shadow-md transform group-hover:scale-110 transition-transform duration-200">
+                  <svg className="w-3.5 h-3.5 md:w-4.5 md:h-4.5 fill-white text-white ml-0.5" viewBox="0 0 24 24">
                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                   </svg>
                 </div>
@@ -91,7 +91,7 @@ function SidebarLatestVideos() {
             {/* Bottom: Title */}
             <div className="py-0.5">
               <h4 
-                className="text-[15px] font-black text-gray-800 leading-snug group-hover:text-red-600 transition-colors telugu-text"
+                className="text-[13px] md:text-[15px] font-black text-gray-800 leading-snug group-hover:text-red-600 transition-colors telugu-text line-clamp-2"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {vid.title}
@@ -102,20 +102,17 @@ function SidebarLatestVideos() {
       </div>
 
       {/* E-Paper Promo Link */}
-      <div className="mt-5 pt-4 border-t border-gray-100 flex flex-col items-center">
+      <div className="hidden md:flex mt-5 pt-4 border-t border-gray-100 flex-col items-center">
         <Link
           href="/category/epaper"
-          className="flex flex-col items-center group w-full"
+          className="flex flex-col items-center group cursor-pointer select-none"
         >
-          {/* Logo container */}
-          <div className="w-full max-w-[200px] h-[64px] bg-white hover:bg-gray-50/50 border border-gray-150 rounded-lg flex items-center justify-center p-2.5 transition-colors shadow-2xs">
-            <img
-              src="/epaper-logo.png"
-              alt="ఈ-పేపర్ లోగో"
-              className="h-10 w-auto object-contain"
-            />
-          </div>
-          <span className="text-[13px] font-black text-gray-800 group-hover:text-red-600 font-sans tracking-widest uppercase mt-2">
+          <img
+            src="/epaper-logo.png"
+            alt="ఈ-పేపర్ లోగో"
+            className="h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-105 rounded"
+          />
+          <span className="text-[13px] font-black text-gray-800 group-hover:text-red-600 font-sans tracking-widest uppercase mt-1.5 transition-colors">
             E-PAPER
           </span>
         </Link>
@@ -209,19 +206,26 @@ export default function HomePage() {
       <Header />
 
       {/* Main Newspaper Centered Container */}
-      <main className="max-w-[1050px] mx-auto bg-white px-4 py-5 shadow-md border-x border-gray-200 relative overflow-visible">
+      <main className="max-w-[1050px] mx-auto bg-white px-4 pt-1 md:pt-5 pb-5 shadow-md border-x border-gray-200 relative overflow-visible">
         
         {/* Flash News Strip */}
-        <FlashNewsBar />
+        <div className="hidden md:block">
+          <FlashNewsBar />
+        </div>
 
         {/* ONE unified 2-column layout — left content | right continuous ad column */}
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-3">
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-1 md:mt-3">
 
           {/* ══════════════ LEFT CONTENT COLUMN (70%) ══════════════ */}
           <div className="w-full lg:col-span-7">
 
+            {/* Mobile Leaderboard Ad (between Flash News and HeroSlider) */}
+            <div className="block md:hidden">
+              <AdBanner position="leaderboard" />
+            </div>
+
             {/* Hero 2-column grid: Slider (col-7) + Videos (col-3) */}
-            <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 mb-5 pb-5 border-b border-gray-100">
+            <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 mb-1.5 pb-2 md:mb-5 md:pb-5 border-b border-gray-100">
 
               {/* Hero Slider column */}
               <div className="lg:col-span-7 flex flex-col gap-3">
@@ -291,7 +295,7 @@ export default function HomePage() {
             </div>
 
             {/* Mobile Ads Block 1 */}
-            <div className="lg:hidden grid grid-cols-1 gap-4 my-5">
+            <div className="lg:hidden flex justify-center gap-2.5 mt-1.5 mb-4">
               <AdBanner position="sidebar" />
               <AdBanner position="astrology" />
             </div>
@@ -299,8 +303,15 @@ export default function HomePage() {
             {/* Breaking News */}
             <BreakingNewsSection />
 
+            <AdBanner position="rectangle" />
+
             {/* Web Stories Section */}
             <WebStoriesSection />
+
+            {/* Mobile-only Ad (Avasa Estates) */}
+            <div className="lg:hidden">
+              <AdBanner position="avasa-estates" />
+            </div>
 
             {/* Dynamic Tabbed News Section */}
             <TabbedNewsWidget
@@ -311,38 +322,95 @@ export default function HomePage() {
             />
 
             {/* Mobile Ad Block 2 */}
-            <div className="lg:hidden my-5">
+            <div className="lg:hidden flex justify-center gap-2.5 mt-2 mb-3.5">
               <AdBanner position="gold-loan" />
+              <AdBanner position="coaching" />
             </div>
 
             <WeatherWidget />
 
             <TrendingSection />
 
+            {/* Mobile-only Ad (Lalitha Jewellery) */}
+            <div className="lg:hidden">
+              <AdBanner position="lalitha-jewellery" />
+            </div>
+
             <NewsSection title="Politics" titleTelugu="రాజకీయాలు" articles={politicsNews} viewAllLink="/category/politics" accentColor="#02599c" layout="featured-left" />
+
+            {/* Mobile-only Ad (JioFiber) */}
+            <div className="lg:hidden">
+              <AdBanner position="jiofiber" />
+            </div>
             <NewsSection title="Entertainment" titleTelugu="సినిమా" articles={entertainmentNews} viewAllLink="/category/entertainment" accentColor="#db2777" layout="featured-left" />
+
+            {/* Mobile-only Ad (Ramraj Cottons) */}
+            <div className="lg:hidden">
+              <AdBanner position="ramraj" />
+            </div>
             <NewsSection title="Sports" titleTelugu="క్రీడలు" articles={sportsNews} viewAllLink="/category/sports" accentColor="#ea580c" layout="featured-left" />
 
-            <AdBanner position="rectangle" />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-              <NewsSection title="Business" titleTelugu="వ్యాపారం" articles={businessNews} viewAllLink="/category/business" accentColor="#15803d" layout="list" />
-              <NewsSection title="Technology" titleTelugu="టెక్నాలజీ" articles={technologyNews} viewAllLink="/category/technology" accentColor="#02599c" layout="list" />
-            </div>
-
-            {/* Mobile Ad Block 3 */}
-            <div className="lg:hidden my-5">
-              <AdBanner position="coaching" />
+            {/* Mobile-only 2 Ads in a row */}
+            <div className="lg:hidden flex justify-center gap-2.5 mt-2 mb-3.5">
+              <AdBanner position="sidebar" />
+              <AdBanner position="astrology" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-              <NewsSection title="Viral" titleTelugu="వైరల్" articles={viralNews} viewAllLink="/category/viral" accentColor="#dc2626" layout="list" />
-              <NewsSection title="Health" titleTelugu="ఆరోగ్యం" articles={healthNews} viewAllLink="/category/health" accentColor="#0891b2" layout="list" />
+              <div>
+                <NewsSection title="Business" titleTelugu="వ్యాపారం" articles={businessNews} viewAllLink="/category/business" accentColor="#15803d" layout="list" />
+                {/* Mobile-only Ad (SBI Home Loans) */}
+                <div className="lg:hidden">
+                  <AdBanner position="sbi" />
+                </div>
+              </div>
+              <div>
+                <NewsSection title="Technology" titleTelugu="టెక్నాలజీ" articles={technologyNews} viewAllLink="/category/technology" accentColor="#02599c" layout="list" />
+                {/* Mobile-only Ad (OnePlus 12) */}
+                <div className="lg:hidden">
+                  <AdBanner position="oneplus" />
+                </div>
+              </div>
+            </div>
+
+
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+              <div>
+                <NewsSection title="Viral" titleTelugu="వైరల్" articles={viralNews} viewAllLink="/category/viral" accentColor="#dc2626" layout="list" />
+                {/* Mobile-only Ads (HDFC Business Loans & iPhone 15 Pro) */}
+                <div className="lg:hidden">
+                  <AdBanner position="hdfc" />
+                  <AdBanner position="iphone" />
+                </div>
+              </div>
+              <div>
+                <NewsSection title="Health" titleTelugu="ఆరోగ్యం" articles={healthNews} viewAllLink="/category/health" accentColor="#0891b2" layout="list" />
+                {/* Mobile-only Ad (PharmEasy) */}
+                <div className="lg:hidden">
+                  <AdBanner position="pharmeasy" />
+                </div>
+              </div>
             </div>
 
             <NewsSection title="Horoscopes" titleTelugu="రాశిఫలాలు" articles={rasipalaluNews} viewAllLink="/category/rasipalalu" accentColor="#b45309" layout="grid3" />
+            {/* Mobile-only Dummy Ad Box */}
+            <div className="lg:hidden">
+              <AdBanner position="dummy" />
+            </div>
+
             <VideoSection />
+            {/* Mobile-only Dummy Ad Box */}
+            <div className="lg:hidden">
+              <AdBanner position="dummy" />
+            </div>
+
             <PhotoGallery />
+            {/* Mobile-only Dummy Ad Box */}
+            <div className="lg:hidden">
+              <AdBanner position="dummy" />
+            </div>
           </div>
 
           {/* ══════════════ RIGHT AD COLUMN (30%) — continuous, no breaks ══════════════ */}

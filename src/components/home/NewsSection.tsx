@@ -1,5 +1,6 @@
+import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import NewsCard from '@/components/cards/NewsCard';
 import { NewsArticle } from '@/lib/mockData';
 
@@ -20,6 +21,41 @@ export default function NewsSection({
   accentColor = '#02599c',
   layout = 'grid3',
 }: NewsSectionProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
+
+  const checkScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setShowLeftArrow(scrollLeft > 10);
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 15);
+    }
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el && layout === 'featured-left') {
+      el.addEventListener('scroll', checkScroll);
+      checkScroll();
+      window.addEventListener('resize', checkScroll);
+      // Trigger a check after images load
+      const timer = setTimeout(checkScroll, 500);
+      return () => {
+        el.removeEventListener('scroll', checkScroll);
+        window.removeEventListener('resize', checkScroll);
+        clearTimeout(timer);
+      };
+    }
+  }, [layout, articles]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === 'left' ? -scrollRef.current.clientWidth : scrollRef.current.clientWidth;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
   if (layout === 'featured-left') {
     return (
       <section className="mb-10">
@@ -34,19 +70,55 @@ export default function NewsSection({
               {titleTelugu}
             </h2>
           </div>
-          <Link
-            href={viewAllLink}
-            className="flex items-center gap-1 text-sm font-semibold hover:gap-2 transition-all"
-            style={{ color: accentColor }}
-          >
-            అన్నీ చూడండి <ArrowRight size={14} />
-          </Link>
+          <div className="flex items-center gap-2.5">
+            <Link
+              href={viewAllLink}
+              className="flex items-center gap-1 text-sm font-semibold hover:gap-2 transition-all"
+              style={{ color: accentColor }}
+            >
+              అన్నీ చూడండి <ArrowRight size={14} />
+            </Link>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {articles.slice(0, 4).map((article) => (
-            <NewsCard key={article.id} article={article} variant="horizontal" />
-          ))}
+        <div className="relative group">
+          {/* Floating Left Arrow - Aligned with image center (top-[68px]) */}
+          <button
+            onClick={() => scroll('left')}
+            disabled={!showLeftArrow}
+            className={`absolute -left-3 top-[68px] -translate-y-1/2 z-20 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all sm:hidden ${
+              showLeftArrow
+                ? 'bg-white border border-gray-900 text-gray-900 cursor-pointer active:scale-90'
+                : 'bg-gray-50/70 border border-gray-200 text-gray-300 cursor-not-allowed'
+            }`}
+            aria-label="Scroll left"
+          >
+            <ChevronLeft size={16} className="stroke-[2.5]" />
+          </button>
+
+          {/* Floating Right Arrow - Aligned with image center (top-[68px]) */}
+          <button
+            onClick={() => scroll('right')}
+            disabled={!showRightArrow}
+            className={`absolute -right-3 top-[68px] -translate-y-1/2 z-20 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all sm:hidden ${
+              showRightArrow
+                ? 'bg-white border border-gray-900 text-gray-900 cursor-pointer active:scale-90'
+                : 'bg-gray-50/70 border border-gray-200 text-gray-300 cursor-not-allowed'
+            }`}
+            aria-label="Scroll right"
+          >
+            <ChevronRight size={16} className="stroke-[2.5]" />
+          </button>
+
+          {/* Scrollable Container */}
+          <div 
+            ref={scrollRef}
+            className="flex overflow-x-auto gap-4 pb-2.5 snap-x hide-scrollbar sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:pb-0"
+          >
+            {articles.slice(0, 4).map((article) => (
+              <NewsCard key={article.id} article={article} variant="horizontal" />
+            ))}
+          </div>
         </div>
       </section>
     );
@@ -95,9 +167,9 @@ export default function NewsSection({
             అన్నీ చూడండి <ArrowRight size={14} />
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="flex overflow-x-auto gap-4 pb-2.5 snap-x hide-scrollbar sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:pb-0">
           {articles.slice(0, 4).map((article) => (
-            <NewsCard key={article.id} article={article} />
+            <NewsCard key={article.id} article={article} className="flex-shrink-0 w-[230px] sm:w-auto snap-start" imageClassName="aspect-[2/1] sm:aspect-video w-full" />
           ))}
         </div>
       </section>
@@ -121,9 +193,9 @@ export default function NewsSection({
           అన్నీ చూడండి <ArrowRight size={14} />
         </Link>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="flex overflow-x-auto gap-4 pb-2.5 snap-x hide-scrollbar sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:pb-0">
         {articles.slice(0, 3).map((article) => (
-          <NewsCard key={article.id} article={article} />
+          <NewsCard key={article.id} article={article} className="flex-shrink-0 w-[230px] sm:w-auto snap-start" imageClassName="aspect-[2/1] sm:aspect-video w-full" />
         ))}
       </div>
     </section>

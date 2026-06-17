@@ -19,7 +19,8 @@ import {
   ChevronDown,
   MapPin,
   Menu,
-  Search
+  Search,
+  ArrowLeft
 } from 'lucide-react';
 
 interface EpaperPageData {
@@ -224,9 +225,10 @@ interface NewspaperPDFPageProps {
   zoom: number;
   onRenderSuccess?: (canvas: HTMLCanvasElement) => void;
   className?: string;
+  highRes?: boolean;
 }
 
-export function NewspaperPDFPage({ pdfDoc, pageNum, zoom, onRenderSuccess, className }: NewspaperPDFPageProps) {
+export function NewspaperPDFPage({ pdfDoc, pageNum, zoom, onRenderSuccess, className, highRes }: NewspaperPDFPageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const renderTaskRef = useRef<any>(null);
 
@@ -247,8 +249,20 @@ export function NewspaperPDFPage({ pdfDoc, pageNum, zoom, onRenderSuccess, class
         if (!ctx) return;
 
         const originalViewport = page.getViewport({ scale: 1.0 });
-        const targetWidth = BASE_WIDTH;
-        const scale = (targetWidth / originalViewport.width) * (zoom / 100);
+        // Increased target width inside NewspaperPDFPage to 1800 for HD resolution
+        const targetWidth = 1800;
+        // If highRes is active, ensure we render at at least 120% zoom for extreme legibility
+        const renderZoom = highRes ? Math.max(120, zoom) : zoom;
+        
+        // Use devicePixelRatio for high-res screens, capped at 3 for high-density Retina mobile/desktop screens
+        const dpr = (highRes && typeof window !== 'undefined') ? Math.min(3, window.devicePixelRatio || 1) : 1;
+        let scale = (targetWidth / originalViewport.width) * (renderZoom / 100) * dpr;
+        
+        // Safety cap on max canvas width (3600px) to prevent excessive memory usage while maintaining crystal clear HD text
+        const maxCanvasWidth = 3600;
+        if (originalViewport.width * scale > maxCanvasWidth) {
+          scale = maxCanvasWidth / originalViewport.width;
+        }
         
         const viewport = page.getViewport({ scale });
         
@@ -288,14 +302,56 @@ export function NewspaperPDFPage({ pdfDoc, pageNum, zoom, onRenderSuccess, class
         renderTaskRef.current.cancel();
       }
     };
-  }, [pdfDoc, pageNum, zoom]);
+  }, [pdfDoc, pageNum, zoom, highRes]);
 
   return <canvas ref={canvasRef} className={className || "w-full h-full object-contain"} />;
 }
 
+const MAIN_EDITIONS = [
+  { name: 'Telangana', nameTe: 'తెలంగాణ', value: 'Telangana' },
+  { name: 'Hyderabad', nameTe: 'హైదరాబాద్', value: 'Hyderabad' }
+];
+
+const AP_EDITIONS = [
+  { name: 'Tirupati District', nameTe: 'తిరుపతి జిల్లా', value: 'Tirupati' },
+  { name: 'SPSR Nellore', nameTe: 'నెల్లూరు జిల్లా', value: 'Sri Potti Sriramulu Nellore' },
+  { name: 'Prakasam District', nameTe: 'ప్రకాశం జిల్లా', value: 'Prakasam' },
+  { name: 'Guntur District', nameTe: 'గుంటూరు జిల్లా', value: 'Guntur' },
+  { name: 'Palanadu District', nameTe: 'పల్నాడు జిల్లా', value: 'Palnadu' },
+  { name: 'Bapatla District', nameTe: 'బాపట్ల జిల్లా', value: 'Bapatla' },
+  { name: 'Krishna District', nameTe: 'కృష్ణా జిల్లా', value: 'Krishna' },
+  { name: 'Anantapur District', nameTe: 'అనంతపురం జిల్లా', value: 'Ananthapuramu' },
+  { name: 'Chittoor District', nameTe: 'చిత్తూరు జిల్లా', value: 'Chittoor' },
+  { name: 'Visakhapatnam District', nameTe: 'విశాఖపట్నం జిల్లా', value: 'Visakhapatnam' },
+  { name: 'East Godavari District', nameTe: 'తూర్పు గోదావరి జిల్లా', value: 'East Godavari' },
+  { name: 'West Godavari District', nameTe: 'పశ్చిమ గోదావరి జిల్లా', value: 'West Godavari' }
+];
+
+const TG_EDITIONS = [
+  { name: 'Rajanna District', nameTe: 'రాజన్న సిరిసిల్ల', value: 'Rajanna Sircilla' },
+  { name: 'Khammam District', nameTe: 'ఖమ్మం జిల్లా', value: 'Khammam' },
+  { name: 'Bhadradri District', nameTe: 'భద్రాద్రి జిల్లా', value: 'Bhadradri Kothagudem' },
+  { name: 'Mahabubnagar District', nameTe: 'మహబూబ్‌నగర్ జిల్లా', value: 'Mahabubnagar' },
+  { name: 'Jogulamba District', nameTe: 'జోగులాంబ గద్వాల్', value: 'Jogulamba Gadwal' },
+  { name: 'Nagarkurnool District', nameTe: 'నాగర్ కర్నూల్ జిల్లా', value: 'Nagarkurnool' },
+  { name: 'Narayanpet District', nameTe: 'నారాయణపేట జిల్లా', value: 'Narayanpet' },
+  { name: 'Karimnagar District', nameTe: 'కరీంనగర్ జిల్లా', value: 'Karimnagar' },
+  { name: 'Warangal District', nameTe: 'వరంగల్ జిల్లా', value: 'Warangal' },
+  { name: 'Nizamabad District', nameTe: 'నిజామాబాద్ జిల్లా', value: 'Nizamabad' },
+  { name: 'Nalgonda District', nameTe: 'నల్గొండ జిల్లా', value: 'Nalgonda' }
+];
+
+const METRO_EDITIONS = [
+  { name: 'Hyderabad Metro', nameTe: 'హైదరాబాద్ మెట్రో', value: 'Hyderabad' },
+  { name: 'Karimnagar Metro', nameTe: 'కరీంనగర్ మెట్రో', value: 'Karimnagar' },
+  { name: 'Warangal Metro', nameTe: 'వరంగల్ మెట్రో', value: 'Warangal' },
+  { name: 'Vijayawada Metro', nameTe: 'విజయవాడ మెట్రో', value: 'Vijayawada' }
+];
+
 export default function EPaperReader() {
   const [viewMode, setViewMode] = useState<'dashboard' | 'reader'>('dashboard');
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   
   const getTodayString = () => {
     const d = new Date();
@@ -304,16 +360,48 @@ export default function EPaperReader() {
   const [selectedDate, setSelectedDate] = useState(getTodayString());
   
   const [activePageIdx, setActivePageIdx] = useState(0);
-  const [zoom, setZoom] = useState(100);
+  const [zoom, setZoom] = useState(75);
+  const [fitZoom, setFitZoom] = useState(25);
   const [isMobile, setIsMobile] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Clipping / Crop box state
   const [isClipping, setIsClipping] = useState(false);
   const [clipBox, setClipBox] = useState({ x: 250, y: 200, width: 320, height: 240 });
-  const [interactionType, setInteractionType] = useState<'none' | 'moving' | 'resizing-tl' | 'resizing-tr' | 'resizing-bl' | 'resizing-br'>('none');
+  const [interactionType, setInteractionType] = useState<'none' | 'moving' | 'resizing-tl' | 'resizing-tr' | 'resizing-bl' | 'resizing-br' | 'resizing-t' | 'resizing-b' | 'resizing-l' | 'resizing-r'>('none');
   const [dragStartOffset, setDragStartOffset] = useState({ x: 0, y: 0 });
   const imageContainerRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const lastTapRef = useRef<number>(0);
+  const handleDoubleTap = (e: React.TouchEvent) => {
+    const now = Date.now();
+    const DOUBLE_PRESS_DELAY = 300;
+    if (now - lastTapRef.current < DOUBLE_PRESS_DELAY) {
+      e.preventDefault();
+      if (zoom > fitZoom) {
+        setZoom(fitZoom);
+      } else {
+        setZoom(150);
+      }
+    }
+    lastTapRef.current = now;
+  };
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (zoom > fitZoom) {
+      setZoom(fitZoom);
+    } else {
+      setZoom(150);
+    }
+  };
+  
+  const paperWidth = isMobile && zoom <= fitZoom
+    ? (scrollContainerRef.current ? scrollContainerRef.current.clientWidth - 8 : (typeof window !== 'undefined' ? window.innerWidth - 8 : 360))
+    : BASE_WIDTH * (zoom / 100);
+
+  const [scrollTop, setScrollTop] = useState(0);
+  const [scrollViewportHeight, setScrollViewportHeight] = useState(0);
 
   // Share Modal state
   const [showShareModal, setShowShareModal] = useState(false);
@@ -549,12 +637,93 @@ export default function EPaperReader() {
     const check = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      if (mobile) setZoom(50);
+      if (mobile) {
+        // Get width from scroll container if available, fallback to window.innerWidth
+        const containerWidth = scrollContainerRef.current 
+          ? scrollContainerRef.current.clientWidth 
+          : window.innerWidth;
+        // Auto-fit zoom: fit newspaper to container width with a tiny margin
+        const currentFitZoom = Math.floor(((containerWidth - 8) / BASE_WIDTH) * 100);
+        setFitZoom(currentFitZoom);
+        setZoom(currentFitZoom);
+      }
     };
     check();
+    // Use a small timeout to ensure DOM is painted and ref is populated
+    const timer = setTimeout(check, 100);
     window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
+    return () => {
+      window.removeEventListener('resize', check);
+      clearTimeout(timer);
+    };
+  }, [viewMode, pdfDoc]);
+ 
+  useEffect(() => {
+    if (viewMode !== 'reader') return;
+
+    // Lock body and html scroll, set height to 100vh
+    document.body.classList.add('overflow-hidden', 'h-screen');
+    document.documentElement.classList.add('overflow-hidden', 'h-screen');
+
+    // Constrain height of the Next.js layout wrappers dynamically to 100vh
+    const mainElement = document.querySelector('main');
+    const mainContainer = mainElement?.parentElement;
+
+    if (mainContainer) {
+      mainContainer.classList.remove('min-h-screen');
+      mainContainer.classList.add('h-screen', 'overflow-hidden');
+    }
+    if (mainElement) {
+      mainElement.classList.add('min-h-0', 'h-full', 'overflow-hidden', 'flex', 'flex-col');
+    }
+
+    const handleScrollEvent = () => {
+      if (!scrollContainerRef.current) return;
+      const container = scrollContainerRef.current;
+      const isContainerScrollable = container.scrollHeight > container.clientHeight;
+      if (isContainerScrollable) {
+        setScrollTop(container.scrollTop);
+        setScrollViewportHeight(container.clientHeight);
+      } else {
+        setScrollTop(window.scrollY || window.pageYOffset || document.documentElement.scrollTop);
+        setScrollViewportHeight(window.innerHeight);
+      }
+    };
+
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScrollEvent, { passive: true });
+    }
+    window.addEventListener('scroll', handleScrollEvent, { passive: true });
+    window.addEventListener('resize', handleScrollEvent);
+
+    // Initial update
+    handleScrollEvent();
+
+    // Use a slight timeout to ensure PDF rendering/layout has updated dimensions
+    const timer = setTimeout(handleScrollEvent, 100);
+
+    return () => {
+      // Unlock body and html scroll
+      document.body.classList.remove('overflow-hidden', 'h-screen');
+      document.documentElement.classList.remove('overflow-hidden', 'h-screen');
+
+      if (mainContainer) {
+        mainContainer.classList.remove('h-screen', 'overflow-hidden');
+        mainContainer.classList.add('min-h-screen');
+      }
+      if (mainElement) {
+        mainElement.classList.remove('min-h-0', 'h-full', 'overflow-hidden', 'flex', 'flex-col');
+      }
+
+      if (container) {
+        container.removeEventListener('scroll', handleScrollEvent);
+      }
+      window.removeEventListener('scroll', handleScrollEvent);
+      window.removeEventListener('resize', handleScrollEvent);
+      clearTimeout(timer);
+    };
+  }, [viewMode, paperWidth, pageAspectRatio]);
 
   const getPointerPos = (e: React.MouseEvent | React.TouchEvent) => {
     if ('touches' in e) {
@@ -692,7 +861,87 @@ export default function EPaperReader() {
     setIsClipping(false);
   };
 
-  const handleResizeStart = (e: React.MouseEvent | React.TouchEvent, handle: 'tl' | 'tr' | 'bl' | 'br') => {
+  const handleSelectEditionCard = (editionName: string) => {
+    setSelectedEdition(editionName);
+    setViewMode('reader');
+    setActivePageIdx(0);
+    setIsClipping(false);
+  };
+
+  const filterEditions = (editionsList: typeof AP_EDITIONS) => {
+    if (!searchQuery) return editionsList;
+    return editionsList.filter(ed => 
+      ed.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      ed.nameTe.includes(searchQuery)
+    );
+  };
+
+  const renderCarousel = (id: string, itemsList: typeof AP_EDITIONS) => {
+    if (itemsList.length === 0) return null;
+    return (
+      <div className="relative w-full group select-none">
+        {/* Left Arrow */}
+        <button
+          onClick={() => {
+            const el = document.getElementById(id);
+            if (el) el.scrollBy({ left: -320, behavior: 'smooth' });
+          }}
+          className="absolute left-0 top-[40%] -translate-y-1/2 z-10 w-9 h-12 bg-black/60 text-white rounded-r-lg flex items-center justify-center hover:bg-black/80 transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg border border-l-0 border-white/20"
+        >
+          <ChevronLeft size={20} className="stroke-[3]" />
+        </button>
+
+        {/* Scroll Container */}
+        <div
+          id={id}
+          className="flex gap-5 overflow-x-auto scroll-smooth hide-scrollbar px-1 py-4 w-full"
+        >
+          {itemsList.map((item, idx) => (
+            <div
+              key={idx}
+              onClick={() => handleSelectEditionCard(item.value)}
+              className="flex-shrink-0 w-[150px] cursor-pointer flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div 
+                className="relative overflow-hidden bg-white border border-gray-250 shadow-xs rounded-t-lg"
+                style={{ aspectRatio: `1 / ${defaultPageAspectRatio}` }}
+              >
+                {defaultPdfDoc ? (
+                  <EditionCardThumbnail
+                    pdfjs={pdfjs}
+                    dateIso={selectedDate}
+                    defaultPdfDoc={defaultPdfDoc}
+                    cardIdx={idx}
+                    totalPages={defaultTotalPages}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-semibold animate-pulse">
+                    Loading...
+                  </div>
+                )}
+              </div>
+              <div className="w-full bg-[#fcc419] py-1.5 px-2 text-center text-[10.5px] font-black text-gray-900 truncate uppercase border-t border-yellow-600 rounded-b-lg">
+                {item.name}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Right Arrow */}
+        <button
+          onClick={() => {
+            const el = document.getElementById(id);
+            if (el) el.scrollBy({ left: 320, behavior: 'smooth' });
+          }}
+          className="absolute right-0 top-[40%] -translate-y-1/2 z-10 w-9 h-12 bg-black/60 text-white rounded-l-lg flex items-center justify-center hover:bg-black/80 transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-lg border border-r-0 border-white/20"
+        >
+          <ChevronRight size={20} className="stroke-[3]" />
+        </button>
+      </div>
+    );
+  };
+
+  const handleResizeStart = (e: React.MouseEvent | React.TouchEvent, handle: 'tl' | 'tr' | 'bl' | 'br' | 't' | 'b' | 'l' | 'r') => {
     setInteractionType(`resizing-${handle}` as typeof interactionType);
     e.stopPropagation();
     if ('preventDefault' in e) e.preventDefault();
@@ -735,19 +984,65 @@ export default function EPaperReader() {
       const minSize = 60;
       setClipBox(prev => {
         const { x, y, width, height } = prev;
-        if (handle === 'br') return { x, y, width: Math.max(minSize, Math.min(BASE_WIDTH - x, pX - x)), height: Math.max(minSize, Math.min(currentHeight - y, pY - y)) };
+        if (handle === 'br') {
+          return {
+            x,
+            y,
+            width: Math.max(minSize, Math.min(BASE_WIDTH - x, pX - x)),
+            height: Math.max(minSize, Math.min(currentHeight - y, pY - y))
+          };
+        }
         if (handle === 'tl') {
           const re = x + width, be = y + height;
-          const nx = Math.max(0, Math.min(re - minSize, pX)), ny = Math.max(0, Math.min(be - minSize, pY));
+          const nx = Math.max(0, Math.min(re - minSize, pX));
+          const ny = Math.max(0, Math.min(be - minSize, pY));
           return { x: nx, y: ny, width: re - nx, height: be - ny };
         }
         if (handle === 'tr') {
-          const be = y + height, ny = Math.max(0, Math.min(be - minSize, pY));
-          return { x, y: ny, width: Math.max(minSize, Math.min(BASE_WIDTH - x, pX - x)), height: be - ny };
+          const be = y + height;
+          const ny = Math.max(0, Math.min(be - minSize, pY));
+          return {
+            x,
+            y: ny,
+            width: Math.max(minSize, Math.min(BASE_WIDTH - x, pX - x)),
+            height: be - ny
+          };
         }
         if (handle === 'bl') {
-          const re = x + width, nx = Math.max(0, Math.min(re - minSize, pX));
-          return { x: nx, y, width: re - nx, height: Math.max(minSize, Math.min(currentHeight - y, pY - y)) };
+          const re = x + width;
+          const nx = Math.max(0, Math.min(re - minSize, pX));
+          return {
+            x: nx,
+            y,
+            width: re - nx,
+            height: Math.max(minSize, Math.min(currentHeight - y, pY - y))
+          };
+        }
+        if (handle === 't') {
+          const be = y + height;
+          const ny = Math.max(0, Math.min(be - minSize, pY));
+          return { x, y: ny, width, height: be - ny };
+        }
+        if (handle === 'b') {
+          return {
+            x,
+            y,
+            width,
+            height: Math.max(minSize, Math.min(currentHeight - y, pY - y))
+          };
+        }
+        if (handle === 'l') {
+          const re = x + width;
+          const nx = Math.max(0, Math.min(re - minSize, pX));
+          return { x: nx, y, width: re - nx, height };
+        }
+        if (handle === 'r') {
+          return {
+            x,
+            y,
+            width: Math.max(minSize, Math.min(BASE_WIDTH - x, pX - x)),
+            height
+          };
         }
         return prev;
       });
@@ -755,6 +1050,45 @@ export default function EPaperReader() {
   };
 
   const handleContainerPointerUp = () => setInteractionType('none');
+
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isMobile || zoom > fitZoom || isClipping) return;
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isMobile || zoom > fitZoom || isClipping || !touchStartRef.current) return;
+    const touch = e.changedTouches[0];
+    const diffX = touch.clientX - touchStartRef.current.x;
+    const diffY = touch.clientY - touchStartRef.current.y;
+    
+    const SWIPE_THRESHOLD = 60; // minimum swipe distance in pixels
+    
+    // Check if horizontal swipe is larger than vertical swipe (primary direction is horizontal)
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > SWIPE_THRESHOLD) {
+      if (diffX < 0) {
+        // Swipe Left -> Next Page
+        if (activePageIdx < totalPages - 1) {
+          setActivePageIdx(prev => prev + 1);
+        }
+      } else {
+        // Swipe Right -> Prev Page
+        if (activePageIdx > 0) {
+          setActivePageIdx(prev => prev - 1);
+        }
+      }
+    }
+    
+    touchStartRef.current = null;
+  };
+
+  const handleTouchEndCombined = (e: React.TouchEvent) => {
+    handleContainerPointerUp();
+    handleTouchEnd(e);
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -791,7 +1125,7 @@ export default function EPaperReader() {
         `}</style>
         
         {/* Sticky top toolbar */}
-        <header className="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between shadow-sm sticky top-0 z-50 text-xs font-semibold h-11">
+        <header className="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between shadow-sm sticky top-0 z-50 text-xs font-semibold h-11 border-t-4 border-[#02599c]">
           <div className="flex items-center gap-2">
             <button 
               onClick={() => {
@@ -846,7 +1180,7 @@ export default function EPaperReader() {
         <div className="flex-1 flex flex-col items-center justify-start py-8 px-4 relative max-w-[900px] mx-auto w-full">
           <div className="flex flex-col items-center gap-1 mb-8">
             <div className="flex items-center gap-2">
-              <div className="bg-[#cc0000] text-white font-black text-center px-2 py-0.5 rounded leading-none text-xs">
+              <div className="bg-[#02599c] text-white font-black text-center px-2 py-0.5 rounded leading-none text-xs">
                 <span>HIGH TV</span>
               </div>
               <h2 className="text-xl font-black text-gray-900 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>హై టీవీ ఈ-పేపర్</h2>
@@ -884,6 +1218,7 @@ export default function EPaperReader() {
                         pageNum={activeArticlePageIdx + 1}
                         zoom={100}
                         className="w-full h-full block"
+                        highRes={true}
                       />
                     )}
                   </div>
@@ -907,7 +1242,7 @@ export default function EPaperReader() {
             {activeArticleObj && prevZoneId && (
               <button
                 onClick={() => setActiveArticleId(prevZoneId)}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#cc0000] text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110 cursor-pointer z-50 hover:bg-[#a60000]"
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#02599c] text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110 cursor-pointer z-50 hover:bg-[#013f70]"
                 title="Previous Article"
               >
                 <ChevronLeft size={20} />
@@ -916,7 +1251,7 @@ export default function EPaperReader() {
             {activeArticleObj && nextZoneId && (
               <button
                 onClick={() => setActiveArticleId(nextZoneId)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#cc0000] text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110 cursor-pointer z-50 hover:bg-[#a60000]"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#02599c] text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110 cursor-pointer z-50 hover:bg-[#013f70]"
                 title="Next Article"
               >
                 <ChevronRight size={20} />
@@ -946,289 +1281,325 @@ export default function EPaperReader() {
     );
   }
 
+  const paperHeight = paperWidth * pageAspectRatio;
+  const arrowHeight = 48;
+  const topPadding = isMobile ? 8 : 24;
+
+  let targetArrowTop = 0;
+  if (typeof window !== 'undefined' && scrollContainerRef.current) {
+    const container = scrollContainerRef.current;
+    const containerRect = container.getBoundingClientRect();
+    const isContainerScrollable = container.scrollHeight > container.clientHeight;
+
+    let relativeCenter = 0;
+    if (isContainerScrollable) {
+      relativeCenter = scrollTop + scrollViewportHeight / 2;
+    } else {
+      relativeCenter = window.innerHeight / 2 - containerRect.top;
+    }
+
+    targetArrowTop = Math.min(
+      paperHeight - arrowHeight,
+      Math.max(0, relativeCenter - topPadding - arrowHeight / 2)
+    );
+  } else {
+    targetArrowTop = paperHeight / 2 - arrowHeight / 2;
+  }
+
   return (
-    <div className="flex flex-col flex-1 w-full bg-[#f8fafc] text-gray-900 select-none">
+    <div className="flex flex-col flex-1 w-full bg-[#f8fafc] text-gray-900 select-none min-h-0">
       {viewMode === 'dashboard' ? (
-        <div className="flex-1 p-6 md:p-10 max-w-[1200px] mx-auto w-full flex flex-col min-h-screen">
-          {/* Dashboard Header Row */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-gray-200 pb-6 mb-8 gap-4">
-            <div>
-              <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Select Edition</h1>
-              <p className="text-sm text-gray-500 mt-1">Choose your region to read the latest e-paper.</p>
-            </div>
-            
-            {/* Styled Date Picker Input */}
-            <div className="flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-4 py-2.5 shadow-sm relative cursor-pointer hover:bg-gray-50 transition-colors w-full sm:w-auto justify-between sm:justify-start">
-              <div className="flex items-center gap-2 text-gray-700">
-                <Calendar size={16} className="text-gray-400" />
-                <span className="font-semibold text-sm">{formatDatePickerLabel(selectedDate)}</span>
+        <div className="flex-1 flex flex-col min-h-screen bg-[#f8fafc] w-full">
+          {/* Dashboard Header Bar */}
+          <div className="bg-white border-b border-gray-200 px-3 md:px-6 py-2.5 flex items-center justify-between gap-2 select-none shadow-sm w-full">
+            <Link href="/" className="group flex items-center gap-2 flex-shrink-0">
+              <img src="/image-copy.png" alt="High TV E-Paper Logo" className="h-9 md:h-11 w-auto object-contain" />
+              <div className="text-gray-800 font-black text-sm select-none border-l-2 border-gray-900/10 pl-3 hidden md:block">
+                ఈ-పేపర్ ఎడిషన్స్
               </div>
-              <ChevronDown size={14} className="text-gray-400" />
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-              />
+            </Link>
+            <Link 
+              href="/" 
+              className="inline-flex items-center gap-1 bg-[#02599c] hover:bg-[#013f70] text-white font-black text-[10px] md:text-xs px-2 md:px-4 py-1 md:py-2 rounded-full transition-colors shadow-3xs select-none cursor-pointer flex-shrink-0"
+            >
+              <ArrowLeft size={10} className="stroke-[3] flex-shrink-0" />
+              <span className="hidden sm:inline">వెబ్ సైట్ హోమ్ పేజీ (Main Site)</span>
+              <span className="sm:hidden whitespace-nowrap">Main Site</span>
+            </Link>
+          </div>
+
+          {/* Dashboard Blue Category Nav Bar */}
+          <div className="bg-[#0c4a80] text-white px-3 md:px-6 py-2 md:py-2.5 flex flex-row flex-wrap items-center justify-between gap-2 select-none shadow-md w-full">
+            {/* Nav Menus */}
+            <div className="flex items-center gap-4 text-[11px] md:text-[12px] font-black uppercase tracking-wider flex-shrink-0">
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('main-editions-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="hover:text-yellow-300 transition-colors cursor-pointer"
+              >
+                Main Editions
+              </button>
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('tg-editions-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="hover:text-yellow-300 transition-colors cursor-pointer"
+              >
+                Telangana
+              </button>
+            </div>
+
+            {/* Search & Date Controls */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Date Picker Input */}
+              <div className="flex items-center gap-1 bg-white border border-gray-300 rounded-lg px-2 py-1 shadow-xs relative cursor-pointer hover:bg-gray-50 transition-colors text-gray-800">
+                <Calendar size={12} className="text-gray-500" />
+                <span className="font-extrabold text-[10px]">{formatDatePickerLabel(selectedDate)}</span>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                />
+              </div>
+
+              {/* Search Input Box */}
+              <div className="flex items-center bg-white/10 hover:bg-white/15 border border-white/20 rounded-lg px-2 py-1 gap-1.5 shadow-inner text-white focus-within:bg-white focus-within:text-gray-900 focus-within:border-white transition-all w-28 md:w-60">
+                <Search size={12} className="opacity-60 flex-shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search Edition"
+                  className="bg-transparent text-[11px] font-semibold outline-none flex-1 min-w-0 placeholder-white/50 focus:placeholder-gray-400"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="opacity-60 hover:opacity-100 cursor-pointer text-xs font-bold text-gray-400 flex-shrink-0">
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Grid of Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
-            {currentDatesPage.map((dateObj, idx) => (
-              <div
-                key={idx}
-                onClick={() => handleSelectEdition(dateObj.isoValue)}
-                className="group cursor-pointer flex flex-col transition-all duration-200 hover:-translate-y-1"
-              >
-                <div 
-                  className="relative overflow-hidden bg-white border border-gray-200/80 shadow-md rounded-xl group-hover:shadow-xl group-hover:border-gray-300 transition-all duration-200"
-                  style={{ aspectRatio: `1 / ${defaultPageAspectRatio}` }}
-                >
-                  {defaultPdfDoc ? (
-                    <EditionCardThumbnail
-                      pdfjs={pdfjs}
-                      dateIso={dateObj.isoValue}
-                      defaultPdfDoc={defaultPdfDoc}
-                      cardIdx={startIndex + idx}
-                      totalPages={defaultTotalPages}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-semibold animate-pulse">
-                      Loading preview...
+          {/* Main Editions Sections Wrapper with Skyscraper Ads */}
+          <div className="w-full flex justify-center items-start px-4 md:px-10 py-6 md:py-10 max-w-[1600px] mx-auto relative gap-6">
+            
+            {/* Left Skyscraper Ad */}
+            <div className="hidden xl:flex w-[160px] h-[600px] sticky top-32 bg-white border border-gray-200 rounded-xl shadow-md p-4 flex-col justify-between items-center text-center select-none flex-shrink-0">
+              <div>
+                <span className="bg-red-600 text-white font-bold text-[9px] px-2 py-0.5 rounded tracking-wide uppercase animate-pulse">AD</span>
+                <h3 className="text-gray-900 font-extrabold text-sm telugu-text mt-4 leading-normal" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  స్వర్ణయుగం హౌసింగ్ వెంచర్స్
+                </h3>
+                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mt-2">
+                  PREMIUM VENTURES
+                </p>
+                <div className="h-px bg-gray-150 my-4 w-full" />
+                <p className="text-gray-700 text-[11px] telugu-text font-bold leading-relaxed" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  భవన నిర్మాణ ప్లాట్లు అమ్మకానికి సిద్ధంగా కలవు. అన్ని సౌకర్యాలు కలవు.
+                </p>
+              </div>
+              <div className="flex flex-col items-center gap-1.5 w-full">
+                <div className="h-px bg-gray-150 my-2 w-full" />
+                <span className="text-gray-400 text-[9px] font-bold">CALL NOW</span>
+                <span className="text-[#02599c] font-black text-sm block">📞 99999 88888</span>
+                <span className="text-[9px] text-gray-500 font-bold">SPECIAL OFFERS</span>
+              </div>
+            </div>
+
+            {/* Central Content Container */}
+            <div className="flex-1 max-w-[1200px] flex flex-col gap-10 w-full min-w-0">
+              {/* Section: MAIN EDITIONS */}
+              <div id="main-editions-section" className="flex flex-col text-left">
+                <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
+                  Main Editions
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                  {filterEditions(MAIN_EDITIONS).map((item, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => handleSelectEditionCard(item.value)}
+                      className="group cursor-pointer flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+                    >
+                      <div 
+                        className="relative overflow-hidden bg-white border border-gray-250 shadow-md rounded-t-lg group-hover:border-yellow-400 transition-all duration-200"
+                        style={{ aspectRatio: `1 / ${defaultPageAspectRatio}` }}
+                      >
+                        {defaultPdfDoc ? (
+                          <EditionCardThumbnail
+                            pdfjs={pdfjs}
+                            dateIso={selectedDate}
+                            defaultPdfDoc={defaultPdfDoc}
+                            cardIdx={idx}
+                            totalPages={defaultTotalPages}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-semibold animate-pulse">
+                            Loading preview...
+                          </div>
+                        )}
+                      </div>
+                      <div className="w-full bg-[#fcc419] py-2 px-3 text-center text-xs font-black text-gray-900 truncate uppercase border-t border-yellow-600 rounded-b-lg">
+                        {item.name}
+                      </div>
                     </div>
+                  ))}
+                  {filterEditions(MAIN_EDITIONS).length === 0 && (
+                    <div className="text-gray-400 text-sm py-4 col-span-full">No main editions match your search.</div>
                   )}
                 </div>
-                <div className="mt-4 text-center sm:text-left px-1">
-                  <p className="font-bold text-sm text-gray-900 group-hover:text-[#cc0000] transition-colors">Main Edition</p>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">{dateObj.label}</p>
-                </div>
               </div>
-            ))}
-          </div>
 
-          {/* Pagination Controls */}
-          <div className="flex items-center justify-center gap-2 mt-10 select-none">
-            {/* Prev Arrow */}
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className={`w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center bg-white text-gray-500 hover:bg-gray-50 transition-colors ${
-                currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-              }`}
-            >
-              <ChevronLeft size={16} />
-            </button>
+              {/* Section: TELANGANA */}
+              <div id="tg-editions-section" className="flex flex-col text-left">
+                <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
+                  Telangana Districts
+                </h2>
+                {renderCarousel('tg-carousel', filterEditions(TG_EDITIONS))}
+                {filterEditions(TG_EDITIONS).length === 0 && (
+                  <div className="text-gray-400 text-sm py-4">No Telangana editions match your search.</div>
+                )}
+              </div>
+            </div>
 
-            {/* Page Numbers */}
-            {Array.from({ length: totalPagesCount }, (_, i) => i + 1).map((pNum) => (
-              <button
-                key={pNum}
-                onClick={() => setCurrentPage(pNum)}
-                className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-colors border ${
-                  pNum === currentPage
-                    ? 'bg-[#cc0000] text-white border-[#cc0000]'
-                    : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:border-gray-300'
-                }`}
-              >
-                {pNum}
-              </button>
-            ))}
+            {/* Right Skyscraper Ad */}
+            <div className="hidden xl:flex w-[160px] h-[600px] sticky top-32 bg-[#0c4a80] border border-[#0a3f6d] rounded-xl shadow-md p-4 flex-col justify-between items-center text-center select-none text-white flex-shrink-0">
+              <div>
+                <span className="bg-yellow-500 text-gray-900 font-black text-[9px] px-2 py-0.5 rounded tracking-wide uppercase">PRIME AD</span>
+                <h3 className="text-yellow-400 font-black text-sm uppercase tracking-wider mt-4 leading-normal">
+                  High TV Digital
+                </h3>
+                <p className="text-gray-200 text-[11px] telugu-text mt-2 leading-relaxed" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  నేడే ప్రకటన ఇవ్వండి - మీ వ్యాపారాన్ని పదింతలు పెంచుకోండి.
+                </p>
+                <div className="h-px bg-white/10 my-4 w-full" />
+                <p className="text-gray-300 text-[10px] leading-normal font-semibold">
+                  Your best content deserves even more views. Connect with millions of active users daily!
+                </p>
+              </div>
+              <div className="flex flex-col items-center gap-1.5 w-full">
+                <div className="h-px bg-white/10 my-2 w-full" />
+                <span className="text-yellow-400 font-black text-xs font-mono tracking-widest">HIGH TV</span>
+                <span className="text-gray-300 text-[9px] font-bold">DIGITAL NETWORK</span>
+              </div>
+            </div>
 
-            {/* Next Arrow */}
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPagesCount, prev + 1))}
-              disabled={currentPage === totalPagesCount}
-              className={`w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center bg-white text-gray-500 hover:bg-gray-50 transition-colors ${
-                currentPage === totalPagesCount ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-              }`}
-            >
-              <ChevronRight size={16} />
-            </button>
           </div>
 
           {/* Floating back-to-top button */}
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-[#cc0000] hover:bg-[#b91c1c] text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110"
+            className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-[#02599c] hover:bg-[#013f70] text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110 cursor-pointer"
             title="Scroll to Top"
           >
             <ArrowUp size={20} />
           </button>
         </div>
       ) : (
-        <div className="bg-[#e9eff4] overflow-hidden flex flex-col flex-1" style={{ minHeight: isMobile ? 'calc(100svh - 120px)' : '750px' }}>
-          
-          {/* Top Branding Row */}
-          <div className="bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between gap-4 select-none">
-            <div className="flex items-center gap-3">
-              <Link href="/" className="group flex items-center gap-2">
-                <div className="flex flex-col bg-[#cc0000] text-white font-black text-center px-2 py-0.5 rounded leading-none">
-                  <span className="text-[15px] tracking-tight">HIGH</span>
-                  <span className="text-[9px] tracking-widest mt-0.5">TV</span>
-                </div>
-                <div className="flex flex-col justify-center leading-none">
-                  <span className="text-[17px] font-black text-gray-900 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>హై టీవీ</span>
-                  <span className="text-[9px] text-[#cc0000] font-bold tracking-widest mt-0.5">ఈ-పేపర్</span>
-                </div>
-              </Link>
-            </div>
-
-            {/* Mock Ad Banner */}
-            <div className="hidden md:flex items-center justify-between flex-1 max-w-[650px] bg-gradient-to-r from-amber-400 to-yellow-300 border border-yellow-500 rounded px-4 py-1.5 shadow-sm text-xs select-none">
-              <div className="flex items-center gap-3">
-                <span className="bg-red-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded animate-pulse">ADVERTISEMENT</span>
-                <span className="text-gray-900 font-extrabold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>స్వర్ణయుగం హౌసింగ్ వెంచర్స్ - ప్లాట్లు అమ్మకానికి కలవు</span>
-              </div>
-              <span className="text-[#cc0000] font-black tracking-wider">📞 99999 88888</span>
-            </div>
-
-            <div className="w-12 h-6 md:block hidden"></div>
-          </div>
-          
+        <div className="bg-[#e9eff4] overflow-hidden flex flex-col flex-1 min-h-0 h-full">
           {/* Main E-Paper Reader Controls Bar */}
-          <header className="bg-white border-b border-gray-200 px-2 flex items-center justify-between shadow-sm z-10 select-none text-gray-700 text-xs font-semibold h-10">
+          <header className="bg-white border-b border-gray-200 px-2 md:px-3 flex items-center justify-between shadow-xs z-10 select-none text-gray-700 text-xs font-semibold h-10 md:h-11 overflow-x-auto hide-scrollbar">
             {/* Left Actions Block */}
-            <div className="flex items-center h-full">
-              {/* Menu Button */}
-              <button className="p-1.5 hover:bg-gray-100 rounded text-gray-500 hover:text-gray-800" title="Menu">
-                <Menu size={16} />
-              </button>
-              
-              <div className="h-5 w-px bg-gray-200 mx-2"></div>
+            <div className="flex items-center h-full gap-0.5 md:gap-1 flex-shrink-0">
 
               {/* Home Button */}
               <button 
                 onClick={() => setViewMode('dashboard')}
-                className="flex items-center gap-1.5 px-2.5 h-full hover:bg-gray-50 transition-colors text-gray-700 hover:text-[#cc0000]"
+                className="flex items-center gap-1 px-1.5 md:px-2.5 h-full hover:bg-gray-50 transition-colors text-gray-700 hover:text-[#02599c] cursor-pointer"
                 title="Back to Editions Dashboard"
               >
-                <Home size={14} className="text-gray-500" />
-                <span>Home</span>
+                <Home size={14} className="text-gray-500 flex-shrink-0" />
+                <span className="hidden md:inline">Home</span>
               </button>
               
-              <div className="h-5 w-px bg-gray-200 mx-2"></div>
+              <div className="h-4 w-px bg-gray-200"></div>
 
               {/* Calendar Date Selector Trigger */}
               <button 
                 onClick={() => setShowCalendarModal(true)}
-                className="flex items-center gap-1.5 px-2.5 h-full hover:bg-gray-50 transition-colors text-gray-700 hover:text-[#cc0000]"
+                className="flex items-center gap-1 px-1.5 md:px-2.5 h-full hover:bg-gray-50 transition-colors text-gray-700 hover:text-[#02599c] cursor-pointer"
                 title="Change Date"
               >
-                <span>{formatDisplayDate(selectedDate)}</span>
-                <Calendar size={14} className="text-gray-400" />
+                <Calendar size={13} className="text-gray-400 flex-shrink-0" />
+                <span className="hidden md:inline">{formatDisplayDate(selectedDate)}</span>
               </button>
 
-              <div className="h-5 w-px bg-gray-200 mx-2"></div>
+              <div className="h-4 w-px bg-gray-200"></div>
 
               {/* Edition Selector Trigger */}
               <button 
                 onClick={() => setShowEditionModal(true)}
-                className="flex items-center gap-1.5 px-2.5 h-full hover:bg-gray-50 transition-colors text-gray-700 hover:text-[#cc0000]"
+                className="flex items-center gap-1 px-1.5 md:px-2.5 h-full hover:bg-gray-50 transition-colors text-gray-700 hover:text-[#02599c] cursor-pointer"
                 title="Select Edition"
               >
-                <span className="text-[#cc0000]">{selectedEdition}</span>
-                <MapPin size={14} className="text-gray-400" />
+                <MapPin size={13} className="text-gray-400 flex-shrink-0" />
+                <span className="text-[#02599c] font-bold text-[10px] md:text-xs max-w-[50px] md:max-w-none truncate">{selectedEdition}</span>
               </button>
 
-              <div className="h-5 w-px bg-gray-200 mx-2"></div>
+              <div className="h-4 w-px bg-gray-200"></div>
 
               {/* Page Dropdown Selector */}
-              <div className="relative flex items-center px-3 h-full hover:bg-gray-50 transition-colors pr-6">
+              <div className="relative flex items-center px-1.5 md:px-3 h-full hover:bg-gray-50 transition-colors">
                 <select
                   value={activePageIdx}
                   onChange={(e) => {
                     setActivePageIdx(Number(e.target.value));
                     setIsClipping(false);
                   }}
-                  className="bg-transparent text-xs font-semibold text-gray-700 outline-none cursor-pointer appearance-none"
+                  className="bg-transparent text-[10px] md:text-xs font-semibold text-gray-700 outline-none cursor-pointer"
                 >
                   {epaperPages.map((page, idx) => (
-                    <option key={idx} value={idx}>{page.pageNum}: Page</option>
+                    <option key={idx} value={idx}>P{page.pageNum}</option>
                   ))}
                 </select>
-                <Grid size={13} className="text-gray-400 pointer-events-none absolute right-2.5" />
               </div>
 
-              <div className="h-5 w-px bg-gray-200 mx-2"></div>
+              <div className="h-4 w-px bg-gray-200"></div>
 
               {/* Crop & Share Button */}
               <button 
                 onClick={() => setIsClipping(!isClipping)}
-                className={`flex items-center gap-1.5 px-3 h-full transition-colors ${
+                className={`flex items-center gap-1 px-1.5 md:px-3 h-full transition-colors cursor-pointer ${
                   isClipping 
-                    ? 'bg-red-50 text-[#cc0000]' 
-                    : 'hover:bg-gray-50 text-gray-700 hover:text-red-600'
+                    ? 'bg-yellow-50 text-[#e0b014] font-bold' 
+                    : 'hover:bg-gray-50 text-gray-700 hover:text-[#02599c]'
                 }`}
               >
-                <Scissors size={14} className={isClipping ? 'text-[#cc0000]' : 'text-gray-400'} />
-                <span>Crop&Share</span>
+                <Scissors size={13} className={isClipping ? 'text-[#e0b014]' : 'text-gray-400'} />
+                <span className="hidden md:inline">Crop&amp;Share</span>
               </button>
-
-              <div className="h-5 w-px bg-gray-200 mx-2"></div>
-
-              {/* Grid View Sidebar Button */}
-              <button 
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="flex items-center justify-center px-3 h-full hover:bg-gray-50 transition-colors text-gray-700 hover:text-brand-blue"
-                title="Toggle Thumbnails Sidebar"
-              >
-                <Grid size={14} className="text-gray-400" />
-              </button>
-
-              <div className="h-5 w-px bg-gray-200 mx-2"></div>
-
-              {/* Quick Zoom Levels Q0, Q1, Q2 */}
-              <div className="flex items-center h-full px-1 gap-1.5">
-                {[
-                  { level: 75, icon: '⁰', label: 'Zoom Out (75%)' },
-                  { level: 100, icon: '¹', label: 'Zoom Actual (100%)' },
-                  { level: 150, icon: '²', label: 'Zoom In (150%)' }
-                ].map((item) => (
-                  <button 
-                    key={item.level}
-                    onClick={() => setZoom(item.level)}
-                    className={`w-6 h-6 rounded flex items-center justify-center relative font-bold transition-all ${
-                      zoom === item.level ? 'bg-gray-200 text-gray-900' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-800'
-                    }`}
-                    title={item.label}
-                  >
-                    <Search size={12} className="stroke-[2.5]" />
-                    <span className="absolute -top-1.5 -right-0.5 text-[8px] font-black">{item.icon}</span>
-                  </button>
-                ))}
-              </div>
             </div>
 
             {/* Right Actions Block */}
-            <div className="flex items-center h-full pr-1 gap-2">
-              {/* Download Page Button */}
+            <div className="flex items-center h-full pr-1 gap-1 md:gap-2 flex-shrink-0">
+
+              {/* Download Button */}
               <button 
                 onClick={handleDownloadPDF}
-                className="flex items-center gap-1 bg-[#cc0000] hover:bg-[#a60000] text-white rounded px-2.5 py-1 text-[11px] font-bold transition-all shadow-sm"
+                className="flex items-center gap-1 bg-[#02599c] hover:bg-[#013f70] text-white rounded px-1.5 md:px-3 py-1 md:py-1.5 text-[10px] md:text-xs font-bold transition-all shadow-xs cursor-pointer"
               >
-                <Download size={11} />
-                <span>Download</span>
+                <Download size={12} />
+                <span className="hidden md:inline">Download PDF</span>
               </button>
 
-              <div className="h-5 w-px bg-gray-200"></div>
-
-              {/* Fullscreen Toggle */}
+              {/* Fullscreen Toggle - desktop only */}
               <button 
                 onClick={toggleFullscreen}
-                className="w-8 h-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors"
+                className="hidden md:flex w-8 h-full items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
                 title="Toggle Fullscreen"
               >
                 <Maximize2 size={15} />
               </button>
 
-              <div className="h-5 w-px bg-gray-200"></div>
-
-              {/* Sidebar Toggle Button */}
+              {/* Sidebar Toggle - desktop only */}
               <button 
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className={`w-8 h-full flex items-center justify-center transition-colors ${
-                  isSidebarOpen ? 'text-brand-blue hover:text-brand-dark-blue hover:bg-gray-50' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'
+                className={`hidden md:flex w-8 h-full items-center justify-center transition-colors cursor-pointer ${
+                  isSidebarOpen ? 'text-[#02599c] hover:bg-gray-50' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'
                 }`}
                 title="Toggle Pages Sidebar"
               >
@@ -1245,31 +1616,35 @@ export default function EPaperReader() {
             
             {/* Page Thumbnail Sidebar - Desktop only */}
             {isSidebarOpen && (
-              <aside className="w-40 bg-white border-r border-gray-200 hidden md:flex flex-col flex-shrink-0">
-                <div className="p-2.5 border-b border-gray-100 flex items-center justify-between">
-                  <span className="font-bold text-[10px] text-gray-500 uppercase tracking-wider">All Pages</span>
-                  <button onClick={() => setIsSidebarOpen(false)} className="text-gray-400 hover:text-gray-600">
-                    <X size={13} />
+              <aside className="w-44 bg-gray-50 border-r border-gray-200 hidden md:flex flex-col flex-shrink-0">
+                <div className="p-3 border-b border-gray-200 flex items-center justify-between bg-white select-none">
+                  <span className="font-extrabold text-[11px] text-gray-600 uppercase tracking-wider">
+                    {selectedEdition.split(' ')[0]} Edition
+                  </span>
+                  <button onClick={() => setIsSidebarOpen(false)} className="text-gray-400 hover:text-gray-600 cursor-pointer p-0.5 rounded hover:bg-gray-100">
+                    <X size={14} />
                   </button>
                 </div>
-                <div className="flex-1 overflow-y-auto p-2.5 space-y-3 scrollbar-thin">
+                <div className="flex-1 overflow-y-auto p-3 space-y-4 scrollbar-thin bg-gray-50/50">
                   {epaperPages.map((page, idx) => (
                     <button
                       key={page.pageNum}
                       onClick={() => { setActivePageIdx(idx); setIsClipping(false); }}
-                      className={`w-full text-left rounded-lg overflow-hidden border transition-all flex flex-col group ${
-                        idx === activePageIdx ? 'border-brand-blue ring-2 ring-brand-blue/10' : 'border-gray-200 hover:border-gray-400'
+                      className={`w-full text-left rounded-lg overflow-hidden border transition-all flex flex-col group shadow-xs ${
+                        idx === activePageIdx 
+                          ? 'border-[#fcc419] ring-4 ring-[#fcc419]/25 shadow-md scale-[1.02]' 
+                          : 'border-gray-200 hover:border-gray-300 bg-white'
                       }`}
                     >
-                      <div className="relative aspect-[3/4] w-full bg-white overflow-hidden flex items-center justify-center">
+                      <div className="relative aspect-[3/4] w-full bg-white overflow-hidden flex items-center justify-center border-b border-gray-100">
                         {pdfDoc ? (
                           <NewspaperPDFPage pdfDoc={pdfDoc} pageNum={page.pageNum} zoom={20} />
                         ) : (
                           <div className="text-gray-400 text-[10px] animate-pulse">Loading...</div>
                         )}
                       </div>
-                      <div className="p-1.5 bg-gray-50 text-[10px] font-bold text-gray-600 text-center w-full group-hover:bg-gray-100 transition-colors">
-                        పేజీ {page.pageNum}
+                      <div className="p-1.5 bg-white text-[10px] font-black text-gray-800 text-center w-full group-hover:bg-gray-50 transition-colors">
+                        {page.pageNum} {idx === 0 ? 'MAIN' : 'STATE'}
                       </div>
                     </button>
                   ))}
@@ -1284,7 +1659,7 @@ export default function EPaperReader() {
                   key={page.pageNum}
                   onClick={() => { setActivePageIdx(idx); setIsClipping(false); }}
                   className={`flex-shrink-0 w-9 h-9 rounded-lg text-[11px] font-black transition-all border ${
-                    idx === activePageIdx ? 'bg-[#cc0000] text-white border-[#cc0000]' : 'bg-gray-100 text-gray-600 border-gray-200'
+                    idx === activePageIdx ? 'bg-[#02599c] text-white border-[#02599c]' : 'bg-gray-100 text-gray-600 border-gray-200'
                   }`}
                 >
                   {page.pageNum}
@@ -1292,19 +1667,29 @@ export default function EPaperReader() {
               ))}
             </div>
 
-            {/* Workspace Display Canvas */}
-            <div
-              className="flex-1 overflow-auto relative bg-[#e9eff4]"
-              onMouseMove={handleContainerPointerMove}
-              onMouseUp={handleContainerPointerUp}
-              onTouchMove={handleContainerPointerMove}
-              onTouchEnd={handleContainerPointerUp}
-            >
+            {/* Workspace Viewport Wrapper */}
+            <div className="flex-1 relative flex flex-col min-w-0 h-full overflow-hidden">
+              {/* Workspace Display Canvas */}
               <div
-                className="relative flex justify-center min-h-full items-start"
+                ref={scrollContainerRef}
+                className={`flex-1 relative bg-[#e9eff4] ${
+                  isMobile 
+                    ? (zoom > fitZoom ? 'overflow-auto' : 'overflow-x-hidden overflow-y-auto') 
+                    : 'overflow-auto'
+                }`}
+                onMouseMove={handleContainerPointerMove}
+                onMouseUp={handleContainerPointerUp}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleContainerPointerMove}
+                onTouchEnd={handleTouchEndCombined}
+              >
+              <div
+                className={`relative flex min-h-full items-start gap-12 ${
+                  zoom > fitZoom ? 'justify-start' : 'justify-center'
+                }`}
                 style={{
-                  minWidth: `${BASE_WIDTH * (zoom / 100) + 32}px`,
-                  padding: isMobile ? '8px 8px 80px 8px' : '24px 24px 48px 24px',
+                  minWidth: zoom > fitZoom ? 'max-content' : '100%',
+                  padding: isMobile ? '4px 0 80px 0' : '24px 24px 48px 24px',
                 }}
               >
                 {/* Floating Clipping Instructions Bar */}
@@ -1320,16 +1705,100 @@ export default function EPaperReader() {
                   </div>
                 )}
 
-                {/* Page View Frame */}
+                {/* Left Skyscraper Ad */}
+                {!isMobile && !isClipping && (
+                  <div className="hidden min-[1450px]:flex w-[160px] h-[600px] sticky top-4 bg-white border border-gray-200 rounded-xl shadow-md p-4 flex-col justify-between items-center text-center select-none flex-shrink-0 z-30">
+                    <div>
+                      <span className="bg-red-600 text-white font-bold text-[9px] px-2 py-0.5 rounded tracking-wide uppercase animate-pulse">AD</span>
+                      <h3 className="text-gray-900 font-extrabold text-sm telugu-text mt-4 leading-normal" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                        స్వర్ణయుగం హౌసింగ్ వెంచర్స్
+                      </h3>
+                      <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mt-2">
+                        PREMIUM VENTURES
+                      </p>
+                      <div className="h-px bg-gray-150 my-4 w-full" />
+                      <p className="text-gray-700 text-[11px] telugu-text font-bold leading-relaxed" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                        భవన నిర్మాణ ప్లాట్లు అమ్మకానికి సిద్ధంగా కలవు. అన్ని సౌకర్యాలు కలవు.
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-1.5 w-full">
+                      <div className="h-px bg-gray-150 my-2 w-full" />
+                      <span className="text-gray-400 text-[9px] font-bold">CALL NOW</span>
+                      <span className="text-[#02599c] font-black text-sm block">📞 99999 88888</span>
+                      <span className="text-[9px] text-gray-500 font-bold">SPECIAL OFFERS</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Page View Frame Wrapper */}
                 <div
-                  ref={imageContainerRef}
-                  className="relative shadow-2xl bg-white rounded-lg overflow-hidden select-none border border-gray-300 flex-shrink-0"
+                  className="relative flex-shrink-0"
+                  onTouchStart={handleDoubleTap}
+                  onDoubleClick={handleDoubleClick}
                   style={{
-                    width:  `${BASE_WIDTH  * (zoom / 100)}px`,
-                    height: `${BASE_WIDTH * pageAspectRatio * (zoom / 100)}px`,
+                    width:  `${paperWidth}px`,
+                    height: `${paperWidth * pageAspectRatio}px`,
                     transition: 'width 0.2s, height 0.2s',
                   }}
                 >
+                  {/* Floating Navigation Arrows - Constrained Vertically via Scroll Tracking, Scrollable Horizontally with paper */}
+                  {activePageIdx > 0 && !isClipping && (
+                    <div 
+                      style={{
+                        top: `${targetArrowTop}px`
+                      }}
+                      className={`absolute w-8 h-12 pointer-events-none z-40 ${
+                        isMobile ? 'left-1' : 'right-full'
+                      }`}
+                    >
+                      <button
+                        onClick={() => {
+                          setActivePageIdx(prev => prev - 1);
+                          setIsClipping(false);
+                        }}
+                        className={`pointer-events-auto w-8 h-12 text-white flex items-center justify-center transition-all shadow-md group border cursor-pointer ${
+                          isMobile 
+                            ? 'bg-[#fcc419]/80 backdrop-blur-xs hover:bg-[#e0b014] rounded-md border-yellow-500/35' 
+                            : 'bg-[#fcc419] hover:bg-[#e0b014] rounded-l-md border-y border-l border-yellow-600'
+                        }`}
+                        title="Previous Page"
+                      >
+                        <ChevronLeft size={18} className="stroke-[3] text-white group-hover:scale-110 transition-transform" />
+                      </button>
+                    </div>
+                  )}
+
+                  {activePageIdx < epaperPages.length - 1 && !isClipping && (
+                    <div 
+                      style={{
+                        top: `${targetArrowTop}px`
+                      }}
+                      className={`absolute w-8 h-12 pointer-events-none z-40 ${
+                        isMobile ? 'right-1' : 'left-full'
+                      }`}
+                    >
+                      <button
+                        onClick={() => {
+                          setActivePageIdx(prev => prev + 1);
+                          setIsClipping(false);
+                        }}
+                        className={`pointer-events-auto w-8 h-12 text-white flex items-center justify-center transition-all shadow-md group border cursor-pointer ${
+                          isMobile 
+                            ? 'bg-[#fcc419]/80 backdrop-blur-xs hover:bg-[#e0b014] rounded-md border-yellow-500/35' 
+                            : 'bg-[#fcc419] hover:bg-[#e0b014] rounded-r-md border-y border-r border-yellow-600'
+                        }`}
+                        title="Next Page"
+                      >
+                        <ChevronRight size={18} className="stroke-[3] text-white group-hover:scale-110 transition-transform" />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Inner Page View Frame */}
+                  <div
+                    ref={imageContainerRef}
+                    className="relative shadow-2xl bg-white rounded-lg overflow-hidden select-none border border-gray-300 w-full h-full"
+                  >
                   {/* PDF Page Canvas */}
                   {pdfDoc ? (
                     <>
@@ -1337,41 +1806,13 @@ export default function EPaperReader() {
                         pdfDoc={pdfDoc}
                         pageNum={activePageIdx + 1}
                         zoom={zoom}
+                        highRes={true}
                       />
-                      
-                      {/* Interactive Article Click Zones */}
-                      {!isClipping && generateMockZonesForPage(activePageIdx).map((zone, zIdx) => (
-                        <div
-                          key={zone.id || zIdx}
-                          tabIndex={0}
-                          role="button"
-                          aria-label={zone.title ? `Read article: ${zone.title}` : 'Read news article'}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              const url = `/category/epaper?view=article&articleId=${zone.id}&date=${selectedDate}&page=${activePageIdx + 1}`;
-                              window.open(url, '_blank');
-                            }
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const url = `/category/epaper?view=article&articleId=${zone.id}&date=${selectedDate}&page=${activePageIdx + 1}`;
-                            window.open(url, '_blank');
-                          }}
-                          className="absolute cursor-pointer z-20 outline-none"
-                          style={{
-                            left: `${zone.x * (zoom / 100)}px`,
-                            top: `${zone.y * (zoom / 100)}px`,
-                            width: `${zone.width * (zoom / 100)}px`,
-                            height: `${zone.height * (zoom / 100)}px`,
-                          }}
-                          title={zone.title}
-                        />
-                      ))}
+
                     </>
                   ) : loadError ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-white p-6 text-center select-none">
-                      <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center text-[#cc0000] mb-4">
+                      <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-[#02599c] mb-4">
                         <X size={32} />
                       </div>
                       <h3 className="text-lg font-black text-gray-900">E-Paper PDF Not Uploaded Yet</h3>
@@ -1380,7 +1821,7 @@ export default function EPaperReader() {
                       </p>
                       <button
                         onClick={() => setViewMode('dashboard')}
-                        className="mt-6 bg-[#cc0000] hover:bg-[#b91c1c] text-white font-bold text-xs px-6 py-2.5 rounded-full shadow transition-all cursor-pointer"
+                        className="mt-6 bg-[#02599c] hover:bg-[#013f70] text-white font-bold text-xs px-6 py-2.5 rounded-full shadow transition-all cursor-pointer"
                       >
                         Back to Select Edition
                       </button>
@@ -1394,7 +1835,7 @@ export default function EPaperReader() {
                   {/* Interactive clipping crop-box overlay */}
                   {isClipping && (
                     <div
-                      className="absolute border-2 border-dashed border-[#dc2626] bg-black/10 z-30 flex flex-col justify-between p-2 shadow-inner touch-none"
+                      className="absolute border-2 border-dashed border-white bg-transparent shadow-[0_0_0_9999px_rgba(0,0,0,0.55)] z-30 select-none touch-none animate-fade-in"
                       style={{
                         left:   `${clipBox.x      * (zoom / 100)}px`,
                         top:    `${clipBox.y      * (zoom / 100)}px`,
@@ -1409,84 +1850,173 @@ export default function EPaperReader() {
                         className="absolute inset-0 cursor-move z-10"
                       />
 
-                      {/* Corner Resize Handles */}
+                      {/* Resize Handles */}
                       <div
                         onMouseDown={(e) => handleResizeStart(e, 'tl')}
                         onTouchStart={(e) => handleResizeStart(e, 'tl')}
-                        className="absolute w-5 h-5 bg-white border-2 border-[#dc2626] rounded-full cursor-nwse-resize z-40"
-                        style={{ left: '-10px', top: '-10px' }}
+                        className="absolute w-6 h-6 bg-gray-500 cursor-nwse-resize z-40 left-0 top-0 -translate-x-1/2 -translate-y-1/2"
+                      />
+                      <div
+                        onMouseDown={(e) => handleResizeStart(e, 't')}
+                        onTouchStart={(e) => handleResizeStart(e, 't')}
+                        className="absolute w-6 h-6 bg-gray-500 cursor-ns-resize z-40 left-1/2 top-0 -translate-x-1/2 -translate-y-1/2"
                       />
                       <div
                         onMouseDown={(e) => handleResizeStart(e, 'tr')}
                         onTouchStart={(e) => handleResizeStart(e, 'tr')}
-                        className="absolute w-5 h-5 bg-white border-2 border-[#dc2626] rounded-full cursor-nesw-resize z-40"
-                        style={{ right: '-10px', top: '-10px' }}
+                        className="absolute w-6 h-6 bg-gray-500 cursor-nesw-resize z-40 right-0 top-0 translate-x-1/2 -translate-y-1/2"
+                      />
+                      <div
+                        onMouseDown={(e) => handleResizeStart(e, 'l')}
+                        onTouchStart={(e) => handleResizeStart(e, 'l')}
+                        className="absolute w-6 h-6 bg-gray-500 cursor-ew-resize z-40 left-0 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                      />
+                      <div
+                        onMouseDown={(e) => handleResizeStart(e, 'r')}
+                        onTouchStart={(e) => handleResizeStart(e, 'r')}
+                        className="absolute w-6 h-6 bg-gray-500 cursor-ew-resize z-40 right-0 top-1/2 translate-x-1/2 -translate-y-1/2"
                       />
                       <div
                         onMouseDown={(e) => handleResizeStart(e, 'bl')}
                         onTouchStart={(e) => handleResizeStart(e, 'bl')}
-                        className="absolute w-5 h-5 bg-white border-2 border-[#dc2626] rounded-full cursor-nesw-resize z-40"
-                        style={{ left: '-10px', bottom: '-10px' }}
+                        className="absolute w-6 h-6 bg-gray-500 cursor-nesw-resize z-40 left-0 bottom-0 -translate-x-1/2 translate-y-1/2"
+                      />
+                      <div
+                        onMouseDown={(e) => handleResizeStart(e, 'b')}
+                        onTouchStart={(e) => handleResizeStart(e, 'b')}
+                        className="absolute w-6 h-6 bg-gray-500 cursor-ns-resize z-40 left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2"
                       />
                       <div
                         onMouseDown={(e) => handleResizeStart(e, 'br')}
                         onTouchStart={(e) => handleResizeStart(e, 'br')}
-                        className="absolute w-5 h-5 bg-white border-2 border-[#dc2626] rounded-full cursor-nwse-resize z-40"
-                        style={{ right: '-10px', bottom: '-10px' }}
+                        className="absolute w-6 h-6 bg-gray-500 cursor-nwse-resize z-40 right-0 bottom-0 translate-x-1/2 translate-y-1/2"
                       />
 
-                      {/* Crop Controls */}
-                      <div className="z-20 pointer-events-none flex flex-col justify-between h-full w-full">
-                        <div className="bg-[#dc2626] text-white text-[9px] font-black tracking-widest px-1.5 py-0.5 rounded shadow w-fit select-none">
-                          CROP ZONE
-                        </div>
-                        
+                      {/* Floating Vertical Toolbar (Attached to Right Edge) */}
+                      <div 
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
+                        className="absolute right-[-18px] bottom-0 flex flex-col gap-1.5 z-50 pointer-events-auto"
+                      >
+                        {/* Facebook Share */}
                         <button
-                          onMouseDown={(e) => e.stopPropagation()}
                           onClick={() => {
-                            const randomId = `${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
-                            setGeneratedClipUrl(`https://hightv.in/clip/clip-${randomId}`);
-                            setShowShareModal(true);
-                            setIsClipping(false);
+                            const shareUrl = `https://hightv.in/clip/clip-${Date.now()}`;
+                            window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), '_blank');
                           }}
-                          className="self-end bg-green-600 hover:bg-green-700 text-white text-[10px] font-black px-2.5 py-1.5 rounded transition-colors shadow-md flex items-center gap-1 cursor-pointer pointer-events-auto"
+                          className="w-9 h-9 rounded-lg bg-[#3b5998] hover:bg-[#2d4373] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 cursor-pointer"
+                          title="Share on Facebook"
                         >
-                          <Scissors size={10} />
-                          <span>Download Clip</span>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                          </svg>
+                        </button>
+
+                        {/* X (Twitter) Share */}
+                        <button
+                          onClick={() => {
+                            const shareUrl = `https://hightv.in/clip/clip-${Date.now()}`;
+                            window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent('HIGH TV News Clip'), '_blank');
+                          }}
+                          className="w-9 h-9 rounded-lg bg-black hover:bg-gray-950 text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 border border-gray-800 cursor-pointer"
+                          title="Share on X"
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                          </svg>
+                        </button>
+
+                        {/* Email Share */}
+                        <button
+                          onClick={() => {
+                            const shareUrl = `https://hightv.in/clip/clip-${Date.now()}`;
+                            window.location.href = 'mailto:?subject=HIGH TV News Clip&body=Check out this news clip: ' + shareUrl;
+                          }}
+                          className="w-9 h-9 rounded-lg bg-[#f97316] hover:bg-[#ea580c] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 cursor-pointer"
+                          title="Share via Email"
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                          </svg>
+                        </button>
+
+                        {/* WhatsApp Share */}
+                        <button
+                          onClick={() => {
+                            const shareUrl = `https://hightv.in/clip/clip-${Date.now()}`;
+                            window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent('Check out this news clip: ' + shareUrl), '_blank');
+                          }}
+                          className="w-9 h-9 rounded-lg bg-[#22c55e] hover:bg-[#16a34a] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 cursor-pointer"
+                          title="Share on WhatsApp"
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
+                          </svg>
+                        </button>
+
+                        {/* Copy Link */}
+                        <button
+                          onClick={() => {
+                            const shareUrl = `https://hightv.in/clip/clip-${Date.now()}`;
+                            navigator.clipboard.writeText(shareUrl);
+                            alert("Clip link copied!");
+                          }}
+                          className="w-9 h-9 rounded-lg bg-[#4b5563] hover:bg-[#374151] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 cursor-pointer"
+                          title="Copy Link to Clipboard"
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                          </svg>
+                        </button>
+
+                        {/* Download Image Crop directly */}
+                        <button
+                          onClick={handleDownloadClip}
+                          className="w-9 h-9 rounded-lg bg-[#15803d] hover:bg-[#166534] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 cursor-pointer"
+                          title="Download Image Clip"
+                        >
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="8 12 12 16 16 12" />
+                            <line x1="12" y1="8" x2="12" y2="16" />
+                          </svg>
                         </button>
                       </div>
                     </div>
                   )}
                 </div>
+              </div>
 
-                {/* Hover Page-Turning Overlay Arrows */}
-                {activePageIdx > 0 && !isClipping && (
-                  <button
-                    onClick={() => {
-                      setActivePageIdx(activePageIdx - 1);
-                      setIsClipping(false);
-                    }}
-                    className="absolute left-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-brand-blue/80 hover:bg-brand-dark-blue text-white flex items-center justify-center transition-all shadow-xl hover:scale-110 animate-fade-in"
-                    title="Previous Page"
-                  >
-                    <ChevronLeft size={24} />
-                  </button>
+                {/* Right Skyscraper Ad */}
+                {!isMobile && !isClipping && (
+                  <div className="hidden min-[1450px]:flex w-[160px] h-[600px] sticky top-4 bg-[#0c4a80] border border-[#0a3f6d] rounded-xl shadow-md p-4 flex-col justify-between items-center text-center select-none text-white flex-shrink-0 z-30">
+                    <div>
+                      <span className="bg-yellow-500 text-gray-900 font-black text-[9px] px-2 py-0.5 rounded tracking-wide uppercase">PRIME AD</span>
+                      <h3 className="text-yellow-400 font-black text-sm uppercase tracking-wider mt-4 leading-normal">
+                        High TV Digital
+                      </h3>
+                      <p className="text-gray-200 text-[11px] telugu-text mt-2 leading-relaxed" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                        నేడే ప్రకటన ఇవ్వండి - మీ వ్యాపారాన్ని పదింతలు పెంచుకోండి.
+                      </p>
+                      <div className="h-px bg-white/10 my-4 w-full" />
+                      <p className="text-gray-300 text-[10px] leading-normal font-semibold">
+                        Your best content deserves even more views. Connect with millions of active users daily!
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-1.5 w-full">
+                      <div className="h-px bg-white/10 my-2 w-full" />
+                      <span className="text-yellow-400 font-black text-xs font-mono tracking-widest">HIGH TV</span>
+                      <span className="text-gray-300 text-[9px] font-bold">DIGITAL NETWORK</span>
+                    </div>
+                  </div>
                 )}
 
-                {activePageIdx < epaperPages.length - 1 && !isClipping && (
-                  <button
-                    onClick={() => {
-                      setActivePageIdx(activePageIdx + 1);
-                      setIsClipping(false);
-                    }}
-                    className="absolute right-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full bg-brand-blue/80 hover:bg-brand-dark-blue text-white flex items-center justify-center transition-all shadow-xl hover:scale-110 animate-fade-in"
-                    title="Next Page"
-                  >
-                    <ChevronRight size={24} />
-                  </button>
-                )}
               </div>
             </div>
+
+          </div>
 
           </div>
 
@@ -1539,6 +2069,7 @@ export default function EPaperReader() {
                               pageNum={activePageIdx + 1}
                               zoom={scale * 100}
                               className="w-full h-full block"
+                              highRes={true}
                             />
                           )}
                         </div>
@@ -1644,7 +2175,7 @@ export default function EPaperReader() {
 
                   <button
                     onClick={handleDownloadClip}
-                    className="flex items-center justify-center gap-2 bg-[#cc0000] hover:bg-[#b91c1c] text-white font-bold py-3.5 rounded-full text-sm transition-colors shadow-md"
+                    className="flex items-center justify-center gap-2 bg-[#02599c] hover:bg-[#013f70] text-white font-bold py-3.5 rounded-full text-sm transition-colors shadow-md cursor-pointer"
                   >
                     <Download size={15} />
                     <span>Download</span>
@@ -1705,6 +2236,7 @@ export default function EPaperReader() {
                               pageNum={activePageIdx + 1}
                               zoom={scale * 100}
                               className="w-full h-full block"
+                              highRes={true}
                             />
                           )}
                         </div>
@@ -1801,7 +2333,7 @@ export default function EPaperReader() {
 
                   <button
                     onClick={handleDownloadArticleClip}
-                    className="flex items-center justify-center gap-2 bg-[#cc0000] hover:bg-[#b91c1c] text-white font-bold px-6 py-3 rounded-full text-sm transition-colors shadow-md"
+                    className="flex items-center justify-center gap-2 bg-[#02599c] hover:bg-[#013f70] text-white font-bold px-6 py-3 rounded-full text-sm transition-colors shadow-md cursor-pointer"
                   >
                     <Download size={15} />
                     <span>Download Article</span>
@@ -1889,9 +2421,9 @@ export default function EPaperReader() {
                             setActivePageIdx(0);
                             setIsClipping(false);
                           }}
-                          className={`h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                          className={`h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer ${
                             isSelected 
-                              ? 'bg-[#cc0000] text-white shadow-md' 
+                              ? 'bg-[#02599c] text-white shadow-md' 
                               : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                           }`}
                         >
@@ -1909,7 +2441,7 @@ export default function EPaperReader() {
           {/* Edition Selector Modal */}
           {showEditionModal && (
             <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in text-left">
-              <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md md:max-w-2xl p-6 relative flex flex-col gap-4 border border-gray-100 max-h-[85vh]">
+              <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md p-6 relative flex flex-col gap-4 border border-gray-100 max-h-[85vh]">
                 <div className="flex items-center justify-between border-b border-gray-100 pb-3">
                   <h3 className="text-lg font-extrabold text-gray-900">Select District Edition</h3>
                   <button 
@@ -1920,153 +2452,96 @@ export default function EPaperReader() {
                   </button>
                 </div>
 
-                {/* State Toggle Tabs */}
-                <div className="flex bg-gray-100 p-1 rounded-xl select-none">
-                  <button
-                    onClick={() => setActiveStateTab('TS')}
-                    className={`flex-1 text-center py-2.5 rounded-lg text-xs font-black transition-all ${
-                      activeStateTab === 'TS'
-                        ? 'bg-[#cc0000] text-white shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50/50'
-                    }`}
-                  >
-                    తెలంగాణ (Telangana)
-                  </button>
-                  <button
-                    onClick={() => setActiveStateTab('AP')}
-                    className={`flex-1 text-center py-2.5 rounded-lg text-xs font-black transition-all ${
-                      activeStateTab === 'AP'
-                        ? 'bg-[#cc0000] text-white shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50/50'
-                    }`}
-                  >
-                    ఆంధ్రప్రదేశ్ (Andhra Pradesh)
-                  </button>
-                </div>
-
                 <div className="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-thin">
-                  {activeStateTab === 'TS' ? (
-                    /* Category: Telangana */
-                    <div className="border border-gray-200 rounded-2xl overflow-hidden animate-fade-in">
-                      <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-b border-gray-200 select-none">
-                        <span className="font-extrabold text-xs text-gray-700 uppercase tracking-wider">Telangana Editions</span>
-                        <span className="text-[10px] text-gray-400 font-bold">33 Districts</span>
-                      </div>
-                      <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white">
-                        {[
-                          'Adilabad',
-                          'Bhadradri Kothagudem',
-                          'Hanamkonda',
-                          'Hyderabad',
-                          'Jagtial',
-                          'Jangaon',
-                          'Jayashankar Bhupalpally',
-                          'Jogulamba Gadwal',
-                          'Kamareddy',
-                          'Karimnagar',
-                          'Khammam',
-                          'Kumuram Bheem Asifabad',
-                          'Mahabubabad',
-                          'Mahabubnagar',
-                          'Mancherial',
-                          'Medak',
-                          'Medchal-Malkajgiri',
-                          'Mulugu',
-                          'Nagarkurnool',
-                          'Nalgonda',
-                          'Narayanpet',
-                          'Nirmal',
-                          'Nizamabad',
-                          'Peddapalli',
-                          'Rajanna Sircilla',
-                          'Rangareddy',
-                          'Sangareddy',
-                          'Siddipet',
-                          'Suryapet',
-                          'Vikarabad',
-                          'Wanaparthy',
-                          'Warangal',
-                          'Yadadri Bhuvanagiri'
-                        ].map((ed) => (
-                          <button
-                            key={ed}
-                            onClick={() => {
-                              setSelectedEdition(ed);
-                              setShowEditionModal(false);
-                              setActivePageIdx(0);
-                              setIsClipping(false);
-                            }}
-                            className={`text-[11px] font-bold py-2 px-3 rounded-lg border text-left transition-all ${
-                              selectedEdition === ed 
-                                ? 'border-[#cc0000] bg-red-50/50 text-[#cc0000]' 
-                                : 'border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50'
-                            }`}
-                          >
-                            {ed}
-                          </button>
-                        ))}
-                      </div>
+                  {/* Category: Telangana */}
+                  <div className="border border-gray-200 rounded-2xl overflow-hidden animate-fade-in">
+                    <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-b border-gray-200 select-none">
+                      <span className="font-extrabold text-xs text-gray-700 uppercase tracking-wider">Telangana Editions</span>
+                      <span className="text-[10px] text-gray-400 font-bold">33 Districts</span>
                     </div>
-                  ) : (
-                    /* Category: Andhra Pradesh */
-                    <div className="border border-gray-200 rounded-2xl overflow-hidden animate-fade-in">
-                      <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-b border-gray-200 select-none">
-                        <span className="font-extrabold text-xs text-gray-700 uppercase tracking-wider">Andhra Pradesh Editions</span>
-                        <span className="text-[10px] text-gray-400 font-bold">26 Districts</span>
-                      </div>
-                      <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white">
-                        {[
-                          'Alluri Sitharama Raju',
-                          'Anakapalli',
-                          'Ananthapuramu',
-                          'Annamayya',
-                          'Bapatla',
-                          'Chittoor',
-                          'Dr. B.R. Ambedkar Konaseema',
-                          'East Godavari',
-                          'Eluru',
-                          'Guntur',
-                          'Kakinada',
-                          'Krishna',
-                          'Kurnool',
-                          'Nandyal',
-                          'NTR',
-                          'Palnadu',
-                          'Parvathipuram Manyam',
-                          'Prakasam',
-                          'Rajamahendravaram',
-                          'Sri Potti Sriramulu Nellore',
-                          'Sri Sathya Sai',
-                          'Srikakulam',
-                          'Tirupati',
-                          'Vijayawada',
-                          'Visakhapatnam',
-                          'Vizianagaram',
-                          'West Godavari',
-                          'YSR Kadapa'
-                        ].map((ed) => (
-                          <button
-                            key={ed}
-                            onClick={() => {
-                              setSelectedEdition(ed);
-                              setShowEditionModal(false);
-                              setActivePageIdx(0);
-                              setIsClipping(false);
-                            }}
-                            className={`text-[11px] font-bold py-2 px-3 rounded-lg border text-left transition-all ${
-                              selectedEdition === ed 
-                                ? 'border-[#cc0000] bg-red-50/50 text-[#cc0000]' 
-                                : 'border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50'
-                            }`}
-                          >
-                            {ed}
-                          </button>
-                        ))}
-                      </div>
+                    <div className="p-3 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white">
+                      {[
+                        'Adilabad',
+                        'Bhadradri Kothagudem',
+                        'Hanamkonda',
+                        'Hyderabad',
+                        'Jagtial',
+                        'Jangaon',
+                        'Jayashankar Bhupalpally',
+                        'Jogulamba Gadwal',
+                        'Kamareddy',
+                        'Karimnagar',
+                        'Khammam',
+                        'Kumuram Bheem Asifabad',
+                        'Mahabubabad',
+                        'Mahabubnagar',
+                        'Mancherial',
+                        'Medak',
+                        'Medchal-Malkajgiri',
+                        'Mulugu',
+                        'Nagarkurnool',
+                        'Nalgonda',
+                        'Narayanpet',
+                        'Nirmal',
+                        'Nizamabad',
+                        'Peddapalli',
+                        'Rajanna Sircilla',
+                        'Rangareddy',
+                        'Sangareddy',
+                        'Siddipet',
+                        'Suryapet',
+                        'Vikarabad',
+                        'Wanaparthy',
+                        'Warangal',
+                        'Yadadri Bhuvanagiri'
+                      ].map((ed) => (
+                        <button
+                          key={ed}
+                          onClick={() => {
+                            setSelectedEdition(ed);
+                            setShowEditionModal(false);
+                            setActivePageIdx(0);
+                            setIsClipping(false);
+                          }}
+                          className={`text-[11px] font-bold py-2 px-3 rounded-lg border text-left transition-all ${
+                            selectedEdition === ed 
+                              ? 'border-[#02599c] bg-blue-50/50 text-[#02599c]' 
+                              : 'border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {ed}
+                        </button>
+                      ))}
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
+            </div>
+          )}
+          {/* Floating Zoom Panel for Reader View */}
+          {viewMode === 'reader' && (
+            <div className="hidden md:flex fixed bottom-16 right-4 z-40 flex-col gap-2 pointer-events-auto">
+              <button
+                onClick={() => setZoom(z => Math.min(250, z + 10))}
+                className="w-10 h-10 rounded-full bg-white text-gray-700 border border-gray-250 shadow-lg flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all cursor-pointer"
+                title="Zoom In"
+              >
+                <Plus size={18} className="stroke-[3] text-gray-500" />
+              </button>
+              <button
+                onClick={() => setZoom(z => Math.max(fitZoom, z - 10))}
+                className="w-10 h-10 rounded-full bg-white text-gray-700 border border-gray-250 shadow-lg flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all cursor-pointer"
+                title="Zoom Out"
+              >
+                <Minus size={18} className="stroke-[3] text-gray-500" />
+              </button>
+              <button
+                onClick={() => setZoom(fitZoom)}
+                className="w-10 h-10 rounded-full bg-[#02599c] text-white shadow-lg flex items-center justify-center hover:bg-[#013f70] active:scale-95 transition-all cursor-pointer text-[10px] font-black"
+                title="Reset Zoom to Fit Width"
+              >
+                FIT
+              </button>
             </div>
           )}
         </div>

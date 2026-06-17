@@ -189,7 +189,7 @@ export default async function CategoryPage({
 
   return (
     <div className="min-h-screen bg-[#f4f6f8] flex flex-col">
-      <Header />
+      {category !== 'epaper' && <Header />}
 
       {category === 'epaper' ? (
         <main className="flex-1 w-full">
@@ -218,7 +218,9 @@ export default async function CategoryPage({
       ) : category === 'photos' ? (
         <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full text-left">
           <BackButton />
-          <FlashNewsBar />
+          <div className="hidden md:block">
+            <FlashNewsBar />
+          </div>
           
           <div className="flex items-center gap-2 mb-6 border-b-2 border-[#64748b] pb-3">
             <h1
@@ -239,27 +241,31 @@ export default async function CategoryPage({
         <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
           <BackButton />
           {/* Flash News Strip */}
-          <FlashNewsBar />
+          <div className="hidden md:block">
+            <FlashNewsBar />
+          </div>
+
+
 
           {isDistrictsView ? (
             <>
               {/* Breadcrumb for districts view */}
-              <div className="flex items-center gap-2 text-[15.5px] text-gray-500 mb-5 border-b border-gray-100 pb-3 font-sans">
-                <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1 font-bold">
-                  <Home size={14} /> Home
+              <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 mb-5 border-b border-gray-100 pb-3 font-sans whitespace-nowrap overflow-hidden">
+                <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
+                  <Home size={11} className="md:hidden" /><Home size={14} className="hidden md:block" /> Home
                 </Link>
-                <ChevronRight size={14} />
-                <Link href={`/category/${category}`} className="hover:text-brand-blue transition-colors font-bold">
+                <ChevronRight size={10} className="md:hidden flex-shrink-0" /><ChevronRight size={14} className="hidden md:block flex-shrink-0" />
+                <Link href={`/category/${category}`} className="hover:text-brand-blue transition-colors font-bold flex-shrink-0">
                   {englishCategories[category] || category}
                 </Link>
-                <ChevronRight size={14} />
-                <span className="text-gray-800 font-bold">
+                <ChevronRight size={10} className="md:hidden flex-shrink-0" /><ChevronRight size={14} className="hidden md:block flex-shrink-0" />
+                <span className="text-gray-800 font-bold flex-shrink-0">
                   District News
                 </span>
                 {activeDistrictObj && (
                   <>
-                    <ChevronRight size={14} />
-                    <span className="text-brand-blue font-extrabold capitalize">
+                    <ChevronRight size={10} className="md:hidden flex-shrink-0" /><ChevronRight size={14} className="hidden md:block flex-shrink-0" />
+                    <span className="text-brand-blue font-extrabold capitalize truncate">
                       {activeDistrictObj.slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                     </span>
                   </>
@@ -269,16 +275,18 @@ export default async function CategoryPage({
               {/* District News Page Header Row */}
               <div className="flex items-center justify-between border-b-2 border-[#e60000] pb-3 mb-6">
                 <h1
-                  className="text-3xl md:text-4xl font-black text-[#e60000] telugu-text"
+                  className="text-xl md:text-4xl font-black text-[#e60000] telugu-text leading-snug"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్' : 'తెలంగాణ'} జిల్లా వార్తలు
                 </h1>
-                <DistrictSelector 
-                  category={category}
-                  districts={targetDistricts}
-                  activeDistrictSlug={districtSlug}
-                />
+                <div className="hidden md:block">
+                  <DistrictSelector 
+                    category={category}
+                    districts={targetDistricts}
+                    activeDistrictSlug={districtSlug}
+                  />
+                </div>
               </div>
 
               <AdBanner position="leaderboard" />
@@ -400,7 +408,7 @@ export default async function CategoryPage({
               {/* Rastra News Page Header */}
               <div className="mb-6 pb-3 border-b-2 border-[#e60000]">
                 <h1
-                  className="text-3xl md:text-4xl font-black text-[#e60000] telugu-text"
+                  className="text-xl md:text-4xl font-black text-[#e60000] telugu-text leading-snug"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్ వార్తలు' : category === 'telangana' ? 'తెలంగాణ వార్తలు' : `${cat?.name || category} వార్తలు`}
@@ -458,7 +466,7 @@ export default async function CategoryPage({
 
                           {/* Mobile-only inline ad after the 4th article */}
                           {index === 3 && (
-                            <div className="col-span-1 sm:col-span-2 lg:hidden my-4">
+                            <div className="col-span-1 sm:col-span-2 lg:hidden mt-2 mb-3">
                               <AdBanner position="gold-loan" />
                             </div>
                           )}
@@ -486,7 +494,7 @@ export default async function CategoryPage({
         </main>
       )}
 
-      <Footer />
+      {category !== 'epaper' && <Footer />}
     </div>
   );
 }

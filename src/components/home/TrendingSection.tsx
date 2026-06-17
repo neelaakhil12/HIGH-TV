@@ -30,7 +30,7 @@ export default function TrendingSection() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Large Featured Trending Card */}
         {trending[0] && (
-          <div className="news-card relative rounded-xl overflow-hidden shadow-lg lg:row-span-2" style={{ height: '360px' }}>
+          <div className="news-card relative rounded-xl overflow-hidden shadow-lg lg:row-span-2 h-[230px] md:h-[360px]">
             <div className="img-zoom-container absolute inset-0">
               <Image
                 src={trending[0].image}
@@ -42,16 +42,16 @@ export default function TrendingSection() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
             </div>
             {/* Trending badge */}
-            <div className="absolute top-3 left-3">
-              <span className="flex items-center gap-1 bg-orange-500 text-white font-black text-sm px-2.5 py-1 rounded-full">
-                <Flame size={12} /> 1 ట్రెండింగ్
+            <div className="absolute top-2.5 left-2.5 md:top-3 md:left-3">
+              <span className="flex items-center gap-1 bg-orange-500 text-white font-black text-xs md:text-sm px-2 py-0.5 md:px-2.5 md:py-1 rounded-full">
+                <Flame size={11} /> 1 ట్రెండింగ్
               </span>
             </div>
-            <div className="absolute inset-x-0 bottom-0 p-5">
+            <div className="absolute inset-x-0 bottom-0 p-4 md:p-5">
 
               <Link href={`/news/${trending[0].slug}`}>
                 <h3
-                  className="text-white text-lg font-black leading-tight hover:text-orange-200 transition-colors telugu-text"
+                  className="text-white text-[15px] md:text-lg font-black leading-tight hover:text-orange-200 transition-colors telugu-text"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {trending[0].title}

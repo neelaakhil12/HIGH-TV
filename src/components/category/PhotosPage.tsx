@@ -45,7 +45,7 @@ export default function PhotosPage() {
             {/* Caption below the card */}
             <div className="p-3 bg-gray-50/50">
               <p
-                className="text-[14px] font-bold text-gray-800 group-hover:text-brand-blue leading-snug truncate telugu-text text-center"
+                className="text-[14px] font-bold text-gray-800 group-hover:text-brand-blue leading-snug telugu-text text-center"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {img.alt}

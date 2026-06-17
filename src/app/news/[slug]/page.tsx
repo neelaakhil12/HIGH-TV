@@ -6,6 +6,7 @@ import BackButton from '@/components/layout/BackButton';
 import ShareButton from '@/components/layout/ShareButton';
 import Footer from '@/components/layout/Footer';
 import DistrictNewsTabs from '@/components/layout/DistrictNewsTabs';
+import AdBanner from '@/components/home/AdBanner';
 import {
   featuredNews,
   politicsNews,
@@ -175,12 +176,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                   <li key={item.id}>
                     <Link
                       href={`/news/${item.slug}`}
-                      className="flex items-start gap-2.5 px-3 py-3 hover:bg-blue-50/50 transition-colors group"
+                      className="flex items-start gap-3 px-3 py-3.5 hover:bg-blue-50/50 transition-colors group"
                     >
-                      <span className="text-[#025390] font-black text-base mt-0.5 flex-shrink-0">■</span>
+                      <span className="w-2 h-2 bg-[#025390] mt-1.5 flex-shrink-0 rounded-[1px]"></span>
                       <p
-                        className="flex-1 min-w-0 text-[15.5px] font-semibold text-gray-700 group-hover:text-[#025390] leading-snug line-clamp-2 telugu-text"
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        className="flex-1 min-w-0 text-[15.5px] font-semibold text-gray-700 group-hover:text-[#025390] line-clamp-2 telugu-text"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.6' }}
                       >
                         {item.title}
                       </p>
@@ -217,8 +218,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
               {/* Headline */}
               <h1
-                className="font-black text-[#cc0000] leading-tight mb-3 telugu-text"
-                style={{ fontFamily: 'Noto Sans Telugu, sans-serif', fontSize: '33px' }}
+                className="font-black text-[#cc0000] leading-tight mb-3 telugu-text text-[19px] md:text-[28px]"
+                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {article.title}
               </h1>
@@ -244,8 +245,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
               {/* Description pull-quote (Summary) */}
               <p
-                className="leading-relaxed mb-4 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r telugu-text text-gray-700"
-                style={{ fontFamily: 'Noto Sans Telugu, sans-serif', fontSize: '19px' }}
+                className="leading-relaxed mb-4 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r telugu-text text-gray-700 text-[15px] md:text-[19px]"
+                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {article.description}
               </p>
@@ -263,7 +264,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </div>
 
               {/* Article Body */}
-              <div className="telugu-text space-y-4 text-gray-800 leading-loose" style={{ fontFamily: 'Noto Sans Telugu, sans-serif', fontSize: '18px' }}>
+              <div className="telugu-text space-y-4 text-gray-800 leading-loose text-[15px] md:text-[18px]" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                 <p>{article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. హై టీవీ డెస్క్ నుండి తాజా సమాచారం ఇక్కడ లభిస్తుంది.</p>
                 <p>అధికారులు తెలిపిన వివరాల ప్రకారం, ఈ నిర్ణయం రాష్ట్ర ప్రజలకు అత్యంత ప్రయోజనకరంగా ఉంటుందని భావిస్తున్నారు. ఈ పరిణామాలు భవిష్యత్తులో మరింత సానుకూలమైన ఫలితాలను ఇస్తాయని నిపుణులు అభిప్రాయపడుతున్నారు.</p>
 
@@ -280,8 +281,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
                 {/* ఈ వార్తా చదవండి promo 1 — after 2 paragraphs */}
                 {trendingNews[0] && (
-                  <div className="flex items-start gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4" style={{ fontSize: '18px' }}>
-                    <span className="text-[#e60000] font-black flex-shrink-0 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4 text-[14px] md:text-[18px]">
+                    <span className="text-[#e60000] font-black flex-shrink-0 telugu-text font-bold" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       ఈ వార్తా చదవండి:
                     </span>
                     <Link href={`/news/${trendingNews[0].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
@@ -295,8 +296,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
                 {/* ఈ వార్తా చదవండి promo 2 — after 4 paragraphs */}
                 {trendingNews[1] && (
-                  <div className="flex items-start gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4" style={{ fontSize: '18px' }}>
-                    <span className="text-[#e60000] font-black flex-shrink-0 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4 text-[14px] md:text-[18px]">
+                    <span className="text-[#e60000] font-black flex-shrink-0 telugu-text font-bold" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       ఈ వార్తా చదవండి:
                     </span>
                     <Link href={`/news/${trendingNews[1].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
@@ -316,10 +317,53 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                     <a href="#" className="mt-2 bg-yellow-350 text-[#1a237e] rounded-full px-3 py-1 text-[10px] font-black hover:bg-yellow-300 transition-colors">Enroll Now</a>
                   </div>
                 </div>
+
+                {/* Read latest & Follow us strip */}
+                <div className="hidden lg:block border-t border-gray-100 pt-5 mt-6 space-y-2.5 text-gray-800 font-sans text-[15px] select-none leading-normal">
+                  <div className="flex items-start gap-2.5">
+                    <span className="flex-shrink-0 bg-[#e60000] text-white rounded-[3px] w-4.5 h-4.5 flex items-center justify-center mt-1 select-none">
+                      <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </span>
+                    <span>
+                      Read latest{' '}
+                      <Link href="/category/national" className="text-[#e60000] font-bold hover:underline">
+                        India News
+                      </Link>{' '}
+                      and{' '}
+                      <Link href="/" className="text-[#e60000] font-bold hover:underline">
+                        Telugu News
+                      </Link>
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="flex-shrink-0 bg-[#e60000] text-white rounded-[3px] w-4.5 h-4.5 flex items-center justify-center mt-1 select-none">
+                      <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </span>
+                    <span>
+                      Follow us on{' '}
+                      <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-[#e60000] font-bold hover:underline">
+                        Facebook
+                      </a>
+                      ,{' '}
+                      <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-[#e60000] font-bold hover:underline">
+                        Twitter
+                      </a>{' '}
+                      &{' '}
+                      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-[#e60000] font-bold hover:underline">
+                        Instagram
+                      </a>
+                      .
+                    </span>
+                  </div>
+                </div>
               </div>
 
               {/* Tags */}
-              <div className="mt-5 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
+              <div className="hidden lg:flex mt-5 pt-4 border-t border-gray-100 flex-wrap gap-2">
                 {article.tags.map((tag) => (
                   <Link
                     key={tag}
@@ -332,14 +376,129 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 ))}
               </div>
 
-              {/* Like / Share bar */}
-              <div className="mt-4 p-3 bg-gray-50 rounded-lg flex items-center justify-between border border-gray-100">
-                <button className="flex items-center gap-2 text-gray-600 hover:text-[#025390] transition-colors font-semibold text-[15.5px] cursor-pointer">
-                  <ThumbsUp size={16} />
-                  <span className="telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>లైక్ చేయండి</span>
-                </button>
-                <ShareButton title={article.title} />
+              {/* Mobile-only Trending & Latest News with Dummy Ads */}
+              <div className="lg:hidden mt-8 pt-6 border-t border-gray-200 flex flex-col gap-6">
+                
+                {/* Trending News */}
+                <div className="bg-white border border-gray-200 rounded overflow-hidden">
+                  <div className="flex items-center gap-2 bg-[#025390] text-white px-3 py-2.5">
+                    <TrendingUp size={14} />
+                    <span className="font-black text-base telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      ట్రెండింగ్ వార్తలు
+                    </span>
+                  </div>
+                  <ul className="divide-y divide-gray-100">
+                    {trendingNews.map((item, idx) => (
+                      <li key={item.id}>
+                        <Link
+                          href={`/news/${item.slug}`}
+                          className="flex items-start gap-3 px-3 py-3.5 hover:bg-blue-50/50 transition-colors group"
+                        >
+                          <span className="w-2 h-2 bg-[#025390] mt-1.5 flex-shrink-0 rounded-[1px]"></span>
+                          <p
+                            className="flex-1 min-w-0 text-[15.5px] font-semibold text-gray-700 group-hover:text-[#025390] line-clamp-2 telugu-text"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.6' }}
+                          >
+                            {item.title}
+                          </p>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Dummy Ad Box 1 */}
+                <AdBanner position="dummy" />
+
+                {/* Dummy Ad Box 2 */}
+                <AdBanner position="dummy" />
+
+                {/* Latest News */}
+                <div className="bg-white border border-gray-200 rounded overflow-hidden">
+                  <div className="bg-[#e60000] text-white px-3 py-2.5">
+                    <span className="font-black text-base telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      తాజా వార్తలు
+                    </span>
+                  </div>
+                  <ul className="divide-y divide-gray-100">
+                    {latestNews.map((item) => (
+                      <li key={item.id}>
+                        <Link
+                          href={`/news/${item.slug}`}
+                          className="flex items-start gap-3 px-3 py-3.5 hover:bg-red-50/50 transition-colors group"
+                        >
+                          <span className="w-2 h-2 bg-[#e60000] mt-1.5 flex-shrink-0 rounded-[1px]"></span>
+                          <p
+                            className="flex-1 min-w-0 text-[15.5px] font-semibold text-gray-700 group-hover:text-[#e60000] line-clamp-2 telugu-text"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.6' }}
+                          >
+                            {item.title}
+                          </p>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Read latest & Follow us strip (Mobile duplicate at the end) */}
+                <div className="border-t border-gray-200 pt-5 mt-6 space-y-2.5 text-gray-800 font-sans text-[15px] select-none leading-normal">
+                  <div className="flex items-start gap-2.5">
+                    <span className="flex-shrink-0 bg-[#e60000] text-white rounded-[3px] w-4.5 h-4.5 flex items-center justify-center mt-1 select-none">
+                      <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </span>
+                    <span>
+                      Read latest{' '}
+                      <Link href="/category/national" className="text-[#e60000] font-bold hover:underline">
+                        India News
+                      </Link>{' '}
+                      and{' '}
+                      <Link href="/" className="text-[#e60000] font-bold hover:underline">
+                        Telugu News
+                      </Link>
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="flex-shrink-0 bg-[#e60000] text-white rounded-[3px] w-4.5 h-4.5 flex items-center justify-center mt-1 select-none">
+                      <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </span>
+                    <span>
+                      Follow us on{' '}
+                      <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-[#e60000] font-bold hover:underline">
+                        Facebook
+                      </a>
+                      ,{' '}
+                      <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-[#e60000] font-bold hover:underline">
+                        Twitter
+                      </a>{' '}
+                      &{' '}
+                      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-[#e60000] font-bold hover:underline">
+                        Instagram
+                      </a>
+                      .
+                    </span>
+                  </div>
+                </div>
+
+                {/* Tags (Mobile duplicate at the end) */}
+                <div className="mt-5 pt-4 border-t border-gray-200 flex flex-wrap gap-2">
+                  {article.tags.map((tag) => (
+                    <Link
+                      key={tag}
+                      href={`/search?q=${tag}`}
+                      className="text-sm bg-gray-100 hover:bg-[#025390] hover:text-white text-gray-600 px-3 py-1 rounded-full transition-colors font-medium telugu-text"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    >
+                      {tag}
+                    </Link>
+                  ))}
+                </div>
+
               </div>
+
             </div>
           </article>
 
@@ -370,12 +529,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                   <li key={item.id}>
                     <Link
                       href={`/news/${item.slug}`}
-                      className="flex items-start gap-2 px-3 py-3 hover:bg-red-50/50 transition-colors group"
+                      className="flex items-start gap-3 px-3 py-3.5 hover:bg-red-50/50 transition-colors group"
                     >
-                      <span className="text-[#e60000] font-black text-base mt-0.5 flex-shrink-0">■</span>
+                      <span className="w-2 h-2 bg-[#e60000] mt-1.5 flex-shrink-0 rounded-[1px]"></span>
                       <p
-                        className="flex-1 min-w-0 text-[15.5px] font-semibold text-gray-700 group-hover:text-[#e60000] leading-snug line-clamp-2 telugu-text"
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        className="flex-1 min-w-0 text-[15.5px] font-semibold text-gray-700 group-hover:text-[#e60000] line-clamp-2 telugu-text"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.6' }}
                       >
                         {item.title}
                       </p>

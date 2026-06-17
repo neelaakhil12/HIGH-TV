@@ -30,12 +30,12 @@ export default function PhotoGallery() {
         </Link>
       </div>
 
-      {/* Uniform Grid */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* Uniform Grid / Horizontal Scroll */}
+      <div className="flex md:grid md:grid-cols-3 overflow-x-auto md:overflow-x-visible gap-4 pb-2.5 md:pb-0 snap-x snap-mandatory scroll-smooth hide-scrollbar">
         {galleryImages.slice(0, 3).map((img, index) => (
           <div
             key={img.id}
-            className="relative h-48 rounded-xl overflow-hidden group cursor-pointer img-zoom-container shadow-sm border border-gray-100"
+            className="flex-shrink-0 w-[140px] aspect-[9/16] md:w-auto md:aspect-auto md:h-48 rounded-xl overflow-hidden group cursor-pointer img-zoom-container shadow-sm border border-gray-100 snap-start relative"
             onClick={() => setLightbox(index)}
           >
             <Image
@@ -49,7 +49,7 @@ export default function PhotoGallery() {
               <ZoomIn size={28} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-              <p className="text-white text-sm font-medium truncate telugu-text">{img.alt}</p>
+              <p className="text-white text-sm font-medium telugu-text">{img.alt}</p>
             </div>
           </div>
         ))}
