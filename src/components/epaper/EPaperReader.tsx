@@ -1680,9 +1680,9 @@ export default function EPaperReader() {
                 )}
 
                 {/* Page View Frame Wrapper and Mobile Ads */}
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-col items-center gap-2 w-full">
                   {isMobile && (
-                    <div className="w-full flex justify-center mb-1" style={{ maxWidth: `${paperWidth}px` }}>
+                    <div className="w-full flex justify-center mb-1 px-4">
                       <AdBanner position="leaderboard" />
                     </div>
                   )}
@@ -1946,7 +1946,7 @@ export default function EPaperReader() {
               </div>
 
               {isMobile && (
-                <div className="w-full flex justify-center mt-1" style={{ maxWidth: `${paperWidth}px` }}>
+                <div className="w-full flex justify-center mt-1 px-4">
                   <AdBanner position="rectangle" />
                 </div>
               )}

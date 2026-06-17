@@ -362,7 +362,7 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
     return (
       <div className="w-full flex flex-col items-center mt-1 mb-3 md:my-3 select-none">
         <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 font-sans md:hidden">ADVERTISEMENT</span>
-        <div className="w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 h-auto min-h-[85px] py-2 bg-[#111113] border-y border-neutral-850 md:border md:rounded-lg flex items-center justify-between px-3 md:px-4 relative overflow-hidden group shadow-sm">
+        <div className="w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 h-auto min-h-[85px] py-2 bg-[#111113] border-y border-neutral-850 md:border md:rounded-lg flex items-center justify-between px-2 sm:px-3 md:px-4 relative overflow-hidden group shadow-sm">
           {/* Adchoices icon */}
           <div className="absolute top-1 right-1 opacity-20 hover:opacity-100 transition-opacity z-10">
             <svg className="w-2.5 h-2.5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
@@ -400,10 +400,10 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
           </div>
 
           {/* Right part: MSN Logo / Phone / SFT */}
-          <div className="flex items-center gap-2.5 md:gap-3 flex-shrink-0 border-l border-neutral-800/60 pl-2 md:pl-3 h-[45px] md:h-[60px] text-right">
+          <div className="flex items-center gap-1.5 md:gap-3 flex-shrink min-w-0 border-l border-neutral-800/60 pl-1.5 md:pl-3 h-[45px] md:h-[60px] text-right">
             <div className="flex flex-col justify-center leading-tight">
-              <span className="text-[8.5px] md:text-[10px] text-neutral-300 font-bold font-sans">5250 - 7460 SFT</span>
-              <span className="text-[8px] md:text-[9.5px] text-amber-400 font-bold font-sans mt-0.5">📞 91426 45645</span>
+              <span className="hidden min-[360px]:block text-[8.5px] md:text-[10px] text-neutral-300 font-bold font-sans">5250 - 7460 SFT</span>
+              <span className="text-[8px] md:text-[9.5px] text-amber-400 font-bold font-sans mt-0.5 whitespace-nowrap">📞 91426 45645</span>
             </div>
             <div className="hidden min-[380px]:flex flex-col justify-center leading-none text-left border-l border-neutral-800/60 pl-2">
               <span className="text-[10px] md:text-[11px] text-amber-500 font-extrabold font-sans">MSN</span>
@@ -484,7 +484,7 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
     return (
       <div className="w-full flex flex-col items-center my-3 select-none">
         <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 font-sans md:hidden">ADVERTISEMENT</span>
-        <div className="w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 h-auto min-h-[120px] py-4 bg-gradient-to-r from-[#4c0519] to-[#881337] border-y border-rose-900 md:border md:rounded-lg flex items-center justify-between p-4 relative overflow-hidden text-left shadow-sm group hover:border-rose-800 transition-colors">
+        <div className="w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 h-auto min-h-[120px] py-4 bg-gradient-to-r from-[#4c0519] to-[#881337] border-y border-rose-900 md:border md:rounded-lg flex items-center justify-between p-3 md:p-4 relative overflow-hidden text-left shadow-sm group hover:border-rose-800 transition-colors">
           {/* Ad label */}
           <div className="absolute top-1.5 left-2 bg-black/40 text-rose-300 text-[6.5px] font-black px-1 py-0.5 rounded leading-none">
             SPONSORED
