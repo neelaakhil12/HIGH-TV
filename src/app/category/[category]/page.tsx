@@ -476,9 +476,9 @@ export default async function CategoryPage({
                   </div>
 
                   {/* Load More */}
-                  <div className="text-center mt-8">
+                  <div className="text-center mt-6">
                     <button
-                      className="bg-brand-blue text-white font-bold px-8 py-3 rounded-lg hover:bg-brand-dark-blue transition-colors telugu-text cursor-pointer"
+                      className="bg-brand-blue text-white font-bold px-4 py-1.5 text-xs sm:px-8 sm:py-3 sm:text-base rounded-lg hover:bg-brand-dark-blue transition-colors telugu-text cursor-pointer"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                     >
                       మరిన్ని వార్తలు లోడ్ చేయండి
