@@ -35,7 +35,7 @@ export default function HeroSlider() {
   return (
     <div className="bg-white md:rounded-lg md:border md:border-gray-200 overflow-hidden flex flex-col md:shadow-xs w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 border-y border-gray-150 md:border-y-0">
       {/* Slider Image Container */}
-      <div className="relative w-full aspect-[3/2] md:aspect-[16/9] bg-neutral-950 overflow-hidden group">
+      <div className="relative w-full aspect-[16/9] bg-neutral-950 overflow-hidden group">
         <Link href={`/news/${slide.slug}`} className="absolute inset-0 block cursor-pointer">
           {/* Blurred background image */}
           <div className="absolute inset-0 opacity-45 blur-lg scale-105 pointer-events-none">
