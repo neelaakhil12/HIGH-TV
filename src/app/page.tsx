@@ -91,7 +91,7 @@ function SidebarLatestVideos() {
             {/* Bottom: Title */}
             <div className="py-1.5 px-1">
               <h4 
-                className="text-[13px] md:text-[15px] font-black text-gray-800 leading-relaxed group-hover:text-red-600 transition-colors telugu-text line-clamp-2"
+                className="text-[15px] md:text-[17px] font-black text-gray-800 leading-relaxed group-hover:text-red-600 transition-colors telugu-text line-clamp-2"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {vid.title}
