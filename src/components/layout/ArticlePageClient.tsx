@@ -342,7 +342,7 @@ export default function ArticlePageClient({
               </div>
 
               {/* Tags */}
-              <div className="flex mt-5 pt-4 border-t border-gray-100 flex-wrap gap-2">
+              <div className="flex mt-5 pt-4 border-t border-gray-100 flex-wrap gap-2 mb-2">
                 {article.tags.map((tag: string) => (
                   <Link
                     key={tag}
@@ -353,6 +353,44 @@ export default function ArticlePageClient({
                     {tag}
                   </Link>
                 ))}
+              </div>
+
+              {/* Bottom Section: మరిన్ని వార్తలు చదవండి (Read More News) */}
+              <div className="mt-8 pt-5 border-t border-gray-150 text-left">
+                <h2
+                  className="font-black text-[#cc0000] text-[18px] md:text-[22px] mb-3.5 telugu-text"
+                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                >
+                  మరిన్ని వార్తలు చదవండి
+                </h2>
+                {/* Bordered box containing other news items */}
+                <div className="border border-gray-250 rounded-xl p-4 bg-white shadow-xs">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+                    {otherNews.slice(0, 6).map((item) => (
+                      <Link
+                        key={item.id}
+                        href={`/news/${item.slug}`}
+                        className="flex gap-3 hover:bg-blue-50/30 p-1.5 rounded-lg transition-colors group"
+                      >
+                        <div className="w-[90px] h-[60px] flex-shrink-0 overflow-hidden rounded-md bg-gray-50 border border-gray-150 relative">
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1 flex flex-col justify-start pl-1">
+                          <p
+                            className="text-[13.5px] sm:text-[14px] md:text-[15px] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-snug telugu-text line-clamp-3"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          >
+                            {item.title}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </article>
@@ -536,36 +574,34 @@ export default function ArticlePageClient({
         </div>
       </div>
 
-      {/* Bottom Section: మరిన్ని (More News) */}
-      <div className="mt-4">
+      {/* Bottom Section: మరిన్ని వార్తలు చదవండి (Read More News) */}
+      <div className="mt-6 text-left">
         <h2
-          className="font-black text-[#cc0000] text-[20px] md:text-[24px] mb-3 telugu-text"
+          className="font-black text-[#cc0000] text-[20px] md:text-[24px] mb-3.5 telugu-text"
           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
         >
-          మరిన్ని
+          మరిన్ని వార్తలు చదవండి
         </h2>
 
         {/* Bordered box containing other news items */}
-        <div className="border border-gray-200 rounded p-4 bg-white shadow-sm">
+        <div className="border border-gray-250 rounded-xl p-4 bg-white shadow-xs">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
             {otherNews.map((item) => (
               <Link
                 key={item.id}
                 href={`/news/${item.slug}`}
-                className="flex gap-3.5 hover:bg-blue-50/30 p-1.5 rounded transition-colors group"
+                className="flex gap-3 hover:bg-blue-50/30 p-1.5 rounded-lg transition-colors group"
               >
-                <div className="w-[90px] h-[60px] flex-shrink-0 overflow-hidden rounded bg-gray-50 border border-gray-150 relative">
-                  <Image
+                <div className="w-[90px] h-[60px] flex-shrink-0 overflow-hidden rounded-md bg-gray-50 border border-gray-150 relative">
+                  <img
                     src={item.image}
                     alt={item.title}
-                    width={90}
-                    height={60}
                     className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
                   />
                 </div>
                 <div className="min-w-0 flex-1 flex flex-col justify-start pl-1">
                   <p
-                    className="text-[0.80rem] sm:text-[0.84rem] md:text-[0.88rem] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-snug telugu-text line-clamp-4"
+                    className="text-[13.5px] sm:text-[14px] md:text-[15px] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-snug telugu-text line-clamp-3"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {item.title}
