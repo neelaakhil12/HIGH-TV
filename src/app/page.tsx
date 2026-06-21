@@ -58,7 +58,7 @@ function SidebarLatestVideos() {
 
   return (
     <div className="bg-white rounded-lg border border-gray-100 p-3 md:p-4 shadow-xs mb-1 md:mb-4 select-none">
-      <h3 className="font-black text-[#fe0000] md:text-gray-900 text-[16px] md:text-[18px] mb-3 text-left tracking-tight telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+      <h3 className="font-black text-[#fe0000] md:text-gray-900 text-[16px] md:text-[18px] mb-3 text-left pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
         హై టీవీ వీడియోలు
       </h3>
       
@@ -89,9 +89,9 @@ function SidebarLatestVideos() {
             </div>
             
             {/* Bottom: Title */}
-            <div className="py-0.5">
+            <div className="py-1.5 px-1">
               <h4 
-                className="text-[13px] md:text-[15px] font-black text-gray-800 leading-snug group-hover:text-red-600 transition-colors telugu-text line-clamp-2"
+                className="text-[13px] md:text-[15px] font-black text-gray-800 leading-relaxed group-hover:text-red-600 transition-colors telugu-text line-clamp-2"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {vid.title}
@@ -110,7 +110,7 @@ function SidebarLatestVideos() {
           <img
             src="/epaper-logo.png"
             alt="ఈ-పేపర్ లోగో"
-            className="h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-105 rounded"
+            className="h-14 w-auto object-contain transition-transform duration-200 group-hover:scale-102 rounded"
           />
           <span className="text-[13px] font-black text-gray-800 group-hover:text-red-600 font-sans tracking-widest uppercase mt-1.5 transition-colors">
             E-PAPER
@@ -152,7 +152,7 @@ function SidebarLatestVideos() {
   );
 }
 
-// Local helper component for Latest News (తాజా వార్తలు) Widget
+// Local helper component for Latest News (బ్రేకింగ్ న్యూస్) Widget
 function LatestNewsFeed() {
   const latestArticles = [...politicsNews, ...sportsNews, ...businessNews, ...technologyNews]
     .slice(0, 12);
@@ -166,7 +166,7 @@ function LatestNewsFeed() {
             className="bg-white px-3 text-[#fe0000] font-black text-base z-10 relative telugu-text" 
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
-            తాజా వార్తలు
+            బ్రేకింగ్ న్యూస్
           </span>
           <div className="absolute inset-y-1/2 left-0 right-0 border-t border-[#fe0000]/20 -z-0"></div>
         </div>
@@ -220,7 +220,7 @@ export default function HomePage() {
           <div className="w-full lg:col-span-7">
 
             {/* Mobile Leaderboard Ad (between Flash News and HeroSlider) */}
-            <div className="block md:hidden">
+            <div className="block md:hidden mb-1">
               <AdBanner position="leaderboard" />
             </div>
 
@@ -275,9 +275,9 @@ export default function HomePage() {
                           className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-200"
                         />
                       </div>
-                      <div className="flex-1 min-w-0 py-0.5">
+                      <div className="flex-1 min-w-0 py-1 px-1">
                         <h4
-                          className="text-[16.5px] font-black text-gray-700 leading-snug line-clamp-3 group-hover:text-[#02599c] transition-colors telugu-text"
+                          className="text-[16.5px] font-black text-gray-700 leading-relaxed line-clamp-3 group-hover:text-[#02599c] transition-colors telugu-text"
                           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                         >
                           {article.title}
@@ -294,10 +294,11 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Mobile Ads Block 1 */}
-            <div className="lg:hidden flex justify-center gap-2.5 mt-1.5 mb-4">
-              <AdBanner position="sidebar" />
-              <AdBanner position="astrology" />
+            {/* Mobile Ads Block 1 — single full-width ad */}
+            <div className="lg:hidden flex justify-center mt-1.5 mb-4">
+              <div className="w-full">
+                <AdBanner position="sidebar" />
+              </div>
             </div>
 
             {/* Breaking News */}
@@ -321,10 +322,9 @@ export default function HomePage() {
               businessNews={businessFeed}
             />
 
-            {/* Mobile Ad Block 2 */}
-            <div className="lg:hidden flex justify-center gap-2.5 mt-2 mb-3.5">
+            {/* Mobile Ad Block 2 — single full-width square */}
+            <div className="lg:hidden mt-2 mb-3.5">
               <AdBanner position="gold-loan" />
-              <AdBanner position="coaching" />
             </div>
 
             <WeatherWidget />
@@ -336,30 +336,31 @@ export default function HomePage() {
               <AdBanner position="lalitha-jewellery" />
             </div>
 
-            <NewsSection title="Politics" titleTelugu="రాజకీయాలు" articles={politicsNews} viewAllLink="/category/politics" accentColor="#02599c" layout="featured-left" />
+            <NewsSection title="పాలిటిక్స్" titleTelugu="పాలిటిక్స్" articles={politicsNews} viewAllLink="/category/politics" accentColor="#02599c" layout="featured-left" />
 
             {/* Mobile-only Ad (JioFiber) */}
             <div className="lg:hidden">
               <AdBanner position="jiofiber" />
             </div>
-            <NewsSection title="Entertainment" titleTelugu="సినిమా" articles={entertainmentNews} viewAllLink="/category/entertainment" accentColor="#db2777" layout="featured-left" />
+            <NewsSection title="Entertainment" titleTelugu="ఫిల్మ్" articles={entertainmentNews} viewAllLink="/category/entertainment" accentColor="#db2777" layout="featured-left" />
 
             {/* Mobile-only Ad (Ramraj Cottons) */}
             <div className="lg:hidden">
               <AdBanner position="ramraj" />
             </div>
-            <NewsSection title="Sports" titleTelugu="క్రీడలు" articles={sportsNews} viewAllLink="/category/sports" accentColor="#ea580c" layout="featured-left" />
+            <NewsSection title="Sports" titleTelugu="స్పోర్ట్స్" articles={sportsNews} viewAllLink="/category/sports" accentColor="#ea580c" layout="featured-left" />
 
 
-            {/* Mobile-only 2 Ads in a row */}
-            <div className="lg:hidden flex justify-center gap-2.5 mt-2 mb-3.5">
-              <AdBanner position="sidebar" />
-              <AdBanner position="astrology" />
+            {/* Mobile-only single full-width Ad */}
+            <div className="lg:hidden flex justify-center mt-2 mb-3.5">
+              <div className="w-full">
+                <AdBanner position="sidebar" />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
               <div>
-                <NewsSection title="Business" titleTelugu="వ్యాపారం" articles={businessNews} viewAllLink="/category/business" accentColor="#15803d" layout="list" />
+                <NewsSection title="Business" titleTelugu="బిజినెస్" articles={businessNews} viewAllLink="/category/business" accentColor="#15803d" layout="list" />
                 {/* Mobile-only Ad (SBI Home Loans) */}
                 <div className="lg:hidden">
                   <AdBanner position="sbi" />
@@ -379,14 +380,13 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
               <div>
                 <NewsSection title="Viral" titleTelugu="వైరల్" articles={viralNews} viewAllLink="/category/viral" accentColor="#dc2626" layout="list" />
-                {/* Mobile-only Ads (HDFC Business Loans & iPhone 15 Pro) */}
+                {/* Mobile-only Ad (HDFC) */}
                 <div className="lg:hidden">
                   <AdBanner position="hdfc" />
-                  <AdBanner position="iphone" />
                 </div>
               </div>
               <div>
-                <NewsSection title="Health" titleTelugu="ఆరోగ్యం" articles={healthNews} viewAllLink="/category/health" accentColor="#0891b2" layout="list" />
+                <NewsSection title="Health" titleTelugu="హెల్త్" articles={healthNews} viewAllLink="/category/health" accentColor="#0891b2" layout="list" />
                 {/* Mobile-only Ad (PharmEasy) */}
                 <div className="lg:hidden">
                   <AdBanner position="pharmeasy" />
@@ -394,7 +394,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <NewsSection title="Horoscopes" titleTelugu="రాశిఫలాలు" articles={rasipalaluNews} viewAllLink="/category/rasipalalu" accentColor="#b45309" layout="grid3" />
+            <NewsSection title="Horoscopes" titleTelugu="శుభఫలాలు" articles={rasipalaluNews} viewAllLink="/category/rasipalalu" accentColor="#b45309" layout="grid3" />
             {/* Mobile-only Dummy Ad Box */}
             <div className="lg:hidden">
               <AdBanner position="dummy" />

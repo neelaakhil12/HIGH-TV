@@ -74,7 +74,7 @@ export function AstrologyAd() {
 // 3. Sidebar: Tanishq Jewellery Ad (Replaces Sathyabama Admissions Banner)
 export function SathyabamaAd() {
   return (
-    <div className="w-[170px] h-[135px] md:w-full md:h-auto bg-[#0f172a] border border-amber-500/20 rounded-none md:rounded-lg flex flex-col justify-between p-2 select-none overflow-hidden relative shadow-md mx-auto">
+    <div className="w-full md:w-full bg-[#0f172a] border border-amber-500/20 rounded-lg flex flex-col justify-between p-3 select-none overflow-hidden relative shadow-md mx-auto">
       
       {/* Tiny Google Adchoices icon */}
       <div className="absolute top-1 right-1 opacity-20 hover:opacity-100 transition-opacity z-10">
@@ -84,43 +84,43 @@ export function SathyabamaAd() {
       </div>
 
       {/* Header: Tanishq Logo */}
-      <div className="flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center gap-0.5">
-          <div className="w-3 h-3 rounded-full bg-amber-500 text-slate-955 text-[5.5px] font-black flex items-center justify-center border border-white">
+      <div className="flex items-center justify-between flex-shrink-0 mb-2">
+        <div className="flex items-center gap-1">
+          <div className="w-4 h-4 rounded-full bg-amber-500 text-slate-955 text-[7px] font-black flex items-center justify-center border border-white">
             T
           </div>
-          <span className="text-[6.5px] font-extrabold text-white tracking-widest font-sans">TANISHQ</span>
+          <span className="text-[9px] font-extrabold text-white tracking-widest font-sans">TANISHQ</span>
         </div>
-        <div className="hidden min-[380px]:block bg-[#b45309] text-white text-[3.5px] font-extrabold px-1 py-0.5 rounded leading-none uppercase font-sans">
+        <div className="bg-[#b45309] text-white text-[6px] font-extrabold px-1.5 py-0.5 rounded leading-none uppercase font-sans">
           TATA Enterprise
         </div>
       </div>
 
       {/* Headline & Body */}
-      <div className="text-left leading-none flex-shrink-0">
-        <h4 className="text-[9px] font-black text-amber-400 tracking-wide font-sans truncate">
+      <div className="text-left leading-none flex-shrink-0 mb-2">
+        <h4 className="text-[13px] font-black text-amber-400 tracking-wide font-sans">
           The Festival of Gold
         </h4>
-        <p className="text-[6.5px] text-gray-300 mt-0.5 font-sans leading-tight line-clamp-1">
+        <p className="text-[10px] text-gray-300 mt-0.5 font-sans leading-tight">
           Flat 20% OFF on Jewellery
         </p>
       </div>
 
       {/* Center Image: Jewellery Model */}
-      <div className="w-full h-[50px] md:h-[110px] rounded-none md:rounded-md overflow-hidden relative border border-slate-900 bg-slate-950 flex-shrink-0">
+      <div className="w-full h-[160px] md:h-[110px] rounded-md overflow-hidden relative border border-slate-900 bg-slate-950 flex-shrink-0">
         <img
           src="/tanishq-ad.png"
           alt="Tanishq Jewellery"
           className="w-full h-full object-cover opacity-90"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/60 to-transparent"></div>
-        <div className="absolute bottom-0.5 left-1">
-          <span className="text-[5px] text-white font-extrabold uppercase font-sans tracking-wide">Pure Gold</span>
+        <div className="absolute bottom-1 left-1.5">
+          <span className="text-[8px] text-white font-extrabold uppercase font-sans tracking-wide">Pure Gold</span>
         </div>
       </div>
 
       {/* Action Button */}
-      <div className="bg-[#b45309] hover:bg-[#9a4407] text-white text-[6.5px] font-black py-0.5 px-1.5 rounded-none md:rounded uppercase tracking-wider text-center leading-normal font-sans cursor-pointer transition-colors flex-shrink-0">
+      <div className="mt-2.5 bg-[#b45309] hover:bg-[#9a4407] text-white text-[11px] font-black py-1.5 px-3 rounded uppercase tracking-wider text-center leading-normal font-sans cursor-pointer transition-colors flex-shrink-0">
         Explore
       </div>
 
@@ -182,41 +182,38 @@ export function GoogleAdSkyscraperPlaceholder() {
 // 5. Sidebar: Manappuram Gold Loan Ad
 export function GoldLoanAd() {
   return (
-    <div className="w-[170px] h-[135px] md:w-full md:h-auto bg-gradient-to-b from-[#78350f] via-[#92400e] to-[#78350f] border border-amber-600/40 rounded-none md:rounded-lg flex flex-col justify-between md:justify-start gap-0 md:gap-3 p-2 md:p-4 select-none overflow-hidden relative shadow-md mx-auto">
+    <div className="w-full md:w-full bg-gradient-to-b from-[#78350f] via-[#92400e] to-[#78350f] border border-amber-600/40 rounded-lg flex flex-col justify-between gap-3 p-3 md:p-4 select-none overflow-hidden relative shadow-md mx-auto aspect-square md:aspect-auto">
       
-      {/* Top accent bar - only on desktop to save mobile vertical space */}
-      <div className="hidden md:block h-1 w-full bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300 absolute top-0 left-0" />
+      {/* Top accent bar */}
+      <div className="h-1 w-full bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300 absolute top-0 left-0" />
 
       {/* Adchoices */}
-      <div className="absolute top-1.5 right-1.5 md:top-2.5 md:right-2 opacity-25 hover:opacity-100 transition-opacity z-10">
-        <svg className="w-2 h-2 md:w-2.5 md:h-2.5 text-amber-200" viewBox="0 0 24 24" fill="currentColor">
+      <div className="absolute top-1.5 right-1.5 opacity-25 hover:opacity-100 transition-opacity z-10">
+        <svg className="w-2.5 h-2.5 text-amber-200" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
         </svg>
       </div>
 
       {/* Logo row */}
-      <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
-        <div className="w-4 h-4 md:w-7 md:h-7 rounded-full bg-amber-400 flex items-center justify-center shadow-sm border border-amber-300">
-          <svg className="w-2.5 h-2.5 md:w-4 md:h-4 text-amber-900" viewBox="0 0 24 24" fill="currentColor">
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center shadow-sm border border-amber-300">
+          <svg className="w-4 h-4 text-amber-900" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93C9.33 17.79 7 14.5 7 11V7.18L12 5z"/>
           </svg>
         </div>
         <div>
-          <span className="text-[6.5px] md:text-[10px] font-black text-amber-200 tracking-widest font-sans uppercase">Manappuram</span>
-          <div className="text-[5px] md:text-[7px] text-amber-300/80 font-bold font-sans tracking-wide uppercase leading-none">Gold Loan</div>
+          <span className="text-[11px] font-black text-amber-200 tracking-widest font-sans uppercase">Manappuram</span>
+          <div className="text-[8px] text-amber-300/80 font-bold font-sans tracking-wide uppercase leading-none">Gold Loan</div>
         </div>
-        <div className="ml-auto bg-amber-400/20 text-amber-200 text-[3.5px] md:text-[5.5px] font-black px-1 py-0.5 rounded border border-amber-400/30 leading-none uppercase">
+        <div className="ml-auto bg-amber-400/20 text-amber-200 text-[6px] font-black px-1.5 py-0.5 rounded border border-amber-400/30 leading-none uppercase">
           SPONSORED
         </div>
       </div>
 
       {/* Headline */}
       <div className="text-left leading-none flex-shrink-0">
-        <h4 className="text-[9.5px] md:text-[14px] font-black text-amber-300 leading-tight font-sans tracking-tight truncate">
-          బంగారు రుణం
-        </h4>
-        <p
-          className="text-[6.5px] md:text-[9px] text-amber-100/90 font-bold font-sans mt-0.5 leading-tight md:leading-relaxed telugu-text line-clamp-1 md:line-clamp-none"
+        <h4 className="text-[14px] font-black text-amber-300 leading-tight font-sans tracking-tight">బంగారు రుణం</h4>
+        <p className="text-[10px] text-amber-100/90 font-bold font-sans mt-0.5 leading-relaxed telugu-text"
           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
         >
           30 నిమిషాల్లో నగదు పొందండి — కనిష్ట వడ్డీ రేటుతో!
@@ -224,45 +221,22 @@ export function GoldLoanAd() {
       </div>
 
       {/* Image */}
-      <div className="w-full h-[50px] md:h-[100px] rounded-none md:rounded-md overflow-hidden relative border border-amber-800/60 bg-amber-950 flex-shrink-0">
-        <img
-          src="/manappuram-ad.png"
-          alt="Gold Jewellery"
-          className="w-full h-full object-cover opacity-85"
-        />
+      <div className="w-full flex-1 rounded-md overflow-hidden relative border border-amber-800/60 bg-amber-950">
+        <img src="/manappuram-ad.png" alt="Gold Jewellery" className="w-full h-full object-cover opacity-85" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#78350f]/70 to-transparent" />
-        <div className="absolute bottom-0.5 left-1">
-          <span className="text-[5px] md:text-[7px] text-amber-200 font-extrabold font-sans uppercase tracking-wider">916 Gold Accepted</span>
+        <div className="absolute bottom-1 left-1.5">
+          <span className="text-[8px] text-amber-200 font-extrabold font-sans uppercase tracking-wider">916 Gold Accepted</span>
         </div>
       </div>
 
-      {/* Stats row - hide on mobile to fit the exact size */}
-      <div className="hidden md:grid grid-cols-3 gap-1.5 text-center flex-shrink-0">
-        {[
-          { label: 'Rate', value: '0.79%' },
-          { label: 'Time', value: '30 Min' },
-          { label: 'LTV', value: 'Up to 75%' },
-        ].map((stat) => (
-          <div key={stat.label} className="bg-black/25 rounded px-1 py-1 md:py-1.5 border border-amber-700/30">
-            <div className="text-[8.5px] md:text-[9.5px] font-black text-amber-300 font-sans leading-none">{stat.value}</div>
-            <div className="text-[6px] md:text-[6.5px] text-amber-200/70 font-bold font-sans mt-0.5 uppercase tracking-wide">{stat.label}</div>
-          </div>
-        ))}
-      </div>
-
       {/* CTA */}
-      <button className="w-full bg-amber-400 hover:bg-amber-300 text-amber-950 font-black text-[6.5px] md:text-[9px] py-0.5 md:py-2 rounded-none md:rounded uppercase tracking-wider font-sans transition-colors shadow-md cursor-pointer flex-shrink-0 leading-normal">
-        <span className="md:hidden">Apply Now</span>
-        <span className="hidden md:inline">Apply Now — Free Doorstep Service</span>
+      <button className="w-full bg-amber-400 hover:bg-amber-300 text-amber-950 font-black text-[11px] py-2 rounded uppercase tracking-wider font-sans transition-colors shadow-md cursor-pointer flex-shrink-0">
+        Apply Now — Free Doorstep Service
       </button>
 
-      {/* Phone - hide on mobile to fit the exact size */}
-      <div className="hidden md:block text-center md:text-[7px] text-amber-300/70 font-bold font-sans flex-shrink-0">
+      <div className="text-center text-[8px] text-amber-300/70 font-bold font-sans">
         📞 1800-4250-5555 • Toll Free 24/7
       </div>
-
-      {/* Bottom accent bar - hide on mobile */}
-      <div className="hidden md:block h-0.5 w-full bg-gradient-to-r from-transparent via-amber-400/60 to-transparent absolute bottom-0 left-0" />
     </div>
   );
 }
@@ -270,33 +244,30 @@ export function GoldLoanAd() {
 // 6. Left Column Bottom: Sri Chaitanya Coaching Ad (tall banner)
 export function CoachingAd() {
   return (
-    <div className="w-[170px] h-[135px] md:w-full md:h-auto bg-gradient-to-br from-[#0c1445] via-[#1a237e] to-[#0c1445] border border-blue-800/40 rounded-none md:rounded-xl flex flex-col justify-between md:justify-start gap-0 md:gap-3 p-2 md:p-4 select-none overflow-hidden relative shadow-md mx-auto">
-      {/* Top accent - only on desktop to save mobile vertical space */}
-      <div className="hidden md:block h-1 w-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 absolute top-0 left-0" />
+    <div className="w-full md:w-full bg-gradient-to-br from-[#0c1445] via-[#1a237e] to-[#0c1445] border border-blue-800/40 rounded-lg flex flex-col justify-between gap-3 p-3 md:p-4 select-none overflow-hidden relative shadow-md mx-auto aspect-square md:aspect-auto">
+      {/* Top accent */}
+      <div className="h-1 w-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 absolute top-0 left-0" />
 
       {/* Sponsored badge */}
-      <div className="absolute top-1.5 left-2 bg-black/40 text-amber-300 text-[4px] md:text-[6px] font-black px-1.5 py-0.5 rounded leading-none uppercase z-10">
+      <div className="absolute top-2 left-3 bg-black/40 text-amber-300 text-[6px] font-black px-1.5 py-0.5 rounded leading-none uppercase z-10">
         SPONSORED
       </div>
 
       {/* Logo row */}
-      <div className="flex items-center gap-1 md:gap-2 flex-shrink-0 z-10">
-        <div className="w-4 h-4 md:w-8 md:h-8 rounded-full bg-amber-400 flex items-center justify-center text-[5.5px] md:text-[10px] font-black text-blue-950 border border-white/20 flex-shrink-0">
+      <div className="flex items-center gap-2 flex-shrink-0 z-10 mt-1">
+        <div className="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center text-[10px] font-black text-blue-950 border border-white/20 flex-shrink-0">
           SC
         </div>
         <div>
-          <div className="text-white font-black text-[6.5px] md:text-[13px] font-sans tracking-wide leading-none">Sri Chaitanya</div>
-          <div className="text-amber-300 font-bold text-[5px] md:text-[8px] font-sans tracking-widest uppercase leading-none mt-0.5">Institutions</div>
+          <div className="text-white font-black text-[13px] font-sans tracking-wide leading-none">Sri Chaitanya</div>
+          <div className="text-amber-300 font-bold text-[8px] font-sans tracking-widest uppercase leading-none mt-0.5">Institutions</div>
         </div>
       </div>
 
       {/* Headline */}
       <div className="text-left leading-none flex-shrink-0">
-        <h4 className="text-[9.5px] md:text-[15px] font-black text-amber-300 font-sans truncate">
-          IIT · NEET · JEE
-        </h4>
-        <p
-          className="text-[6.5px] md:text-[10px] text-blue-100 font-bold mt-0.5 leading-tight md:leading-relaxed telugu-text line-clamp-1 md:line-clamp-none"
+        <h4 className="text-[15px] font-black text-amber-300 font-sans">IIT · NEET · JEE</h4>
+        <p className="text-[10px] text-blue-100 font-bold mt-0.5 leading-relaxed telugu-text"
           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
         >
           టాప్ ర్యాంకుల కోసం శ్రీ చైతన్యలో చేరండి
@@ -304,51 +275,19 @@ export function CoachingAd() {
       </div>
 
       {/* Hero image */}
-      <div className="w-full h-[50px] md:h-[130px] rounded-none md:rounded-lg overflow-hidden relative border border-blue-950 bg-blue-950 flex-shrink-0">
-        <img
-          src="/chaitanya-ad.png"
-          alt="Sri Chaitanya Students"
-          className="w-full h-full object-cover opacity-60"
-        />
+      <div className="w-full flex-1 rounded-lg overflow-hidden relative border border-blue-950 bg-blue-950">
+        <img src="/chaitanya-ad.png" alt="Sri Chaitanya Students" className="w-full h-full object-cover opacity-60" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0c1445]/80 to-transparent" />
       </div>
 
-      {/* Stats - hide on mobile */}
-      <div className="hidden md:grid grid-cols-3 gap-2 flex-shrink-0">
-        {[
-          { val: '35+', label: 'Years' },
-          { val: '5L+', label: 'Alumni' },
-          { val: '98%', label: 'Success' },
-        ].map((s) => (
-          <div key={s.label} className="bg-white/10 rounded-lg py-2 text-center border border-white/10">
-            <div className="text-[12px] font-black text-amber-300 font-sans">{s.val}</div>
-            <div className="text-[7px] text-blue-200 font-bold font-sans uppercase tracking-wide mt-0.5">{s.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Courses - hide on mobile */}
-      <div className="hidden md:flex flex-wrap gap-1.5 flex-shrink-0">
-        {['IIT-JEE', 'NEET', 'EAMCET', 'Olympiad', 'Foundation'].map((c) => (
-          <span key={c} className="bg-blue-900/60 border border-blue-700/50 text-blue-100 text-[8px] font-bold px-2 py-0.5 rounded-full font-sans">
-            {c}
-          </span>
-        ))}
-      </div>
-
       {/* CTA */}
-      <button className="w-full bg-amber-400 hover:bg-amber-300 text-blue-950 font-black text-[6.5px] md:text-[10px] py-0.5 md:py-2.5 rounded-none md:rounded-lg uppercase tracking-wider font-sans transition-colors shadow cursor-pointer flex-shrink-0 leading-normal">
-        <span className="md:hidden">Enroll Now</span>
-        <span className="hidden md:inline">Enroll Now — Free Counselling</span>
+      <button className="w-full bg-amber-400 hover:bg-amber-300 text-blue-950 font-black text-[11px] py-2 rounded-lg uppercase tracking-wider font-sans transition-colors shadow cursor-pointer flex-shrink-0">
+        Enroll Now — Free Counselling
       </button>
 
-      {/* Phone - hide on mobile */}
-      <div className="hidden md:block text-center text-[7.5px] text-blue-300/80 font-bold font-sans flex-shrink-0">
+      <div className="text-center text-[8px] text-blue-300/80 font-bold font-sans">
         📞 1800-599-2233 • Hyderabad | Vijayawada | Warangal
       </div>
-
-      {/* Bottom border line - hide on mobile */}
-      <div className="hidden md:block h-0.5 w-full bg-gradient-to-r from-transparent via-amber-400/50 to-transparent absolute bottom-0 left-0" />
     </div>
   );
 }
@@ -360,7 +299,7 @@ interface AdBannerProps {
 export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
   if (position === 'leaderboard') {
     return (
-      <div className="w-full flex flex-col items-center mt-1 mb-3 md:my-3 select-none">
+      <div className="w-full flex flex-col items-center mt-1 mb-1 md:my-3 select-none">
         <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 font-sans md:hidden">ADVERTISEMENT</span>
         <div className="w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 h-auto min-h-[85px] py-2 bg-[#111113] border-y border-neutral-850 md:border md:rounded-lg flex items-center justify-between px-2 sm:px-3 md:px-4 relative overflow-hidden group shadow-sm">
           {/* Adchoices icon */}

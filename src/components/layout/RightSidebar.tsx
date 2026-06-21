@@ -30,7 +30,7 @@ export default function RightSidebar() {
       <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left">
         <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100">
           <div className="w-1.5 h-6 bg-[#e60000] rounded-full"></div>
-          <h3 className="font-black text-gray-900 text-[16px] md:text-[18px] telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+          <h3 className="font-black text-gray-900 text-[16px] md:text-[18px] pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
             ట్రెండింగ్ వార్తలు
           </h3>
         </div>
@@ -39,7 +39,7 @@ export default function RightSidebar() {
             <Link
               key={`${article.id}-${idx}`}
               href={`/news/${article.slug}`}
-              className="flex items-center gap-2.5 pb-2.5 last:pb-0 last:border-b-0 border-b border-gray-50 group cursor-pointer"
+              className="flex items-center gap-2.5 pb-2.5 last:pb-0 last:border-b-0 border-b border-gray-55 group cursor-pointer"
             >
               {/* Image thumbnail */}
               <div className="w-14 h-10 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
@@ -50,9 +50,9 @@ export default function RightSidebar() {
                 />
               </div>
               {/* Text */}
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 py-1 px-1">
                 <h4
-                  className="text-[16px] font-black text-gray-800 leading-snug group-hover:text-[#02599c] transition-colors telugu-text line-clamp-2"
+                  className="text-[1.05rem] font-black text-gray-800 leading-relaxed group-hover:text-[#02599c] transition-colors telugu-text line-clamp-2"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {article.title}
@@ -139,7 +139,7 @@ export default function RightSidebar() {
 
       {/* 9. Trending Tags Box */}
       <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left">
-        <h3 className="font-black text-gray-800 text-[15px] mb-3 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ట్రెండింగ్ ట్యాగ్స్</h3>
+        <h3 className="font-black text-gray-800 text-[15px] mb-3 pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ట్రెండింగ్ ట్యాగ్స్</h3>
         <div className="flex flex-wrap gap-2">
           {['రాజకీయాలు', 'ఆంధ్రప్రదేశ్', 'తెలంగాణ', 'క్రికెట్', 'సినిమా', 'AI', 'బడ్జెట్', 'వరదలు', 'IPL', 'మెట్రో', 'వ్యాపారం', 'ఆరోగ్యం'].map((tag) => (
             <Link key={tag} href={`/search?q=${tag}`} className="text-sm bg-gray-100 hover:bg-brand-blue hover:text-white text-gray-600 px-3 py-1.5 rounded-full transition-colors font-medium telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>

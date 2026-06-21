@@ -12,7 +12,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "హై టీవీ | తెలుగు వార్తలు - Breaking Telugu News",
-  description: "హై టీవీ - ఆంధ్రప్రదేశ్, తెలంగాణ, జాతీయ, అంతర్జాతీయ, రాజకీయాలు, సినిమా, క్రీడలు మరియు వ్యాపార వార్తలు. HIGH TV Express Telugu News Platform.",
+  description: "హై టీవీ - ఆంధ్రప్రదేశ్, తెలంగాణ, నేషనల్, ఇంటర్నేషనల్, రాజకీయాలు, ఫిల్మ్, స్పోర్ట్స్ మరియు వ్యాపార వార్తలు. HIGH TV Express Telugu News Platform.",
   keywords: "Telugu News, High TV, హై టీవీ, తెలుగు వార్తలు, Breaking News, AP News, Telangana News",
   openGraph: {
     title: "హై టీవీ | Express Telugu News Platform",

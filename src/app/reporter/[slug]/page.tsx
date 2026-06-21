@@ -75,20 +75,24 @@ export default async function ReporterPage({ params }: { params: Promise<{ slug:
       <Header />
 
       <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
-        <BackButton />
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-6 border-b border-gray-100 pb-3 flex-wrap font-sans">
-          <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1 font-bold">
-            <Home size={14} /> Home
-          </Link>
-          <ChevronRight size={14} />
-          <Link href="/team" className="hover:text-brand-blue transition-colors font-bold">
-            Our Team
-          </Link>
-          <ChevronRight size={14} />
-          <span className="text-gray-800 font-bold capitalize">
-            {slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-          </span>
+        {/* Breadcrumb & Back Button */}
+        <div className="flex items-center justify-between gap-4 mb-5 border-b border-gray-100 pb-3 overflow-hidden">
+          <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
+            <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
+              <Home size={14} className="flex-shrink-0" /> Home
+            </Link>
+            <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
+            <Link href="/team" className="hover:text-brand-blue transition-colors font-bold flex-shrink-0">
+              Our Team
+            </Link>
+            <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
+            <span className="text-gray-800 font-bold capitalize truncate flex-shrink-0">
+              {slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+            </span>
+          </div>
+          <div className="flex-shrink-0">
+            <BackButton />
+          </div>
         </div>
 
         {/* 2-column Grid */}

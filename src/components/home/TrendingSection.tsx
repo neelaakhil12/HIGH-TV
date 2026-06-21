@@ -15,7 +15,7 @@ export default function TrendingSection() {
           <div className="flex items-center gap-2">
             <Flame size={20} className="text-orange-500" />
             <h2
-              className="text-xl md:text-2xl font-black text-orange-500 telugu-text"
+              className="text-xl md:text-2xl font-black text-orange-500 pl-1 leading-normal telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               ట్రెండింగ్ వార్తలు
@@ -26,7 +26,7 @@ export default function TrendingSection() {
           అన్నీ చూడండి <ArrowRight size={14} />
         </Link>
       </div>
-
+ 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Large Featured Trending Card */}
         {trending[0] && (
@@ -48,20 +48,20 @@ export default function TrendingSection() {
               </span>
             </div>
             <div className="absolute inset-x-0 bottom-0 p-4 md:p-5">
-
+ 
               <Link href={`/news/${trending[0].slug}`}>
                 <h3
-                  className="text-white text-[15px] md:text-lg font-black leading-tight hover:text-orange-200 transition-colors telugu-text"
+                  className="text-white text-[1.08rem] md:text-[1.25rem] font-black leading-relaxed hover:text-orange-200 transition-colors telugu-text pl-1 pb-1"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {trending[0].title}
                 </h3>
               </Link>
-
+ 
             </div>
           </div>
         )}
-
+ 
         {/* Small trending cards */}
         <div className="space-y-3">
           {trending.slice(1, 5).map((article, index) => (
@@ -83,10 +83,10 @@ export default function TrendingSection() {
                 />
               </div>
               <div className="flex-1 min-w-0 relative z-10">
-
+ 
                 <Link href={`/news/${article.slug}`}>
                   <p
-                    className="text-[15px] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
+                    className="text-[1.02rem] md:text-[1.08rem] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-2 leading-relaxed telugu-text pl-1 pb-1"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {article.title}

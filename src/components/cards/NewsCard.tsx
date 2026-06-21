@@ -151,7 +151,7 @@ export default function NewsCard({ article, variant = 'default', className, imag
 
             <Link href={`/news/${article.slug}`}>
               <h3
-                className="text-[15.5px] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-3 leading-snug telugu-text px-1.5"
+                className="text-[0.92rem] md:text-[0.98rem] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-3 leading-relaxed telugu-text pl-2.5 pr-1 pb-1"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {article.title}
@@ -179,7 +179,7 @@ export default function NewsCard({ article, variant = 'default', className, imag
         <div className="flex-1">
           <Link href={`/news/${article.slug}`}>
             <p
-              className="text-[14px] font-semibold text-gray-800 group-hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text px-1.5"
+               className="text-[0.98rem] font-semibold text-gray-800 group-hover:text-brand-blue transition-colors line-clamp-2 leading-relaxed telugu-text pl-2.5 pr-1 pb-1"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.title}
@@ -208,14 +208,14 @@ export default function NewsCard({ article, variant = 'default', className, imag
 
             <Link href={`/news/${article.slug}`}>
               <h3
-                className="text-base md:text-lg lg:text-xl font-black text-gray-950 leading-snug hover:text-brand-blue transition-colors telugu-text"
+                className="text-[1.15rem] md:text-[1.28rem] lg:text-[1.4rem] font-black text-gray-955 leading-relaxed hover:text-brand-blue transition-colors telugu-text pl-2.5 pb-1"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {article.title}
               </h3>
             </Link>
             <p
-              className="text-sm md:text-[15px] text-gray-500 leading-relaxed mt-2 line-clamp-2 telugu-text px-1.5"
+              className="text-[1rem] md:text-[1.08rem] text-gray-500 leading-[1.85] pb-2 mt-2 line-clamp-2 telugu-text pl-2.5 pr-1"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.description}
@@ -257,26 +257,34 @@ export default function NewsCard({ article, variant = 'default', className, imag
 
         <Link href={`/news/${article.slug}`} className="flex-1">
           <h2
-            className="text-[15px] md:text-[17px] font-bold text-gray-800 hover:text-brand-blue transition-colors leading-snug line-clamp-2 mb-2 telugu-text px-1.5"
+            className={`${
+              article.categorySlug === 'rasipalalu'
+                ? 'text-[0.95rem] md:text-[1.05rem]'
+                : 'text-[1.08rem] md:text-[1.18rem]'
+            } font-bold text-gray-800 hover:text-brand-blue transition-colors leading-relaxed line-clamp-2 mb-2 telugu-text pl-2.5 pr-1 pb-1`}
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             {article.title}
           </h2>
-          <p
-            className="text-sm text-gray-500 leading-relaxed line-clamp-2 telugu-text px-1.5"
-            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-          >
-            {article.description}
-          </p>
+          {article.categorySlug !== 'rasipalalu' && (
+            <p
+              className="text-[0.98rem] md:text-[1.05rem] text-gray-500 leading-[1.85] pb-2 line-clamp-2 telugu-text pl-2.5 pr-1"
+              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+            >
+              {article.description}
+            </p>
+          )}
         </Link>
 
         {/* Meta */}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
-          <div className="flex items-center gap-3 text-[13px] text-gray-400">
+        {article.categorySlug !== 'rasipalalu' && (
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
+            <div className="flex items-center gap-3 text-[13px] text-gray-400">
 
+            </div>
+            <ShareButton articleTitle={article.title} slug={article.slug} />
           </div>
-          <ShareButton articleTitle={article.title} slug={article.slug} />
-        </div>
+        )}
       </div>
     </article>
   );

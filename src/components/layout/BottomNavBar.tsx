@@ -28,29 +28,33 @@ export default function BottomNavBar() {
 
   const menuItems = [
     { label: 'హోమ్', href: '/' },
-    { label: 'తాజా వార్తలు', href: '/category/latest' },
+    { label: 'బ్రేకింగ్ న్యూస్', href: '/category/latest' },
     { label: 'తెలంగాణ', href: '/category/telangana' },
     { label: 'ఆంధ్రప్రదేశ్', href: '/category/andhra-pradesh' },
     { label: 'ఈ-పేపర్', href: '/category/epaper' },
-    { label: 'జాతీయం', href: '/category/national' },
-    { label: 'అంతర్జాతీయం', href: '/category/international' },
+    { label: 'నేషనల్', href: '/category/national' },
+    { label: 'ఇంటర్నేషనల్', href: '/category/international' },
     { label: 'బిజినెస్', href: '/category/business' },
-    { label: 'క్రీడలు', href: '/category/sports' },
-    { label: 'సినిమా', href: '/category/entertainment' },
+    { label: 'హెల్త్', href: '/category/health' },
+    { label: 'స్పోర్ట్స్', href: '/category/sports' },
+    { label: 'ఫిల్మ్', href: '/category/entertainment' },
     { label: 'టెక్నాలజీ', href: '/category/technology' },
-    { label: 'ఆరోగ్యం', href: '/category/health' },
-    { label: 'రాశిఫలాలు', href: '/category/rasipalalu' },
+    { label: 'శుభఫలాలు', href: '/category/rasipalalu' },
     { label: 'వైరల్', href: '/category/viral' },
     { label: 'ఆల్బమ్‌లు', href: '/category/photos' },
     { label: 'వీడియోలు', href: '/category/videos' },
-    { label: 'మహిళలు', href: '/category/women' },
+    { label: 'ఆమె', href: '/category/women' },
     { label: 'లైఫ్ స్టైల్', href: '/category/lifestyle' },
     { label: 'వెబ్ స్టోరీస్', href: '/category/webstories' },
-    { label: 'అంతర్మథనం', href: '/category/antharmadanam' },
-    { label: 'ఆధ్యాత్మికం', href: '/category/adyathmikam' },
+    { label: 'వ్యక్తిత్వ వికాసం', href: '/category/antharmadanam' },
+    { label: 'దైవం', href: '/category/adyathmikam' },
     { label: 'సంపాదకీయం', href: '/category/sampadakiyam' },
+    { label: 'అడ్మిషన్స్', href: '/category/admissions' },
+    { label: 'కరెంట్ అఫైర్స్', href: '/category/current-affairs' },
+    { label: 'నోటిఫికేషన్స్', href: '/category/notification' },
+    { label: 'సిటిజన్ రిపోర్టర్', href: '/category/citizen-reporter' },
     { label: 'మా టీమ్', href: '/team' },
-    { label: 'వాతావరణం', href: '/weather' },
+    { label: 'వెదర్', href: '/weather' },
   ];
 
   const isEPaperActive = pathname?.startsWith('/category/epaper') || false;
@@ -176,10 +180,10 @@ export default function BottomNavBar() {
             className={`transition-transform duration-200 ${isHealthActive ? 'scale-110 stroke-[2.5]' : 'stroke-[2]'}`} 
           />
           <span 
-            className="text-[9.5px] mt-0.5 telugu-text tracking-tight leading-none truncate w-full"
+            className="text-[9.5px] mt-0.5 telugu-text tracking-tight leading-none text-center"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
-            ఆరోగ్యం
+            హెల్త్
           </span>
         </Link>
 

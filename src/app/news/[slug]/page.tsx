@@ -1,12 +1,6 @@
-import Image from 'next/image';
-import Link from 'next/link';
 import Header from '@/components/layout/Header';
-
-import BackButton from '@/components/layout/BackButton';
-import ShareButton from '@/components/layout/ShareButton';
 import Footer from '@/components/layout/Footer';
-import DistrictNewsTabs from '@/components/layout/DistrictNewsTabs';
-import AdBanner from '@/components/home/AdBanner';
+import ArticlePageClient from '@/components/layout/ArticlePageClient';
 import {
   featuredNews,
   politicsNews,
@@ -26,8 +20,12 @@ import {
   sampadakiyamNews,
   districtNews,
   getReporterByAuthor,
+  vidyaNews,
+  admissionsNews,
+  currentAffairsNews,
+  upadiNews,
+  notificationNews
 } from '@/lib/mockData';
-import { Home, ChevronRight, Clock, ThumbsUp, TrendingUp } from 'lucide-react';
 import type { Metadata } from 'next';
 
 const allNews = [
@@ -48,30 +46,42 @@ const allNews = [
   ...adyathmikamNews,
   ...sampadakiyamNews,
   ...districtNews,
+  ...vidyaNews,
+  ...admissionsNews,
+  ...currentAffairsNews,
+  ...upadiNews,
+  ...notificationNews
 ];
 
 const englishCategories: Record<string, string> = {
-  'latest': 'Latest News',
+  'latest': 'Breaking News',
   'telangana': 'Telangana',
   'andhra-pradesh': 'Andhra Pradesh',
   'national': 'National',
   'international': 'International',
   'business': 'Business',
+  'politics': 'పాలిటిక్స్',
   'sports': 'Sports',
   'entertainment': 'Entertainment',
   'technology': 'Technology',
   'health': 'Health',
   'viral': 'Viral',
-  'rasipalalu': 'Astrology',
+  'rasipalalu': 'Shubhafalalu',
   'photos': 'Photos',
   'videos': 'Videos',
   'webstories': 'Web Stories',
-  'antharmadanam': 'Opinion',
-  'adyathmikam': 'Devotional',
+  'antharmadanam': 'Vyakthithva Vikasam',
+  'adyathmikam': 'Daivam',
   'sampadakiyam': 'Editorial',
-  'women': 'Women',
+  'women': 'Aamey',
   'lifestyle': 'Lifestyle',
-  'epaper': 'E-Paper'
+  'epaper': 'E-Paper',
+  'vidya': 'Vidya',
+  'admissions': 'Admissions',
+  'current-affairs': 'Current Affairs',
+  'upadi': 'Upadi',
+  'notification': 'Notification',
+  'citizen-reporter': 'Citizen Reporter'
 };
 
 export async function generateStaticParams() {
@@ -92,30 +102,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr);
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const year = String(d.getFullYear()).slice(2);
-  const hours = d.getHours();
-  const mins = String(d.getMinutes()).padStart(2, '0');
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  const h = hours % 12 || 12;
-  return `${day}/${month}/${year}, ${h}:${mins} ${ampm}`;
-}
-
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const article = allNews.find((n) => n.slug === slug) || allNews[0];
   const reporter = getReporterByAuthor(article.author);
 
-  // Trending: top viewed articles (excluding current)
+  // Other news for bottom grid (excluding current)
+  const otherNews = allNews
+    .filter((n) => n.id !== article.id)
+    .slice(0, 9);
+
+  // Trending for in-text promo links
   const trendingNews = allNews
     .filter((n) => n.id !== article.id)
     .sort((a, b) => (b.views || 0) - (a.views || 0))
     .slice(0, 8);
 
-  // Latest news for right sidebar
+  // Latest news for sidebar
   const latestNews = allNews
     .filter((n) => n.id !== article.id)
     .slice(0, 8);
@@ -128,440 +131,16 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     <div className="min-h-screen bg-[#f0f2f5]">
       <Header />
 
-      <main className="max-w-[1050px] mx-auto bg-white shadow-md border-x border-gray-200 px-4 py-4">
-
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-3 flex-wrap font-sans border-b border-gray-100 pb-3">
-          <Link href="/" className="hover:text-[#025390] transition-colors flex items-center gap-1 font-bold">
-            <Home size={12} /> Home
-          </Link>
-          <ChevronRight size={12} />
-          <Link href={`/category/${article.categorySlug}`} className="hover:text-[#025390] transition-colors font-bold">
-            {englishCategories[article.categorySlug] || article.category}
-          </Link>
-          <ChevronRight size={12} />
-          <span className="text-gray-400 truncate max-w-[300px] telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-            {article.title.slice(0, 50)}...
-          </span>
-        </div>
-
-        {/* 3-Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[185px_1fr_185px] gap-3">
-
-          {/* ═══ LEFT SIDEBAR ═══ */}
-          <aside className="hidden lg:flex flex-col gap-3">
-
-            {/* Ad 1 — Jewellery */}
-            <div className="bg-white border border-gray-200 rounded overflow-hidden">
-              <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
-              <div className="bg-gradient-to-br from-[#7b2d00] to-[#c0392b] p-4 text-white text-center min-h-[180px] flex flex-col items-center justify-center gap-2">
-                <div className="text-3xl">💍</div>
-                <div className="text-base font-black leading-tight">CMR జ్యువెల్లరీ</div>
-                <div className="text-[11px] font-bold opacity-90">Gold & Diamond Sale</div>
-                <div className="text-[10px] opacity-80 telugu-text" style={{fontFamily:'Noto Sans Telugu,sans-serif'}}>వేసవి ఆఫర్లు — 30% వరకు తగ్గింపు</div>
-                <div className="mt-2 bg-yellow-400 text-[#7b2d00] rounded-full px-3 py-1 text-[10px] font-black">Shop Now →</div>
-              </div>
-            </div>
-
-            {/* Trending News */}
-            <div className="bg-white border border-gray-200 rounded overflow-hidden">
-              <div className="flex items-center gap-2 bg-[#025390] text-white px-3 py-2.5">
-                <TrendingUp size={14} />
-                <span className="font-black text-base telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  ట్రెండింగ్ వార్తలు
-                </span>
-              </div>
-              <ul className="divide-y divide-gray-100">
-                {trendingNews.map((item, idx) => (
-                  <li key={item.id}>
-                    <Link
-                      href={`/news/${item.slug}`}
-                      className="flex items-start gap-3 px-3 py-3.5 hover:bg-blue-50/50 transition-colors group"
-                    >
-                      <span className="w-2 h-2 bg-[#025390] mt-1.5 flex-shrink-0 rounded-[1px]"></span>
-                      <p
-                        className="flex-1 min-w-0 text-[15.5px] font-semibold text-gray-700 group-hover:text-[#025390] line-clamp-2 telugu-text"
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.6' }}
-                      >
-                        {item.title}
-                      </p>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Ad 2 — Education */}
-            <div className="bg-white border border-gray-200 rounded overflow-hidden">
-              <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
-              <div className="bg-gradient-to-br from-[#1a237e] to-[#283593] p-4 text-white text-center min-h-[150px] flex flex-col items-center justify-center gap-2">
-                <div className="text-2xl">🎓</div>
-                <div className="text-sm font-black leading-tight">NARAYANA<br/>IIT Academy</div>
-                <div className="text-[10px] font-bold opacity-90 telugu-text" style={{fontFamily:'Noto Sans Telugu,sans-serif'}}>JEE • NEET • EAMCET</div>
-                <div className="text-[9px] opacity-80">Admissions Open 2026</div>
-                <div className="mt-2 bg-yellow-300 text-[#1a237e] rounded-full px-3 py-1 text-[10px] font-black">Enroll Now</div>
-              </div>
-            </div>
-          </aside>
-
-          {/* ═══ MIDDLE — ARTICLE ═══ */}
-          <article className="bg-white border border-gray-200 rounded overflow-hidden flex-1 max-w-[750px] mx-auto">
-            <div className="p-4 md:p-5">
-
-              {article.isBreaking && (
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="bg-red-600 text-white text-[12px] font-black px-2 py-0.5 rounded breaking-badge">
-                    🔴 Breaking
-                  </span>
-                </div>
-              )}
-
-              {/* Headline */}
-              <h1
-                className="font-black text-[#cc0000] leading-tight mb-3 telugu-text text-[19px] md:text-[28px]"
-                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-              >
-                {article.title}
-              </h1>
-
-              {/* Meta row */}
-              <div className="flex flex-wrap items-center gap-3 text-gray-500 mb-4 pb-3 border-b border-gray-100 font-sans" style={{ fontSize: '14px' }}>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-6 h-6 bg-[#025390] rounded-full flex items-center justify-center">
-                    <span className="text-white text-[12px] font-black">హై</span>
-                  </div>
-                  <Link href={`/reporter/${reporter.slug}`} className="font-bold text-[#025390] hover:text-red-600 transition-colors telugu-text" style={{ fontFamily: 'Mandali, sans-serif' }}>
-                    {reporter.name}
-                  </Link>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock size={12} />
-                  <span className="font-semibold">Published: {formatDate(article.publishedAt)} IST</span>
-                </div>
-                <div className="ml-auto">
-                  <ShareButton title={article.title} />
-                </div>
-              </div>
-
-              {/* Description pull-quote (Summary) */}
-              <p
-                className="leading-relaxed mb-4 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r telugu-text text-gray-700 text-[15px] md:text-[19px]"
-                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-              >
-                {article.description}
-              </p>
-
-              {/* Hero Image */}
-              <div className="rounded overflow-hidden mb-5 border border-gray-100">
-                <Image
-                  src={article.image}
-                  alt={article.title}
-                  width={800}
-                  height={450}
-                  className="w-full h-auto"
-                  priority
-                />
-              </div>
-
-              {/* Article Body */}
-              <div className="telugu-text space-y-4 text-gray-800 leading-loose text-[15px] md:text-[18px]" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                <p>{article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. హై టీవీ డెస్క్ నుండి తాజా సమాచారం ఇక్కడ లభిస్తుంది.</p>
-                <p>అధికారులు తెలిపిన వివరాల ప్రకారం, ఈ నిర్ణయం రాష్ట్ర ప్రజలకు అత్యంత ప్రయోజనకరంగా ఉంటుందని భావిస్తున్నారు. ఈ పరిణామాలు భవిష్యత్తులో మరింత సానుకూలమైన ఫలితాలను ఇస్తాయని నిపుణులు అభిప్రాయపడుతున్నారు.</p>
-
-                {/* Mobile Ad 1 */}
-                <div className="lg:hidden my-5 border border-gray-150 rounded overflow-hidden">
-                  <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
-                  <div className="bg-gradient-to-br from-[#7b2d00] to-[#c0392b] p-4 text-white text-center flex flex-col items-center justify-center gap-2">
-                    <div className="text-2xl">💍</div>
-                    <div className="text-base font-black leading-tight">CMR జ్యువెల్లరీ — Gold & Diamond Sale</div>
-                    <div className="text-[10px] opacity-80 telugu-text" style={{fontFamily:'Noto Sans Telugu,sans-serif'}}>వేసవి ఆఫర్లు — 30% వరకు తగ్గింపు</div>
-                    <a href="#" className="mt-2 bg-yellow-400 text-[#7b2d00] rounded-full px-3 py-1 text-[10px] font-black hover:bg-yellow-350 transition-colors">Shop Now →</a>
-                  </div>
-                </div>
-
-                {/* ఈ వార్తా చదవండి promo 1 — after 2 paragraphs */}
-                {trendingNews[0] && (
-                  <div className="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4 text-[14px] md:text-[18px]">
-                    <span className="text-[#e60000] font-black flex-shrink-0 telugu-text font-bold" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      ఈ వార్తా చదవండి:
-                    </span>
-                    <Link href={`/news/${trendingNews[0].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      {trendingNews[0].title}
-                    </Link>
-                  </div>
-                )}
-
-                <p>ఈ అంశంపై స్థానిక ప్రజలు, నిపుణులు వివిధ అభిప్రాయాలు వ్యక్తం చేశారు. కొందరు ఈ నిర్ణయాన్ని స్వాగతిస్తున్నారు, మరికొందరు దీనిపై సందేహాలు వ్యక్తం చేస్తున్నారు.</p>
-                <p>హై టీవీ ఈ అంశాన్ని నిరంతరం ట్రాక్ చేస్తూ తాజా అప్‌డేట్‌లను అందిస్తుంది. మరిన్ని వివరాలకు మా వెబ్‌సైట్‌ను అనుసరించండి.</p>
-
-                {/* ఈ వార్తా చదవండి promo 2 — after 4 paragraphs */}
-                {trendingNews[1] && (
-                  <div className="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4 text-[14px] md:text-[18px]">
-                    <span className="text-[#e60000] font-black flex-shrink-0 telugu-text font-bold" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      ఈ వార్తా చదవండి:
-                    </span>
-                    <Link href={`/news/${trendingNews[1].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      {trendingNews[1].title}
-                    </Link>
-                  </div>
-                )}
-
-                {/* Mobile Ad 2 */}
-                <div className="lg:hidden my-5 border border-gray-150 rounded overflow-hidden">
-                  <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
-                  <div className="bg-gradient-to-br from-[#1a237e] to-[#283593] p-4 text-white text-center flex flex-col items-center justify-center gap-2">
-                    <div className="text-2xl">🎓</div>
-                    <div className="text-base font-black leading-tight text-center">NARAYANA IIT Academy</div>
-                    <div className="text-[11px] font-bold opacity-90 telugu-text" style={{fontFamily:'Noto Sans Telugu,sans-serif'}}>JEE • NEET • EAMCET</div>
-                    <div className="text-[10px] opacity-80">Admissions Open 2026</div>
-                    <a href="#" className="mt-2 bg-yellow-350 text-[#1a237e] rounded-full px-3 py-1 text-[10px] font-black hover:bg-yellow-300 transition-colors">Enroll Now</a>
-                  </div>
-                </div>
-
-                {/* Read latest & Follow us strip */}
-                <div className="hidden lg:block border-t border-gray-100 pt-5 mt-6 space-y-2.5 text-gray-800 font-sans text-[15px] select-none leading-normal">
-                  <div className="flex items-start gap-2.5">
-                    <span className="flex-shrink-0 bg-[#e60000] text-white rounded-[3px] w-4.5 h-4.5 flex items-center justify-center mt-1 select-none">
-                      <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z"/>
-                      </svg>
-                    </span>
-                    <span>
-                      Read latest{' '}
-                      <Link href="/category/national" className="text-[#e60000] font-bold hover:underline">
-                        India News
-                      </Link>{' '}
-                      and{' '}
-                      <Link href="/" className="text-[#e60000] font-bold hover:underline">
-                        Telugu News
-                      </Link>
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-2.5">
-                    <span className="flex-shrink-0 bg-[#e60000] text-white rounded-[3px] w-4.5 h-4.5 flex items-center justify-center mt-1 select-none">
-                      <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z"/>
-                      </svg>
-                    </span>
-                    <span>
-                      Follow us on{' '}
-                      <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-[#e60000] font-bold hover:underline">
-                        Facebook
-                      </a>
-                      ,{' '}
-                      <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-[#e60000] font-bold hover:underline">
-                        Twitter
-                      </a>{' '}
-                      &{' '}
-                      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-[#e60000] font-bold hover:underline">
-                        Instagram
-                      </a>
-                      .
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tags */}
-              <div className="hidden lg:flex mt-5 pt-4 border-t border-gray-100 flex-wrap gap-2">
-                {article.tags.map((tag) => (
-                  <Link
-                    key={tag}
-                    href={`/search?q=${tag}`}
-                    className="text-sm bg-gray-100 hover:bg-[#025390] hover:text-white text-gray-600 px-3 py-1 rounded-full transition-colors font-medium telugu-text"
-                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                  >
-                    {tag}
-                  </Link>
-                ))}
-              </div>
-
-              {/* Mobile-only Trending & Latest News with Dummy Ads */}
-              <div className="lg:hidden mt-8 pt-6 border-t border-gray-200 flex flex-col gap-6">
-                
-                {/* Trending News */}
-                <div className="bg-white border border-gray-200 rounded overflow-hidden">
-                  <div className="flex items-center gap-2 bg-[#025390] text-white px-3 py-2.5">
-                    <TrendingUp size={14} />
-                    <span className="font-black text-base telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      ట్రెండింగ్ వార్తలు
-                    </span>
-                  </div>
-                  <ul className="divide-y divide-gray-100">
-                    {trendingNews.map((item, idx) => (
-                      <li key={item.id}>
-                        <Link
-                          href={`/news/${item.slug}`}
-                          className="flex items-start gap-3 px-3 py-3.5 hover:bg-blue-50/50 transition-colors group"
-                        >
-                          <span className="w-2 h-2 bg-[#025390] mt-1.5 flex-shrink-0 rounded-[1px]"></span>
-                          <p
-                            className="flex-1 min-w-0 text-[15.5px] font-semibold text-gray-700 group-hover:text-[#025390] line-clamp-2 telugu-text"
-                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.6' }}
-                          >
-                            {item.title}
-                          </p>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Dummy Ad Box 1 */}
-                <AdBanner position="dummy" />
-
-                {/* Dummy Ad Box 2 */}
-                <AdBanner position="dummy" />
-
-                {/* Latest News */}
-                <div className="bg-white border border-gray-200 rounded overflow-hidden">
-                  <div className="bg-[#e60000] text-white px-3 py-2.5">
-                    <span className="font-black text-base telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      తాజా వార్తలు
-                    </span>
-                  </div>
-                  <ul className="divide-y divide-gray-100">
-                    {latestNews.map((item) => (
-                      <li key={item.id}>
-                        <Link
-                          href={`/news/${item.slug}`}
-                          className="flex items-start gap-3 px-3 py-3.5 hover:bg-red-50/50 transition-colors group"
-                        >
-                          <span className="w-2 h-2 bg-[#e60000] mt-1.5 flex-shrink-0 rounded-[1px]"></span>
-                          <p
-                            className="flex-1 min-w-0 text-[15.5px] font-semibold text-gray-700 group-hover:text-[#e60000] line-clamp-2 telugu-text"
-                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.6' }}
-                          >
-                            {item.title}
-                          </p>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Read latest & Follow us strip (Mobile duplicate at the end) */}
-                <div className="border-t border-gray-200 pt-5 mt-6 space-y-2.5 text-gray-800 font-sans text-[15px] select-none leading-normal">
-                  <div className="flex items-start gap-2.5">
-                    <span className="flex-shrink-0 bg-[#e60000] text-white rounded-[3px] w-4.5 h-4.5 flex items-center justify-center mt-1 select-none">
-                      <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z"/>
-                      </svg>
-                    </span>
-                    <span>
-                      Read latest{' '}
-                      <Link href="/category/national" className="text-[#e60000] font-bold hover:underline">
-                        India News
-                      </Link>{' '}
-                      and{' '}
-                      <Link href="/" className="text-[#e60000] font-bold hover:underline">
-                        Telugu News
-                      </Link>
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-2.5">
-                    <span className="flex-shrink-0 bg-[#e60000] text-white rounded-[3px] w-4.5 h-4.5 flex items-center justify-center mt-1 select-none">
-                      <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z"/>
-                      </svg>
-                    </span>
-                    <span>
-                      Follow us on{' '}
-                      <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-[#e60000] font-bold hover:underline">
-                        Facebook
-                      </a>
-                      ,{' '}
-                      <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-[#e60000] font-bold hover:underline">
-                        Twitter
-                      </a>{' '}
-                      &{' '}
-                      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-[#e60000] font-bold hover:underline">
-                        Instagram
-                      </a>
-                      .
-                    </span>
-                  </div>
-                </div>
-
-                {/* Tags (Mobile duplicate at the end) */}
-                <div className="mt-5 pt-4 border-t border-gray-200 flex flex-wrap gap-2">
-                  {article.tags.map((tag) => (
-                    <Link
-                      key={tag}
-                      href={`/search?q=${tag}`}
-                      className="text-sm bg-gray-100 hover:bg-[#025390] hover:text-white text-gray-600 px-3 py-1 rounded-full transition-colors font-medium telugu-text"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                    >
-                      {tag}
-                    </Link>
-                  ))}
-                </div>
-
-              </div>
-
-            </div>
-          </article>
-
-          {/* ═══ RIGHT SIDEBAR ═══ */}
-          <aside className="hidden lg:flex flex-col gap-3">
-
-            {/* Ad 3 — Real Estate */}
-            <div className="bg-white border border-gray-200 rounded overflow-hidden">
-              <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
-              <div className="bg-gradient-to-br from-[#0d3b2e] to-[#1a5c45] p-4 text-white text-center min-h-[160px] flex flex-col items-center justify-center gap-2">
-                <div className="text-2xl">🏢</div>
-                <div className="text-sm font-black leading-tight">NAVANAAMI<br/><span className="text-xs font-bold opacity-80">at Kokapet</span></div>
-                <div className="text-[10px] font-bold opacity-90">2437 – 3379 SqFt</div>
-                <div className="text-[11px] font-black text-yellow-300">₹2.3 Cr* Onwards</div>
-                <div className="mt-1 bg-white text-[#0d3b2e] rounded-full px-3 py-1 text-[10px] font-black">+91 98861 88383</div>
-              </div>
-            </div>
-
-            {/* Latest News */}
-            <div className="bg-white border border-gray-200 rounded overflow-hidden">
-              <div className="bg-[#e60000] text-white px-3 py-2.5">
-                <span className="font-black text-base telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  తాజా వార్తలు
-                </span>
-              </div>
-              <ul className="divide-y divide-gray-100">
-                {latestNews.map((item) => (
-                  <li key={item.id}>
-                    <Link
-                      href={`/news/${item.slug}`}
-                      className="flex items-start gap-3 px-3 py-3.5 hover:bg-red-50/50 transition-colors group"
-                    >
-                      <span className="w-2 h-2 bg-[#e60000] mt-1.5 flex-shrink-0 rounded-[1px]"></span>
-                      <p
-                        className="flex-1 min-w-0 text-[15.5px] font-semibold text-gray-700 group-hover:text-[#e60000] line-clamp-2 telugu-text"
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.6' }}
-                      >
-                        {item.title}
-                      </p>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Ad 4 — Health Insurance */}
-            <div className="bg-white border border-gray-200 rounded overflow-hidden">
-              <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
-              <div className="bg-gradient-to-br from-[#e65100] to-[#bf360c] p-4 text-white text-center min-h-[140px] flex flex-col items-center justify-center gap-2">
-                <div className="text-2xl">🏥</div>
-                <div className="text-sm font-black">Star Health</div>
-                <div className="text-[10px] font-bold opacity-90 telugu-text" style={{fontFamily:'Noto Sans Telugu,sans-serif'}}>ఆరోగ్య బీమా ₹99/నెల</div>
-                <div className="text-[9px] opacity-80">Family Floater Plans Available</div>
-                <div className="mt-2 bg-white text-[#e65100] rounded-full px-3 py-1 text-[10px] font-black">Get Quote →</div>
-              </div>
-            </div>
-
-            {/* జిల్లా వార్తలు — Toggle */}
-            <DistrictNewsTabs apNews={apDistrictNews} tgNews={tgDistrictNews} />
-
-          </aside>
-        </div>
-      </main>
+      <ArticlePageClient
+        article={article}
+        reporter={reporter}
+        trendingNews={trendingNews}
+        latestNews={latestNews}
+        apDistrictNews={apDistrictNews}
+        tgDistrictNews={tgDistrictNews}
+        otherNews={otherNews}
+        englishCategories={englishCategories}
+      />
 
       <Footer />
     </div>

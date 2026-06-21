@@ -212,9 +212,9 @@ export default function WebStoriesSection() {
                 <Layers size={13} className="stroke-[2.5]" />
               </div>
               {/* Image text overlay */}
-              <div className="absolute top-[15%] left-0 right-0 px-3 text-center">
+              <div className="absolute top-[15%] left-0 right-0 px-5 md:px-6 text-center">
                 <span
-                  className="text-[14px] md:text-[17px] font-black leading-tight block break-words"
+                  className="text-[18px] md:text-[22px] font-black leading-relaxed block break-words"
                   style={getTextStyle(story.coverStyle)}
                 >
                   {story.coverTitle}
@@ -222,9 +222,9 @@ export default function WebStoriesSection() {
               </div>
             </div>
             {/* Bottom Title Text */}
-            <div className="mt-2 text-left">
+            <div className="mt-2 text-left py-1 pl-3.5 pr-2">
               <h4
-                className="text-[12.5px] font-black text-gray-800 group-hover:text-[#02599c] leading-snug line-clamp-2 telugu-text"
+                className="text-[0.92rem] md:text-[1.02rem] font-black text-gray-855 group-hover:text-[#02599c] leading-[2.15] pb-2 telugu-text line-clamp-2"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {story.title}

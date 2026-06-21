@@ -23,7 +23,7 @@ export default function TabbedNewsWidget({
   const tabs = [
     { id: 'tg', name: 'తెలంగాణ', data: tgNews },
     { id: 'ap', name: 'ఆంధ్రప్రదేశ్', data: apNews },
-    { id: 'adyathmikam', name: 'ఆధ్యాత్మికం', data: adyathmikamNews },
+    { id: 'adyathmikam', name: 'దైవం', data: adyathmikamNews },
     { id: 'business', name: 'బిజినెస్', data: businessNews },
   ] as const;
 
@@ -79,7 +79,7 @@ export default function TabbedNewsWidget({
                 </h3>
               </Link>
               <p
-                className="text-gray-500 text-sm line-clamp-3 leading-relaxed telugu-text"
+                className="text-gray-500 text-[1.05rem] leading-[1.8] pb-1 line-clamp-3 telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {currentTab.data[0].description}
@@ -104,9 +104,9 @@ export default function TabbedNewsWidget({
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 py-0.5 pl-2.5 pr-1">
                   <p
-                    className="text-sm font-bold text-gray-800 group-hover:text-brand-blue transition-colors line-clamp-2 leading-snug telugu-text"
+                    className="text-[0.95rem] font-bold text-gray-800 group-hover:text-brand-blue transition-colors line-clamp-2 leading-relaxed pb-1 telugu-text"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {article.title}
@@ -130,7 +130,7 @@ export default function TabbedNewsWidget({
             className="inline-block text-sm font-bold text-brand-blue hover:text-brand-red transition-colors telugu-text"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
-            {currentTab.name} వార్తలు అన్నీ చూడండి &raquo;
+            {currentTab.name} {'వార్తలు అన్నీ చూడండి'} &raquo;
           </Link>
         </div>
       </div>

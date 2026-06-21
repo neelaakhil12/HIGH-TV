@@ -82,7 +82,7 @@ export default function SearchPage({
               className="text-lg font-bold text-gray-800 mb-5 telugu-text text-left"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
-              తాజా వార్తలు
+              బ్రేకింగ్ న్యూస్
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {allNews.map((article) => (

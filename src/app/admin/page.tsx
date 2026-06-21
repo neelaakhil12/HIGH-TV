@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<'home' | 'article'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'article' | 'inline-image'>('home');
 
   // Form states
   const [enabled, setEnabled] = useState(true);
@@ -16,6 +16,10 @@ export default function AdminPage() {
   const [optNo, setOptNo] = useState('కాదు');
   const [optUnsure, setOptUnsure] = useState('చెప్పలేం');
   
+  const [inlineImageEnabled, setInlineImageEnabled] = useState(false);
+  const [inlineImageData, setInlineImageData] = useState('');
+  const [inlineImageCaption, setInlineImageCaption] = useState('యోగ ఆసనాలు వేస్తున్న మోదీ..');
+
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
   // Load configuration from localStorage whenever activeTab changes
@@ -28,6 +32,28 @@ export default function AdminPage() {
     const savedOptYes = localStorage.getItem(`promo_poll_${activeTab}_option_yes`);
     const savedOptNo = localStorage.getItem(`promo_poll_${activeTab}_option_no`);
     const savedOptUnsure = localStorage.getItem(`promo_poll_${activeTab}_option_unsure`);
+
+    const savedInlineEnabled = localStorage.getItem('inline_article_image_enabled');
+    const savedInlineData = localStorage.getItem('inline_article_image_data');
+    const savedInlineCaption = localStorage.getItem('inline_article_image_caption');
+
+    if (savedInlineEnabled !== null) {
+      setInlineImageEnabled(savedInlineEnabled === 'true');
+    } else {
+      setInlineImageEnabled(false);
+    }
+
+    if (savedInlineData !== null) {
+      setInlineImageData(savedInlineData);
+    } else {
+      setInlineImageData('');
+    }
+
+    if (savedInlineCaption !== null) {
+      setInlineImageCaption(savedInlineCaption);
+    } else {
+      setInlineImageCaption('యోగ ఆసనాలు వేస్తున్న మోదీ..');
+    }
 
     // Default fallbacks depending on tab
     if (savedEnabled !== null) {
@@ -83,14 +109,20 @@ export default function AdminPage() {
     e.preventDefault();
     setSaveStatus('saving');
 
-    localStorage.setItem(`promo_popup_${activeTab}_enabled`, String(enabled));
-    localStorage.setItem(`promo_popup_${activeTab}_type`, popupType);
-    localStorage.setItem(`promo_ad_${activeTab}_image`, adImage);
-    localStorage.setItem(`promo_ad_${activeTab}_link`, adLink);
-    localStorage.setItem(`promo_poll_${activeTab}_question`, pollQuestion);
-    localStorage.setItem(`promo_poll_${activeTab}_option_yes`, optYes);
-    localStorage.setItem(`promo_poll_${activeTab}_option_no`, optNo);
-    localStorage.setItem(`promo_poll_${activeTab}_option_unsure`, optUnsure);
+    if (activeTab === 'inline-image') {
+      localStorage.setItem('inline_article_image_enabled', String(inlineImageEnabled));
+      localStorage.setItem('inline_article_image_data', inlineImageData);
+      localStorage.setItem('inline_article_image_caption', inlineImageCaption);
+    } else {
+      localStorage.setItem(`promo_popup_${activeTab}_enabled`, String(enabled));
+      localStorage.setItem(`promo_popup_${activeTab}_type`, popupType);
+      localStorage.setItem(`promo_ad_${activeTab}_image`, adImage);
+      localStorage.setItem(`promo_ad_${activeTab}_link`, adLink);
+      localStorage.setItem(`promo_poll_${activeTab}_question`, pollQuestion);
+      localStorage.setItem(`promo_poll_${activeTab}_option_yes`, optYes);
+      localStorage.setItem(`promo_poll_${activeTab}_option_no`, optNo);
+      localStorage.setItem(`promo_poll_${activeTab}_option_unsure`, optUnsure);
+    }
 
     setTimeout(() => {
       setSaveStatus('saved');
@@ -124,7 +156,7 @@ export default function AdminPage() {
         </div>
 
         {/* Scope Selector Tabs */}
-        <div className="flex bg-slate-900/60 p-1 border border-slate-800 rounded-xl select-none">
+        <div className="flex bg-slate-900/60 p-1 border border-slate-800 rounded-xl select-none gap-1">
           <button 
             type="button"
             onClick={() => setActiveTab('home')}
@@ -143,141 +175,241 @@ export default function AdminPage() {
           >
             📄 Article Page Popup
           </button>
+          <button 
+            type="button"
+            onClick={() => setActiveTab('inline-image')}
+            className={`flex-1 text-center py-2.5 text-xs font-black rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              activeTab === 'inline-image' ? 'bg-[#02599c] text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            🖼️ Inline Article Image
+          </button>
         </div>
 
         {/* Config Container */}
         <form onSubmit={handleSave} className="bg-slate-900 border border-slate-800/80 rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col gap-6 animate-fade-in">
           
-          <div className="flex items-center justify-between bg-slate-950/60 p-4 rounded-xl border border-slate-800/50">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-extrabold text-white">Enable popup for {activeTab === 'home' ? 'Homepage' : 'Articles'}</span>
-              <span className="text-xs text-slate-400">Toggle whether this popup is active.</span>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
-                checked={enabled} 
-                onChange={(e) => setEnabled(e.target.checked)} 
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#02599c]"></div>
-            </label>
-          </div>
-
-          {enabled && (
+          {activeTab !== 'inline-image' ? (
             <>
-              {/* Type Select */}
-              <div className="flex flex-col gap-2.5">
-                <span className="text-xs font-black text-slate-400 uppercase tracking-wider">Popup Content Style</span>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setPopupType('ad')}
-                    className={`py-3.5 px-4 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                      popupType === 'ad'
-                        ? 'border-[#02599c] bg-[#02599c]/10 text-white shadow-md'
-                        : 'border-slate-800 bg-slate-950/30 text-slate-400 hover:border-slate-700 hover:text-slate-200'
-                    }`}
-                  >
-                    📢 Advertisement Image
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPopupType('poll')}
-                    className={`py-3.5 px-4 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                      popupType === 'poll'
-                        ? 'border-[#02599c] bg-[#02599c]/10 text-white shadow-md'
-                        : 'border-slate-800 bg-slate-950/30 text-slate-400 hover:border-slate-700 hover:text-slate-200'
-                    }`}
-                  >
-                    📊 Voting Poll Card
-                  </button>
+              <div className="flex items-center justify-between bg-slate-950/60 p-4 rounded-xl border border-slate-800/50">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-extrabold text-white">Enable popup for {activeTab === 'home' ? 'Homepage' : 'Articles'}</span>
+                  <span className="text-xs text-slate-400">Toggle whether this popup is active.</span>
                 </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={enabled} 
+                    onChange={(e) => setEnabled(e.target.checked)} 
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#02599c]"></div>
+                </label>
               </div>
 
-              <div className="h-px bg-slate-800/80 my-2" />
-
-              {popupType === 'ad' ? (
-                /* ══════════════ AD SETTINGS ══════════════ */
-                <div className="flex flex-col gap-4 animate-fade-in">
-                  <h3 className="text-sm font-black text-white flex items-center gap-1.5">
-                    📢 Advertisement Settings ({activeTab === 'home' ? 'Homepage' : 'Articles'})
-                  </h3>
-                  
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-400">Ad Image URL</label>
-                    <input 
-                      type="text" 
-                      value={adImage}
-                      onChange={(e) => setAdImage(e.target.value)}
-                      className="bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-sm outline-none transition-colors"
-                      placeholder="e.g. /popup-ad.png"
-                    />
-                    <span className="text-[10px] text-slate-500">Relative path (like <code>/popup-ad.png</code>) or an external image link.</span>
+              {enabled && (
+                <>
+                  {/* Type Select */}
+                  <div className="flex flex-col gap-2.5">
+                    <span className="text-xs font-black text-slate-400 uppercase tracking-wider">Popup Content Style</span>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setPopupType('ad')}
+                        className={`py-3.5 px-4 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                          popupType === 'ad'
+                            ? 'border-[#02599c] bg-[#02599c]/10 text-white shadow-md'
+                            : 'border-slate-800 bg-slate-950/30 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                        }`}
+                      >
+                        📢 Advertisement Image
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPopupType('poll')}
+                        className={`py-3.5 px-4 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                          popupType === 'poll'
+                            ? 'border-[#02599c] bg-[#02599c]/10 text-white shadow-md'
+                            : 'border-slate-800 bg-slate-950/30 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                        }`}
+                      >
+                        📊 Voting Poll Card
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-400">Ad Redirect Link</label>
-                    <input 
-                      type="text" 
-                      value={adLink}
-                      onChange={(e) => setAdLink(e.target.value)}
-                      className="bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-sm outline-none transition-colors"
-                      placeholder="e.g. https://hightv.in"
-                    />
-                    <span className="text-[10px] text-slate-500">Redirect target when users click on the banner. Use <code>#</code> to disable redirect.</span>
-                  </div>
+                  <div className="h-px bg-slate-800/80 my-2" />
+
+                  {popupType === 'ad' ? (
+                    /* ══════════════ AD SETTINGS ══════════════ */
+                    <div className="flex flex-col gap-4 animate-fade-in">
+                      <h3 className="text-sm font-black text-white flex items-center gap-1.5">
+                        📢 Advertisement Settings ({activeTab === 'home' ? 'Homepage' : 'Articles'})
+                      </h3>
+                      
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-bold text-slate-400">Ad Image URL</label>
+                        <input 
+                          type="text" 
+                          value={adImage}
+                          onChange={(e) => setAdImage(e.target.value)}
+                          className="bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-sm outline-none transition-colors"
+                          placeholder="e.g. /popup-ad.png"
+                        />
+                        <span className="text-[10px] text-slate-500">Relative path (like <code>/popup-ad.png</code>) or an external image link.</span>
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-bold text-slate-400">Ad Redirect Link</label>
+                        <input 
+                          type="text" 
+                          value={adLink}
+                          onChange={(e) => setAdLink(e.target.value)}
+                          className="bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-sm outline-none transition-colors"
+                          placeholder="e.g. https://hightv.in"
+                        />
+                        <span className="text-[10px] text-slate-500">Redirect target when users click on the banner. Use <code>#</code> to disable redirect.</span>
+                      </div>
+                    </div>
+                  ) : (
+                    /* ══════════════ POLL SETTINGS ══════════════ */
+                    <div className="flex flex-col gap-4 animate-fade-in">
+                      <h3 className="text-sm font-black text-white flex items-center gap-1.5">
+                        📊 Voting Poll Settings ({activeTab === 'home' ? 'Homepage' : 'Articles'})
+                      </h3>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-bold text-slate-400">Poll Question (Telugu/English)</label>
+                        <textarea 
+                          rows={2}
+                          value={pollQuestion}
+                          onChange={(e) => setPollQuestion(e.target.value)}
+                          className="bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-sm outline-none transition-colors resize-none telugu-text"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          placeholder="Enter the question text..."
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-bold text-slate-400">Option 1 Label</label>
+                          <input 
+                            type="text" 
+                            value={optYes}
+                            onChange={(e) => setOptYes(e.target.value)}
+                            className="bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-2 text-sm outline-none transition-colors telugu-text"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-bold text-slate-400">Option 2 Label</label>
+                          <input 
+                            type="text" 
+                            value={optNo}
+                            onChange={(e) => setOptNo(e.target.value)}
+                            className="bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-2 text-sm outline-none transition-colors telugu-text"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-bold text-slate-400">Option 3 Label</label>
+                          <input 
+                            type="text" 
+                            value={optUnsure}
+                            onChange={(e) => setOptUnsure(e.target.value)}
+                            className="bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-2 text-sm outline-none transition-colors telugu-text"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </>
+          ) : (
+            /* ══════════════ INLINE IMAGE SETTINGS ══════════════ */
+            <>
+              <div className="flex items-center justify-between bg-slate-950/60 p-4 rounded-xl border border-slate-800/50">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-extrabold text-white">Enable Inline Image in Articles</span>
+                  <span className="text-xs text-slate-400">Toggle whether the inline image is displayed inside the article page.</span>
                 </div>
-              ) : (
-                /* ══════════════ POLL SETTINGS ══════════════ */
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={inlineImageEnabled} 
+                    onChange={(e) => setInlineImageEnabled(e.target.checked)} 
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#02599c]"></div>
+                </label>
+              </div>
+
+              {inlineImageEnabled && (
                 <div className="flex flex-col gap-4 animate-fade-in">
                   <h3 className="text-sm font-black text-white flex items-center gap-1.5">
-                    📊 Voting Poll Settings ({activeTab === 'home' ? 'Homepage' : 'Articles'})
+                    🖼️ Inline Image Settings
                   </h3>
 
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-400">Poll Question (Telugu/English)</label>
-                    <textarea 
-                      rows={2}
-                      value={pollQuestion}
-                      onChange={(e) => setPollQuestion(e.target.value)}
-                      className="bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-sm outline-none transition-colors resize-none telugu-text"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                      placeholder="Enter the question text..."
-                    />
+                  {/* Image Uploader */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-bold text-slate-400">Upload Image</label>
+                    <div className="border border-dashed border-slate-800 hover:border-[#02599c] rounded-xl p-4 bg-slate-950/30 transition-colors text-center w-full relative">
+                      {!inlineImageData ? (
+                        <div className="flex flex-col items-center justify-center py-4 cursor-pointer">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setInlineImageData(reader.result as string);
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          />
+                          <span className="text-xs font-extrabold text-slate-300">
+                            Click to select an image
+                          </span>
+                          <span className="text-[10px] text-slate-500 mt-1">PNG, JPG or JPEG format</span>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="relative w-full max-w-[300px] mx-auto overflow-hidden rounded-lg border border-slate-800 bg-slate-950">
+                            <img
+                              src={inlineImageData}
+                              alt="Preview"
+                              className="w-full h-auto object-contain block max-h-[200px] mx-auto"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setInlineImageData('')}
+                              className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 transition-colors cursor-pointer"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-slate-400">Option 1 Label</label>
-                      <input 
-                        type="text" 
-                        value={optYes}
-                        onChange={(e) => setOptYes(e.target.value)}
-                        className="bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-2 text-sm outline-none transition-colors telugu-text"
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-slate-400">Option 2 Label</label>
-                      <input 
-                        type="text" 
-                        value={optNo}
-                        onChange={(e) => setOptNo(e.target.value)}
-                        className="bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-2 text-sm outline-none transition-colors telugu-text"
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-slate-400">Option 3 Label</label>
-                      <input 
-                        type="text" 
-                        value={optUnsure}
-                        onChange={(e) => setOptUnsure(e.target.value)}
-                        className="bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-2 text-sm outline-none transition-colors telugu-text"
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                      />
-                    </div>
+                  {/* Caption Input */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-400">Caption (Telugu/English)</label>
+                    <input 
+                      type="text" 
+                      value={inlineImageCaption}
+                      onChange={(e) => setInlineImageCaption(e.target.value)}
+                      className="bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-sm outline-none transition-colors telugu-text"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      placeholder="Enter image caption..."
+                    />
                   </div>
                 </div>
               )}
@@ -286,13 +418,19 @@ export default function AdminPage() {
 
           {/* Action Buttons */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-slate-850">
-            <button
-              type="button"
-              onClick={resetSessionAndPreview}
-              className="w-full md:w-auto text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 px-4 rounded-xl transition-all border border-slate-700 cursor-pointer text-center"
-            >
-              🔄 Reset Popup Show Session for {activeTab === 'home' ? 'Homepage' : 'Articles'}
-            </button>
+            {activeTab !== 'inline-image' ? (
+              <button
+                type="button"
+                onClick={resetSessionAndPreview}
+                className="w-full md:w-auto text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 px-4 rounded-xl transition-all border border-slate-700 cursor-pointer text-center"
+              >
+                🔄 Reset Popup Show Session for {activeTab === 'home' ? 'Homepage' : 'Articles'}
+              </button>
+            ) : (
+              <div className="text-xs text-slate-500">
+                Changes will take effect immediately on article page load.
+              </div>
+            )}
             <button
               type="submit"
               disabled={saveStatus === 'saving'}

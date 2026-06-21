@@ -102,7 +102,7 @@ export default function PollWidget() {
       <div className="flex border-b border-gray-100">
         <button
           onClick={() => handleTabChange('latest')}
-          className={`flex-1 py-2.5 text-[13px] font-black transition-colors duration-150 cursor-pointer
+          className={`flex-1 py-2.5 text-[15px] font-black transition-colors duration-150 cursor-pointer
             ${activeTab === 'latest'
               ? 'bg-[#e60000] text-white'
               : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
@@ -113,7 +113,7 @@ export default function PollWidget() {
         </button>
         <button
           onClick={() => handleTabChange('more')}
-          className={`flex-1 py-2.5 text-[13px] font-black transition-colors duration-150 cursor-pointer
+          className={`flex-1 py-2.5 text-[15px] font-black transition-colors duration-150 cursor-pointer
             ${activeTab === 'more'
               ? 'bg-[#e60000] text-white'
               : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
@@ -141,7 +141,7 @@ export default function PollWidget() {
 
         {/* Question */}
         <p
-          className="text-[13.5px] font-black text-gray-800 leading-snug mb-4 telugu-text"
+          className="text-[16px] font-black text-gray-800 leading-snug mb-4 telugu-text"
           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
         >
           {poll.question}
@@ -175,7 +175,7 @@ export default function PollWidget() {
                       className="w-4 h-4 accent-[#e60000] flex-shrink-0 cursor-pointer"
                     />
                     <span
-                      className="text-[12.5px] font-bold text-gray-700 leading-snug telugu-text"
+                      className="text-[15px] font-bold text-gray-700 leading-snug telugu-text"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                     >
                       {option.label}
@@ -186,13 +186,13 @@ export default function PollWidget() {
                   <div className="space-y-1">
                     <div className="flex items-center justify-between">
                       <span
-                        className={`text-[12px] font-black leading-snug telugu-text ${isSelected ? 'text-[#e60000]' : 'text-gray-700'}`}
+                        className={`text-[14.5px] font-black leading-snug telugu-text ${isSelected ? 'text-[#e60000]' : 'text-gray-700'}`}
                         style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                       >
                         {option.label}
-                        {isSelected && <span className="ml-1 text-[10px]">✓</span>}
+                        {isSelected && <span className="ml-1 text-[11px]">✓</span>}
                       </span>
-                      <span className={`text-[12px] font-black ${isWinner ? 'text-[#e60000]' : 'text-gray-500'}`}>
+                      <span className={`text-[14.5px] font-black ${isWinner ? 'text-[#e60000]' : 'text-gray-500'}`}>
                         {pct}%
                       </span>
                     </div>
@@ -215,7 +215,7 @@ export default function PollWidget() {
             <button
               onClick={handleVote}
               disabled={!selectedOption}
-              className={`w-full py-2.5 rounded-lg text-[13px] font-black text-white transition-all duration-200 cursor-pointer
+              className={`w-full py-2.5 rounded-lg text-[15px] font-black text-white transition-all duration-200 cursor-pointer
                 ${selectedOption
                   ? 'bg-[#e60000] hover:bg-[#cc0000] shadow-sm hover:shadow-md active:scale-[0.98]'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -227,7 +227,7 @@ export default function PollWidget() {
           ) : (
             <div className="text-center">
               <p
-                className="text-[11.5px] text-gray-400 font-bold telugu-text"
+                className="text-[13px] text-gray-400 font-bold telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 మొత్తం ఓట్లు: <span className="text-gray-600 font-black">{totalVotes.toLocaleString('te-IN')}</span>
@@ -237,7 +237,7 @@ export default function PollWidget() {
           )}
           {!hasVoted && selectedOption && (
             <p
-              className="text-center mt-1.5 text-[10.5px] text-gray-400 telugu-text"
+              className="text-center mt-1.5 text-[12px] text-gray-400 telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {totalVotes.toLocaleString('te-IN')} మంది ఓటు వేశారు

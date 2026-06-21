@@ -7,10 +7,10 @@ import NewsCard from '@/components/cards/NewsCard';
 import AdBanner from '@/components/home/AdBanner';
 import RightSidebar from '@/components/layout/RightSidebar';
 import EPaperReader from '@/components/epaper/EPaperReader';
-import FlashNewsBar from '@/components/home/FlashNewsBar';
-import DistrictSelector from '@/components/category/DistrictSelector';
 import WebStoriesPage from '@/components/category/WebStoriesPage';
 import PhotosPage from '@/components/category/PhotosPage';
+import CitizenReporterForm from '@/components/category/CitizenReporterForm';
+import LiveUpdatesPage from '@/components/category/LiveUpdatesPage';
 import { 
   categories, 
   politicsNews, 
@@ -55,12 +55,13 @@ const allNews = [
 ];
 
 const englishCategories: Record<string, string> = {
-  'latest': 'Latest News',
+  'latest': 'Breaking News',
   'telangana': 'Telangana',
   'andhra-pradesh': 'Andhra Pradesh',
   'national': 'National',
   'international': 'International',
   'business': 'Business',
+  'politics': 'పాలిటిక్స్',
   'sports': 'Sports',
   'entertainment': 'Entertainment',
   'technology': 'Technology',
@@ -75,7 +76,13 @@ const englishCategories: Record<string, string> = {
   'sampadakiyam': 'Editorial',
   'women': 'Women',
   'lifestyle': 'Lifestyle',
-  'epaper': 'E-Paper'
+  'epaper': 'E-Paper',
+  'vidya': 'Vidya',
+  'admissions': 'Admissions',
+  'current-affairs': 'Current Affairs',
+  'upadi': 'Upadi',
+  'notification': 'Notification',
+  'citizen-reporter': 'Citizen Reporter'
 };
 
 export async function generateStaticParams() {
@@ -191,14 +198,31 @@ export default async function CategoryPage({
     <div className="min-h-screen bg-[#f4f6f8] flex flex-col">
       {category !== 'epaper' && <Header />}
 
-      {category === 'epaper' ? (
+      {category === 'latest' ? (
+        <main className="flex-1 w-full">
+          <LiveUpdatesPage />
+        </main>
+      ) : category === 'epaper' ? (
         <main className="flex-1 w-full">
           <EPaperReader />
         </main>
       ) : category === 'webstories' ? (
         <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full text-left">
-          <BackButton />
-          <FlashNewsBar />
+          {/* Breadcrumb Row with Back Button on the right */}
+          <div className="flex items-center justify-between gap-4 mb-5 border-b border-gray-100 pb-3 overflow-hidden">
+            <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
+              <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
+                <Home className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" /> Home
+              </Link>
+              <ChevronRight className="w-3 h-3 md:w-3.5 md:h-3.5 text-gray-400 flex-shrink-0" />
+              <span className="text-gray-800 font-bold flex-shrink-0">
+                Web Stories
+              </span>
+            </div>
+            <div className="flex-shrink-0 pb-0.5">
+              <BackButton />
+            </div>
+          </div>
           
           <div className="flex items-center gap-2 mb-6 border-b-2 border-[#e60000] pb-3">
             <h1
@@ -208,8 +232,6 @@ export default async function CategoryPage({
               వెబ్ స్టోరీస్
             </h1>
           </div>
-
-          <AdBanner position="leaderboard" />
           
           <div className="mt-6">
             <WebStoriesPage />
@@ -217,9 +239,20 @@ export default async function CategoryPage({
         </main>
       ) : category === 'photos' ? (
         <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full text-left">
-          <BackButton />
-          <div className="hidden md:block">
-            <FlashNewsBar />
+          {/* Breadcrumb Row with Back Button on the right */}
+          <div className="flex items-center justify-between gap-4 mb-5 border-b border-gray-100 pb-3 overflow-hidden">
+            <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
+              <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
+                <Home className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" /> Home
+              </Link>
+              <ChevronRight className="w-3 h-3 md:w-3.5 md:h-3.5 text-gray-400 flex-shrink-0" />
+              <span className="text-gray-800 font-bold flex-shrink-0">
+                Photos
+              </span>
+            </div>
+            <div className="flex-shrink-0 pb-0.5">
+              <BackButton />
+            </div>
           </div>
           
           <div className="flex items-center gap-2 mb-6 border-b-2 border-[#64748b] pb-3">
@@ -230,46 +263,71 @@ export default async function CategoryPage({
               ఫోటో గ్యాలరీ
             </h1>
           </div>
-
-          <AdBanner position="leaderboard" />
           
           <div className="mt-6">
             <PhotosPage />
           </div>
         </main>
+      ) : category === 'citizen-reporter' ? (
+        <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full text-left">
+          {/* Breadcrumb Row with Back Button on the right */}
+          <div className="flex items-center justify-between gap-4 mb-5 border-b border-gray-100 pb-3 overflow-hidden">
+            <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
+              <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
+                <Home className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" /> Home
+              </Link>
+              <ChevronRight className="w-3 h-3 md:w-3.5 md:h-3.5 text-gray-400 flex-shrink-0" />
+              <span className="text-gray-800 font-bold flex-shrink-0">
+                Citizen Reporter
+              </span>
+            </div>
+            <div className="flex-shrink-0 pb-0.5">
+              <BackButton />
+            </div>
+          </div>
+          
+          {/* 70% Left and 30% Right Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-4">
+            <div className="w-full lg:col-span-7">
+              <CitizenReporterForm />
+            </div>
+            {/* Right Sidebar Column (30%) with Ads */}
+            <div className="w-full lg:col-span-3">
+              <RightSidebar />
+            </div>
+          </div>
+        </main>
       ) : (
         <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
-          <BackButton />
-          {/* Flash News Strip */}
-          <div className="hidden md:block">
-            <FlashNewsBar />
-          </div>
-
-
 
           {isDistrictsView ? (
             <>
               {/* Breadcrumb for districts view */}
-              <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 mb-5 border-b border-gray-100 pb-3 font-sans whitespace-nowrap overflow-hidden">
-                <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
-                  <Home size={11} className="md:hidden" /><Home size={14} className="hidden md:block" /> Home
-                </Link>
-                <ChevronRight size={10} className="md:hidden flex-shrink-0" /><ChevronRight size={14} className="hidden md:block flex-shrink-0" />
-                <Link href={`/category/${category}`} className="hover:text-brand-blue transition-colors font-bold flex-shrink-0">
-                  {englishCategories[category] || category}
-                </Link>
-                <ChevronRight size={10} className="md:hidden flex-shrink-0" /><ChevronRight size={14} className="hidden md:block flex-shrink-0" />
-                <span className="text-gray-800 font-bold flex-shrink-0">
-                  District News
-                </span>
-                {activeDistrictObj && (
-                  <>
-                    <ChevronRight size={10} className="md:hidden flex-shrink-0" /><ChevronRight size={14} className="hidden md:block flex-shrink-0" />
-                    <span className="text-brand-blue font-extrabold capitalize truncate">
-                      {activeDistrictObj.slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                    </span>
-                  </>
-                )}
+              <div className="flex items-center justify-between gap-4 mb-5 border-b border-gray-100 pb-3 overflow-hidden">
+                <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
+                  <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
+                    <Home size={11} className="md:hidden" /><Home size={14} className="hidden md:block" /> Home
+                  </Link>
+                  <ChevronRight size={10} className="md:hidden flex-shrink-0" /><ChevronRight size={14} className="hidden md:block flex-shrink-0" />
+                  <Link href={`/category/${category}`} className="hover:text-brand-blue transition-colors font-bold flex-shrink-0">
+                    {englishCategories[category] || category}
+                  </Link>
+                  <ChevronRight size={10} className="md:hidden flex-shrink-0" /><ChevronRight size={14} className="hidden md:block flex-shrink-0" />
+                  <span className="text-gray-800 font-bold flex-shrink-0">
+                    District News
+                  </span>
+                  {activeDistrictObj && (
+                    <>
+                      <ChevronRight size={10} className="md:hidden flex-shrink-0" /><ChevronRight size={14} className="hidden md:block flex-shrink-0" />
+                      <span className="text-brand-blue font-extrabold capitalize truncate">
+                        {activeDistrictObj.slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                      </span>
+                    </>
+                  )}
+                </div>
+                <div className="flex-shrink-0 pb-0.5">
+                  <BackButton />
+                </div>
               </div>
 
               {/* District News Page Header Row */}
@@ -280,20 +338,34 @@ export default async function CategoryPage({
                 >
                   {category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్' : 'తెలంగాణ'} జిల్లా వార్తలు
                 </h1>
-                <div className="hidden md:block">
-                  <DistrictSelector 
-                    category={category}
-                    districts={targetDistricts}
-                    activeDistrictSlug={districtSlug}
-                  />
-                </div>
               </div>
 
-              <AdBanner position="leaderboard" />
-
-              {/* Mobile Ad Block */}
-              <div className="lg:hidden my-4">
-                <AdBanner position="rectangle" />
+              {/* District Names Box with Red Background */}
+              <div className="w-full bg-[#e60000] text-white rounded-xl p-4 md:p-5 shadow-md mb-6 select-none text-left">
+                <h3 className="text-[15px] md:text-[18px] font-black telugu-text mb-3.5 flex items-center gap-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  <MapPin size={16} className="text-white animate-pulse" />
+                  వార్తల కోసం మీ జిల్లాను ఎంచుకోండి:
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {/* Individual District Buttons */}
+                  {targetDistricts.map((dist) => {
+                    const isActive = districtSlug === dist.slug;
+                    return (
+                      <Link
+                        key={dist.slug}
+                        href={`/category/${category}?view=districts&district=${dist.slug}`}
+                        className={`px-3.5 py-1.5 md:py-2 text-center text-[13.5px] md:text-[15px] font-extrabold telugu-text rounded-lg border transition-all active:scale-[0.97] flex items-center justify-center min-h-[38px] cursor-pointer ${
+                          isActive
+                            ? 'bg-white text-[#e60000] border-white shadow-sm'
+                            : 'bg-white/10 text-white border-white/20 hover:bg-white/20'
+                        }`}
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      >
+                        {dist.name}
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* 70% Left and 30% Right Layout */}
@@ -387,22 +459,27 @@ export default async function CategoryPage({
           ) : (
             <>
               {/* Breadcrumb */}
-              <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 mb-5 border-b border-gray-100 pb-3 font-sans whitespace-nowrap overflow-hidden">
-                <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
-                  <Home className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" /> Home
-                </Link>
-                <ChevronRight className="w-3 h-3 md:w-3.5 md:h-3.5 text-gray-400 flex-shrink-0" />
-                <span className="text-gray-800 font-bold flex-shrink-0">
-                  {englishCategories[category] || category}
-                </span>
-                {activeDistrictObj && (
-                  <>
-                    <ChevronRight className="w-3 h-3 md:w-3.5 md:h-3.5 text-gray-400 flex-shrink-0" />
-                    <span className="text-brand-blue font-extrabold capitalize truncate">
-                      {activeDistrictObj.slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                    </span>
-                  </>
-                )}
+              <div className="flex items-center justify-between gap-4 mb-5 border-b border-gray-100 pb-3 overflow-hidden">
+                <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
+                  <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
+                    <Home className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" /> Home
+                  </Link>
+                  <ChevronRight className="w-3 h-3 md:w-3.5 md:h-3.5 text-gray-400 flex-shrink-0" />
+                  <span className="text-gray-800 font-bold flex-shrink-0">
+                    {englishCategories[category] || category}
+                  </span>
+                  {activeDistrictObj && (
+                    <>
+                      <ChevronRight className="w-3 h-3 md:w-3.5 md:h-3.5 text-gray-400 flex-shrink-0" />
+                      <span className="text-brand-blue font-extrabold capitalize truncate">
+                        {activeDistrictObj.slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                      </span>
+                    </>
+                  )}
+                </div>
+                <div className="flex-shrink-0 pb-0.5">
+                  <BackButton />
+                </div>
               </div>
 
               {/* Rastra News Page Header */}
@@ -413,13 +490,6 @@ export default async function CategoryPage({
                 >
                   {category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్ వార్తలు' : category === 'telangana' ? 'తెలంగాణ వార్తలు' : `${cat?.name || category} వార్తలు`}
                 </h1>
-              </div>
-
-              <AdBanner position="leaderboard" />
-
-              {/* Mobile Ad Block */}
-              <div className="lg:hidden my-4">
-                <AdBanner position="rectangle" />
               </div>
 
               {/* 70% Left and 30% Right Layout */}

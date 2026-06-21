@@ -17,15 +17,8 @@ const homeWeatherData = [
     bg: 'from-blue-50/50 to-indigo-50/30'
   },
   {
-    city: 'వరంగల్',
-    temp: 33,
-    condition: 'మేఘావృతం',
-    icon: <Cloud size={24} className="text-gray-400" />,
-    bg: 'from-gray-50/50 to-slate-50/30'
-  },
-  {
-    city: 'ఖమ్మం',
-    temp: 35,
+    city: 'నల్గొండ',
+    temp: 34,
     condition: 'ఎండగా ఉంటుంది',
     icon: <Sun size={24} className="text-amber-500" />,
     bg: 'from-amber-50/50 to-orange-50/30'
@@ -57,21 +50,21 @@ export default function WeatherWidget() {
       </div>
 
       {/* Horizontally scrollable on mobile, Grid on desktop */}
-      <div className="flex overflow-x-auto gap-3 pb-2.5 snap-x hide-scrollbar md:grid md:grid-cols-4 md:pb-0">
+      <div className="flex overflow-x-auto gap-3 pb-2.5 snap-x hide-scrollbar md:grid md:grid-cols-3 md:pb-0">
         {homeWeatherData.map((data, index) => (
           <div 
             key={index} 
-            className={`bg-gradient-to-br ${data.bg} border border-gray-100 rounded-lg p-2.5 flex items-center justify-between hover:shadow-xs hover:border-blue-100 transition-all duration-200 flex-shrink-0 w-[155px] snap-start md:w-auto min-w-0`}
+            className={`bg-gradient-to-br ${data.bg} border border-gray-100 rounded-lg p-2.5 flex items-center justify-between hover:shadow-xs hover:border-blue-100 transition-all duration-200 flex-shrink-0 w-[185px] snap-start md:w-auto min-w-0`}
           >
             <div className="space-y-0.5 text-left min-w-0 flex-1 mr-1.5">
               <h4 
-                className="font-black text-[12px] md:text-[13px] text-gray-900 telugu-text leading-tight truncate"
+                className="font-black text-[12px] md:text-[13px] text-gray-900 telugu-text leading-tight"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {data.city}
               </h4>
               <p 
-                className="text-[10px] md:text-[11px] text-gray-500 font-bold telugu-text leading-tight truncate"
+                className="text-[10px] md:text-[11px] text-gray-500 font-bold telugu-text leading-tight"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {data.condition}

@@ -21,34 +21,41 @@ export interface NewsArticle {
 
 export const categories = [
   { name: 'హోమ్', slug: 'home', color: '#02599c' },
-  { name: 'తాజా వార్తలు', slug: 'latest', color: '#02599c' },
+  { name: 'బ్రేకింగ్ న్యూస్', slug: 'latest', color: '#02599c' },
   { name: 'ఈ-పేపర్', slug: 'epaper', color: '#0f766e' },
   { name: 'రాజకీయాలు', slug: 'politics', color: '#1a6b3a' },
   { name: 'ఆంధ్రప్రదేశ్', slug: 'andhra-pradesh', color: '#d97706' },
   { name: 'తెలంగాణ', slug: 'telangana', color: '#7c3aed' },
-  { name: 'జాతీయం', slug: 'national', color: '#0369a1' },
-  { name: 'అంతర్జాతీయం', slug: 'international', color: '#0e7490' },
+  { name: 'నేషనల్', slug: 'national', color: '#0369a1' },
+  { name: 'ఇంటర్నేషనల్', slug: 'international', color: '#0e7490' },
   { name: 'బిజినెస్', slug: 'business', color: '#15803d' },
-  { name: 'సినిమా', slug: 'entertainment', color: '#db2777' },
-  { name: 'క్రీడలు', slug: 'sports', color: '#ea580c' },
+  { name: 'ఫిల్మ్', slug: 'entertainment', color: '#db2777' },
+  { name: 'స్పోర్ట్స్', slug: 'sports', color: '#ea580c' },
   { name: 'టెక్నాలజీ', slug: 'technology', color: '#4f46e5' },
-  { name: 'ఆరోగ్యం', slug: 'health', color: '#0891b2' },
+  { name: 'హెల్త్', slug: 'health', color: '#0891b2' },
   { name: 'వైరల్', slug: 'viral', color: '#dc2626' },
   { name: 'లైఫ్ స్టైల్', slug: 'lifestyle', color: '#9333ea' },
-  { name: 'రాశిఫలాలు', slug: 'rasipalalu', color: '#b45309' },
+  { name: 'శుభఫలాలు', slug: 'rasipalalu', color: '#b45309' },
   { name: 'ఆల్బమ్‌లు', slug: 'photos', color: '#64748b' },
   { name: 'వీడియోలు', slug: 'videos', color: '#dc2626' },
   { name: 'వెబ్ స్టోరీస్', slug: 'webstories', color: '#ec4899' },
   { name: 'సంపాదకీయం', slug: 'sampadakiyam', color: '#be123c' },
-  { name: 'సంపాదకీయం', slug: 'editorial', color: '#be123c' },
+  { name: 'ఎడిటోరియల్', slug: 'editorial', color: '#be123c' },
   { name: 'వైరల్ స్టోరీస్', slug: 'viral-stories', color: '#dc2626' },
-  { name: 'మహిళలు', slug: 'women', color: '#ec4899' },
+  { name: 'ఆమె', slug: 'women', color: '#ec4899' },
   { name: 'షార్ట్స్', slug: 'shorts', color: '#f43f5e' },
-  { name: 'అంతర్మథనం', slug: 'antharmadanam', color: '#8b5cf6' },
+  { name: 'వ్యక్తిత్వ వికాసం', slug: 'antharmadanam', color: '#8b5cf6' },
   { name: 'మా బృందం (Team)', slug: 'team', color: '#4b5563' },
-  { name: 'ఆధ్యాత్మికం', slug: 'adyathmikam', color: '#f59e0b' },
-  { name: 'ఆధ్యాత్మికం', slug: 'devotional', color: '#f59e0b' },
+  { name: 'దైవం', slug: 'adyathmikam', color: '#f59e0b' },
+  { name: 'దైవం', slug: 'devotional', color: '#f59e0b' },
+  { name: 'విద్య', slug: 'vidya', color: '#0284c7' },
+  { name: 'అడ్మిషన్స్', slug: 'admissions', color: '#0369a1' },
+  { name: 'కరెంట్ అఫైర్స్', slug: 'current-affairs', color: '#0e7490' },
+  { name: 'ఉపాధి', slug: 'upadi', color: '#16a34a' },
+  { name: 'నోటిఫికేషన్స్', slug: 'notification', color: '#15803d' },
+  { name: 'సిటిజన్ రిపోర్టర్', slug: 'citizen-reporter', color: '#cc0000' },
 ];
+
 
 export interface District {
   slug: string;
@@ -927,7 +934,7 @@ export const rasipalaluNews: NewsArticle[] = [
     title: 'నేటి రాశిఫలాలు: జూన్ 5, 2026 నాటి ద్వాదశ రాశిఫలాలు.. ఈ రాశి వారికి ఆకస్మిక ధనలాభం!',
     description: 'నేటి రోజు మీ రాశి ఫలాలు ఎలా ఉన్నాయి? ఏ రాశి వారికి అనుకూలంగా ఉంది? ఏ రాశి వారు అప్రమత్తంగా ఉండాలో ఇక్కడ తెలుసుకోండి.',
     content: 'నేటి రోజు మీ రాశి ఫలాలు ఎలా ఉన్నాయి? మేష రాశి నుండి మీన రాశి వరకు గల ద్వాదశ రాశుల ఫలితాలు ఇక్కడ తెలుసుకోండి. మేష రాశి: అనుకూల సమయం, ఉద్యోగంలో పురోగతి ఉంటుంది. వృషభ రాశి: ప్రయాణాల్లో జాగ్రత్త అవసరం. మిథున రాశి: ఆకస్మిక ధనలాభం కలిగే అవకాశం ఉంది. కర్కాటక రాశి: కుటుంబ సభ్యులతో ఆనందంగా గడుపుతారు. సింహ రాశి: వ్యాపారంలో లాభాలు వస్తాయి. కన్యా రాశి: ఆరోగ్యంపై శ్రద్ధ వహించండి. తులా రాశి: నూతన పనులు ప్రారంభిస్తారు. వృశ్చిక రాశి: ఖర్చులు పెరుగుతాయి. ధనుస్సు రాశి: పనులన్నీ సజావుగా సాగుతాయి. మకర రాశి: గౌరవ ప్రతిష్టలు పెరుగుతాయి. కుంభ రాశి: శుభవార్తలు వింటారు. మీన రాశి: మిశ్రమ ఫలితాలు ఉంటాయి.',
-    category: 'రాశిఫలాలు',
+    category: 'శుభఫలాలు',
     categorySlug: 'rasipalalu',
     categoryColor: '#b45309',
     image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&h=450&fit=crop',
@@ -945,7 +952,7 @@ export const rasipalaluNews: NewsArticle[] = [
     title: 'వారఫలాలు: జూన్ 5 నుంచి జూన్ 11 వరకు.. ఈ రాశుల వారికి ఉద్యోగంలో ప్రమోషన్!',
     description: 'ఈ వారంలో ద్వాదశ రాశుల వారి జాతకం ఎలా ఉండబోతోంది? ఎవరికి కెరీర్ మెరుగ్గా ఉంటుంది? ఆరోగ్య విషయాల్లో ఎలాంటి జాగ్రత్తలు తీసుకోవాలి?',
     content: 'ఈ వారం ద్వాదశ రాశుల వారి భవిష్యత్తు ఎలా ఉండబోతోందంటే... మేష రాశి వారికి ఉద్యోగంలో అనుకూలమైన మార్పులు ఉంటాయి, ప్రమోషన్ లభించే అవకాశం ఉంది. వృషభ రాశి వారు ఆర్థిక విషయాల్లో జాగ్రత్తగా ఉండాలి. మిథున రాశి విద్యార్థులు విజయం సాధిస్తారు. కర్కాటక రాశి వారికి గృహ నిర్మాణ పనులు వేగవంతం అవుతాయి. సింహ రాశి వారికి వ్యాపార విస్తరణకు అనుకూలం. కన్యా రాశి వారు వివాదాలకు దూరంగా ఉండాలి. తులా రాశి ఉద్యోగస్తులకు ప్రశంసలు దక్కుతాయి. వృశ్చిక రాశి వారికి ప్రయాణాల వల్ల ప్రయోజనం. ధనుస్సు రాశి వారు ఆరోగ్యాన్ని నిర్లక్ష్యం చేయవద్దు. మకర రాశి వారికి ఆశించిన అవకాశాలు వస్తాయి. కుంభ రాశి వారు శుభకార్యాల్లో పాల్గొంటారు. మీన రాశి వారికి పనులు విజయవంతంగా పూర్తవుతాయి.',
-    category: 'రాశిఫలాలు',
+    category: 'శుభఫలాలు',
     categorySlug: 'rasipalalu',
     categoryColor: '#b45309',
     image: 'https://images.unsplash.com/photo-1532960401447-7dd05bef20b0?w=800&h=450&fit=crop',
@@ -963,7 +970,7 @@ export const rasipalaluNews: NewsArticle[] = [
     title: 'సంవత్సర రాశిఫలాలు 2026: మీ రాశికి ఈ సంవత్సరం ఎలాంటి ఫలితాలు రాబోతున్నాయి?',
     description: 'నూతన సంవత్సరంలో ద్వాదశ రాశుల వారి గ్రహాల సంచారం ఆధారంగా కెరీర్, పెళ్లి, కుటుంబం మరియు ఆర్థిక స్థితిగతుల విశ్లేషణ.',
     content: '2026 సంవత్సరంలో గురు, శని, రాహు-కేతువుల సంచారం వల్ల ద్వాదశ రాశుల వారికి విభిన్న ఫలితాలు రాబోతున్నాయి. మేష, సింహ, ధనుస్సు రాశుల వారికి ఈ సంవత్సరం అద్భుతమైన కెరీర్ ఎదుగుదల మరియు ఆర్థిక స్థిరత్వం ఉంటుంది. వృషభ, కన్య, మకర రాశుల వారికి మధ్యస్థ ఫలితాలు ఉంటాయి. మిథున, తుల, కుంభ రాశుల వారు ఆరోగ్య విషయాల్లో అప్రమత్తంగా ఉండాలి. కర్కాటక, వృశ్చిక, మీన రాశుల వారికి సామాజికంగా గౌరవ ప్రతిష్టలు లభిస్తాయి.',
-    category: 'రాశిఫలాలు',
+    category: 'శుభఫలాలు',
     categorySlug: 'rasipalalu',
     categoryColor: '#b45309',
     image: 'https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?w=800&h=450&fit=crop',
@@ -980,8 +987,8 @@ export const rasipalaluNews: NewsArticle[] = [
     slug: 'saturn-transit-effects-and-remedies-2026',
     title: 'శని గోచారం 2026: శని దేవుడి సంచారం వల్ల ఈ మూడు రాశుల వారికి విపరీతమైన రాజయోగం!',
     description: 'కుంభ రాశిలో శని సంచారం వల్ల ఏ రాశుల వారికి సానుకూల ఫలితాలు వస్తాయి? ఎలాంటి పరిహారాలు చేయాలో పూర్తి వివరాలు.',
-    content: 'శని దేవుడు స్వక్షేత్రమైన కుంభ రాశిలో సంచరించడం వల్ల కొన్ని రాశుల వారికి శశ మహాపురుష యోగం పడుతోంది. దీనివల్ల మేషం, మిథునం, మరియు తులా రాశుల వారికి అపారమైన కీర్తి, సంపద దక్కుతాయి. శని ప్రభావం వల్ల ఏదైనా ఆటంకాలు ఎదురైతే శనివారం నాడు నువ్వుల నూనెతో దీపారాధన చేయడం, హనుమాన్ చాలీసా పఠించడం ద్వారా ఉపశమనం లభిస్తుంది.',
-    category: 'రాశిఫలాలు',
+    content: 'శని దేవుడు స్వక్షేత్రమైన కుంభ రాశిలో సంచరించడం వల్ల కొన్ని రాశుల వారికి శశ మహాపురుష యోగం పడుతోంది. దీనివల్ల మేషం, మిథున జాతకస్తులకు మంచి యోగం ఉంటుంది. శని ప్రభావం వల్ల ఆటంకాలు తొలగిపోతాయి.',
+    category: 'శుభఫలాలు',
     categorySlug: 'rasipalalu',
     categoryColor: '#b45309',
     image: 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=800&h=450&fit=crop',
@@ -1229,6 +1236,130 @@ export const sampadakiyamNews: NewsArticle[] = [
     tags: ['సంపాదకీయం', 'విద్యా విధానం', 'సంస్కరణలు'],
   }
 ];
+
+export const vidyaNews: NewsArticle[] = [
+  {
+    id: 'vidya-1',
+    slug: 'digital-learning-telugu-states-schools',
+    title: 'డిజిటల్ క్లాస్ రూమ్‌లతో విద్యా రంగంలో సరికొత్త విప్లవం',
+    description: 'ప్రభుత్వ బడులలో పెరిగిన కంప్యూటర్ ల్యాబ్‌లు మరియు ఇంటరాక్టివ్ బోర్డులు. విద్యార్థులలో పెరిగిన సాంకేతిక నైపుణ్యాలు.',
+    content: 'ఈ నూతన విద్యా విధానం ద్వారా విద్యార్థులలో విషయగ్రహణ సామర్థ్యం పెరిగిందని ఉపాధ్యాయులు చెబుతున్నారు. గ్రామీణ ప్రాంతాల్లో కూడా డిజిటల్ విద్య విస్తరిస్తోంది.',
+    category: 'విద్య',
+    categorySlug: 'vidya',
+    categoryColor: '#0284c7',
+    image: 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=800&h=450&fit=crop',
+    author: 'డిజిటల్ విలేఖరి',
+    publishedAt: '2026-06-20T09:00:00Z',
+    isBreaking: false,
+    isTrending: true,
+    isFeatured: true,
+    views: 12500,
+    tags: ['విద్య', 'డిజిటల్ క్లాస్ రూమ్', 'పాఠశాల'],
+  },
+  {
+    id: 'vidya-2',
+    slug: 'new-education-policy-reforms-implementation',
+    title: 'నూతన జాతీయ విద్యా విధానం అమలులో పురోగతి',
+    description: 'ప్రాథమిక స్థాయి నుండి వృత్తి విద్యా కోర్సుల అనుసంధానం. మాతృభాషలోనే విద్యా బోధనకు అగ్రతాంబూలం.',
+    content: 'నూతన జాతీయ విద్యా విధానం 5+3+3+4 పద్ధతిలో అమలు చేయటం పై విద్యాశాఖ నిపుణులు హర్షం వ్యక్తం చేస్తున్నారు.',
+    category: 'విద్య',
+    categorySlug: 'vidya',
+    categoryColor: '#0284c7',
+    image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=450&fit=crop',
+    author: 'హై టీవీ బ్యూరో',
+    publishedAt: '2026-06-19T06:00:00Z',
+    isBreaking: false,
+    isTrending: false,
+    isFeatured: false,
+    views: 8900,
+    tags: ['విద్య', 'జాతీయ విద్యా విధానం', 'సంస్కరణలు'],
+  }
+];
+
+export const admissionsNews: NewsArticle[] = [
+  {
+    id: 'adm-1',
+    slug: 'admissions-open-top-universities-telugu-states',
+    title: 'తెలుగు రాష్ట్రాల్లోని ప్రముఖ యూనివర్సిటీల్లో అడ్మిషన్ల నోటిఫికేషన్ విడుదల',
+    description: 'ఉస్మానియా, ఆంధ్రా యూనివర్సిటీలలో డిగ్రీ, పీజీ ప్రవేశాలకు ఆన్‌లైన్ దరఖాస్తులు ప్రారంభం.',
+    content: 'ఆసక్తిగల అభ్యర్థులు అధికారిక వెబ్‌సైట్ ద్వారా ఈ నెల చివరి నాటికి దరఖాస్తు చేసుకోవాలని యూనివర్సిటీ యాజమాన్యాలు సూచించాయి.',
+    category: 'అడ్మిషన్స్',
+    categorySlug: 'admissions',
+    categoryColor: '#0369a1',
+    image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=450&fit=crop',
+    author: 'విలేఖరి',
+    publishedAt: '2026-06-20T08:00:00Z',
+    isBreaking: true,
+    isTrending: true,
+    isFeatured: false,
+    views: 14200,
+    tags: ['అడ్మిషన్స్', 'ప్రవేశాలు', 'యూనివర్సిటీ'],
+  }
+];
+
+export const currentAffairsNews: NewsArticle[] = [
+  {
+    id: 'ca-1',
+    slug: 'current-affairs-june-2026-competetive-exams',
+    title: 'కరెంట్ అఫైర్స్ జూన్ 2026: పోటీ పరీక్షల ప్రత్యేకం',
+    description: 'పోటీ పరీక్షలకు సిద్ధమవుతున్న అభ్యర్థుల కోసం ముఖ్యమైన అంతర్జాతీయ మరియు జాతీయ వార్తల సమాహారం.',
+    content: 'ఈ నెలలో జరిగిన ముఖ్యమైన సదస్సులు, క్రీడా విజేతలు, నూతన నియామకాలు మొదలైన వివరాలు అభ్యర్థుల కోసం అందించాము.',
+    category: 'కరెంట్ అఫైర్స్',
+    categorySlug: 'current-affairs',
+    categoryColor: '#0e7490',
+    image: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=450&fit=crop',
+    author: 'హై టీవీ డెస్క్',
+    publishedAt: '2026-06-20T10:00:00Z',
+    isBreaking: false,
+    isTrending: false,
+    isFeatured: true,
+    views: 21000,
+    tags: ['కరెంట్ అఫైర్స్', 'పోటీ పరీక్షలు', 'జీకే'],
+  }
+];
+
+export const upadiNews: NewsArticle[] = [
+  {
+    id: 'upadi-1',
+    slug: 'skill-development-training-programs-jobs',
+    title: 'నిరుద్యోగులకు వరం: ఉచిత నైపుణ్య శిక్షణ - ఉద్యోగ అవకాశాలు',
+    description: 'ప్రభుత్వ ఆధ్వర్యంలో యువతకు ఉచిత టెక్నికల్ శిక్షణ మరియు ప్లేస్‌మెంట్స్ సదుపాయం.',
+    content: 'ఈ ప్రోగ్రాం ద్వారా శిక్షణ పొందిన దాదాపు 80% మందికి కార్పొరేట్ కంపెనీలలో ఉద్యోగాలు లభించాయని అధికారులు తెలిపారు.',
+    category: 'ఉపాధి',
+    categorySlug: 'upadi',
+    categoryColor: '#16a34a',
+    image: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&h=450&fit=crop',
+    author: 'డిజిటల్ విలేఖరి',
+    publishedAt: '2026-06-20T07:30:00Z',
+    isBreaking: false,
+    isTrending: true,
+    isFeatured: true,
+    views: 16500,
+    tags: ['ఉపాధి', 'నైపుణ్య శిక్షణ', 'ఉద్యోగాలు'],
+  }
+];
+
+export const notificationNews: NewsArticle[] = [
+  {
+    id: 'not-1',
+    slug: 'job-notification-government-recruitments-2026',
+    title: 'తాజా నోటిఫికేషన్: ప్రభుత్వ రంగంలో 5,000 పైగా పోస్టుల భర్తీకి గ్రీన్ సిగ్నల్',
+    description: 'గ్రూప్-2, గ్రూప్-4 మరియు పోలీస్ కానిస్టేబుల్ పోస్టులకు త్వరలోనే అధికారిక నోటిఫికేషన్ విడుదల.',
+    content: 'అభ్యర్థులు సిలబస్ మరియు పరీక్షా సరళిని అనుసరించి ప్రిపరేషన్ వేగవంతం చేసుకోవాలని నిపుణుల సలహా.',
+    category: 'నోటిఫికేషన్స్',
+    categorySlug: 'notification',
+    categoryColor: '#15803d',
+    image: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=800&h=450&fit=crop',
+    author: 'హై టీవీ డెస్క్',
+    publishedAt: '2026-06-20T11:00:00Z',
+    isBreaking: true,
+    isTrending: true,
+    isFeatured: true,
+    views: 28000,
+    tags: ['నోటిఫికేషన్స్', 'ప్రభుత్వ ఉద్యోగాలు', 'జాబ్స్'],
+  }
+];
+
 
 export const galleryImages = [
   { id: 1, src: 'https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?w=600&h=400&fit=crop', alt: 'రాజకీయ సభ' },

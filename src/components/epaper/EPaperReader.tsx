@@ -1270,7 +1270,7 @@ export default function EPaperReader() {
           {/* Dashboard Header Bar */}
           <div className="bg-white border-b border-gray-200 px-3 md:px-6 py-2.5 flex items-center justify-between gap-2 select-none shadow-sm w-full">
             <Link href="/" className="group flex items-center gap-2 flex-shrink-0">
-              <img src="/image-copy.png" alt="High TV E-Paper Logo" className="h-9 md:h-11 w-auto object-contain" />
+              <img src="/image-copy.png" alt="High TV E-Paper Logo" className="h-11 md:h-14 w-auto object-contain" />
               <div className="text-gray-800 font-black text-sm select-none border-l-2 border-gray-900/10 pl-3 hidden md:block">
                 ఈ-పేపర్ ఎడిషన్స్
               </div>

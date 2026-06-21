@@ -23,7 +23,7 @@ export default function DistrictNewsTabs({ apNews, tgNews }: Props) {
     <div className="bg-white border border-gray-200 rounded overflow-hidden">
       {/* Header */}
       <div className="bg-[#025390] text-white px-3 py-2.5">
-        <span className="font-black text-base telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+        <span className="font-black text-base pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
           జిల్లా వార్తలు
         </span>
       </div>
@@ -70,7 +70,7 @@ export default function DistrictNewsTabs({ apNews, tgNews }: Props) {
                 />
               </div>
               <p
-                className="flex-1 min-w-0 text-[16px] font-semibold text-gray-700 group-hover:text-[#025390] leading-snug line-clamp-2 telugu-text"
+                className="flex-1 min-w-0 text-[16px] font-semibold text-gray-700 group-hover:text-[#025390] leading-relaxed pl-1 pb-1 telugu-text line-clamp-2"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {item.title}

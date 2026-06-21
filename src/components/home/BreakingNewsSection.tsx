@@ -36,11 +36,10 @@ export default function BreakingNewsSection() {
                     className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
                   />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <span className="text-[16px] font-black text-gray-800 group-hover:text-brand-blue transition-colors leading-snug block telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <div className="min-w-0 flex-1 py-1 px-1">
+                  <span className="text-[1.05rem] md:text-[1.12rem] font-black text-gray-800 group-hover:text-brand-blue transition-colors leading-relaxed block telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                     {article.title}
                   </span>
-
                 </div>
               </Link>
             ))}
@@ -49,11 +48,11 @@ export default function BreakingNewsSection() {
             {breaking[0] && (
               <>
                 <img src={breaking[0].image} alt={breaking[0].title} className="w-full h-full object-cover" loading="eager" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-3">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 pb-5 px-4 pt-2">
                   <span className="bg-brand-red text-white text-[11px] font-black px-1.5 py-0.5 rounded breaking-badge mb-1 inline-block">🔴 BREAKING</span>
                   <Link href={`/news/${breaking[0].slug}`}>
-                    <h3 className="text-white text-[18px] font-black leading-snug hover:text-hover-yellow transition-colors telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    <h3 className="text-white text-[1.15rem] md:text-[1.28rem] font-black leading-relaxed hover:text-hover-yellow transition-colors telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       {breaking[0].title}
                     </h3>
                   </Link>

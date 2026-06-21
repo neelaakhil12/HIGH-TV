@@ -83,7 +83,7 @@ export default function HeroSlider() {
           {/* News Headline - exactly one line */}
           <Link href={`/news/${slide.slug}`} className="block group">
             <h2
-              className="text-gray-800 text-[15.5px] md:text-base font-black leading-snug group-hover:text-[#02599c] transition-colors telugu-text"
+              className="text-gray-800 text-[15.5px] md:text-base font-black leading-relaxed pl-1 pb-1 group-hover:text-[#02599c] transition-colors telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               title={slide.title}
             >

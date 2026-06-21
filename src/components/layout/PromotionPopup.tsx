@@ -64,13 +64,13 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
       if (id === 'article') {
         const timer = setTimeout(() => {
           setIsOpen(true);
-        }, 1500); // 1.5 seconds delay on load
+        }, 25000); // 25 seconds delay on load
         return () => clearTimeout(timer);
       } else if (!hasSeenPopup) {
         const timer = setTimeout(() => {
           setIsOpen(true);
           sessionStorage.setItem(`hasSeenPromoPopup_${id}`, 'true');
-        }, 1500); // 1.5 seconds delay on load
+        }, 25000); // 25 seconds delay on load
         return () => clearTimeout(timer);
       }
     }
