@@ -22,6 +22,7 @@ export interface NewsArticle {
 export const categories = [
   { name: 'హోమ్', slug: 'home', color: '#02599c' },
   { name: 'బ్రేకింగ్ న్యూస్', slug: 'latest', color: '#02599c' },
+  { name: 'లైవ్ అప్‌డేట్స్', slug: 'live-updates', color: '#dc2626' },
   { name: 'ఈ-పేపర్', slug: 'epaper', color: '#0f766e' },
   { name: 'రాజకీయాలు', slug: 'politics', color: '#1a6b3a' },
   { name: 'ఆంధ్రప్రదేశ్', slug: 'andhra-pradesh', color: '#d97706' },

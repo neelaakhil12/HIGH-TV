@@ -29,6 +29,7 @@ export default function BottomNavBar() {
   const menuItems = [
     { label: 'హోమ్', href: '/' },
     { label: 'బ్రేకింగ్ న్యూస్', href: '/category/latest' },
+    { label: 'లైవ్ అప్‌డేట్స్', href: '/category/live-updates' },
     { label: 'తెలంగాణ', href: '/category/telangana' },
     { label: 'ఆంధ్రప్రదేశ్', href: '/category/andhra-pradesh' },
     { label: 'ఈ-పేపర్', href: '/category/epaper' },

@@ -56,6 +56,7 @@ const allNews = [
 
 const englishCategories: Record<string, string> = {
   'latest': 'Breaking News',
+  'live-updates': 'Live Updates',
   'telangana': 'Telangana',
   'andhra-pradesh': 'Andhra Pradesh',
   'national': 'National',
@@ -134,6 +135,12 @@ export default async function CategoryPage({
   
   // Get all articles for this category
   let articles = allNews.filter((n) => n.categorySlug === category);
+  if (category === 'latest') {
+    articles = allNews.filter((n) => n.isBreaking);
+    if (articles.length === 0) {
+      articles = allNews.slice(0, 12);
+    }
+  }
 
   // Apply district filter if present
   let activeDistrictName = '';
@@ -198,7 +205,7 @@ export default async function CategoryPage({
     <div className="min-h-screen bg-[#f4f6f8] flex flex-col">
       {category !== 'epaper' && <Header />}
 
-      {category === 'latest' ? (
+      {category === 'live-updates' ? (
         <main className="flex-1 w-full">
           <LiveUpdatesPage />
         </main>

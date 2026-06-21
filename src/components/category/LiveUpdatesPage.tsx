@@ -363,7 +363,7 @@ export default function LiveUpdatesPage() {
           <div className="text-[11px] md:text-[13px] font-bold text-gray-500 font-sans uppercase tracking-wider flex items-center gap-1.5 select-none">
             <Link href="/" className="hover:text-blue-900 transition-colors">HOME</Link> 
             <ChevronRight className="w-3.5 h-3.5 text-gray-450" />
-            <Link href="/category/latest" onClick={() => setSelectedUpdate(null)} className="hover:text-blue-900 transition-colors">
+            <Link href="/category/live-updates" onClick={() => setSelectedUpdate(null)} className="hover:text-blue-900 transition-colors">
               LIVE UPDATES
             </Link>
             {selectedUpdate && (

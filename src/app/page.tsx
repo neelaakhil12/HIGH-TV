@@ -248,7 +248,7 @@ export default function HomePage() {
                     ఆంధ్రప్రదేశ్ జిల్లాల వార్తలు
                   </Link>
                   <Link
-                    href="/category/latest"
+                    href="/category/live-updates"
                     className="bg-[#5c2d91] hover:bg-[#4a2078] text-white font-black py-2 px-1 rounded text-center text-[12px] md:text-[13px] lg:text-sm transition-colors shadow-xs flex items-center justify-center gap-2 telugu-text cursor-pointer"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
