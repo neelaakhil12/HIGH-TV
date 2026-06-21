@@ -280,7 +280,7 @@ export default function Header() {
           <Link href="/category/webstories"     className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/webstories')}`}>వెబ్ స్టోరీస్</Link>
           <Link href="/category/antharmadanam"  className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/antharmadanam')}`}>వ్యక్తిత్వ వికాసం</Link>
           <Link href="/category/adyathmikam"    className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/adyathmikam')}`}>దైవం</Link>
-          <Link href="/category/sampadakiyam"   className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/sampadakiyam')}`}>సంపాదకీయం</Link>
+          <Link href="/category/sampadakiyam"   className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/sampadakiyam')}`}>ఎడిటోరియల్</Link>
           <Link href="/category/epaper"         className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/epaper')}`}>ఈ-పేపర్</Link>
           <Link href="/category/citizen-reporter" className={`px-2.5 h-full flex items-center hover:bg-black/15 flex-shrink-0 ${navCls('/category/citizen-reporter')}`}>సిటిజన్ రిపోర్టర్</Link>
         </div>
@@ -422,8 +422,10 @@ export default function Header() {
                         <Link onClick={closeAllDropdowns} href="/category/webstories"    className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వెబ్ స్టోరీస్</Link>
                         <Link onClick={closeAllDropdowns} href="/category/antharmadanam" className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వ్యక్తిత్వ వికాసం</Link>
                         <Link onClick={closeAllDropdowns} href="/category/adyathmikam"   className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>దైవం</Link>
-                        <Link onClick={closeAllDropdowns} href="/category/sampadakiyam"  className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>సంపాదకీయం</Link>
+                        <Link onClick={closeAllDropdowns} href="/category/sampadakiyam"  className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఎడిటోరియల్</Link>
                         <Link onClick={closeAllDropdowns} href="/category/citizen-reporter" className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>సిటిజన్ రిపోర్టర్</Link>
+                        <Link onClick={closeAllDropdowns} href="/team" className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>మా టీమ్</Link>
+                        <Link onClick={closeAllDropdowns} href="/weather" className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వాతావరణం</Link>
                       </div>
                     </div>
                   </div>
@@ -557,7 +559,7 @@ export default function Header() {
                   { href: '/category/webstories',     label: 'వెబ్ స్టోరీస్' },
                   { href: '/category/antharmadanam',  label: 'వ్యక్తిత్వ వికాసం' },
                   { href: '/category/adyathmikam',    label: 'దైవం'           },
-                  { href: '/category/sampadakiyam',   label: 'సంపాదకీయం'      },
+                  { href: '/category/sampadakiyam',   label: 'ఎడిటోరియల్'      },
                   { href: '/category/admissions',     label: 'అడ్మిషన్స్'       },
                   { href: '/category/current-affairs', label: 'కరెంట్ అఫైర్స్'  },
                   { href: '/category/notification',   label: 'నోటిఫికేషన్స్'   },

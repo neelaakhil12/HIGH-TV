@@ -56,9 +56,9 @@ export default function FlashNewsBar({ isMobileHeader = false }: { isMobileHeade
           <span className="font-extrabold text-[#fe0000] text-[12.5px] tracking-wider uppercase font-sans">
             FLASH NEWS
           </span>
-          <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
+          <span className="relative flex h-2 w-2 flex-shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
           </span>
         </div>
 
@@ -91,16 +91,16 @@ export default function FlashNewsBar({ isMobileHeader = false }: { isMobileHeade
       <div className="h-6 w-[1px] bg-gray-200 mx-4 flex-shrink-0"></div>
 
       {/* Content wrapper */}
-      <div className="flex-1 flex items-start min-h-[2.5rem] overflow-hidden">
+      <div className="flex-1 flex items-center min-h-[2.5rem] overflow-hidden">
         <div
-          className={`flex items-start gap-2.5 w-full transition-all duration-300 ${
+          className={`flex items-center gap-2.5 w-full transition-all duration-300 ${
             fade ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'
           }`}
         >
           {/* Pulsing Live indicator */}
-          <span className="relative flex h-2.5 w-2.5 mt-1.5 flex-shrink-0">
+          <span className="relative flex h-2 w-2 flex-shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
           </span>
 
           {/* Headline Link */}
@@ -108,7 +108,7 @@ export default function FlashNewsBar({ isMobileHeader = false }: { isMobileHeade
             key={currentIndex}
             href={flashNewsItems[currentIndex].link}
             className="text-[18.5px] font-extrabold text-gray-800 hover:text-[#02599c] transition-colors telugu-text text-left pr-4 pl-0.5 cursor-pointer block"
-            style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.8' }}
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.4' }}
           >
             {flashNewsItems[currentIndex].text}
           </Link>

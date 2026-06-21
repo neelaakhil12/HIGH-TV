@@ -49,7 +49,7 @@ export default function BottomNavBar() {
     { label: 'వెబ్ స్టోరీస్', href: '/category/webstories' },
     { label: 'వ్యక్తిత్వ వికాసం', href: '/category/antharmadanam' },
     { label: 'దైవం', href: '/category/adyathmikam' },
-    { label: 'సంపాదకీయం', href: '/category/sampadakiyam' },
+    { label: 'ఎడిటోరియల్', href: '/category/sampadakiyam' },
     { label: 'అడ్మిషన్స్', href: '/category/admissions' },
     { label: 'కరెంట్ అఫైర్స్', href: '/category/current-affairs' },
     { label: 'నోటిఫికేషన్స్', href: '/category/notification' },
