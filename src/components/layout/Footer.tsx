@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { categories } from '@/lib/mockData';
 import BackToTopBar from '@/components/layout/BackToTopBar';
-import ScrollToTopButton from '@/components/layout/ScrollToTopButton';
 
 // Inline SVG social icons
 const FacebookIcon = () => (
@@ -139,7 +138,6 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-    <ScrollToTopButton />
     </>
   );
 }

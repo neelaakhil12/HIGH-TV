@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import GlobalPromotionPopup from "@/components/layout/GlobalPromotionPopup";
 import BottomNavBar from "@/components/layout/BottomNavBar";
+import ScrollToTopButton from "@/components/layout/ScrollToTopButton";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -45,6 +46,7 @@ export default function RootLayout({
         {children}
         <BottomNavBar />
         <GlobalPromotionPopup />
+        <ScrollToTopButton />
       </body>
     </html>
   );
