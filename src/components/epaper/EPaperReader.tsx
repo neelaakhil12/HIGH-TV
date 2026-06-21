@@ -594,7 +594,12 @@ export default function EPaperReader() {
   useEffect(() => {
     const check = () => {
       const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
+      setIsMobile(prevMobile => {
+        if (prevMobile && !mobile) {
+          setZoom(75);
+        }
+        return mobile;
+      });
       if (mobile) {
         // Get width from scroll container if available, fallback to window.innerWidth
         const containerWidth = scrollContainerRef.current 
@@ -2468,32 +2473,7 @@ export default function EPaperReader() {
               </div>
             </div>
           )}
-          {/* Floating Zoom Panel for Reader View */}
-          {viewMode === 'reader' && (
-            <div className="hidden md:flex fixed bottom-16 right-4 z-40 flex-col gap-2 pointer-events-auto">
-              <button
-                onClick={() => setZoom(z => Math.min(250, z + 10))}
-                className="w-10 h-10 rounded-full bg-white text-gray-700 border border-gray-250 shadow-lg flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all cursor-pointer"
-                title="Zoom In"
-              >
-                <Plus size={18} className="stroke-[3] text-gray-500" />
-              </button>
-              <button
-                onClick={() => setZoom(z => Math.max(fitZoom, z - 10))}
-                className="w-10 h-10 rounded-full bg-white text-gray-700 border border-gray-250 shadow-lg flex items-center justify-center hover:bg-gray-50 active:scale-95 transition-all cursor-pointer"
-                title="Zoom Out"
-              >
-                <Minus size={18} className="stroke-[3] text-gray-500" />
-              </button>
-              <button
-                onClick={() => setZoom(fitZoom)}
-                className="w-10 h-10 rounded-full bg-[#02599c] text-white shadow-lg flex items-center justify-center hover:bg-[#013f70] active:scale-95 transition-all cursor-pointer text-[10px] font-black"
-                title="Reset Zoom to Fit Width"
-              >
-                FIT
-              </button>
-            </div>
-          )}
+
         </div>
       )}
     </div>
