@@ -1613,20 +1613,7 @@ export default function EPaperReader() {
               </aside>
             )}
 
-            {/* Mobile Page Navigator Bar */}
-            <div className="md:hidden fixed bottom-14 left-0 right-0 z-40 bg-white border-t border-gray-200 flex overflow-x-auto hide-scrollbar gap-2 px-3 py-2 shadow-lg">
-              {epaperPages.map((page, idx) => (
-                <button
-                  key={page.pageNum}
-                  onClick={() => { setActivePageIdx(idx); setIsClipping(false); }}
-                  className={`flex-shrink-0 w-9 h-9 rounded-lg text-[11px] font-black transition-all border ${
-                    idx === activePageIdx ? 'bg-[#02599c] text-white border-[#02599c]' : 'bg-gray-100 text-gray-600 border-gray-200'
-                  }`}
-                >
-                  {page.pageNum}
-                </button>
-              ))}
-            </div>
+
 
             {/* Workspace Viewport Wrapper */}
             <div className="flex-1 relative flex flex-col min-w-0 h-full overflow-hidden">
@@ -1946,7 +1933,7 @@ export default function EPaperReader() {
               </div>
 
               {isMobile && (
-                <div className="w-full flex justify-center mt-1 px-4">
+                <div className="w-full flex justify-center mt-1 px-4 pb-14">
                   <AdBanner position="rectangle" />
                 </div>
               )}
