@@ -34,7 +34,7 @@ export default function BottomNavBar() {
     { label: 'ఆంధ్రప్రదేశ్', href: '/category/andhra-pradesh' },
     { label: 'ఈ-పేపర్', href: '/category/epaper' },
     { label: 'నేషనల్', href: '/category/national' },
-    { label: 'ఇంటర్నేషనల్', href: '/category/international' },
+    { label: 'వరల్డ్', href: '/category/international' },
     { label: 'బిజినెస్', href: '/category/business' },
     { label: 'హెల్త్', href: '/category/health' },
     { label: 'స్పోర్ట్స్', href: '/category/sports' },

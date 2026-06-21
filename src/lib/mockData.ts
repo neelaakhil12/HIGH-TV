@@ -28,7 +28,7 @@ export const categories = [
   { name: 'ఆంధ్రప్రదేశ్', slug: 'andhra-pradesh', color: '#d97706' },
   { name: 'తెలంగాణ', slug: 'telangana', color: '#7c3aed' },
   { name: 'నేషనల్', slug: 'national', color: '#0369a1' },
-  { name: 'ఇంటర్నేషనల్', slug: 'international', color: '#0e7490' },
+  { name: 'వరల్డ్', slug: 'international', color: '#0e7490' },
   { name: 'బిజినెస్', slug: 'business', color: '#15803d' },
   { name: 'ఫిల్మ్', slug: 'entertainment', color: '#db2777' },
   { name: 'స్పోర్ట్స్', slug: 'sports', color: '#ea580c' },

@@ -262,7 +262,7 @@ export default function Header() {
             <ChevronDown size={11} className={`text-[#ffb3d1] transition-transform duration-200 ${isAPMobileExpanded ? 'rotate-180' : ''}`} />
           </button>
           <Link href="/category/national"       className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/national')}`}>నేషనల్</Link>
-          <Link href="/category/international"  className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/international')}`}>ఇంటర్నేషనల్</Link>
+          <Link href="/category/international"  className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/international')}`}>వరల్డ్</Link>
           <Link href="/category/business"       className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/business')}`}>బిజినెస్</Link>
           <Link href="/category/health"         className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/health')}`}>హెల్త్</Link>
           <Link href="/category/admissions"     className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/admissions')}`}>విద్య</Link>
@@ -353,7 +353,7 @@ export default function Header() {
               <Link href="/category/national" className={`px-3 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/national')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>నేషనల్</Link>
 
               {/* ఇంటర్నేషనల్ */}
-              <Link href="/category/international" className={`px-3 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/international')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఇంటర్నేషనల్</Link>
+              <Link href="/category/international" className={`px-3 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/international')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వరల్డ్</Link>
 
               {/* బిజినెస్ */}
               <Link href="/category/business" className={`px-3 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/business')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>బిజినెస్</Link>
@@ -543,7 +543,7 @@ export default function Header() {
                   { href: '/category/andhra-pradesh', label: 'ఆంధ్రప్రదేశ్'  },
                   { href: '/category/epaper',         label: 'ఈ-పేపర్'        },
                   { href: '/category/national',       label: 'నేషనల్'         },
-                  { href: '/category/international',  label: 'ఇంటర్నేషనల్'   },
+                  { href: '/category/international',  label: 'వరల్డ్'   },
                   { href: '/category/business',       label: 'బిజినెస్'       },
                   { href: '/category/health',         label: 'హెల్త్'          },
                   { href: '/category/politics',       label: 'పాలిటిక్స్'      },
