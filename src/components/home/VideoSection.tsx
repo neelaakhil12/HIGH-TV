@@ -57,7 +57,7 @@ export default function VideoSection() {
 
             <div className="p-3">
               <h3
-                className="text-[0.98rem] md:text-[1.08rem] font-bold text-gray-800 group-hover:text-[#66000c] transition-colors line-clamp-2 leading-relaxed mb-2 telugu-text pl-2.5 pr-1 pb-1"
+                className="secondary-headline text-gray-800 group-hover:text-[#66000c] transition-colors line-clamp-2 mb-2 telugu-text pl-2.5 pr-1 pb-1"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {video.title}

@@ -74,7 +74,7 @@ export function AstrologyAd() {
 // 3. Sidebar: Tanishq Jewellery Ad (Replaces Sathyabama Admissions Banner)
 export function SathyabamaAd() {
   return (
-    <div className="w-full md:w-full bg-[#0f172a] border border-amber-500/20 rounded-lg flex flex-col justify-between p-3 select-none overflow-hidden relative shadow-md mx-auto">
+    <div className="w-full max-w-[280px] md:max-w-none md:w-full bg-[#0f172a] border border-amber-500/20 rounded-lg flex flex-col justify-between p-2.5 md:p-3 select-none overflow-hidden relative shadow-md mx-auto">
       
       {/* Tiny Google Adchoices icon */}
       <div className="absolute top-1 right-1 opacity-20 hover:opacity-100 transition-opacity z-10">
@@ -84,30 +84,30 @@ export function SathyabamaAd() {
       </div>
 
       {/* Header: Tanishq Logo */}
-      <div className="flex items-center justify-between flex-shrink-0 mb-2">
+      <div className="flex items-center justify-between flex-shrink-0 mb-1.5 md:mb-2">
         <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded-full bg-amber-500 text-slate-955 text-[7px] font-black flex items-center justify-center border border-white">
+          <div className="w-3.5 h-3.5 md:w-4 md:h-4 rounded-full bg-amber-500 text-slate-955 text-[6.5px] md:text-[7px] font-black flex items-center justify-center border border-white">
             T
           </div>
-          <span className="text-[9px] font-extrabold text-white tracking-widest font-sans">TANISHQ</span>
+          <span className="text-[8px] md:text-[9px] font-extrabold text-white tracking-widest font-sans">TANISHQ</span>
         </div>
-        <div className="bg-[#b45309] text-white text-[6px] font-extrabold px-1.5 py-0.5 rounded leading-none uppercase font-sans">
+        <div className="bg-[#b45309] text-white text-[5.5px] md:text-[6px] font-extrabold px-1.5 py-0.5 rounded leading-none uppercase font-sans">
           TATA Enterprise
         </div>
       </div>
 
       {/* Headline & Body */}
-      <div className="text-left leading-none flex-shrink-0 mb-2">
-        <h4 className="text-[13px] font-black text-amber-400 tracking-wide font-sans">
+      <div className="text-left leading-none flex-shrink-0 mb-1.5 md:mb-2">
+        <h4 className="text-[11.5px] md:text-[13px] font-black text-amber-400 tracking-wide font-sans">
           The Festival of Gold
         </h4>
-        <p className="text-[10px] text-gray-300 mt-0.5 font-sans leading-tight">
+        <p className="text-[9px] md:text-[10px] text-gray-300 mt-0.5 font-sans leading-tight">
           Flat 20% OFF on Jewellery
         </p>
       </div>
 
       {/* Center Image: Jewellery Model */}
-      <div className="w-full h-[160px] md:h-[110px] rounded-md overflow-hidden relative border border-slate-900 bg-slate-950 flex-shrink-0">
+      <div className="w-full h-[120px] md:h-[110px] rounded-md overflow-hidden relative border border-slate-900 bg-slate-950 flex-shrink-0">
         <img
           src="/tanishq-ad.png"
           alt="Tanishq Jewellery"
@@ -115,12 +115,12 @@ export function SathyabamaAd() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/60 to-transparent"></div>
         <div className="absolute bottom-1 left-1.5">
-          <span className="text-[8px] text-white font-extrabold uppercase font-sans tracking-wide">Pure Gold</span>
+          <span className="text-[7.5px] md:text-[8px] text-white font-extrabold uppercase font-sans tracking-wide">Pure Gold</span>
         </div>
       </div>
 
       {/* Action Button */}
-      <div className="mt-2.5 bg-[#b45309] hover:bg-[#9a4407] text-white text-[11px] font-black py-1.5 px-3 rounded uppercase tracking-wider text-center leading-normal font-sans cursor-pointer transition-colors flex-shrink-0">
+      <div className="mt-2 md:mt-2.5 bg-[#b45309] hover:bg-[#9a4407] text-white text-[10px] md:text-[11px] font-black py-1 md:py-1.5 px-3 rounded uppercase tracking-wider text-center leading-normal font-sans cursor-pointer transition-colors flex-shrink-0">
         Explore
       </div>
 

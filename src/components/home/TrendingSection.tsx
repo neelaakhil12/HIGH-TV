@@ -51,7 +51,7 @@ export default function TrendingSection() {
  
               <Link href={`/news/${trending[0].slug}`}>
                 <h3
-                  className="text-white text-[1.08rem] md:text-[1.25rem] font-black leading-relaxed hover:text-orange-200 transition-colors telugu-text pl-1 pb-1"
+                  className="secondary-headline text-white hover:text-orange-200 transition-colors telugu-text pl-2.5 pb-1 font-black"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {trending[0].title}
@@ -86,7 +86,7 @@ export default function TrendingSection() {
  
                 <Link href={`/news/${article.slug}`}>
                   <p
-                    className="text-[1.02rem] md:text-[1.08rem] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-2 leading-relaxed telugu-text pl-1 pb-1"
+                    className="secondary-headline font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-2 telugu-text pl-2.5 pb-1"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {article.title}

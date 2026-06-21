@@ -136,7 +136,7 @@ interface NewsCardProps {
 export default function NewsCard({ article, variant = 'default', className, imageClassName }: NewsCardProps) {
   if (variant === 'horizontal') {
     return (
-      <article className={`news-card flex flex-col gap-2.5 bg-white rounded-lg overflow-hidden border border-gray-100 hover:border-blue-100 px-5 py-3 sm:p-3 text-left flex-shrink-0 w-full snap-start sm:w-auto ${className || ''}`}>
+      <article className={`news-card flex flex-col gap-2.5 bg-white rounded-lg overflow-hidden border border-gray-100 hover:border-blue-100 card-padding text-left flex-shrink-0 w-full snap-start sm:w-auto ${className || ''}`}>
         <Link href={`/news/${article.slug}`} className="block img-zoom-container rounded-md overflow-hidden w-full aspect-video relative">
           <Image
             src={article.image}
@@ -151,7 +151,7 @@ export default function NewsCard({ article, variant = 'default', className, imag
 
             <Link href={`/news/${article.slug}`}>
               <h3
-                className="text-[0.92rem] md:text-[0.98rem] font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-3 leading-relaxed telugu-text pl-2.5 pr-1 pb-1"
+                className="secondary-headline headline-hover telugu-text line-clamp-3 pl-2.5 pr-1 pb-1"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {article.title}
@@ -179,7 +179,7 @@ export default function NewsCard({ article, variant = 'default', className, imag
         <div className="flex-1">
           <Link href={`/news/${article.slug}`}>
             <p
-               className="text-[0.98rem] font-semibold text-gray-800 group-hover:text-brand-blue transition-colors line-clamp-2 leading-relaxed telugu-text pl-2.5 pr-1 pb-1"
+               className="secondary-headline headline-hover telugu-text line-clamp-2 pl-2.5 pr-1 pb-1"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.title}
@@ -203,19 +203,19 @@ export default function NewsCard({ article, variant = 'default', className, imag
             sizes="(max-width: 768px) 100vw, 800px"
           />
         </Link>
-        <div className="p-4 flex flex-col flex-1 justify-between">
+        <div className="card-padding flex flex-col flex-1 justify-between">
           <div>
 
             <Link href={`/news/${article.slug}`}>
               <h3
-                className="text-[1.15rem] md:text-[1.28rem] lg:text-[1.4rem] font-black text-gray-955 leading-relaxed hover:text-brand-blue transition-colors telugu-text pl-2.5 pb-1"
+                className="secondary-headline headline-hover telugu-text pl-2.5 pb-1"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {article.title}
               </h3>
             </Link>
             <p
-              className="text-[1rem] md:text-[1.08rem] text-gray-500 leading-[1.85] pb-2 mt-2 line-clamp-2 telugu-text pl-2.5 pr-1"
+              className="news-summary summary-truncate telugu-text pl-2.5 pr-1 gap-headline-summary"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.description}
@@ -252,23 +252,19 @@ export default function NewsCard({ article, variant = 'default', className, imag
       </Link>
 
       {/* Content */}
-      <div className="p-4 flex flex-col flex-1">
+      <div className="card-padding flex flex-col flex-1">
 
 
         <Link href={`/news/${article.slug}`} className="flex-1">
           <h2
-            className={`${
-              article.categorySlug === 'rasipalalu'
-                ? 'text-[0.95rem] md:text-[1.05rem]'
-                : 'text-[1.08rem] md:text-[1.18rem]'
-            } font-bold text-gray-800 hover:text-brand-blue transition-colors leading-relaxed line-clamp-2 mb-2 telugu-text pl-2.5 pr-1 pb-1`}
+            className="secondary-headline headline-hover telugu-text line-clamp-2 mb-2 pl-2.5 pr-1 pb-1"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             {article.title}
           </h2>
           {article.categorySlug !== 'rasipalalu' && (
             <p
-              className="text-[0.98rem] md:text-[1.05rem] text-gray-500 leading-[1.85] pb-2 line-clamp-2 telugu-text pl-2.5 pr-1"
+              className="news-summary summary-truncate telugu-text pl-2.5 pr-1 gap-headline-summary"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
             >
               {article.description}

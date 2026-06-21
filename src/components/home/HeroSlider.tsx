@@ -78,12 +78,12 @@ export default function HeroSlider() {
       </div>
 
       {/* Slide Text Content Container (Placed directly under the image) */}
-      <div className="p-3.5 px-4 md:px-3.5 select-none bg-white">
+      <div className="card-padding select-none bg-white">
         <div key={current} className="slide-fade-in">
           {/* News Headline - exactly one line */}
           <Link href={`/news/${slide.slug}`} className="block group">
             <h2
-              className="text-gray-800 text-[15.5px] md:text-base font-black leading-relaxed pl-1 pb-1 group-hover:text-[#02599c] transition-colors telugu-text"
+              className="secondary-headline headline-hover telugu-text pl-1 pb-1"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               title={slide.title}
             >

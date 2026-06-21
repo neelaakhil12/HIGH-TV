@@ -195,7 +195,7 @@ export default function WebStoriesPage() {
               {/* Image text overlay */}
               <div className="absolute top-[15%] left-0 right-0 px-5 md:px-6 text-center">
                 <span
-                  className="text-[18px] md:text-[22px] font-black leading-relaxed block break-words"
+                  className="text-[18px] md:text-[22px] font-black leading-relaxed block break-words pl-2.5"
                   style={getTextStyle(story.coverStyle)}
                 >
                   {story.coverTitle}
@@ -205,7 +205,7 @@ export default function WebStoriesPage() {
             {/* Bottom Title Text */}
             <div className="mt-3 text-left py-1 pl-3.5 pr-2">
               <h4
-                className="text-[0.92rem] md:text-[1.02rem] font-black text-gray-855 group-hover:text-[#02599c] leading-[2.15] pb-2 telugu-text line-clamp-2"
+                className="text-[0.92rem] md:text-[1.02rem] font-black text-gray-855 group-hover:text-[#02599c] leading-relaxed md:leading-[2.15] pb-2 telugu-text line-clamp-4 md:line-clamp-2 pl-2.5"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {story.title}
@@ -321,7 +321,7 @@ export default function WebStoriesPage() {
               className="absolute left-1/2 rounded-full bg-black/65 backdrop-blur-xs shadow-2xl z-20 pointer-events-none flex flex-col justify-start items-center px-6 text-center animate-story-circle-pop border border-white/10 transition-all duration-500 ease-in-out"
             >
               <h3
-                className="text-[17px] md:text-[22px] font-black leading-relaxed text-white telugu-text max-w-[240px] md:max-w-[270px] mx-auto"
+                className="text-[17px] md:text-[22px] font-black leading-relaxed text-white telugu-text max-w-[240px] md:max-w-[270px] mx-auto pl-2.5"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {typedText}

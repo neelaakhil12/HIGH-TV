@@ -14,6 +14,12 @@
   --section-bg: #F8F8F8;
   --astrology-bg: #ffedfd;
   --panchangam-title: #b5009d;
+  
+  /* Typography and Layout Spacing */
+  --headline-summary-gap: 12px;
+  --card-padding: 16px;
+  --section-spacing: 24px;
+  --paragraph-spacing: 18px;
 }
 
 @theme inline {
@@ -267,6 +273,210 @@ body {
 
 .animate-fade-overlay {
   animation: fade-in-overlay 0.25s ease forwards;
+}
+
+/* News Typography Hierarchy System */
+
+/* Main Headlines: Top breaking news and featured stories */
+.main-headline {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+@media (min-width: 768px) {
+  .main-headline {
+    font-size: 28px;
+    line-height: 1.25;
+  }
+}
+/* Telugu Line Height Override (+0.2) */
+.main-headline.telugu-text {
+  line-height: 1.5;
+}
+@media (min-width: 768px) {
+  .main-headline.telugu-text {
+    line-height: 1.4;
+  }
+}
+
+/* Secondary Headlines: News cards and category-based articles */
+.secondary-headline {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+@media (min-width: 768px) {
+  .secondary-headline {
+    font-size: 19px;
+    line-height: 1.3;
+  }
+}
+/* Telugu Line Height Override (+0.3) to prevent top/bottom vowel clipping in line-clamp */
+.secondary-headline.telugu-text {
+  line-height: 1.75;
+}
+@media (min-width: 768px) {
+  .secondary-headline.telugu-text {
+    line-height: 1.65;
+  }
+}
+
+/* News Summary: Summary text under each headline */
+.news-summary {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.8;
+}
+@media (min-width: 768px) {
+  .news-summary {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+}
+/* Telugu Override: Reduced size but maintains high readability */
+.news-summary.telugu-text {
+  font-size: 14.5px !important;
+  line-height: 1.8;
+}
+@media (min-width: 768px) {
+  .news-summary.telugu-text {
+    font-size: 16px !important;
+    line-height: 1.75;
+  }
+}
+
+/* Article Body: Full article reading page */
+.article-body {
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.8;
+}
+@media (min-width: 768px) {
+  .article-body {
+    font-size: 19px;
+    line-height: 1.8;
+  }
+}
+/* Telugu Override: +0.2 Line Height and 16px Minimum Font Size */
+.article-body.telugu-text {
+  font-size: 16px !important; /* enforces minimum body size */
+  line-height: 2.0;
+}
+@media (min-width: 768px) {
+  .article-body.telugu-text {
+    font-size: 19px !important; /* 19px is >= 16px */
+    line-height: 2.0;
+  }
+}
+
+/* Category Label: News categories like Politics, Sports, Business */
+.category-label {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Meta Info: Date, author, and time */
+.meta-info {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Spacing Rules */
+.card-padding {
+  padding: var(--card-padding) !important;
+}
+
+.section-spacing {
+  margin-bottom: var(--section-spacing) !important;
+}
+
+.paragraph-spacing {
+  margin-bottom: var(--paragraph-spacing) !important;
+}
+
+.gap-headline-summary {
+  margin-top: var(--headline-summary-gap) !important;
+}
+
+/* UI Behaviors */
+.headline-hover {
+  transition: color 0.2s ease;
+}
+.headline-hover:hover {
+  color: var(--brand-blue) !important;
+}
+
+.summary-truncate {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Scoped classes for Category Page (specifically breaking news page) to avoid homepage changes */
+.category-headline {
+  font-size: 14px; /* Reduced by 2px (was 16px) */
+  font-weight: 700;
+  line-height: 1.4;
+}
+@media (min-width: 768px) {
+  .category-headline {
+    font-size: 17px; /* Reduced by 2px (was 19px) */
+    line-height: 1.35;
+  }
+}
+.category-headline.telugu-text {
+  line-height: 1.85; /* extra spacing for Telugu vowels/modifiers */
+}
+@media (min-width: 768px) {
+  .category-headline.telugu-text {
+    line-height: 1.75;
+  }
+}
+
+.category-summary {
+  font-size: 14px; /* Increased by 1px (was 13px) */
+  font-weight: 500;
+  line-height: 1.75;
+}
+@media (min-width: 768px) {
+  .category-summary {
+    font-size: 16px; /* Increased by 1px (was 15px) */
+    line-height: 1.7;
+  }
+}
+.category-summary.telugu-text {
+  font-size: 15.5px !important; /* Increased by 1px (was 14.5px) */
+  line-height: 1.95 !important; /* extra spacing to prevent bottom clipping under line-clamp-2 */
+}
+@media (min-width: 768px) {
+  .category-summary.telugu-text {
+    font-size: 17px !important; /* Increased by 1px (was 16px) */
+    line-height: 1.9 !important;
+  }
+}
+
+/* News details page summary block size (slightly larger than normal news summary) */
+.article-summary {
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.8;
+}
+@media (min-width: 768px) {
+  .article-summary {
+    font-size: 15.5px;
+    line-height: 1.7;
+  }
+}
+.article-summary.telugu-text {
+  font-size: 14px !important;
+  line-height: 1.85 !important;
+}
+@media (min-width: 768px) {
+  .article-summary.telugu-text {
+    font-size: 17px !important;
+    line-height: 1.75 !important;
+  }
 }
 
 

@@ -34,6 +34,7 @@ export const categories = [
   { name: 'స్పోర్ట్స్', slug: 'sports', color: '#ea580c' },
   { name: 'టెక్నాలజీ', slug: 'technology', color: '#4f46e5' },
   { name: 'హెల్త్', slug: 'health', color: '#0891b2' },
+  { name: 'డాక్టర్స్ కార్నర్', slug: 'doctors-corner', color: '#0891b2' },
   { name: 'వైరల్', slug: 'viral', color: '#dc2626' },
   { name: 'లైఫ్ స్టైల్', slug: 'lifestyle', color: '#9333ea' },
   { name: 'శుభఫలాలు', slug: 'rasipalalu', color: '#b45309' },
@@ -845,6 +846,42 @@ export const healthNews: NewsArticle[] = [
     views: 18700,
     tags: ['ఆరోగ్యం', 'వర్షాకాలం', 'వ్యాధులు'],
   },
+  {
+    id: 'dc-1',
+    slug: 'diabetes-control-tips-doctor',
+    title: 'మధుమేహం అదుపులో ఉంచుకోవడానికి నిపుణులైన వైద్యులు ఇచ్చే టాప్ సలహాలు',
+    description: 'రक्तంలో చక్కెర స్థాయిలను క్రమబద్ధీకరించడానికి రోజువారీ అలవాట్లలో మార్పులపై డాక్టర్ల వివరణ.',
+    content: '',
+    category: 'డాక్టర్స్ కార్నర్',
+    categorySlug: 'doctors-corner',
+    categoryColor: '#0891b2',
+    image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&h=450&fit=crop',
+    author: 'డా. కిరణ్ (ఎండోక్రినాలజిస్ట్)',
+    publishedAt: '2024-06-21T08:00:00Z',
+    isBreaking: false,
+    isTrending: false,
+    isFeatured: false,
+    views: 24500,
+    tags: ['ఆరోగ్యం', 'షుగర్', 'వైద్యులు'],
+  },
+  {
+    id: 'dc-2',
+    slug: 'heart-health-diet-tips',
+    title: 'గుండె ఆరోగ్యం కోసం తీసుకోవాల్సిన ఆహారం మరియు వ్యాయామ నియమాలు',
+    description: 'కార్డియాలజిస్ట్ డాక్టర్ శేఖర్ సూచించిన ఆరోగ్యకరమైన జీవనశైలి మార్గదర్శకాలు.',
+    content: '',
+    category: 'డాక్టర్స్ కార్నర్',
+    categorySlug: 'doctors-corner',
+    categoryColor: '#0891b2',
+    image: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&h=450&fit=crop',
+    author: 'డా. శేఖర్ (కార్డియాలజిస్ట్)',
+    publishedAt: '2024-06-20T08:00:00Z',
+    isBreaking: false,
+    isTrending: false,
+    isFeatured: false,
+    views: 19800,
+    tags: ['గుండె', 'ఆరోగ్యం', 'డాక్టర్స్'],
+  },
 ];
 
 export const viralNews: NewsArticle[] = [
@@ -1388,56 +1425,56 @@ export interface ReporterProfile {
 
 export const reporterProfiles: Record<string, ReporterProfile> = {
   'suresh': {
-    name: 'హై టీవీ రిపోర్టర్ సురేష్',
+    name: 'హై టీవీ రిపోర్టర్ Suresh',
     slug: 'suresh',
     role: 'జాతీయ రాజకీయాల విశ్లేషకులు & ఢిల్లీ బ్యూరో ఇన్-చార్జ్',
     bio: 'సురేష్ గారు జాతీయ రాజకీయాలు, పార్లమెంట్ వ్యవహారాలు మరియు కేంద్ర ప్రభుత్వ విధానాలపై గత 10 సంవత్సరాలుగా నిరంతరం విశ్లేషణాత్మక కథనాలు అందిస్తున్నారు.',
     image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop'
   },
   'ramesh': {
-    name: 'హై టీవీ రిపోర్టర్ రమేష్',
+    name: 'హై టీవీ రిపోర్టర్ Ramesh',
     slug: 'ramesh',
     role: 'ముఖ్య రాజకీయ ప్రతినిధి',
     bio: 'రమేష్ గారు తెలుగు రాష్ట్రాల రాజకీయాలు, ఎన్నికల విశ్లేషణలు మరియు ప్రజా సమస్యలపై ప్రత్యేక కథనాలకు పేరుగాంచారు.',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop'
   },
   'swapna': {
-    name: 'హై టీవీ రిపోర్టర్ స్వప్న',
+    name: 'హై టీవీ రిపోర్టర్ Swapna',
     slug: 'swapna',
     role: 'సినిమా & ఎంటర్టైన్మెంట్ రిపోర్టర్',
     bio: 'స్వప్న గారు టాలీవుడ్ చిత్ర పరిశ్రమ విశేషాలు, సినీ ప్రముఖుల ఇంటర్వ్యూలు మరియు చిత్ర సమీక్షలను వేగంగా అందిస్తారు.',
     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop'
   },
   'kiran': {
-    name: 'హై టీవీ రిపోర్టర్ కిరణ్',
+    name: 'హై టీవీ రిపోర్టర్ Kiran',
     slug: 'kiran',
     role: 'క్రీడా విశ్లేషకులు',
     bio: 'కిరణ్ గారు క్రికెట్, బ్యాడ్మింటన్ మరియు ఒలింపిక్ క్రీడల వార్తలను ఎప్పటికప్పుడు పాఠకులకు విశ్లేషణాత్మకంగా చేరవేస్తారు.',
     image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop'
   },
   'dr-sarada': {
-    name: 'హై టీవీ ప్రతినిధి డా. శారద',
+    name: 'హై టీవీ ప్రతినిధి Dr. Sarada',
     slug: 'dr-sarada',
     role: 'ఆరోగ్య & జీవనశైలి నిపుణురాలు',
     bio: 'డా. శారద గారు ప్రజా ఆరోగ్యం, వైద్య సలహాలు, ఆహార నియమాలు మరియు యోగా విశిష్టతలపై ఉపయోగకరమైన కథనాలు రాస్తుంటారు.',
     image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop'
   },
   'krishnaprasad': {
-    name: 'ఆచార్య కృష్ణప్రసాద్',
+    name: 'ఆచార్య Krishnaprasad',
     slug: 'krishnaprasad',
     role: 'ఆధ్యాత్మిక సిద్దాంతి',
     bio: 'కృష్ణప్రసాద్ గారు మన సంస్కృతి, పూజా విధానాలు, వ్రతాలు మరియు హిందూ పండుగల ప్రాముఖ్యతను శాస్త్రీయంగా వివరిస్తారు.',
     image: 'https://images.unsplash.com/photo-1607990283143-e81e7a2c93ab?w=400&h=400&fit=crop'
   },
   'subrahmanyam': {
-    name: 'సిద్ధాంతి సుబ్రహ్మణ్య శర్మ',
+    name: 'సిద్ధాంతి Subrahmanya Sharma',
     slug: 'subrahmanyam',
     role: 'ప్రముఖ జ్యోతిష్య నిపుణులు',
     bio: 'సుబ్రహ్మణ్య శర్మ గారు జాతక విశ్లేషణ, గ్రహాల గోచారం మరియు రాశిఫలాలపై ఖచ్చితమైన విశ్లేషణలు అందిస్తూ ప్రజల మన్ననలు పొందారు.',
     image: 'https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=400&h=400&fit=crop'
   },
   'default': {
-    name: 'హై టీవీ రిపోర్టర్ సురేష్',
+    name: 'హై టీవీ రిపోర్టర్ Suresh',
     slug: 'suresh',
     role: 'స్టాఫ్ రిపోర్టర్',
     bio: 'హై టీవీ వార్తా విభాగం నిరంతరం నిజాయితీతో కూడిన వార్తలను సేకరించి ప్రజల ముందుకు తెస్తుంది.',

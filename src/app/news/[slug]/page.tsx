@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ArticlePageClient from '@/components/layout/ArticlePageClient';
@@ -65,6 +66,7 @@ const englishCategories: Record<string, string> = {
   'entertainment': 'Entertainment',
   'technology': 'Technology',
   'health': 'Health',
+  'doctors-corner': "Doctor's Corner",
   'viral': 'Viral',
   'rasipalalu': 'Shubhafalalu',
   'photos': 'Photos',
@@ -131,16 +133,18 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     <div className="min-h-screen bg-[#f0f2f5]">
       <Header />
 
-      <ArticlePageClient
-        article={article}
-        reporter={reporter}
-        trendingNews={trendingNews}
-        latestNews={latestNews}
-        apDistrictNews={apDistrictNews}
-        tgDistrictNews={tgDistrictNews}
-        otherNews={otherNews}
-        englishCategories={englishCategories}
-      />
+      <Suspense fallback={null}>
+        <ArticlePageClient
+          article={article}
+          reporter={reporter}
+          trendingNews={trendingNews}
+          latestNews={latestNews}
+          apDistrictNews={apDistrictNews}
+          tgDistrictNews={tgDistrictNews}
+          otherNews={otherNews}
+          englishCategories={englishCategories}
+        />
+      </Suspense>
 
       <Footer />
     </div>

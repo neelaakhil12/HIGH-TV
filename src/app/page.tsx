@@ -277,7 +277,7 @@ export default function HomePage() {
                       </div>
                       <div className="flex-1 min-w-0 py-1 px-1">
                         <h4
-                          className="text-[16.5px] font-black text-gray-700 leading-relaxed line-clamp-3 group-hover:text-[#02599c] transition-colors telugu-text"
+                          className="text-[16.5px] font-black text-gray-700 leading-relaxed line-clamp-3 group-hover:text-[#02599c] transition-colors telugu-text pl-2.5"
                           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                         >
                           {article.title}

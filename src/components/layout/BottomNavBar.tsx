@@ -59,7 +59,7 @@ export default function BottomNavBar() {
   ];
 
   const isEPaperActive = pathname?.startsWith('/category/epaper') || false;
-  const isHealthActive = pathname?.startsWith('/category/health') || false;
+  const isHealthActive = pathname?.startsWith('/category/health') || pathname?.startsWith('/category/doctors-corner') || false;
   const isSearchActive = pathname === '/search';
 
   return (

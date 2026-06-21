@@ -30,19 +30,19 @@ export default function RightSidebar() {
       <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left">
         <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100">
           <div className="w-1.5 h-6 bg-[#e60000] rounded-full"></div>
-          <h3 className="font-black text-gray-900 text-[16px] md:text-[18px] pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+          <h3 className="font-black text-gray-900 text-[18px] md:text-[20px] pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
             ట్రెండింగ్ వార్తలు
           </h3>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-3.5">
           {trendingArticles.map((article, idx) => (
             <Link
               key={`${article.id}-${idx}`}
               href={`/news/${article.slug}`}
-              className="flex items-center gap-2.5 pb-2.5 last:pb-0 last:border-b-0 border-b border-gray-55 group cursor-pointer"
+              className="flex items-start gap-3 pb-3 last:pb-0 last:border-b-0 border-b border-gray-55 group cursor-pointer"
             >
               {/* Image thumbnail */}
-              <div className="w-14 h-10 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
+              <div className="w-20 h-14 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
                 <img
                   src={article.image}
                   alt={article.title}
@@ -50,9 +50,9 @@ export default function RightSidebar() {
                 />
               </div>
               {/* Text */}
-              <div className="min-w-0 flex-1 py-1 px-1">
+              <div className="min-w-0 flex-1 py-0.5">
                 <h4
-                  className="text-[1.05rem] font-black text-gray-800 leading-relaxed group-hover:text-[#02599c] transition-colors telugu-text line-clamp-2"
+                  className="text-[14.5px] md:text-[15.5px] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-relaxed telugu-text line-clamp-2"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {article.title}

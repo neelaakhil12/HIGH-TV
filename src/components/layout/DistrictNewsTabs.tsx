@@ -62,15 +62,8 @@ export default function DistrictNewsTabs({ apNews, tgNews }: Props) {
               href={`/news/${item.slug}`}
               className="flex items-start gap-2 px-3 py-2.5 hover:bg-blue-50/50 transition-colors group"
             >
-              <div className="w-14 h-10 flex-shrink-0 rounded overflow-hidden bg-gray-100 border border-gray-150">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                />
-              </div>
               <p
-                className="flex-1 min-w-0 text-[16px] font-semibold text-gray-700 group-hover:text-[#025390] leading-relaxed pl-1 pb-1 telugu-text line-clamp-2"
+                className="flex-1 min-w-0 text-[17px] font-semibold text-gray-700 group-hover:text-[#025390] leading-relaxed pl-2 pb-1 telugu-text line-clamp-2"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {item.title}

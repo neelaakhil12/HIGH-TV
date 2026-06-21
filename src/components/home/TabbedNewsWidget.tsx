@@ -72,14 +72,14 @@ export default function TabbedNewsWidget({
               </span>
               <Link href={`/news/${currentTab.data[0].slug}`}>
                 <h3
-                  className="font-black text-gray-900 group-hover:text-brand-blue transition-colors text-[15px] md:text-[17px] mb-2 line-clamp-2 telugu-text"
+                  className="secondary-headline font-black text-gray-900 group-hover:text-brand-blue transition-colors mb-2 line-clamp-2 telugu-text pl-2.5"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {currentTab.data[0].title}
                 </h3>
               </Link>
               <p
-                className="text-gray-500 text-[1.05rem] leading-[1.8] pb-1 line-clamp-3 telugu-text"
+                className="news-summary text-gray-550 pb-1 line-clamp-3 telugu-text pl-2.5"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {currentTab.data[0].description}
@@ -106,7 +106,7 @@ export default function TabbedNewsWidget({
                 </div>
                 <div className="flex-1 py-0.5 pl-2.5 pr-1">
                   <p
-                    className="text-[0.95rem] font-bold text-gray-800 group-hover:text-brand-blue transition-colors line-clamp-2 leading-relaxed pb-1 telugu-text"
+                    className="text-[14.5px] md:text-[16px] font-bold text-gray-800 group-hover:text-brand-blue transition-colors line-clamp-2 leading-relaxed pb-1 telugu-text pl-2.5"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {article.title}

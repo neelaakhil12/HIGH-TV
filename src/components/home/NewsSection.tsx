@@ -81,44 +81,11 @@ export default function NewsSection({
           </div>
         </div>
 
-        <div className="relative group">
-          {/* Floating Left Arrow - Aligned with image center (top-[68px]) */}
-          <button
-            onClick={() => scroll('left')}
-            disabled={!showLeftArrow}
-            className={`absolute -left-3 top-[68px] -translate-y-1/2 z-20 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all sm:hidden ${
-              showLeftArrow
-                ? 'bg-white border border-gray-900 text-gray-900 cursor-pointer active:scale-90'
-                : 'bg-gray-50/70 border border-gray-200 text-gray-300 cursor-not-allowed'
-            }`}
-            aria-label="Scroll left"
-          >
-            <ChevronLeft size={16} className="stroke-[2.5]" />
-          </button>
-
-          {/* Floating Right Arrow - Aligned with image center (top-[68px]) */}
-          <button
-            onClick={() => scroll('right')}
-            disabled={!showRightArrow}
-            className={`absolute -right-3 top-[68px] -translate-y-1/2 z-20 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all sm:hidden ${
-              showRightArrow
-                ? 'bg-white border border-gray-900 text-gray-900 cursor-pointer active:scale-90'
-                : 'bg-gray-50/70 border border-gray-200 text-gray-300 cursor-not-allowed'
-            }`}
-            aria-label="Scroll right"
-          >
-            <ChevronRight size={16} className="stroke-[2.5]" />
-          </button>
-
-          {/* Scrollable Container */}
-          <div 
-            ref={scrollRef}
-            className="flex overflow-x-auto gap-4 pb-2.5 snap-x hide-scrollbar sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:pb-0"
-          >
-            {articles.slice(0, 4).map((article) => (
-              <NewsCard key={article.id} article={article} variant="horizontal" />
-            ))}
-          </div>
+        {/* 2 in a Row Grid (2x2 Layout) */}
+        <div className="grid grid-cols-2 gap-4">
+          {articles.slice(0, 4).map((article) => (
+            <NewsCard key={article.id} article={article} variant="horizontal" />
+          ))}
         </div>
       </section>
     );

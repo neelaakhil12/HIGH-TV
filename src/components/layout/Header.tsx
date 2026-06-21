@@ -14,18 +14,28 @@ export default function Header() {
   const [teluguDate, setTeluguDate] = useState('');
   const [isAPMobileExpanded, setIsAPMobileExpanded] = useState(false);
   const [isTGMobileExpanded, setIsTGMobileExpanded] = useState(false);
+  const [isHealthMobileExpanded, setIsHealthMobileExpanded] = useState(false);
+  const [isVidyaMobileExpanded, setIsVidyaMobileExpanded] = useState(false);
+  const [isUpadiMobileExpanded, setIsUpadiMobileExpanded] = useState(false);
   const [isMoreMobileExpanded, setIsMoreMobileExpanded] = useState(false);
 
   useEffect(() => {
+    setIsTGMobileExpanded(false);
+    setIsAPMobileExpanded(false);
+    setIsHealthMobileExpanded(false);
+    setIsVidyaMobileExpanded(false);
+    setIsUpadiMobileExpanded(false);
+
     if (pathname.startsWith('/category/telangana')) {
       setIsTGMobileExpanded(true);
-      setIsAPMobileExpanded(false);
     } else if (pathname.startsWith('/category/andhra-pradesh')) {
       setIsAPMobileExpanded(true);
-      setIsTGMobileExpanded(false);
-    } else {
-      setIsTGMobileExpanded(false);
-      setIsAPMobileExpanded(false);
+    } else if (pathname.startsWith('/category/health') || pathname.startsWith('/category/doctors-corner')) {
+      setIsHealthMobileExpanded(true);
+    } else if (pathname.startsWith('/category/admissions') || pathname.startsWith('/category/current-affairs') || pathname.startsWith('/category/vidya')) {
+      setIsVidyaMobileExpanded(true);
+    } else if (pathname.startsWith('/category/notification') || pathname.startsWith('/category/upadi')) {
+      setIsUpadiMobileExpanded(true);
     }
   }, [pathname]);
 
@@ -35,12 +45,14 @@ export default function Header() {
   // States for desktop dropdowns (to support touch screens in desktop mode)
   const [isAPDropdownOpen, setIsAPDropdownOpen] = useState(false);
   const [isTGDropdownOpen, setIsTGDropdownOpen] = useState(false);
+  const [isHealthDropdownOpen, setIsHealthDropdownOpen] = useState(false);
   const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
 
   const closeAllDropdowns = () => {
     setIsAPDropdownOpen(false);
     setIsTGDropdownOpen(false);
     setIsMoreDropdownOpen(false);
+    setIsHealthDropdownOpen(false);
   };
 
   const handleAPClick = (e: React.MouseEvent) => {
@@ -48,12 +60,22 @@ export default function Header() {
     setIsAPDropdownOpen(!isAPDropdownOpen);
     setIsTGDropdownOpen(false);
     setIsMoreDropdownOpen(false);
+    setIsHealthDropdownOpen(false);
   };
 
   const handleTGClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsTGDropdownOpen(!isTGDropdownOpen);
     setIsAPDropdownOpen(false);
+    setIsMoreDropdownOpen(false);
+    setIsHealthDropdownOpen(false);
+  };
+
+  const handleHealthClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsHealthDropdownOpen(!isHealthDropdownOpen);
+    setIsAPDropdownOpen(false);
+    setIsTGDropdownOpen(false);
     setIsMoreDropdownOpen(false);
   };
 
@@ -62,6 +84,7 @@ export default function Header() {
     setIsMoreDropdownOpen(!isMoreDropdownOpen);
     setIsAPDropdownOpen(false);
     setIsTGDropdownOpen(false);
+    setIsHealthDropdownOpen(false);
   };
 
   // Close dropdowns on outside click
@@ -264,9 +287,43 @@ export default function Header() {
           <Link href="/category/national"       className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/national')}`}>నేషనల్</Link>
           <Link href="/category/international"  className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/international')}`}>వరల్డ్</Link>
           <Link href="/category/business"       className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/business')}`}>బిజినెస్</Link>
-          <Link href="/category/health"         className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/health')}`}>హెల్త్</Link>
-          <Link href="/category/admissions"     className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/admissions')}`}>విద్య</Link>
-          <Link href="/category/notification"   className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/notification')}`}>ఉపాధి</Link>
+          <button 
+            onClick={() => {
+              setIsHealthMobileExpanded(!isHealthMobileExpanded);
+              setIsTGMobileExpanded(false);
+              setIsAPMobileExpanded(false);
+            }}
+            className={`px-2.5 h-full flex items-center gap-0.5 hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${pathname.startsWith('/category/health') || pathname.startsWith('/category/doctors-corner') ? 'text-[#ffb3d1]' : 'text-white'}`}
+          >
+            హెల్త్
+            <ChevronDown size={11} className={`text-[#ffb3d1] transition-transform duration-200 ${isHealthMobileExpanded ? 'rotate-180' : ''}`} />
+          </button>
+          <button 
+            onClick={() => {
+              setIsVidyaMobileExpanded(!isVidyaMobileExpanded);
+              setIsTGMobileExpanded(false);
+              setIsAPMobileExpanded(false);
+              setIsHealthMobileExpanded(false);
+              setIsUpadiMobileExpanded(false);
+            }}
+            className={`px-2.5 h-full flex items-center gap-0.5 hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${pathname.startsWith('/category/admissions') || pathname.startsWith('/category/current-affairs') || pathname.startsWith('/category/vidya') ? 'text-[#ffb3d1]' : 'text-white'}`}
+          >
+            విద్య
+            <ChevronDown size={11} className={`text-[#ffb3d1] transition-transform duration-200 ${isVidyaMobileExpanded ? 'rotate-180' : ''}`} />
+          </button>
+          <button 
+            onClick={() => {
+              setIsUpadiMobileExpanded(!isUpadiMobileExpanded);
+              setIsTGMobileExpanded(false);
+              setIsAPMobileExpanded(false);
+              setIsHealthMobileExpanded(false);
+              setIsVidyaMobileExpanded(false);
+            }}
+            className={`px-2.5 h-full flex items-center gap-0.5 hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${pathname.startsWith('/category/notification') || pathname.startsWith('/category/upadi') ? 'text-[#ffb3d1]' : 'text-white'}`}
+          >
+            ఉపాధి
+            <ChevronDown size={11} className={`text-[#ffb3d1] transition-transform duration-200 ${isUpadiMobileExpanded ? 'rotate-180' : ''}`} />
+          </button>
           <Link href="/category/politics"        className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/politics')}`}>పాలిటిక్స్</Link>
           <Link href="/category/sports"         className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/sports')}`}>స్పోర్ట్స్</Link>
           <Link href="/category/entertainment"  className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/entertainment')}`}>ఫిల్మ్</Link>
@@ -290,6 +347,9 @@ export default function Header() {
         <MobileSubNav
           isTGMobileExpanded={isTGMobileExpanded}
           isAPMobileExpanded={isAPMobileExpanded}
+          isHealthMobileExpanded={isHealthMobileExpanded}
+          isVidyaMobileExpanded={isVidyaMobileExpanded}
+          isUpadiMobileExpanded={isUpadiMobileExpanded}
           pathname={pathname}
         />
       </Suspense>
@@ -358,8 +418,23 @@ export default function Header() {
               {/* బిజినెస్ */}
               <Link href="/category/business" className={`px-3 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/business')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>బిజినెస్</Link>
 
-              {/* హెల్త్ */}
-              <Link href="/category/health" className={`px-3 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/health')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>హెల్త్</Link>
+              {/* హెల్త్ Dropdown */}
+              <div className="relative group border-r border-white/20 h-full flex-shrink-0">
+                <button 
+                  onClick={handleHealthClick}
+                  className={`px-3 h-full flex items-center gap-1 hover:bg-black/15 transition-colors cursor-pointer ${pathname.startsWith('/category/health') || pathname.startsWith('/category/doctors-corner') ? 'text-[#ffb3d1]' : 'text-white'}`} 
+                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                >
+                  హెల్త్
+                  <ChevronDown size={11} className={`text-[#ffb3d1] transition-transform duration-200 ${isHealthDropdownOpen ? 'rotate-180' : 'group-hover:rotate-180'}`} />
+                </button>
+                <div className={`absolute top-full left-0 ${isHealthDropdownOpen ? 'block' : 'hidden'} group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-2.5 w-52 z-50 animate-fade-in border-t-2 border-[#025390]`}>
+                  <div className="flex flex-col gap-0.5 text-left">
+                    <Link onClick={closeAllDropdowns} href="/category/health" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>హెల్త్ వార్తలు</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/doctors-corner" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>డాక్టర్స్ కార్నర్</Link>
+                  </div>
+                </div>
+              </div>
 
               {/* విద్య Dropdown */}
               <div className="relative group border-r border-white/20 h-full flex-shrink-0">
@@ -425,7 +500,7 @@ export default function Header() {
                         <Link onClick={closeAllDropdowns} href="/category/sampadakiyam"  className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఎడిటోరియల్</Link>
                         <Link onClick={closeAllDropdowns} href="/category/citizen-reporter" className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>సిటిజన్ రిపోర్టర్</Link>
                         <Link onClick={closeAllDropdowns} href="/team" className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>మా టీమ్</Link>
-                        <Link onClick={closeAllDropdowns} href="/weather" className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వాతావరణం</Link>
+                        <Link onClick={closeAllDropdowns} href="/weather" className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వెదర్</Link>
                       </div>
                     </div>
                   </div>
@@ -546,6 +621,7 @@ export default function Header() {
                   { href: '/category/international',  label: 'వరల్డ్'   },
                   { href: '/category/business',       label: 'బిజినెస్'       },
                   { href: '/category/health',         label: 'హెల్త్'          },
+                  { href: '/category/doctors-corner', label: 'డాక్టర్స్ కార్నర్' },
                   { href: '/category/politics',       label: 'పాలిటిక్స్'      },
                   { href: '/category/sports',         label: 'స్పోర్ట్స్'       },
                   { href: '/category/entertainment',  label: 'ఫిల్మ్'         },
@@ -565,7 +641,7 @@ export default function Header() {
                   { href: '/category/notification',   label: 'నోటిఫికేషన్స్'   },
                   { href: '/category/citizen-reporter', label: 'సిటిజన్ రిపోర్టర్' },
                   { href: '/team',                    label: 'మా టీమ్'        },
-                  { href: '/weather',                 label: 'వాతావరణం'       },
+                  { href: '/weather',                 label: 'వెదర్'       },
                 ].map((link, i) => (
                   <Link
                     key={i}
@@ -614,10 +690,16 @@ export default function Header() {
 function MobileSubNav({
   isTGMobileExpanded,
   isAPMobileExpanded,
+  isHealthMobileExpanded,
+  isVidyaMobileExpanded,
+  isUpadiMobileExpanded,
   pathname,
 }: {
   isTGMobileExpanded: boolean;
   isAPMobileExpanded: boolean;
+  isHealthMobileExpanded: boolean;
+  isVidyaMobileExpanded: boolean;
+  isUpadiMobileExpanded: boolean;
   pathname: string;
 }) {
   const searchParams = useSearchParams();
@@ -663,6 +745,61 @@ function MobileSubNav({
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             జిల్లాల వారీగా వార్తలు
+          </Link>
+        </div>
+      )}
+
+      {/* Mobile Sub-pages strip for Health */}
+      {isHealthMobileExpanded && (
+        <div className="md:hidden w-full bg-[#013d6e] border-t border-[#012f5c] text-[13.5px] font-extrabold text-white telugu-text flex items-center justify-around py-2 shadow-xs">
+          <Link 
+            href="/category/health" 
+            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/health' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            హెల్త్ వార్తలు
+          </Link>
+          <div className="h-4 w-[1px] bg-white/20" />
+          <Link 
+            href="/category/doctors-corner" 
+            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/doctors-corner' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            డాక్టర్స్ కార్నర్
+          </Link>
+        </div>
+      )}
+
+      {/* Mobile Sub-pages strip for Vidya */}
+      {isVidyaMobileExpanded && (
+        <div className="md:hidden w-full bg-[#013d6e] border-t border-[#012f5c] text-[13.5px] font-extrabold text-white telugu-text flex items-center justify-around py-2 shadow-xs">
+          <Link 
+            href="/category/admissions" 
+            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/admissions' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            అడ్మిషన్స్
+          </Link>
+          <div className="h-4 w-[1px] bg-white/20" />
+          <Link 
+            href="/category/current-affairs" 
+            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/current-affairs' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            కరెంట్ అఫైర్స్
+          </Link>
+        </div>
+      )}
+
+      {/* Mobile Sub-pages strip for Upadi */}
+      {isUpadiMobileExpanded && (
+        <div className="md:hidden w-full bg-[#013d6e] border-t border-[#012f5c] text-[13.5px] font-extrabold text-white telugu-text flex items-center justify-around py-2 shadow-xs">
+          <Link 
+            href="/category/notification" 
+            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/notification' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            నోటిఫికేషన్స్
           </Link>
         </div>
       )}

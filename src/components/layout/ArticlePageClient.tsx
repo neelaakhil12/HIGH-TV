@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import BackButton from '@/components/layout/BackButton';
@@ -77,7 +78,9 @@ export default function ArticlePageClient({
   otherNews,
   englishCategories
 }: ArticlePageClientProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const searchParams = useSearchParams();
+  const isCompact = searchParams.get('compact') === '1';
+  const [isExpanded, setIsExpanded] = useState(!isCompact);
   const [inlineImage, setInlineImage] = useState<string | null>(null);
   const [inlineCaption, setInlineCaption] = useState<string>('యోగ ఆసనాలు వేస్తున్న మోదీ..');
 
@@ -133,23 +136,29 @@ export default function ArticlePageClient({
   if (isExpanded) {
     // ═══ FULL 3-COLUMN LAYOUT "LIKE BEFORE" ═══
     return (
-      <main className="max-w-[1050px] mx-auto bg-white shadow-md border-x border-gray-200 px-4 py-4">
+      <main className="max-w-[1050px] mx-auto bg-white shadow-md border-x border-gray-200 px-2.5 py-4 md:px-4">
         {/* Mobile-only Ad — square, above breadcrumb */}
-        <div className="md:hidden mb-3">
-          <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider rounded-t">Advertisement</div>
-          <div className="w-full aspect-square bg-gradient-to-br from-[#7b2d00] to-[#c0392b] rounded-b overflow-hidden flex flex-col items-center justify-center gap-3 text-white text-center px-6">
-            <div className="text-5xl">💍</div>
-            <div className="text-xl font-black leading-tight">CMR జ్యువెల్లరీ</div>
-            <div className="text-sm font-bold opacity-90">Gold &amp; Diamond Sale</div>
-            <div className="text-[13px] opacity-80 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వేసవి ఆఫర్లు — 30% వరకు తగ్గింపు</div>
-            <a href="#" className="mt-1 bg-yellow-400 text-[#7b2d00] rounded-full px-5 py-2 text-sm font-black hover:bg-yellow-300 transition-colors">Shop Now →</a>
+        <div className="md:hidden mb-3 max-w-[280px] mx-auto w-full">
+          <div className="bg-gray-100 text-[9px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider rounded-t border-t border-x border-gray-200">
+            Advertisement
+          </div>
+          <div className="bg-gradient-to-br from-[#7b2d00] to-[#c0392b] rounded-b overflow-hidden flex flex-col items-center justify-center p-3 gap-2.5 text-white text-center border-b border-x border-gray-200 shadow-sm">
+            <div className="text-3xl">💍</div>
+            <div className="text-base font-black leading-tight">CMR జ్యువెల్లరీ</div>
+            <div className="text-[11px] font-bold opacity-90">Gold &amp; Diamond Sale</div>
+            <div className="text-[11px] opacity-80 telugu-text leading-tight" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              వేసవి ఆఫర్లు — 30% వరకు తగ్గింపు
+            </div>
+            <a href="#" className="mt-1 bg-yellow-400 text-[#7b2d00] rounded-full px-4 py-1 text-xs font-black hover:bg-yellow-300 transition-colors shadow-xs">
+              Shop Now →
+            </a>
           </div>
         </div>
 
         {/* Breadcrumb & Back Button */}
 
         <div className="flex items-center justify-between gap-4 mb-3 border-b border-gray-100 pb-3 overflow-hidden">
-          <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
+          <div className="flex items-center gap-1 md:gap-2 text-[13px] md:text-[17.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
             <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
               <Home size={14} className="flex-shrink-0" /> Home
             </Link>
@@ -201,8 +210,8 @@ export default function ArticlePageClient({
                     >
                       <span className="w-2 h-2 bg-[#025390] mt-1.5 flex-shrink-0 rounded-[1px]"></span>
                       <p
-                        className="flex-1 min-w-0 text-[1rem] md:text-[1.08rem] font-semibold text-gray-700 group-hover:text-[#025390] line-clamp-2 telugu-text"
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.6' }}
+                        className="flex-1 min-w-0 text-[14.5px] md:text-[15.5px] font-semibold text-gray-700 group-hover:text-[#025390] line-clamp-2 telugu-text pl-0.5"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.7' }}
                       >
                         {item.title}
                       </p>
@@ -238,14 +247,14 @@ export default function ArticlePageClient({
 
               {/* Headline */}
               <h1
-                className="font-black text-[#cc0000] leading-tight mb-3 telugu-text text-[19px] md:text-[28px]"
+                className="main-headline telugu-text text-[#cc0000] mb-3"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {article.title}
               </h1>
 
               {/* Meta row */}
-              <div className="flex flex-wrap items-center gap-3 text-gray-500 mb-4 pb-3 border-b border-gray-100 font-sans" style={{ fontSize: '14px' }}>
+              <div className="flex flex-wrap items-center gap-3 text-gray-500 mb-4 pb-3 border-b border-gray-100 font-sans meta-info">
                 <div className="flex items-center gap-1.5">
                   <div className="w-6 h-6 bg-[#025390] rounded-full flex items-center justify-center">
                     <span className="text-white text-[12px] font-black">హై</span>
@@ -265,7 +274,7 @@ export default function ArticlePageClient({
 
               {/* Description summary */}
               <p
-                className="leading-relaxed mb-4 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r telugu-text text-gray-700 text-[1.05rem] md:text-[1.25rem]"
+                className="hidden md:block article-summary telugu-text text-gray-700 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r mb-4"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {article.description}
@@ -283,7 +292,7 @@ export default function ArticlePageClient({
 
 
               {/* Full Article Body */}
-              <div className="telugu-text space-y-4 text-gray-800 leading-loose text-[1.05rem] md:text-[1.18rem]" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              <div className="telugu-text space-y-[18px] text-gray-800 article-body" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                 <p>{article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. హై టీవీ డెస్క్ నుండి తాజా సమాచారం ఇక్కడ లభిస్తుంది.</p>
                 <p>అధికారులు తెలిపిన వివరాల ప్రకారం, ఈ నిర్ణయం రాష్ట్ర ప్రజలకు అత్యంత ప్రయోజనకరంగా ఉంటుందని భావిస్తున్నారు. ఈ పరిణామాలు భవిష్యత్తులో మరింత సానుకూలమైన ఫలితాలను ఇస్తాయని నిపుణులు అభిప్రాయపడుతున్నారు.</p>
 
@@ -396,15 +405,15 @@ export default function ArticlePageClient({
                   మరిన్ని వార్తలు చదవండి
                 </h2>
                 {/* Bordered box containing other news items */}
-                <div className="border border-gray-250 rounded-xl p-4 bg-white shadow-xs">
+                <div className="border border-gray-250 rounded-xl p-2 md:p-4 bg-white shadow-xs">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
                     {otherNews.slice(0, 6).map((item) => (
                       <Link
                         key={item.id}
                         href={`/news/${item.slug}`}
-                        className="flex gap-3 hover:bg-blue-50/30 p-1.5 rounded-lg transition-colors group"
+                        className="flex gap-3 hover:bg-blue-50/30 p-1 md:p-1.5 rounded-lg transition-colors group"
                       >
-                        <div className="w-[90px] h-[60px] flex-shrink-0 overflow-hidden rounded-md bg-gray-50 border border-gray-150 relative flex items-center justify-center">
+                        <div className="w-[75px] h-[50px] md:w-[90px] md:h-[60px] flex-shrink-0 overflow-hidden rounded-md bg-gray-50 border border-gray-150 relative flex items-center justify-center">
                           <FallbackImage
                             src={item.image}
                             alt={item.title}
@@ -414,7 +423,7 @@ export default function ArticlePageClient({
                         </div>
                         <div className="min-w-0 flex-1 flex flex-col justify-start pl-1">
                           <p
-                            className="text-[13.5px] sm:text-[14px] md:text-[15px] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-snug telugu-text line-clamp-3"
+                            className="text-[13.5px] sm:text-[14.5px] md:text-[16.5px] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-relaxed telugu-text line-clamp-4 md:line-clamp-3 pb-1 pl-1"
                             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                           >
                             {item.title}
@@ -458,8 +467,8 @@ export default function ArticlePageClient({
                     >
                       <span className="w-2 h-2 bg-[#e60000] mt-1.5 flex-shrink-0 rounded-[1px]"></span>
                       <p
-                        className="flex-1 min-w-0 text-[1rem] md:text-[1.08rem] font-semibold text-gray-700 group-hover:text-[#e60000] line-clamp-2 telugu-text"
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.6' }}
+                        className="flex-1 min-w-0 text-[14.5px] md:text-[15.5px] font-semibold text-gray-700 group-hover:text-[#e60000] line-clamp-2 telugu-text pl-0.5"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.7' }}
                       >
                         {item.title}
                       </p>
@@ -492,10 +501,10 @@ export default function ArticlePageClient({
 
   // ═══ COMPACT LAYOUT (DEFAULT VIEW) ═══
   return (
-    <main className="max-w-[1050px] mx-auto bg-white shadow-md border-x border-gray-200 px-4 py-4">
+    <main className="max-w-[1050px] mx-auto bg-white shadow-md border-x border-gray-200 px-2.5 py-4 md:px-4">
       {/* Breadcrumb & Back Button */}
       <div className="flex items-center justify-between gap-4 mb-4 border-b border-gray-100 pb-3 overflow-hidden">
-        <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
+        <div className="flex items-center gap-1 md:gap-2 text-[13px] md:text-[17.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
           <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
             <Home size={14} className="flex-shrink-0" /> Home
           </Link>
@@ -526,9 +535,15 @@ export default function ArticlePageClient({
               className="object-cover"
             />
           </div>
-          {/* Ad under the image */}
-          <div className="w-full">
-            <AdBanner position="rectangle" />
+          {/* "పూర్తిగా చదవండి" button under image */}
+          <div className="mt-3">
+            <button
+              onClick={() => setIsExpanded(true)}
+              className="inline-flex items-center justify-center gap-2 bg-[#cc0000] hover:bg-[#e60000] text-white font-black text-[15px] md:text-[16px] px-6 py-2.5 rounded-lg transition-colors shadow-sm cursor-pointer select-none telugu-text"
+              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+            >
+              పూర్తిగా చదవండి
+            </button>
           </div>
         </div>
 
@@ -536,23 +551,21 @@ export default function ArticlePageClient({
         <div className="md:col-span-6 lg:col-span-5 flex flex-col justify-start">
           
           {/* Meta Row: Date/Time */}
-          <div className="flex items-center gap-1.5 text-gray-500 font-sans text-[12px] md:text-[14.5px] mb-2.5">
+          <div className="flex items-center gap-1.5 text-gray-500 font-sans meta-info mb-2.5">
             <Calendar size={14} className="text-[#02599c]" />
             <span className="font-semibold">{formatDate(article.publishedAt)}</span>
           </div>
 
           {/* Red Headline */}
           <h1
-            className="font-black text-[#cc0000] leading-snug mb-3.5 telugu-text text-[20px] md:text-[26px]"
+            className="main-headline telugu-text text-[#cc0000] mb-3.5"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
             {article.title}
           </h1>
 
           {/* Limited Description & Toggled Read Button */}
-          <div className="telugu-text space-y-4 text-gray-800 leading-relaxed text-[15.5px] md:text-[17.5px]" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-            <p className="font-bold text-gray-700 leading-normal">{article.description}</p>
-
+          <div className="telugu-text space-y-[18px] text-gray-800 article-body" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
             {/* Inline Image Section */}
             {inlineImage && (
               <div className="my-5 w-full text-center">
@@ -575,19 +588,10 @@ export default function ArticlePageClient({
               </div>
             )}
 
-            <p>{article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. తాజా సమాచారం ఇక్కడ లభిస్తుంది.</p>
+            <p className="article-summary telugu-text">{article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. తాజా సమాచారం ఇక్కడ లభిస్తుంది.</p>
           </div>
 
-          {/* "పూర్తిగా చదవండి" Expansion Button */}
-          <div className="mt-4">
-            <button
-              onClick={() => setIsExpanded(true)}
-              className="inline-flex items-center justify-center gap-2 bg-[#cc0000] hover:bg-[#e60000] text-white font-black text-[15px] md:text-[16px] px-6 py-2.5 rounded-lg transition-colors shadow-sm cursor-pointer select-none telugu-text"
-              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-            >
-              పూర్తిగా చదవండి
-            </button>
-          </div>
+
 
           {/* Reporter Info & Share (Compact footer) */}
           <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100 text-gray-500 font-sans text-xs">
@@ -615,15 +619,15 @@ export default function ArticlePageClient({
         </h2>
 
         {/* Bordered box containing other news items */}
-        <div className="border border-gray-250 rounded-xl p-4 bg-white shadow-xs">
+        <div className="border border-gray-250 rounded-xl p-2 md:p-4 bg-white shadow-xs">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
             {otherNews.map((item) => (
               <Link
                 key={item.id}
                 href={`/news/${item.slug}`}
-                className="flex gap-3 hover:bg-blue-50/30 p-1.5 rounded-lg transition-colors group"
+                className="flex gap-3 hover:bg-blue-50/30 p-1 md:p-1.5 rounded-lg transition-colors group"
               >
-                <div className="w-[90px] h-[60px] flex-shrink-0 overflow-hidden rounded-md bg-gray-50 border border-gray-150 relative flex items-center justify-center">
+                <div className="w-[75px] h-[50px] md:w-[90px] md:h-[60px] flex-shrink-0 overflow-hidden rounded-md bg-gray-50 border border-gray-150 relative flex items-center justify-center">
                   <FallbackImage
                     src={item.image}
                     alt={item.title}
@@ -633,7 +637,7 @@ export default function ArticlePageClient({
                 </div>
                 <div className="min-w-0 flex-1 flex flex-col justify-start pl-1">
                   <p
-                    className="text-[13.5px] sm:text-[14px] md:text-[15px] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-snug telugu-text line-clamp-3"
+                    className="text-[13.5px] sm:text-[14.5px] md:text-[16.5px] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-relaxed telugu-text line-clamp-4 md:line-clamp-3 pb-1 pl-1"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {item.title}
