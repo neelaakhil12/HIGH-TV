@@ -444,7 +444,7 @@ export default function Header() {
             
             {/* Left: Trending Label + Election Results */}
             <div className="flex items-center gap-1.5 overflow-hidden">
-              <span className="font-extrabold text-[12px] md:text-[15px] tracking-wider text-[#e60000] uppercase font-sans flex items-center gap-1.5 flex-shrink-0">
+              <span className="font-extrabold text-[12px] md:text-[15px] tracking-wider text-[#02599c] uppercase font-sans flex items-center gap-1.5 flex-shrink-0">
                 <TrendingUp className="stroke-[2.5] animate-pulse w-3.5 h-3.5 md:w-4 md:h-4" />
                 TRENDING :
               </span>
