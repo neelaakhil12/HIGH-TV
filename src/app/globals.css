@@ -415,13 +415,13 @@ body {
 
 /* Scoped classes for Category Page (specifically breaking news page) to avoid homepage changes */
 .category-headline {
-  font-size: 14px; /* Reduced by 2px (was 16px) */
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.4;
 }
 @media (min-width: 768px) {
   .category-headline {
-    font-size: 17px; /* Reduced by 2px (was 19px) */
+    font-size: 20px;
     line-height: 1.35;
   }
 }
@@ -435,23 +435,23 @@ body {
 }
 
 .category-summary {
-  font-size: 14px; /* Increased by 1px (was 13px) */
+  font-size: 14px;
   font-weight: 500;
   line-height: 1.75;
 }
 @media (min-width: 768px) {
   .category-summary {
-    font-size: 16px; /* Increased by 1px (was 15px) */
+    font-size: 16px;
     line-height: 1.7;
   }
 }
 .category-summary.telugu-text {
-  font-size: 15.5px !important; /* Increased by 1px (was 14.5px) */
+  font-size: 14.5px !important;
   line-height: 1.95 !important; /* extra spacing to prevent bottom clipping under line-clamp-2 */
 }
 @media (min-width: 768px) {
   .category-summary.telugu-text {
-    font-size: 17px !important; /* Increased by 1px (was 16px) */
+    font-size: 16.5px !important;
     line-height: 1.9 !important;
   }
 }
