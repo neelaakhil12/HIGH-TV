@@ -14,7 +14,7 @@ export default function ScrollToTopButton() {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    // Scroll visibility toggle
+    // Scroll visibility toggle for Back-to-Top button
     const onScroll = () => setVisible(window.scrollY > 400);
     window.addEventListener('scroll', onScroll);
 
@@ -55,11 +55,9 @@ export default function ScrollToTopButton() {
     }
   };
 
-  if (!visible) return null;
-
   return (
     <>
-      {/* Floating Dark Mode Toggle Button */}
+      {/* Floating Dark Mode Toggle Button (Always Visible) */}
       <button
         onClick={toggleDarkMode}
         title={isDark ? "కాంతి మోడ్ ఆన్ చేయండి" : "చీకటి మోడ్ ఆన్ చేయండి"}
@@ -72,7 +70,7 @@ export default function ScrollToTopButton() {
         {isDark ? <Sun size={16} /> : <Moon size={16} />}
       </button>
 
-      {/* Floating WhatsApp Button */}
+      {/* Floating WhatsApp Button (Always Visible) */}
       <button
         onClick={shareWhatsApp}
         title="వాట్సాప్‌లో షేర్ చేయండి"
@@ -81,14 +79,16 @@ export default function ScrollToTopButton() {
         <WhatsAppIcon />
       </button>
 
-      {/* Back to Top Button */}
-      <button
-        onClick={goTop}
-        title="పైకి వెళ్ళండి"
-        className="fixed bottom-[72px] md:bottom-4 right-3 md:right-6 z-50 w-9 h-9 bg-[#025390] hover:bg-[#013d6b] text-white rounded-full shadow-lg flex items-center justify-center transition-colors duration-200 cursor-pointer"
-      >
-        <ArrowUp size={16} />
-      </button>
+      {/* Back to Top Button (Visible only after scrolling) */}
+      {visible && (
+        <button
+          onClick={goTop}
+          title="పైకి వెళ్ళండి"
+          className="fixed bottom-[72px] md:bottom-4 right-3 md:right-6 z-50 w-9 h-9 bg-[#025390] hover:bg-[#013d6b] text-white rounded-full shadow-lg flex items-center justify-center transition-colors duration-200 cursor-pointer"
+        >
+          <ArrowUp size={16} />
+        </button>
+      )}
     </>
   );
 }

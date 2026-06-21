@@ -271,16 +271,16 @@ body {
 
 /* ── Global Dark Mode Styling ────────────────────────────────────── */
 .dark {
-  --background: #121212;
+  --background: #000000;
   --foreground: #f3f4f6;
   --border: #2d2d2d;
-  --card-bg: #1e1e1e;
-  --section-bg: #181818;
-  --astrology-bg: #2d182b;
+  --card-bg: #121212;
+  --section-bg: #0a0a0a;
+  --astrology-bg: #1e0b1c;
 }
 
 .dark body {
-  background: #121212 !important;
+  background: #000000 !important;
   color: #f3f4f6 !important;
 }
 
@@ -290,7 +290,7 @@ body {
 .dark select,
 .dark input,
 .dark textarea {
-  background-color: #1e1e1e !important;
+  background-color: #121212 !important;
   color: #f3f4f6 !important;
   border-color: #2d2d2d !important;
 }
@@ -301,7 +301,8 @@ body {
 .dark .text-gray-650,
 .dark .text-gray-600,
 .dark .text-gray-500,
-.dark .text-gray-400 {
+.dark .text-gray-400,
+.dark .text-\[\#222222\] {
   color: #d1d5db !important;
 }
 
@@ -345,13 +346,13 @@ body {
   background-color: #1a2333 !important;
 }
 
-.dark .bg-[#025390],
-.dark .bg-[#02599c] {
+.dark .bg-\[\#025390\],
+.dark .bg-\[\#02599c\] {
   background-color: #0f273b !important;
 }
 
-.dark .text-[#02599c],
-.dark .text-[#025390] {
+.dark .text-\[\#02599c\],
+.dark .text-\[\#025390\] {
   color: #60a5fa !important;
 }
 
@@ -360,11 +361,11 @@ body {
   color: #e5e7eb !important;
 }
 
-.dark .bg-[#f4f6f8] {
-  background-color: #121212 !important;
+.dark .bg-\[\#f4f6f8\] {
+  background-color: #000000 !important;
 }
 
-.dark .text-[#fe0000] {
+.dark .text-\[\#fe0000\] {
   color: #fca5a5 !important;
 }
 
