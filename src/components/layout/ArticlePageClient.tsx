@@ -341,19 +341,7 @@ export default function ArticlePageClient({
                 </div>
               </div>
 
-              {/* Tags */}
-              <div className="flex mt-5 pt-4 border-t border-gray-100 flex-wrap gap-2 mb-2">
-                {article.tags.map((tag: string) => (
-                  <Link
-                    key={tag}
-                    href={`/search?q=${tag}`}
-                    className="text-sm bg-gray-100 hover:bg-[#025390] hover:text-white text-gray-600 px-3 py-1 rounded-full transition-colors font-medium telugu-text"
-                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                  >
-                    {tag}
-                  </Link>
-                ))}
-              </div>
+
 
               {/* Bottom Section: మరిన్ని వార్తలు చదవండి (Read More News) */}
               <div className="mt-8 pt-5 border-t border-gray-150 text-left">
