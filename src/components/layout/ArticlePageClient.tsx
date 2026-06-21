@@ -535,16 +535,7 @@ export default function ArticlePageClient({
               className="object-cover"
             />
           </div>
-          {/* "పూర్తిగా చదవండి" button under image */}
-          <div className="mt-3">
-            <button
-              onClick={() => setIsExpanded(true)}
-              className="inline-flex items-center justify-center gap-2 bg-[#cc0000] hover:bg-[#e60000] text-white font-black text-[15px] md:text-[16px] px-6 py-2.5 rounded-lg transition-colors shadow-sm cursor-pointer select-none telugu-text"
-              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-            >
-              పూర్తిగా చదవండి
-            </button>
-          </div>
+
         </div>
 
         {/* Right Column: Metadata, Red Title, Limited Description, Button */}
@@ -604,6 +595,17 @@ export default function ArticlePageClient({
               </Link>
             </div>
             <ShareButton title={article.title} />
+          </div>
+
+          {/* "పూర్తిగా చదవండి" button under reporter/share */}
+          <div className="mt-4">
+            <button
+              onClick={() => setIsExpanded(true)}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#cc0000] hover:bg-[#e60000] text-white font-black text-[15px] md:text-[16px] px-6 py-2.5 rounded-lg transition-colors shadow-sm cursor-pointer select-none telugu-text"
+              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+            >
+              పూర్తిగా చదవండి
+            </button>
           </div>
 
         </div>
