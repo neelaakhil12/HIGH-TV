@@ -724,7 +724,7 @@ export default function EPaperReader() {
         img.onerror = () => resolve(null);
       });
 
-      const headerHeightVal = 75;
+      const headerHeightVal = 110;
       const footerHeightVal = 65;
 
       const canvas = document.createElement('canvas');
@@ -738,8 +738,8 @@ export default function EPaperReader() {
         
         // 2. Draw logo (centered at top)
         if (logoImg) {
-          const logoMaxH = 45 * scaleFactor;
-          const logoMaxW = canvas.width * 0.8;
+          const logoMaxH = 75 * scaleFactor;
+          const logoMaxW = canvas.width * 0.9;
           let drawW = logoImg.width;
           let drawH = logoImg.height;
           const logoRatio = drawW / drawH;
@@ -756,7 +756,7 @@ export default function EPaperReader() {
           ctx.drawImage(logoImg, lx, ly, drawW, drawH);
         } else {
           ctx.fillStyle = '#02599c';
-          ctx.font = `bold ${24 * scaleFactor}px sans-serif`;
+          ctx.font = `bold ${36 * scaleFactor}px sans-serif`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText('HIGH TV', canvas.width / 2, (headerHeightVal * scaleFactor) / 2);
@@ -868,7 +868,7 @@ export default function EPaperReader() {
         img.onerror = () => resolve(null);
       });
 
-      const headerHeightVal = 75;
+      const headerHeightVal = 110;
       const footerHeightVal = 65;
 
       const canvas = document.createElement('canvas');
@@ -882,8 +882,8 @@ export default function EPaperReader() {
         
         // 2. Draw logo (centered at top)
         if (logoImg) {
-          const logoMaxH = 45 * scaleFactor;
-          const logoMaxW = canvas.width * 0.8;
+          const logoMaxH = 75 * scaleFactor;
+          const logoMaxW = canvas.width * 0.9;
           let drawW = logoImg.width;
           let drawH = logoImg.height;
           const logoRatio = drawW / drawH;
@@ -900,7 +900,7 @@ export default function EPaperReader() {
           ctx.drawImage(logoImg, lx, ly, drawW, drawH);
         } else {
           ctx.fillStyle = '#02599c';
-          ctx.font = `bold ${24 * scaleFactor}px sans-serif`;
+          ctx.font = `bold ${36 * scaleFactor}px sans-serif`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText('HIGH TV', canvas.width / 2, (headerHeightVal * scaleFactor) / 2);
