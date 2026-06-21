@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, Sun, Moon } from 'lucide-react';
 
 const WhatsAppIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -11,10 +11,25 @@ const WhatsAppIcon = () => (
 
 export default function ScrollToTopButton() {
   const [visible, setVisible] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
+    // Scroll visibility toggle
     const onScroll = () => setVisible(window.scrollY > 400);
     window.addEventListener('scroll', onScroll);
+
+    // Initial theme check on mount
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDark(false);
+    }
+
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
@@ -28,10 +43,35 @@ export default function ScrollToTopButton() {
     window.open(url, '_blank');
   };
 
+  const toggleDarkMode = () => {
+    if (isDark) {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      setIsDark(true);
+    }
+  };
+
   if (!visible) return null;
 
   return (
     <>
+      {/* Floating Dark Mode Toggle Button */}
+      <button
+        onClick={toggleDarkMode}
+        title={isDark ? "కాంతి మోడ్ ఆన్ చేయండి" : "చీకటి మోడ్ ఆన్ చేయండి"}
+        className={`fixed bottom-[160px] md:bottom-[104px] right-3 md:right-6 z-50 w-9 h-9 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 cursor-pointer ${
+          isDark 
+            ? 'bg-yellow-400 text-gray-900 hover:bg-yellow-350' 
+            : 'bg-slate-800 text-yellow-300 hover:bg-slate-700'
+        }`}
+      >
+        {isDark ? <Sun size={16} /> : <Moon size={16} />}
+      </button>
+
       {/* Floating WhatsApp Button */}
       <button
         onClick={shareWhatsApp}
