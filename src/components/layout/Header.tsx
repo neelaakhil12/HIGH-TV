@@ -241,10 +241,6 @@ export default function Header() {
             </svg>
           </Link>
           <Link href="/category/latest"        className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/latest')}`}>బ్రేకింగ్ న్యూస్</Link>
-          <Link href="/category/live-updates"  className={`px-2.5 h-full flex items-center gap-1 hover:bg-black/15 border-r border-white/20 flex-shrink-0 text-red-150 ${navCls('/category/live-updates')}`}>
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            లైవ్ అప్‌డేట్స్
-          </Link>
           <button 
             onClick={() => {
               setIsTGMobileExpanded(!isTGMobileExpanded);
@@ -315,12 +311,6 @@ export default function Header() {
               {/* బ్రేకింగ్ న్యూస్ */}
               <Link href="/category/latest" className={`px-3 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/latest')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                 బ్రేకింగ్ న్యూస్
-              </Link>
-
-              {/* లైవ్ అప్‌డేట్స్ */}
-              <Link href="/category/live-updates" className={`px-3 h-full flex items-center gap-1.5 hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 text-red-150 ${navCls('/category/live-updates')}`} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                లైవ్ అప్‌డేట్స్
               </Link>
 
               {/* తెలంగాణ Dropdown */}
@@ -547,7 +537,6 @@ export default function Header() {
                 {[
                   { href: '/',                        label: 'హోమ్'           },
                   { href: '/category/latest',         label: 'బ్రేకింగ్ న్యూస్' },
-                  { href: '/category/live-updates',  label: 'లైవ్ అప్‌డేట్స్' },
                   { href: '/category/telangana',      label: 'తెలంగాణ'        },
                   { href: '/category/andhra-pradesh', label: 'ఆంధ్రప్రదేశ్'  },
                   { href: '/category/epaper',         label: 'ఈ-పేపర్'        },
