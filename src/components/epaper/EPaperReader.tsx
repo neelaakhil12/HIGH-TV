@@ -716,14 +716,52 @@ export default function EPaperReader() {
       const renderScale = (targetWidth / originalViewport.width) * scaleFactor;
       const viewport = page.getViewport({ scale: renderScale });
       
+      // Load logo image
+      const logoImg = await new Promise<HTMLImageElement | null>((resolve) => {
+        const img = new Image();
+        img.src = '/logo.png';
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+      });
+
+      const headerHeightVal = 75;
+      const footerHeightVal = 65;
+
       const canvas = document.createElement('canvas');
       canvas.width = clipBox.width * scaleFactor;
-      canvas.height = clipBox.height * scaleFactor;
+      canvas.height = (clipBox.height + headerHeightVal + footerHeightVal) * scaleFactor;
       const ctx = canvas.getContext('2d');
       if (ctx) {
+        // 1. Fill white background
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
+        // 2. Draw logo (centered at top)
+        if (logoImg) {
+          const logoMaxH = 45 * scaleFactor;
+          const logoMaxW = canvas.width * 0.8;
+          let drawW = logoImg.width;
+          let drawH = logoImg.height;
+          const logoRatio = drawW / drawH;
+          if (drawH > logoMaxH) {
+            drawH = logoMaxH;
+            drawW = drawH * logoRatio;
+          }
+          if (drawW > logoMaxW) {
+            drawW = logoMaxW;
+            drawH = drawW / logoRatio;
+          }
+          const lx = (canvas.width - drawW) / 2;
+          const ly = ((headerHeightVal * scaleFactor) - drawH) / 2;
+          ctx.drawImage(logoImg, lx, ly, drawW, drawH);
+        } else {
+          ctx.fillStyle = '#02599c';
+          ctx.font = `bold ${24 * scaleFactor}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('HIGH TV', canvas.width / 2, (headerHeightVal * scaleFactor) / 2);
+        }
+
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = viewport.width;
         tempCanvas.height = viewport.height;
@@ -735,6 +773,7 @@ export default function EPaperReader() {
           };
           await page.render(renderContext).promise;
           
+          // 3. Draw newspaper clip in the middle
           ctx.drawImage(
             tempCanvas,
             clipBox.x * scaleFactor,
@@ -742,11 +781,60 @@ export default function EPaperReader() {
             clipBox.width * scaleFactor,
             clipBox.height * scaleFactor,
             0,
-            0,
+            headerHeightVal * scaleFactor,
             canvas.width,
-            canvas.height
+            clipBox.height * scaleFactor
           );
           
+          // 4. Draw metadata & link at the bottom
+          const currentHost = typeof window !== 'undefined' ? window.location.origin : 'https://hightv.in';
+          const clipLink = `${currentHost}/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
+          
+          const getEditionDisplayName = (editionVal: string) => {
+            const allEditions = [...MAIN_EDITIONS, ...AP_EDITIONS, ...TG_EDITIONS, ...METRO_EDITIONS];
+            const found = allEditions.find(ed => ed.value === editionVal);
+            return found ? `${found.nameTe} (${found.name})` : editionVal;
+          };
+
+          const formatDateForClip = (dateStr: string) => {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+              return `${parts[2]}/${parts[1]}/${parts[0]}`; // dd/mm/yyyy
+            }
+            return dateStr;
+          };
+
+          const editionText = getEditionDisplayName(selectedEdition);
+          const pageText = `Page : ${activePageIdx + 1}`;
+          const metadataText = `${formatDateForClip(selectedDate)} | ${editionText} | ${pageText}`;
+
+          const footerStartY = (headerHeightVal + clipBox.height) * scaleFactor;
+          const maxTextW = canvas.width - (20 * scaleFactor);
+
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          // Helper to draw text within width constraint
+          const fillTextToFit = (text: string, x: number, y: number, baseSize: number, isBold = true, color = '#1e293b') => {
+            ctx.fillStyle = color;
+            let size = baseSize * scaleFactor;
+            ctx.font = `${isBold ? 'bold ' : ''}${size}px sans-serif`;
+            let measured = ctx.measureText(text).width;
+            while (measured > maxTextW && size > 8 * scaleFactor) {
+              size -= 1;
+              ctx.font = `${isBold ? 'bold ' : ''}${size}px sans-serif`;
+              measured = ctx.measureText(text).width;
+            }
+            ctx.fillText(text, x, y);
+          };
+
+          // Draw metadata line
+          fillTextToFit(metadataText, canvas.width / 2, footerStartY + (22 * scaleFactor), 13, true, '#1e293b');
+
+          // Draw link line
+          fillTextToFit(`Source : ${clipLink}`, canvas.width / 2, footerStartY + (44 * scaleFactor), 11, true, '#02599c');
+
           const imgData = canvas.toDataURL('image/jpeg', 0.95);
           const link = document.createElement('a');
           link.download = `hightv-clip-${selectedDate}-page${activePageIdx + 1}.jpg`;
@@ -772,14 +860,52 @@ export default function EPaperReader() {
       const renderScale = (targetWidth / originalViewport.width) * scaleFactor;
       const viewport = page.getViewport({ scale: renderScale });
       
+      // Load logo image
+      const logoImg = await new Promise<HTMLImageElement | null>((resolve) => {
+        const img = new Image();
+        img.src = '/logo.png';
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+      });
+
+      const headerHeightVal = 75;
+      const footerHeightVal = 65;
+
       const canvas = document.createElement('canvas');
       canvas.width = activeArticle.width * scaleFactor;
-      canvas.height = activeArticle.height * scaleFactor;
+      canvas.height = (activeArticle.height + headerHeightVal + footerHeightVal) * scaleFactor;
       const ctx = canvas.getContext('2d');
       if (ctx) {
+        // 1. Fill white background
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
+        // 2. Draw logo (centered at top)
+        if (logoImg) {
+          const logoMaxH = 45 * scaleFactor;
+          const logoMaxW = canvas.width * 0.8;
+          let drawW = logoImg.width;
+          let drawH = logoImg.height;
+          const logoRatio = drawW / drawH;
+          if (drawH > logoMaxH) {
+            drawH = logoMaxH;
+            drawW = drawH * logoRatio;
+          }
+          if (drawW > logoMaxW) {
+            drawW = logoMaxW;
+            drawH = drawW / logoRatio;
+          }
+          const lx = (canvas.width - drawW) / 2;
+          const ly = ((headerHeightVal * scaleFactor) - drawH) / 2;
+          ctx.drawImage(logoImg, lx, ly, drawW, drawH);
+        } else {
+          ctx.fillStyle = '#02599c';
+          ctx.font = `bold ${24 * scaleFactor}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('HIGH TV', canvas.width / 2, (headerHeightVal * scaleFactor) / 2);
+        }
+
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = viewport.width;
         tempCanvas.height = viewport.height;
@@ -791,6 +917,7 @@ export default function EPaperReader() {
           };
           await page.render(renderContext).promise;
           
+          // 3. Draw newspaper clip in the middle
           ctx.drawImage(
             tempCanvas,
             activeArticle.x * scaleFactor,
@@ -798,11 +925,60 @@ export default function EPaperReader() {
             activeArticle.width * scaleFactor,
             activeArticle.height * scaleFactor,
             0,
-            0,
+            headerHeightVal * scaleFactor,
             canvas.width,
-            canvas.height
+            activeArticle.height * scaleFactor
           );
           
+          // 4. Draw metadata & link at the bottom
+          const currentHost = typeof window !== 'undefined' ? window.location.origin : 'https://hightv.in';
+          const clipLink = `${currentHost}/category/epaper?view=article&date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}&articleId=${activeArticle.id}`;
+          
+          const getEditionDisplayName = (editionVal: string) => {
+            const allEditions = [...MAIN_EDITIONS, ...AP_EDITIONS, ...TG_EDITIONS, ...METRO_EDITIONS];
+            const found = allEditions.find(ed => ed.value === editionVal);
+            return found ? `${found.nameTe} (${found.name})` : editionVal;
+          };
+
+          const formatDateForClip = (dateStr: string) => {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+              return `${parts[2]}/${parts[1]}/${parts[0]}`; // dd/mm/yyyy
+            }
+            return dateStr;
+          };
+
+          const editionText = getEditionDisplayName(selectedEdition);
+          const pageText = `Page : ${activePageIdx + 1}`;
+          const metadataText = `${formatDateForClip(selectedDate)} | ${editionText} | ${pageText}`;
+
+          const footerStartY = (headerHeightVal + activeArticle.height) * scaleFactor;
+          const maxTextW = canvas.width - (20 * scaleFactor);
+
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          // Helper to draw text within width constraint
+          const fillTextToFit = (text: string, x: number, y: number, baseSize: number, isBold = true, color = '#1e293b') => {
+            ctx.fillStyle = color;
+            let size = baseSize * scaleFactor;
+            ctx.font = `${isBold ? 'bold ' : ''}${size}px sans-serif`;
+            let measured = ctx.measureText(text).width;
+            while (measured > maxTextW && size > 8 * scaleFactor) {
+              size -= 1;
+              ctx.font = `${isBold ? 'bold ' : ''}${size}px sans-serif`;
+              measured = ctx.measureText(text).width;
+            }
+            ctx.fillText(text, x, y);
+          };
+
+          // Draw metadata line
+          fillTextToFit(metadataText, canvas.width / 2, footerStartY + (22 * scaleFactor), 13, true, '#1e293b');
+
+          // Draw link line
+          fillTextToFit(`Source : ${clipLink}`, canvas.width / 2, footerStartY + (44 * scaleFactor), 11, true, '#02599c');
+
           const imgData = canvas.toDataURL('image/jpeg', 0.95);
           const link = document.createElement('a');
           link.download = `hightv-article-${selectedDate}-page${activePageIdx + 1}-${activeArticle.id}.jpg`;
