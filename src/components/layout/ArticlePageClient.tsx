@@ -9,6 +9,53 @@ import DistrictNewsTabs from '@/components/layout/DistrictNewsTabs';
 import AdBanner from '@/components/home/AdBanner';
 import { Home, ChevronRight, Clock, Calendar, ThumbsUp, TrendingUp } from 'lucide-react';
 
+function FallbackImage({ src, alt, className, fill, width, height, ...props }: {
+  src: string;
+  alt: string;
+  className?: string;
+  fill?: boolean;
+  width?: number;
+  height?: number;
+  [key: string]: any;
+}) {
+  const [imgSrc, setImgSrc] = useState('/logo.png');
+
+  useEffect(() => {
+    if (!src) return;
+    const img = new window.Image();
+    img.src = src;
+    img.onload = () => {
+      setImgSrc(src);
+    };
+    img.onerror = () => {
+      setImgSrc('/logo.png');
+    };
+  }, [src]);
+
+  if (fill) {
+    return (
+      <img
+        src={imgSrc}
+        alt={alt}
+        className={className}
+        style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+        {...props}
+      />
+    );
+  }
+
+  return (
+    <img
+      src={imgSrc}
+      alt={alt}
+      className={className}
+      width={width}
+      height={height}
+      {...props}
+    />
+  );
+}
+
 interface ArticlePageClientProps {
   article: any;
   reporter: any;
@@ -225,14 +272,11 @@ export default function ArticlePageClient({
               </p>
 
               {/* Hero Image */}
-              <div className="rounded overflow-hidden mb-5 border border-gray-100">
-                <Image
+              <div className="rounded overflow-hidden mb-5 border border-gray-100 relative aspect-video flex items-center justify-center bg-gray-50">
+                <FallbackImage
                   src={article.image}
                   alt={article.title}
-                  width={800}
-                  height={450}
-                  className="w-full h-auto"
-                  priority
+                  className="w-full h-auto max-h-[450px] object-cover"
                 />
               </div>
 
@@ -267,7 +311,7 @@ export default function ArticlePageClient({
                       <div className="absolute top-3 left-3 bg-[#cc0000] text-white text-[11px] font-black px-2 py-0.5 rounded tracking-wide z-10 font-sans">
                         1/1
                       </div>
-                      <img
+                      <FallbackImage
                         src={inlineImage}
                         alt={inlineCaption}
                         className="w-full h-auto object-contain block max-h-[500px] mx-auto"
@@ -360,10 +404,11 @@ export default function ArticlePageClient({
                         href={`/news/${item.slug}`}
                         className="flex gap-3 hover:bg-blue-50/30 p-1.5 rounded-lg transition-colors group"
                       >
-                        <div className="w-[90px] h-[60px] flex-shrink-0 overflow-hidden rounded-md bg-gray-50 border border-gray-150 relative">
-                          <img
+                        <div className="w-[90px] h-[60px] flex-shrink-0 overflow-hidden rounded-md bg-gray-50 border border-gray-150 relative flex items-center justify-center">
+                          <FallbackImage
                             src={item.image}
                             alt={item.title}
+                            fill
                             className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
                           />
                         </div>
@@ -473,15 +518,13 @@ export default function ArticlePageClient({
         
         {/* Left Column: Hero Image & Ad */}
         <div className="md:col-span-6 lg:col-span-7 flex flex-col gap-3">
-          <div className="rounded-lg overflow-hidden border border-gray-200 shadow-sm relative w-full h-[220px] sm:h-[280px] md:h-[260px] lg:h-[290px]">
-            <Image
+          <div className="rounded-lg overflow-hidden border border-gray-200 shadow-sm relative w-full h-[220px] sm:h-[280px] md:h-[260px] lg:h-[290px] flex items-center justify-center bg-gray-50">
+            <FallbackImage
               src={article.image}
               alt={article.title}
               fill
               className="object-cover"
-              priority
             />
-
           </div>
           {/* Ad under the image */}
           <div className="w-full">
@@ -518,7 +561,7 @@ export default function ArticlePageClient({
                   <div className="absolute top-3 left-3 bg-[#cc0000] text-white text-[11px] font-black px-2 py-0.5 rounded tracking-wide z-10 font-sans">
                     1/1
                   </div>
-                  <img
+                  <FallbackImage
                     src={inlineImage}
                     alt={inlineCaption}
                     className="w-full h-auto object-contain block max-h-[500px] mx-auto"
@@ -580,10 +623,11 @@ export default function ArticlePageClient({
                 href={`/news/${item.slug}`}
                 className="flex gap-3 hover:bg-blue-50/30 p-1.5 rounded-lg transition-colors group"
               >
-                <div className="w-[90px] h-[60px] flex-shrink-0 overflow-hidden rounded-md bg-gray-50 border border-gray-150 relative">
-                  <img
+                <div className="w-[90px] h-[60px] flex-shrink-0 overflow-hidden rounded-md bg-gray-50 border border-gray-150 relative flex items-center justify-center">
+                  <FallbackImage
                     src={item.image}
                     alt={item.title}
+                    fill
                     className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
                   />
                 </div>
