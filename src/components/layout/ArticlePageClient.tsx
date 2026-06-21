@@ -236,17 +236,7 @@ export default function ArticlePageClient({
                 />
               </div>
 
-              {/* Mobile-only Square Ad — after hero image */}
-              <div className="md:hidden my-4">
-                <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider rounded-t">Advertisement</div>
-                <div className="w-full aspect-square bg-gradient-to-br from-[#7b2d00] to-[#c0392b] rounded-b overflow-hidden flex flex-col items-center justify-center gap-3 text-white text-center px-6">
-                  <div className="text-5xl">💍</div>
-                  <div className="text-xl font-black leading-tight">CMR జ్యువెల్లరీ</div>
-                  <div className="text-sm font-bold opacity-90">Gold &amp; Diamond Sale</div>
-                  <div className="text-[13px] opacity-80 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వేసవి ఆఫర్లు — 30% వరకు తగ్గింపు</div>
-                  <a href="#" className="mt-1 bg-yellow-400 text-[#7b2d00] rounded-full px-5 py-2 text-sm font-black hover:bg-yellow-300 transition-colors">Shop Now →</a>
-                </div>
-              </div>
+
 
               {/* Full Article Body */}
               <div className="telugu-text space-y-4 text-gray-800 leading-loose text-[1.05rem] md:text-[1.18rem]" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
@@ -305,17 +295,7 @@ export default function ArticlePageClient({
                   </div>
                 )}
 
-                {/* Mobile Ad 2 */}
-                <div className="lg:hidden my-5 border border-gray-150 rounded overflow-hidden">
-                  <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
-                  <div className="bg-gradient-to-br from-[#1a237e] to-[#283593] p-4 text-white text-center flex flex-col items-center justify-center gap-2">
-                    <div className="text-2xl">🎓</div>
-                    <div className="text-base font-black leading-tight text-center">NARAYANA IIT Academy</div>
-                    <div className="text-[11px] font-bold opacity-90 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>JEE • NEET • EAMCET</div>
-                    <div className="text-[10px] opacity-80">Admissions Open 2026</div>
-                    <a href="#" className="mt-2 bg-yellow-350 text-[#1a237e] rounded-full px-3 py-1 text-[10px] font-black hover:bg-yellow-300 transition-colors">Enroll Now</a>
-                  </div>
-                </div>
+
 
                 {/* Read latest & Follow us strip */}
                 <div className="hidden lg:block border-t border-gray-100 pt-5 mt-6 space-y-2.5 text-gray-800 font-sans text-[15px] select-none leading-normal">
