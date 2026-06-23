@@ -37,7 +37,8 @@ import {
   Maximize2,
   Globe,
   Sliders,
-  FileCheck
+  FileCheck,
+  TrendingUp
 } from 'lucide-react';
 
 import { 
@@ -181,6 +182,12 @@ export default function AdminPage() {
   const [newNewsLink, setNewNewsLink] = useState('');
   const [editingFlashIndex, setEditingFlashIndex] = useState<number | null>(null);
 
+  // Trending News Ticker config
+  const [trendingNewsList, setTrendingNewsList] = useState<{ text: string; link: string }[]>([]);
+  const [newTrendingText, setNewTrendingText] = useState('');
+  const [newTrendingLink, setNewTrendingLink] = useState('');
+  const [editingTrendingIndex, setEditingTrendingIndex] = useState<number | null>(null);
+
   // Homepage Settings: youtube list
   const [videosList, setVideosList] = useState<{ id: string; title: string; thumbnail: string }[]>([]);
 
@@ -243,6 +250,28 @@ export default function AdminPage() {
       }
     } catch {
       setFlashNewsList([]);
+    }
+
+    // Load Trending news ticker items
+    try {
+      const savedTrending = localStorage.getItem('trending_news_items');
+      if (savedTrending) {
+        setTrendingNewsList(JSON.parse(savedTrending));
+      } else {
+        // These are the same defaults used in Header.tsx
+        const trendingDefaults = [
+          { text: "ఎన్నికల ఫలితాలు", link: "/search?q=ఎన్నికల ఫలితాలు" },
+          { text: "ఆంధ్రప్రదేశ్‌లో భారీ వర్షాలు", link: "/search?q=వర్షాలు" },
+          { text: "హైదరాబాద్ మెట్రో విస్తరణ", link: "/search?q=మెట్రో" },
+          { text: "బంగారం ధరలు నేటి అప్‌డేట్స్", link: "/search?q=బంగారం" },
+          { text: "టీమిండియా వన్డే సిరీస్ విజయం", link: "/search?q=క్రికెట్" },
+          { text: "నేటి రాశిఫలాలు", link: "/search?q=రాశిఫలాలు" },
+          { text: "వెబ్ స్టోరీస్ గ్యాలరీ", link: "/category/webstories" }
+        ];
+        setTrendingNewsList(trendingDefaults);
+      }
+    } catch {
+      setTrendingNewsList([]);
     }
 
     // Load Videos list
@@ -934,6 +963,44 @@ export default function AdminPage() {
     localStorage.setItem('flash_news_items', JSON.stringify(updated));
   };
 
+  // Add/Edit trending news item
+  const handleAddTrendingNews = () => {
+    if (!newTrendingText.trim()) return;
+    const item = {
+      text: newTrendingText.trim(),
+      link: newTrendingLink.trim() || `/search?q=${encodeURIComponent(newTrendingText.trim())}`
+    };
+    let updated;
+    if (editingTrendingIndex !== null) {
+      updated = [...trendingNewsList];
+      updated[editingTrendingIndex] = item;
+      setEditingTrendingIndex(null);
+      alert('Trending news item updated successfully!');
+    } else {
+      updated = [...trendingNewsList, item];
+      alert('Trending news item added successfully!');
+    }
+    setTrendingNewsList(updated);
+    localStorage.setItem('trending_news_items', JSON.stringify(updated));
+    setNewTrendingText('');
+    setNewTrendingLink('');
+  };
+
+  const startEditingTrendingNews = (index: number) => {
+    const item = trendingNewsList[index];
+    if (item) {
+      setNewTrendingText(item.text);
+      setNewTrendingLink(item.link || '');
+      setEditingTrendingIndex(index);
+    }
+  };
+
+  const handleRemoveTrendingNews = (idx: number) => {
+    const updated = trendingNewsList.filter((_, index) => index !== idx);
+    setTrendingNewsList(updated);
+    localStorage.setItem('trending_news_items', JSON.stringify(updated));
+  };
+
   // Handle Video fields edits
   const handleVideoFieldChange = (idx: number, field: 'id' | 'title' | 'thumbnail', val: string) => {
     const updated = [...videosList];
@@ -1097,6 +1164,18 @@ export default function AdminPage() {
             <div className="flex items-center gap-2.5">
               <Megaphone className="w-4 h-4" />
               <span>Flash News Ticker</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('trending'); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'trending' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <TrendingUp className="w-4 h-4" />
+              <span>Trending Ticker</span>
             </div>
           </button>
 
@@ -2214,6 +2293,118 @@ export default function AdminPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleRemoveFlashNews(index)}
+                                  className="text-red-500 hover:text-red-700 p-1.5 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-red-500/10"
+                                  title="Remove item"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════ VIEW: TRENDING NEWS TICKER ══════════════ */}
+          {activeTab === 'trending' && (
+            <div className="flex flex-col gap-6 animate-fade-in text-left">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800 font-sans">Trending News Config</h2>
+                <p className="text-slate-500 text-xs">Configure the rotating trending headlines displayed in the website&apos;s top header TRENDING bar.</p>
+              </div>
+
+              <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 flex flex-col gap-4 shadow-sm">
+
+                {/* Form to append Trending Headline */}
+                <div className="bg-amber-50 p-4 border border-amber-200/60 rounded-2xl flex flex-col gap-4">
+                  <span className="text-[11px] font-black text-amber-600 uppercase tracking-widest">
+                    {editingTrendingIndex !== null ? '✍️ Edit trending headline' : '📈 Add trending headline'}
+                  </span>
+                  <div className="flex flex-col gap-3 md:flex-row">
+                    <input
+                      type="text"
+                      value={newTrendingText}
+                      onChange={(e) => setNewTrendingText(e.target.value)}
+                      placeholder="e.g. హైదరాబాద్‌లో నేడు భారీ ట్రాఫిక్ జామ్..."
+                      className="flex-1 bg-white border border-slate-200/60 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    />
+                    <input
+                      type="text"
+                      value={newTrendingLink}
+                      onChange={(e) => setNewTrendingLink(e.target.value)}
+                      placeholder="Redirect URL path (optional)"
+                      className="flex-1 bg-white border border-slate-200/60 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs font-mono outline-none transition-colors text-slate-800"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddTrendingNews}
+                      className="bg-amber-500 hover:bg-amber-600 text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5 shrink-0"
+                    >
+                      {editingTrendingIndex !== null ? <Pencil className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                      <span>{editingTrendingIndex !== null ? 'Update item' : 'Add item'}</span>
+                    </button>
+                    {editingTrendingIndex !== null && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewTrendingText('');
+                          setNewTrendingLink('');
+                          setEditingTrendingIndex(null);
+                        }}
+                        className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-black text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5 shrink-0"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Grid Table lists */}
+                <div className="border border-slate-200/80 rounded-2xl overflow-hidden">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-amber-50 border-b border-amber-100 text-slate-400 font-black">
+                        <th className="p-3 text-[10px] uppercase tracking-wider">#</th>
+                        <th className="p-3 text-[10px] uppercase tracking-wider">Trending Headline Text (Telugu)</th>
+                        <th className="p-3 text-[10px] uppercase tracking-wider">Redirect Link</th>
+                        <th className="p-3 text-[10px] uppercase tracking-wider text-center">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {trendingNewsList.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="p-8 text-center text-slate-450 font-bold">
+                            No trending headlines configured. Add one above!
+                          </td>
+                        </tr>
+                      ) : (
+                        trendingNewsList.map((item, index) => (
+                          <tr key={index} className="hover:bg-slate-50/50">
+                            <td className="p-3 font-mono text-slate-400 font-bold">{index + 1}</td>
+                            <td className="p-3 font-bold text-slate-800 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                              {item.text}
+                            </td>
+                            <td className="p-3 font-mono text-[10px] text-slate-400 truncate max-w-[200px]">{item.link}</td>
+                            <td className="p-3 text-center">
+                              <div className="flex items-center justify-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => startEditingTrendingNews(index)}
+                                  className="text-slate-500 hover:text-amber-600 p-1.5 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-amber-50"
+                                  title="Edit item"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveTrendingNews(index)}
                                   className="text-red-500 hover:text-red-700 p-1.5 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-red-500/10"
                                   title="Remove item"
                                 >
