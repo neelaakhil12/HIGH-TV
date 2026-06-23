@@ -164,8 +164,23 @@ function SidebarLatestVideos() {
 
 // Local helper component for Latest News (బ్రేకింగ్ న్యూస్) Widget
 function LatestNewsFeed() {
-  const latestArticles = [...politicsNews, ...sportsNews, ...businessNews, ...technologyNews]
-    .slice(0, 12);
+  const [latestArticles, setLatestArticles] = useState<any[]>([]);
+
+  useEffect(() => {
+    try {
+      const mergedP = getMergedArticles(politicsNews, 'politics');
+      const mergedS = getMergedArticles(sportsNews, 'sports');
+      const mergedB = getMergedArticles(businessNews, 'business');
+      const mergedT = getMergedArticles(technologyNews, 'technology');
+      
+      const all = [...mergedP, ...mergedS, ...mergedB, ...mergedT]
+        .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+        .slice(0, 12);
+      setLatestArticles(all);
+    } catch (e) {
+      console.error('Error in LatestNewsFeed:', e);
+    }
+  }, []);
 
   return (
     <div className="flex flex-col h-full select-none">
@@ -184,10 +199,10 @@ function LatestNewsFeed() {
       
       {/* Scrollable List */}
       <div className="flex-1 overflow-y-auto space-y-3.5 pr-1 max-h-[440px] hide-scrollbar text-left">
-        {latestArticles.map((article) => (
+        {latestArticles.map((article, idx) => (
           <Link 
             href={`/news/${article.slug}`} 
-            key={article.id} 
+            key={`${article.id}-${idx}`} 
             className="flex items-start gap-2 group cursor-pointer"
           >
             <span className="text-gray-400 mt-1 flex-shrink-0 text-[10px]">▪</span>
