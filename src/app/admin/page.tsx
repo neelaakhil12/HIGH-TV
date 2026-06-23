@@ -35,8 +35,9 @@ import {
   Eraser,
   Type,
   Maximize2,
-  FileCheck,
-  Globe
+  Globe,
+  Sliders,
+  FileCheck
 } from 'lucide-react';
 
 import { 
@@ -62,12 +63,16 @@ import {
   antharmadanamNews,
   getMergedArticles,
   apDistricts,
-  tgDistricts
+  tgDistricts,
+  featuredNews,
+  videoNews
 } from '@/lib/mockData';
 
 // Main 22 Pages/Categories List (excluding subpages)
 const MAIN_CATEGORIES_LIST = [
   { slug: 'latest', name: 'బ్రేకింగ్ న్యూస్ (Breaking)' },
+  { slug: 'trending', name: 'ట్రెండింగ్ వార్తలు (Trending)' },
+  { slug: 'featured', name: 'ముఖ్య వార్తలు (Featured)' },
   { slug: 'politics', name: 'రాజకీయాలు (Politics)' },
   { slug: 'national', name: 'నేషనల్ (National)' },
   { slug: 'international', name: 'వరల్డ్ (World)' },
@@ -142,6 +147,19 @@ export default function AdminPage() {
   const [newsAuthor, setNewsAuthor] = useState('హై టీవీ డెస్క్');
   const [newsPublishedDate, setNewsPublishedDate] = useState('');
   const [newsImage, setNewsImage] = useState('');
+
+  // Story placement flag checkboxes
+  const [isBreakingChecked, setIsBreakingChecked] = useState(false);
+  const [isTrendingChecked, setIsTrendingChecked] = useState(false);
+  const [isFeaturedChecked, setIsFeaturedChecked] = useState(false);
+
+  // Homepage slider states
+  const [sliderSlidesList, setSliderSlidesList] = useState<any[]>([]);
+  const [newSlideTitle, setNewSlideTitle] = useState('');
+  const [newSlideImage, setNewSlideImage] = useState('');
+  const [newSlideLink, setNewSlideLink] = useState('');
+  const [editingSlideIndex, setEditingSlideIndex] = useState<number | null>(null);
+
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   // WYSIWYG Editor references
@@ -161,6 +179,7 @@ export default function AdminPage() {
   const [flashNewsList, setFlashNewsList] = useState<{ text: string; link: string }[]>([]);
   const [newNewsText, setNewNewsText] = useState('');
   const [newNewsLink, setNewNewsLink] = useState('');
+  const [editingFlashIndex, setEditingFlashIndex] = useState<number | null>(null);
 
   // Homepage Settings: youtube list
   const [videosList, setVideosList] = useState<{ id: string; title: string; thumbnail: string }[]>([]);
@@ -210,7 +229,18 @@ export default function AdminPage() {
 
     // Load Flash news
     try {
-      setFlashNewsList(JSON.parse(localStorage.getItem('flash_news_items') || '[]'));
+      const savedTicker = localStorage.getItem('flash_news_items');
+      if (savedTicker) {
+        setFlashNewsList(JSON.parse(savedTicker));
+      } else {
+        const defaults = [
+          { text: "ముంబై ఎయిర్‌పోర్ట్‌లో భారీగా బంగారం పట్టివేత", link: "/search?q=బంగారం" },
+          { text: "నేడు ఏపీ కేబినెట్‌ కీలక భేటీ.. పలు కీలక నిర్ణయాలు తీసుకునే అవకాశం", link: "/search?q=ఏపీ కేబినెట్‌" },
+          { text: "తెలంగాణలో రాబోయే రెండు రోజుల్లో భారీ వర్షాలు కురిసే అవకాశం", link: "/search?q=వర్షాలు" },
+          { text: "భారత క్రికెట్ జట్టు సంచలన విజయం.. సిరీస్ సొంతం చేసుకున్న టీమిండియా", link: "/search?q=క్రికెట్" }
+        ];
+        setFlashNewsList(defaults);
+      }
     } catch {
       setFlashNewsList([]);
     }
@@ -264,6 +294,23 @@ export default function AdminPage() {
     } catch {
       setEpapersList([]);
     }
+
+    // Load Homepage slides
+    try {
+      const savedSlides = localStorage.getItem('homepage_banner_slides');
+      if (savedSlides) {
+        setSliderSlidesList(JSON.parse(savedSlides));
+      } else {
+        const defaults = featuredNews.map(item => ({
+          title: item.title,
+          image: item.image,
+          link: `/news/${item.slug}`
+        }));
+        setSliderSlidesList(defaults);
+      }
+    } catch {
+      setSliderSlidesList([]);
+    }
   }, [isAuthenticated, popupScope, activeAdSpot, refreshCounter]);
 
   // Set default published date when switching to add article view
@@ -275,6 +322,9 @@ export default function AdminPage() {
       setNewsDescription('');
       setNewsImage('');
       setEditingArticle(null);
+      setIsBreakingChecked(false);
+      setIsTrendingChecked(false);
+      setIsFeaturedChecked(false);
       // Auto-check filterCategory in classification tree
       if (filterCategory !== 'all' && filterCategory !== 'latest') {
         setSelectedCategories([filterCategory]);
@@ -429,6 +479,8 @@ export default function AdminPage() {
       ...businessNews,
       ...healthNews,
       ...viralNews,
+      ...featuredNews,
+      ...videoNews,
       ...rasipalaluNews,
       ...adyathmikamNews,
       ...sampadakiyamNews,
@@ -486,6 +538,15 @@ export default function AdminPage() {
     // Filter by category
     if (filterCategory !== 'all') {
       result = result.filter((art) => {
+        if (filterCategory === 'latest') {
+          return art.isBreaking || art.categorySlug === 'latest';
+        }
+        if (filterCategory === 'trending') {
+          return art.isTrending;
+        }
+        if (filterCategory === 'featured') {
+          return art.isFeatured || art.categorySlug === 'featured';
+        }
         const categoriesToCheck = [art.categorySlug, art.districtSlug].filter(Boolean);
         return categoriesToCheck.includes(filterCategory);
       });
@@ -503,6 +564,98 @@ export default function AdminPage() {
 
     return result;
   }, [allArticles, filterCategory, searchQuery]);
+
+  // Quick Action: Toggle flags (isBreaking, isTrending, isFeatured) directly from news list table or edit form
+  const toggleArticleFlag = (articleId: string, flag: 'isBreaking' | 'isTrending' | 'isFeatured') => {
+    try {
+      if (articleId.startsWith('custom-art-')) {
+        const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
+        const updated = custom.map((art: any) => {
+          if (art.id === articleId) {
+            return { ...art, [flag]: !art[flag] };
+          }
+          return art;
+        });
+        localStorage.setItem('custom_news_articles', JSON.stringify(updated));
+        setCustomNewsList(updated);
+      } else {
+        const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
+        const current = modified[articleId] || {};
+        const staticArt = allArticles.find(a => a.id === articleId);
+        const currentValue = current[flag] !== undefined ? current[flag] : (staticArt ? staticArt[flag] : false);
+        modified[articleId] = {
+          ...current,
+          id: articleId,
+          [flag]: !currentValue
+        };
+        localStorage.setItem('modified_news_articles', JSON.stringify(modified));
+      }
+      setRefreshCounter(prev => prev + 1);
+    } catch (e) {
+      console.error('Error toggling article flag:', e);
+    }
+  };
+
+  // Custom Banner Slides Configuration helpers
+  const handleAddBannerSlide = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSlideTitle.trim() || !newSlideImage) {
+      alert('Slide Title and Image are required!');
+      return;
+    }
+    const newSlide = {
+      title: newSlideTitle.trim(),
+      image: newSlideImage,
+      link: newSlideLink.trim()
+    };
+    let updated;
+    if (editingSlideIndex !== null) {
+      updated = [...sliderSlidesList];
+      updated[editingSlideIndex] = newSlide;
+      setEditingSlideIndex(null);
+      alert('Homepage banner slide updated successfully!');
+    } else {
+      updated = [...sliderSlidesList, newSlide];
+      alert('Homepage banner slide added successfully!');
+    }
+    setSliderSlidesList(updated);
+    localStorage.setItem('homepage_banner_slides', JSON.stringify(updated));
+    setNewSlideTitle('');
+    setNewSlideImage('');
+    setNewSlideLink('');
+  };
+
+  const startEditingSlide = (index: number) => {
+    const slide = sliderSlidesList[index];
+    if (slide) {
+      setNewSlideTitle(slide.title);
+      setNewSlideImage(slide.image);
+      setNewSlideLink(slide.link || '');
+      setEditingSlideIndex(index);
+    }
+  };
+
+  const handleDeleteBannerSlide = (index: number) => {
+    if (!confirm('Are you sure you want to delete this slide?')) return;
+    const updated = sliderSlidesList.filter((_, idx) => idx !== index);
+    setSliderSlidesList(updated);
+    localStorage.setItem('homepage_banner_slides', JSON.stringify(updated));
+    if (editingSlideIndex === index) {
+      setNewSlideTitle('');
+      setNewSlideImage('');
+      setNewSlideLink('');
+      setEditingSlideIndex(null);
+    }
+  };
+
+  const handleNewSlideImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleCompressAndSetImage(file, (base64) => {
+        setNewSlideImage(base64);
+      });
+    }
+  };
 
   // Sidebar dynamic navigation list builders
   const toggleSidebarGroup = (group: string) => {
@@ -595,9 +748,9 @@ export default function AdminPage() {
         body: cleanBodyHTML,
         image: newsImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop',
         views: 0,
-        isBreaking: false,
-        isTrending: false,
-        isFeatured: false
+        isBreaking: isBreakingChecked,
+        isTrending: isTrendingChecked,
+        isFeatured: isFeaturedChecked
       };
 
       const updated = [newArticle, ...customNewsList];
@@ -618,9 +771,9 @@ export default function AdminPage() {
         description: excerptText,
         body: cleanBodyHTML,
         image: newsImage,
-        isBreaking: editingArticle.isBreaking,
-        isTrending: editingArticle.isTrending,
-        isFeatured: editingArticle.isFeatured
+        isBreaking: isBreakingChecked,
+        isTrending: isTrendingChecked,
+        isFeatured: isFeaturedChecked
       };
       localStorage.setItem('modified_news_articles', JSON.stringify(modified));
       alert('Article updated successfully!');
@@ -644,6 +797,10 @@ export default function AdminPage() {
     const activeCheckboxes = [art.categorySlug];
     if (art.districtSlug) activeCheckboxes.push(art.districtSlug);
     setSelectedCategories(activeCheckboxes);
+
+    setIsBreakingChecked(art.isBreaking || false);
+    setIsTrendingChecked(art.isTrending || false);
+    setIsFeaturedChecked(art.isFeatured || false);
 
     // Helper to resolve media library URL placeholders to raw base64 for local editor view
     const convertPlaceholdersToBase64 = (htmlContent: string) => {
@@ -739,20 +896,36 @@ export default function AdminPage() {
     }, 600);
   };
 
-  // Add marquee item
+  // Add/Edit marquee item
   const handleAddFlashNews = () => {
     if (!newNewsText.trim()) return;
-    const newMarquee = [
-      ...flashNewsList,
-      {
-        text: newNewsText.trim(),
-        link: newNewsLink.trim() || `/search?q=${encodeURIComponent(newNewsText.trim())}`
-      }
-    ];
-    setFlashNewsList(newMarquee);
-    localStorage.setItem('flash_news_items', JSON.stringify(newMarquee));
+    const item = {
+      text: newNewsText.trim(),
+      link: newNewsLink.trim() || `/search?q=${encodeURIComponent(newNewsText.trim())}`
+    };
+    let updated;
+    if (editingFlashIndex !== null) {
+      updated = [...flashNewsList];
+      updated[editingFlashIndex] = item;
+      setEditingFlashIndex(null);
+      alert('Flash news ticker item updated successfully!');
+    } else {
+      updated = [...flashNewsList, item];
+      alert('Flash news ticker item added successfully!');
+    }
+    setFlashNewsList(updated);
+    localStorage.setItem('flash_news_items', JSON.stringify(updated));
     setNewNewsText('');
     setNewNewsLink('');
+  };
+
+  const startEditingFlashNews = (index: number) => {
+    const item = flashNewsList[index];
+    if (item) {
+      setNewNewsText(item.text);
+      setNewNewsLink(item.link || '');
+      setEditingFlashIndex(index);
+    }
   };
 
   const handleRemoveFlashNews = (idx: number) => {
@@ -891,8 +1064,7 @@ export default function AdminPage() {
         <nav className="p-4 flex flex-col gap-1 overflow-y-auto flex-1 hide-scrollbar">
           
           <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 pl-2">System Configs</span>
-          
-          <button
+                    <button
             onClick={() => { setActiveTab('dashboard'); setNewsViewMode('list'); }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
               activeTab === 'dashboard' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-450 hover:text-white hover:bg-slate-900/50'
@@ -901,6 +1073,42 @@ export default function AdminPage() {
             <div className="flex items-center gap-2.5">
               <LayoutDashboard className="w-4 h-4" />
               <span>Dashboard Overview</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('news'); setNewsViewMode('list'); setFilterCategory('all'); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'news' && filterCategory === 'all' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <FileText className="w-4 h-4" />
+              <span>News Management</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('breaking'); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'breaking' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Megaphone className="w-4 h-4" />
+              <span>Flash News Ticker</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('slider'); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'slider' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Sliders className="w-4 h-4" />
+              <span>Homepage Slides</span>
             </div>
           </button>
 
@@ -1317,7 +1525,7 @@ export default function AdminPage() {
                         <th className="p-4 text-[10px] uppercase tracking-wider">Article Info</th>
                         <th className="p-4 text-[10px] uppercase tracking-wider">Category</th>
                         <th className="p-4 text-[10px] uppercase tracking-wider">Author</th>
-                        <th className="p-4 text-[10px] uppercase tracking-wider">Status</th>
+                        <th className="p-4 text-[10px] uppercase tracking-wider">Placements</th>
                         <th className="p-4 text-[10px] uppercase tracking-wider text-center">Actions</th>
                       </tr>
                     </thead>
@@ -1357,9 +1565,43 @@ export default function AdminPage() {
                               {art.author}
                             </td>
                             <td className="p-4">
-                              <div className="flex items-center gap-1.5">
-                                <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                                <span className="text-[10px] font-bold text-slate-500">Approved</span>
+                              <div className="flex items-center gap-1.5 select-none">
+                                <button
+                                  type="button"
+                                  onClick={() => toggleArticleFlag(art.id, 'isBreaking')}
+                                  className={`px-2 py-0.5 rounded text-[9px] font-black border transition-all cursor-pointer ${
+                                    art.isBreaking 
+                                      ? 'bg-rose-500 border-rose-500 text-white shadow-xs animate-pulse-subtle' 
+                                      : 'bg-white border-slate-250 text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+                                  }`}
+                                  title="Toggle Breaking placement"
+                                >
+                                  Breaking
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleArticleFlag(art.id, 'isTrending')}
+                                  className={`px-2 py-0.5 rounded text-[9px] font-black border transition-all cursor-pointer ${
+                                    art.isTrending 
+                                      ? 'bg-amber-500 border-amber-500 text-white shadow-xs' 
+                                      : 'bg-white border-slate-250 text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+                                  }`}
+                                  title="Toggle Trending placement"
+                                >
+                                  Trending
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleArticleFlag(art.id, 'isFeatured')}
+                                  className={`px-2 py-0.5 rounded text-[9px] font-black border transition-all cursor-pointer ${
+                                    art.isFeatured 
+                                      ? 'bg-[#02599c] border-[#02599c] text-white shadow-xs' 
+                                      : 'bg-white border-slate-250 text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+                                  }`}
+                                  title="Toggle Featured placement"
+                                >
+                                  Featured
+                                </button>
                               </div>
                             </td>
                             <td className="p-4 text-center">
@@ -1620,6 +1862,51 @@ export default function AdminPage() {
                     </div>
                   </div>
 
+                  {/* Target Placements (Promotion Flags) */}
+                  <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
+                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Target Placements</label>
+                    <div className="space-y-3">
+                      <label className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/75 rounded-xl border border-slate-100 cursor-pointer transition-colors select-none">
+                        <input
+                          type="checkbox"
+                          checked={isBreakingChecked}
+                          onChange={(e) => setIsBreakingChecked(e.target.checked)}
+                          className="w-4 h-4 text-rose-600 focus:ring-rose-500 border-slate-300 rounded cursor-pointer"
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-xs font-black text-slate-700 telugu-text">బ్రేకింగ్ న్యూస్ (Breaking News)</span>
+                          <span className="text-[10px] text-slate-400 font-normal">Shows in home breaking feed and ticker.</span>
+                        </div>
+                      </label>
+                      
+                      <label className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/75 rounded-xl border border-slate-100 cursor-pointer transition-colors select-none">
+                        <input
+                          type="checkbox"
+                          checked={isTrendingChecked}
+                          onChange={(e) => setIsTrendingChecked(e.target.checked)}
+                          className="w-4 h-4 text-amber-600 focus:ring-amber-500 border-slate-300 rounded cursor-pointer"
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-xs font-black text-slate-700 telugu-text">ట్రెండింగ్ న్యూస్ (Trending News)</span>
+                          <span className="text-[10px] text-slate-400 font-normal">Shows in the home trending grid.</span>
+                        </div>
+                      </label>
+
+                      <label className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/75 rounded-xl border border-slate-100 cursor-pointer transition-colors select-none">
+                        <input
+                          type="checkbox"
+                          checked={isFeaturedChecked}
+                          onChange={(e) => setIsFeaturedChecked(e.target.checked)}
+                          className="w-4 h-4 text-[#02599c] focus:ring-[#02599c] border-slate-300 rounded cursor-pointer"
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-xs font-black text-slate-700 telugu-text">ముఖ్య వార్తలు (Featured News)</span>
+                          <span className="text-[10px] text-slate-400 font-normal">Shows in the top home slider/highlights.</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
                   {/* Classification Tree Checklist (Select Categories) */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
                     <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Classification</label>
@@ -1845,7 +2132,9 @@ export default function AdminPage() {
                 
                 {/* Form to append Headline */}
                 <div className="bg-slate-50 p-4 border border-slate-200/60 rounded-2xl flex flex-col gap-4">
-                  <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Add scrolling headline</span>
+                  <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                    {editingFlashIndex !== null ? '✍️ Edit scrolling headline' : 'Add scrolling headline'}
+                  </span>
                   <div className="flex flex-col gap-3 md:flex-row">
                     <input
                       type="text"
@@ -1867,9 +2156,22 @@ export default function AdminPage() {
                       onClick={handleAddFlashNews}
                       className="bg-[#02599c] hover:bg-[#024a82] text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5 shrink-0"
                     >
-                      <Plus className="w-4 h-4" />
-                      <span>Add item</span>
+                      {editingFlashIndex !== null ? <Pencil className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                      <span>{editingFlashIndex !== null ? 'Update item' : 'Add item'}</span>
                     </button>
+                    {editingFlashIndex !== null && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewNewsText('');
+                          setNewNewsLink('');
+                          setEditingFlashIndex(null);
+                        }}
+                        className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-black text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5 shrink-0"
+                      >
+                        Cancel
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -1900,14 +2202,24 @@ export default function AdminPage() {
                             </td>
                             <td className="p-3 font-mono text-[10px] text-slate-400 truncate max-w-[200px]">{item.link}</td>
                             <td className="p-3 text-center">
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveFlashNews(index)}
-                                className="text-red-500 hover:text-red-700 p-1.5 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-red-500/10"
-                                title="Remove item"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
+                              <div className="flex items-center justify-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => startEditingFlashNews(index)}
+                                  className="text-slate-500 hover:text-rose-600 p-1.5 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-slate-100"
+                                  title="Edit item"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveFlashNews(index)}
+                                  className="text-red-500 hover:text-red-700 p-1.5 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-red-500/10"
+                                  title="Remove item"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))
@@ -2503,6 +2815,175 @@ export default function AdminPage() {
                 </div>
               </div>
 
+            </div>
+          )}
+
+          {/* ══════════════ VIEW: HOMEPAGE SLIDES ══════════════ */}
+          {activeTab === 'slider' && (
+            <div className="flex flex-col gap-6 animate-fade-in text-left">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800">Homepage Slider Banner Config</h2>
+                <p className="text-slate-500 text-xs">Configure high-resolution banner slides displayed in the homepage hero carousel.</p>
+              </div>
+
+              {/* Alert Note */}
+              <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-4 flex items-start gap-3 shadow-3xs">
+                <Info className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+                <div className="text-xs text-slate-600 leading-relaxed">
+                  <span className="font-extrabold text-slate-800 block mb-1">Banner Carousel Syncing:</span>
+                  Slides configured here will instantly overwrite the default hero section slider on the homepage. Keep slide titles short and ensure image aspect ratios are landscape for best display presentation.
+                </div>
+              </div>
+
+              {/* Add New Slide Form */}
+              <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-4">
+                <h3 className="text-sm font-black text-slate-850 border-b border-slate-100 pb-2.5">
+                  {editingSlideIndex !== null ? '✏️ Edit Homepage Slide' : '➕ Add New Homepage Slide'}
+                </h3>
+                <form onSubmit={handleAddBannerSlide} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex flex-col gap-1 md:col-span-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Slide Title (Telugu/English)</label>
+                    <input
+                      type="text"
+                      required
+                      value={newSlideTitle}
+                      onChange={(e) => setNewSlideTitle(e.target.value)}
+                      placeholder="e.g. బ్రేకింగ్: ఏపీలో భారీగా పెరిగిన వర్షపాతం..."
+                      className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3.5 py-2.5 text-xs outline-none font-bold text-slate-800 telugu-text"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Redirect Link (e.g. /news/my-slug)</label>
+                    <input
+                      type="text"
+                      value={newSlideLink}
+                      onChange={(e) => setNewSlideLink(e.target.value)}
+                      placeholder="Redirect URL path"
+                      className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3.5 py-2.5 text-xs font-mono outline-none text-slate-800"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1 md:col-span-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Slide Landscape Image</label>
+                    <div className="border border-dashed border-slate-250 bg-slate-50/50 hover:border-[#02599c] rounded-xl p-4 text-center relative cursor-pointer min-h-[110px] flex items-center justify-center transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleNewSlideImageUpload}
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      />
+                      {!newSlideImage ? (
+                        <div className="flex flex-col items-center gap-1.5 text-slate-500">
+                          <Upload className="w-5 h-5 text-slate-400" />
+                          <span className="text-xs font-bold">Select high-res landscape slide cover</span>
+                        </div>
+                      ) : (
+                        <div className="relative max-w-[320px]">
+                          <img src={newSlideImage} alt="new-slide" className="max-h-[80px] w-auto rounded border border-slate-200" />
+                          <button
+                            type="button"
+                            onClick={(e) => { e.preventDefault(); setNewSlideImage(''); }}
+                            className="absolute -top-2 -right-2 bg-black/60 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]"
+                          >✕</button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="md:col-span-3 flex justify-end gap-2.5">
+                    {editingSlideIndex !== null && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingSlideIndex(null);
+                          setNewSlideTitle('');
+                          setNewSlideImage('');
+                          setNewSlideLink('');
+                        }}
+                        className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-1.5 hover:scale-[1.01]"
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-1.5 hover:scale-[1.01]"
+                    >
+                      {editingSlideIndex !== null ? (
+                        <>
+                          <CheckCircle className="w-4 h-4" />
+                          <span>Update Carousel Slide</span>
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-4 h-4" />
+                          <span>Add Carousel Slide</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Stored Banner Slides List */}
+              <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-4 mt-2">
+                <h3 className="text-sm font-black text-slate-850 border-b border-slate-100 pb-2.5">
+                  Configured Carousel Slides ({sliderSlidesList.length})
+                </h3>
+
+                <div className="border border-slate-200 rounded-2xl overflow-hidden">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200 text-slate-400 font-black">
+                        <th className="p-3 text-[10px] uppercase tracking-wider">Preview</th>
+                        <th className="p-3 text-[10px] uppercase tracking-wider">Slide Title</th>
+                        <th className="p-3 text-[10px] uppercase tracking-wider">Redirect Destination</th>
+                        <th className="p-3 text-[10px] uppercase tracking-wider text-center">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {sliderSlidesList.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="p-8 text-center text-slate-450 font-bold">
+                            No custom banner slides configured. Add one above!
+                          </td>
+                        </tr>
+                      ) : (
+                        sliderSlidesList.map((slide, idx) => (
+                          <tr key={idx} className="hover:bg-slate-50/50">
+                            <td className="p-3">
+                              <img src={slide.image} alt={slide.title} className="w-20 h-11 object-cover rounded border border-slate-200 bg-slate-100" />
+                            </td>
+                            <td className="p-3 font-bold text-slate-800 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                              {slide.title}
+                            </td>
+                            <td className="p-3 font-mono text-[10px] text-slate-400 truncate max-w-[220px]">{slide.link || 'None (no clickthrough)'}</td>
+                            <td className="p-3 text-center">
+                              <div className="flex items-center justify-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => startEditingSlide(idx)}
+                                  className="text-slate-500 hover:text-rose-600 p-1.5 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-slate-100"
+                                  title="Edit Slide"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteBannerSlide(idx)}
+                                  className="text-red-500 hover:text-red-700 p-1.5 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-red-500/10"
+                                  title="Delete Slide"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           )}
 
