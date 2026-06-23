@@ -1,10 +1,26 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AlertCircle, ArrowRight } from 'lucide-react';
-import { politicsNews, formatTimeAgo } from '@/lib/mockData';
+import { politicsNews, formatTimeAgo, getMergedArticles } from '@/lib/mockData';
 
 export default function BreakingNewsSection() {
-  const breaking = politicsNews.filter((n) => n.isBreaking);
-  const latest = [...politicsNews, ...politicsNews].slice(0, 3);
+  const [breakingList, setBreakingList] = useState<any[]>([]);
+  const [latestList, setLatestList] = useState<any[]>([]);
+
+  useEffect(() => {
+    try {
+      const mergedAll = getMergedArticles(politicsNews);
+      setBreakingList(mergedAll.filter((n) => n.isBreaking));
+      setLatestList(mergedAll.slice(0, 3));
+    } catch (e) {
+      console.error('Error loading custom articles in BreakingNewsSection', e);
+    }
+  }, []);
+
+  const activeBreaking = breakingList.length > 0 ? breakingList : politicsNews.filter((n) => n.isBreaking);
+  const activeLatest = latestList.length > 0 ? latestList : [...politicsNews].slice(0, 3);
 
   return (
     <section className="mb-5">
@@ -23,11 +39,11 @@ export default function BreakingNewsSection() {
       <div className="bg-white rounded-b-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[270px]">
           <div className="border-r border-gray-100 overflow-hidden flex flex-col">
-            {latest.map((article, index) => (
+            {activeLatest.map((article, index) => (
               <Link
                 key={`${article.id}-${index}`}
                 href={`/news/${article.slug}`}
-                className="flex items-center gap-3 px-3 py-2 border-b border-gray-50 hover:bg-blue-50 transition-colors group last:border-b-0 flex-1"
+                className="flex items-center gap-3 px-3 py-2 border-b border-gray-55 hover:bg-blue-50 transition-colors group last:border-b-0 flex-1"
               >
                 <div className="w-14 h-10 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
                   <img
@@ -45,15 +61,15 @@ export default function BreakingNewsSection() {
             ))}
           </div>
           <div className="relative overflow-hidden h-[180px] lg:h-full">
-            {breaking[0] && (
+            {activeBreaking[0] && (
               <>
-                <img src={breaking[0].image} alt={breaking[0].title} className="w-full h-full object-cover" loading="eager" />
+                <img src={activeBreaking[0].image} alt={activeBreaking[0].title} className="w-full h-full object-cover" loading="eager" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 pb-5 px-4 pt-2">
                   <span className="bg-brand-red text-white text-[11px] font-black px-1.5 py-0.5 rounded breaking-badge mb-1 inline-block">🔴 BREAKING</span>
-                  <Link href={`/news/${breaking[0].slug}`}>
+                  <Link href={`/news/${activeBreaking[0].slug}`}>
                     <h3 className="secondary-headline text-white hover:text-hover-yellow transition-colors telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      {breaking[0].title}
+                      {activeBreaking[0].title}
                     </h3>
                   </Link>
                 </div>

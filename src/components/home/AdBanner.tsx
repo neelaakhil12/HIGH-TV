@@ -1,6 +1,7 @@
 'use client';
 
-// 1. Left Column: Cartoon Holiday Banner ("సెలవుల్లో సరదాగా!")
+import { useState, useEffect } from 'react';
+
 export function HolidayBanner() {
   return (
     <div className="w-full h-[65px] bg-gradient-to-r from-[#ffe4e6] via-[#fffbeb] to-[#e0f2fe] border border-[#fbcfe8] rounded-md flex items-center justify-between px-4 md:px-6 py-1 select-none overflow-hidden relative shadow-xs">
@@ -297,6 +298,123 @@ interface AdBannerProps {
 }
 
 export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
+  const [customAd, setCustomAd] = useState<{ image: string; link: string } | null>(null);
+
+  useEffect(() => {
+    const handleResolveAd = () => {
+      try {
+        const parsedAds = JSON.parse(localStorage.getItem('custom_ads_config') || '{}');
+        const isMobile = window.innerWidth < 768;
+        
+        let prefix = '';
+        const path = window.location.pathname;
+        const catMatch = path.match(/\/category\/([a-zA-Z0-9_-]+)/);
+        const distMatch = path.match(/\/district\/[a-zA-Z0-9_-]+\/([a-zA-Z0-9_-]+)/);
+        
+        if (catMatch && catMatch[1]) {
+          prefix = catMatch[1];
+        } else if (distMatch && distMatch[1]) {
+          prefix = distMatch[1];
+        }
+
+        let configKey = '';
+        if (isMobile) {
+          if (prefix) {
+            const specMobileKey = `${prefix}_mobile_${position}`;
+            if (parsedAds[specMobileKey] && parsedAds[specMobileKey].enabled && parsedAds[specMobileKey].image) {
+              configKey = specMobileKey;
+            } else {
+              configKey = `mobile_${position}`;
+            }
+          } else {
+            configKey = `mobile_${position}`;
+          }
+          
+          if (!parsedAds[configKey] || !parsedAds[configKey].enabled || !parsedAds[configKey].image) {
+            if (prefix) {
+              const specKey = `${prefix}_${position}`;
+              if (parsedAds[specKey] && parsedAds[specKey].enabled && parsedAds[specKey].image) {
+                configKey = specKey;
+              } else {
+                configKey = position;
+              }
+            } else {
+              configKey = position;
+            }
+          }
+        } else {
+          if (prefix) {
+            const specKey = `${prefix}_${position}`;
+            if (parsedAds[specKey] && parsedAds[specKey].enabled && parsedAds[specKey].image) {
+              configKey = specKey;
+            } else {
+              configKey = position;
+            }
+          } else {
+            configKey = position;
+          }
+        }
+
+        const activeAd = parsedAds[configKey];
+        if (activeAd && activeAd.enabled && activeAd.image) {
+          setCustomAd({ image: activeAd.image, link: activeAd.link || '#' });
+        } else {
+          setCustomAd(null);
+        }
+      } catch (e) {
+        setCustomAd(null);
+      }
+    };
+
+    handleResolveAd();
+    window.addEventListener('resize', handleResolveAd);
+    return () => window.removeEventListener('resize', handleResolveAd);
+  }, [position]);
+
+  if (customAd) {
+    const isLeaderboard = position === 'leaderboard';
+    const isSidebar = position === 'sidebar';
+    
+    return (
+      <div className={`w-full flex flex-col items-center select-none ${isLeaderboard ? 'mt-1 mb-1 md:my-3' : 'my-3'}`}>
+        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 font-sans md:hidden">ADVERTISEMENT</span>
+        <a 
+          href={customAd.link} 
+          target={customAd.link === '#' ? '_self' : '_blank'}
+          rel="noopener noreferrer"
+          onClick={(e) => {
+            if (customAd.link === '#') e.preventDefault();
+          }}
+          className={`relative block overflow-hidden rounded-lg border border-slate-200/20 bg-slate-900 shadow-md group hover:border-[#02599c]/50 transition-colors w-full ${
+            isLeaderboard 
+              ? 'h-auto min-h-[90px] max-h-[120px]' 
+              : isSidebar 
+                ? 'aspect-square md:aspect-auto md:min-h-[220px]' 
+                : 'min-h-[120px] max-h-[160px]'
+          }`}
+        >
+          {/* Ad label */}
+          <div className="absolute top-1.5 left-2 bg-black/50 text-[#ffb3d1] text-[6.5px] font-black px-1.5 py-0.5 rounded leading-none uppercase tracking-wider font-sans z-10">
+            Sponsor
+          </div>
+          
+          <img 
+            src={customAd.image} 
+            alt="Advertisement" 
+            className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-300"
+          />
+
+          {/* Adchoices badge */}
+          <div className="absolute top-1.5 right-1.5 opacity-35 z-10">
+            <svg className="w-2.5 h-2.5 text-white fill-current" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+          </div>
+        </a>
+      </div>
+    );
+  }
+
   if (position === 'leaderboard') {
     return (
       <div className="w-full flex flex-col items-center mt-1 mb-1 md:my-3 select-none">

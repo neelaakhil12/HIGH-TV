@@ -8,10 +8,12 @@ import NewsCard from '@/components/cards/NewsCard';
 import AdBanner from '@/components/home/AdBanner';
 import RightSidebar from '@/components/layout/RightSidebar';
 import EPaperReader from '@/components/epaper/EPaperReader';
+import CategoryArticlesFeed from '@/components/category/CategoryArticlesFeed';
 import WebStoriesPage from '@/components/category/WebStoriesPage';
 import PhotosPage from '@/components/category/PhotosPage';
 import CitizenReporterForm from '@/components/category/CitizenReporterForm';
 import LiveUpdatesPage from '@/components/category/LiveUpdatesPage';
+import MultiDistrictFeed from '@/components/category/MultiDistrictFeed';
 import { 
   categories, 
   politicsNews, 
@@ -340,31 +342,29 @@ export default async function CategoryPage({
               </div>
 
               {/* District News Page Header Row */}
-              <div className="flex items-center justify-between border-b-2 border-[#e60000] pb-3 mb-6">
+              <div className="flex items-center justify-between border-b-2 border-[#e60000] pb-2 mb-6 gap-3">
                 <h1
-                  className="text-lg md:text-4xl font-black text-[#e60000] telugu-text leading-snug"
+                  className="text-lg md:text-3xl font-black text-[#e60000] telugu-text leading-snug"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   {category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్' : 'తెలంగాణ'} జిల్లా వార్తలు
                 </h1>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span
+                    className="text-[13px] md:text-[15px] font-black text-gray-700 telugu-text hidden sm:inline"
+                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                  >
+                    జిల్లా ఎంచుకోండి:
+                  </span>
+                  <DistrictDropdown
+                    state={category}
+                    currentSlug={districtSlug || ''}
+                    districts={targetDistricts}
+                  />
+                </div>
               </div>
 
-              {/* District Dropdown Selector */}
-              <div className="flex items-center gap-3 mb-6">
-                <span
-                  className="text-[15px] font-black text-gray-700 telugu-text"
-                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                >
-                  జిల్లా ఎంచుకోండి:
-                </span>
-                <DistrictDropdown
-                  state={category}
-                  currentSlug={districtSlug || ''}
-                  districts={targetDistricts}
-                />
-              </div>
-
-              {/* News Grid — only show when a district is selected */}
+              {/* News Grid */}
               {districtSlug ? (
                 <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-6">
                   {/* Districts News Layout (70%) */}
@@ -442,8 +442,17 @@ export default async function CategoryPage({
                   <RightSidebar />
                 </div>
               ) : (
-                <div className="mt-8 text-center text-gray-400 telugu-text text-[16px]" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  పై నుండి మీ జిల్లాను ఎంచుకోండి వార్తలు చూడడానికి.
+                <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-6">
+                  {/* Multi-district list layout showing 1 article per district */}
+                  <div className="w-full lg:col-span-7">
+                    <MultiDistrictFeed
+                      state={category}
+                      districts={targetDistricts}
+                      initialArticles={districtNews}
+                    />
+                  </div>
+                  {/* Sidebar (30%) */}
+                  <RightSidebar />
                 </div>
               )}
             </>
@@ -487,98 +496,11 @@ export default async function CategoryPage({
               <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-6">
                 {/* Articles List (70%) — horizontal 2-column format */}
                 <div className="w-full lg:col-span-7">
-                  <div className={category === 'doctors-corner' || category === 'health' ? "grid grid-cols-1 sm:grid-cols-2 gap-5" : "grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-0"}>
-                    {allArticles.map((article, index) => {
-                      const d = new Date(article.publishedAt);
-                      const h = d.getHours() % 12 || 12;
-                      const m = String(d.getMinutes()).padStart(2, '0');
-                      const timeStr = `${h}:${m}`;
-                      
-                      const isLatest = category === 'latest';
-                      const headlineClass = isLatest ? 'category-headline' : 'secondary-headline';
-                      const summaryClass = isLatest ? 'category-summary' : 'news-summary';
-
-                      if (category === 'doctors-corner' || category === 'health') {
-                        return (
-                          <div key={article.id} className="contents">
-                            <div className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm hover:shadow-md transition-all flex flex-col group mb-1">
-                              <Link href={`/news/${article.slug}`} className="block relative aspect-video rounded-md overflow-hidden bg-black/5 mb-3">
-                                <img
-                                  src={article.image}
-                                  alt={article.title}
-                                  className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-200"
-                                />
-                              </Link>
-                              <div className="flex-1 flex flex-col text-left">
-                                <Link href={`/news/${article.slug}`}>
-                                  <h3
-                                    className="text-base font-bold text-[#02599c] hover:text-[#013f70] hover:underline leading-relaxed telugu-text pb-1"
-                                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                                  >
-                                    {article.title}{' '}
-                                    <span className="text-[#e60000] font-black text-[14px] font-sans">[{timeStr}]</span>
-                                  </h3>
-                                </Link>
-                                <p
-                                  className="text-sm text-gray-500 mt-1 line-clamp-3 telugu-text leading-relaxed"
-                                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                                >
-                                  {article.description}
-                                </p>
-                              </div>
-                            </div>
-                            {/* Mobile-only inline ad after the 4th article */}
-                            {index === 3 && (
-                              <div className="col-span-1 sm:col-span-2 lg:hidden mt-2 mb-3">
-                                <AdBanner position="gold-loan" />
-                              </div>
-                            )}
-                          </div>
-                        );
-                      }
-
-                      return (
-                        <div key={article.id} className="contents">
-                          <Link
-                            href={isLatest ? `/news/${article.slug}?compact=1` : `/news/${article.slug}`}
-                            className="flex gap-3 items-start py-3 px-2 border-b border-gray-100 hover:bg-blue-50/40 transition-colors group"
-                          >
-                            {/* Thumbnail */}
-                            <div className="w-[120px] h-[80px] flex-shrink-0 rounded overflow-hidden bg-gray-100 border border-gray-150 relative">
-                              <img
-                                src={article.image}
-                                alt={article.title}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                              />
-                            </div>
-                            {/* Text */}
-                            <div className="flex-1 min-w-0">
-                              <h3
-                                className={`${headlineClass} font-black text-[#02599c] group-hover:text-[#013f70] line-clamp-2 telugu-text pl-2.5`}
-                                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                              >
-                                {article.title}{' '}
-                                <span className="text-[#e60000] font-black text-[14px] md:text-[15px] font-sans">[{timeStr}]</span>
-                              </h3>
-                              <p
-                                className={`${summaryClass} text-gray-500 mt-1 line-clamp-2 telugu-text pl-2.5`}
-                                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                              >
-                                {article.description}
-                              </p>
-                            </div>
-                          </Link>
-
-                          {/* Mobile-only inline ad after the 4th article */}
-                          {index === 3 && (
-                            <div className="col-span-1 sm:col-span-2 lg:hidden mt-2 mb-3">
-                              <AdBanner position="gold-loan" />
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+                  <CategoryArticlesFeed 
+                    initialArticles={allArticles} 
+                    categorySlug={category} 
+                    districtSlug={districtSlug}
+                  />
 
                   {/* Load More */}
                   <div className="text-center mt-6">

@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+
 export default function FlashNewsBar({ isMobileHeader = false }: { isMobileHeader?: boolean }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fade, setFade] = useState(true);
   const [cycleTime, setCycleTime] = useState(5000);
 
-  const flashNewsItems = [
+  const [flashNewsItems, setFlashNewsItems] = useState<{ text: string; link: string }[]>([
     {
       text: "ముంబై ఎయిర్‌పోర్ట్‌లో భారీగా బంగారం పట్టివేత",
       link: "/search?q=బంగారం"
@@ -25,7 +26,18 @@ export default function FlashNewsBar({ isMobileHeader = false }: { isMobileHeade
       text: "భారత క్రికెట్ జట్టు సంచలన విజయం.. సిరీస్ సొంతం చేసుకున్న టీమిండియా",
       link: "/search?q=క్రికెట్"
     }
-  ];
+  ]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('flash_news_items');
+    if (saved) {
+      try {
+        setFlashNewsItems(JSON.parse(saved));
+      } catch (e) {
+        console.error("Error parsing flash news items", e);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -36,6 +48,7 @@ export default function FlashNewsBar({ isMobileHeader = false }: { isMobileHeade
   }, []);
 
   useEffect(() => {
+    if (flashNewsItems.length === 0) return;
     const timer = setInterval(() => {
       setFade(false);
       setTimeout(() => {

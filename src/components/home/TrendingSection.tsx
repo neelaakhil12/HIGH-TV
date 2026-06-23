@@ -1,10 +1,25 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Flame, ArrowRight } from 'lucide-react';
-import { featuredNews, formatTimeAgo } from '@/lib/mockData';
+import { featuredNews, getMergedArticles } from '@/lib/mockData';
 
 export default function TrendingSection() {
-  const trending = featuredNews.filter((n) => n.isTrending).slice(0, 5);
+  const [trending, setTrending] = useState<any[]>([]);
+
+  useEffect(() => {
+    try {
+      const mergedAll = getMergedArticles(featuredNews);
+      const customTrending = mergedAll.filter((n: any) => n.isTrending);
+      setTrending(customTrending.slice(0, 5));
+    } catch (e) {
+      console.error('Error loading custom trending articles', e);
+    }
+  }, []);
+
+  const activeTrending = trending.length > 0 ? trending : featuredNews.filter((n) => n.isTrending).slice(0, 5);
 
   return (
     <section className="mb-10">
@@ -29,12 +44,12 @@ export default function TrendingSection() {
  
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Large Featured Trending Card */}
-        {trending[0] && (
+        {activeTrending[0] && (
           <div className="news-card relative rounded-xl overflow-hidden shadow-lg lg:row-span-2 h-[230px] md:h-[360px]">
             <div className="img-zoom-container absolute inset-0">
               <Image
-                src={trending[0].image}
-                alt={trending[0].title}
+                src={activeTrending[0].image}
+                alt={activeTrending[0].title}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -49,12 +64,12 @@ export default function TrendingSection() {
             </div>
             <div className="absolute inset-x-0 bottom-0 p-4 md:p-5">
  
-              <Link href={`/news/${trending[0].slug}`}>
+              <Link href={`/news/${activeTrending[0].slug}`}>
                 <h3
                   className="secondary-headline text-white hover:text-orange-200 transition-colors telugu-text pl-2.5 pb-1 font-black"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
-                  {trending[0].title}
+                  {activeTrending[0].title}
                 </h3>
               </Link>
  
@@ -64,7 +79,7 @@ export default function TrendingSection() {
  
         {/* Small trending cards */}
         <div className="space-y-3">
-          {trending.slice(1, 5).map((article, index) => (
+          {activeTrending.slice(1, 5).map((article, index) => (
             <article
               key={article.id}
               className="news-card flex gap-3 bg-white rounded-lg border border-gray-100 p-3 overflow-hidden relative"
@@ -92,7 +107,7 @@ export default function TrendingSection() {
                     {article.title}
                   </p>
                 </Link>
-
+ 
               </div>
             </article>
           ))}

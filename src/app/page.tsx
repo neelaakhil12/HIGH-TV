@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
@@ -29,16 +29,15 @@ import {
   rasipalaluNews,
   districtNews,
   adyathmikamNews,
+  getMergedArticles,
 } from '@/lib/mockData';
 import Image from 'next/image';
 import { X } from 'lucide-react';
 
 
-// Local helper component for Latest Videos Widget (Replaces SidebarLatestHeadlines)
 function SidebarLatestVideos() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
-
-  const videos = [
+  const [videos, setVideos] = useState<{ id: string; title: string; thumbnail: string }[]>([
     {
       id: "p_kI2pXWkAc",
       title: "దేవర పార్ట్-1 అఫీషియల్ ట్రైలర్ - జూనియర్ ఎన్టీఆర్, కొరటాల శివ",
@@ -54,7 +53,18 @@ function SidebarLatestVideos() {
       title: "గేమ్ చేంజర్ అఫీషియల్ సాంగ్ - రామ్ చరణ్, శంకర్",
       thumbnail: "/hightv_breaking.png"
     }
-  ];
+  ]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('latest_videos');
+    if (saved) {
+      try {
+        setVideos(JSON.parse(saved));
+      } catch (e) {
+        console.error("Error parsing latest videos", e);
+      }
+    }
+  }, []);
 
   return (
     <div className="bg-white rounded-lg border border-gray-100 p-3 md:p-4 shadow-xs mb-1 md:mb-4 select-none">
@@ -74,7 +84,7 @@ function SidebarLatestVideos() {
               className="relative w-full aspect-video rounded-md overflow-hidden shadow-xs border border-gray-150 bg-black/5"
             >
               <img 
-                src={vid.thumbnail} 
+                src={vid.thumbnail || `https://img.youtube.com/vi/${vid.id}/hqdefault.jpg`} 
                 alt={vid.title}
                 className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
               />
@@ -195,11 +205,47 @@ function LatestNewsFeed() {
 }
 
 export default function HomePage() {
+  const [politicsList, setPoliticsList] = useState(politicsNews);
+  const [sportsList, setSportsList] = useState(sportsNews);
+  const [entertainmentList, setEntertainmentList] = useState(entertainmentNews);
+  const [businessList, setBusinessList] = useState(businessNews);
+  const [technologyList, setTechnologyList] = useState(technologyNews);
+  const [viralList, setViralList] = useState(viralNews);
+  const [healthList, setHealthList] = useState(healthNews);
+  const [featuredList, setFeaturedList] = useState(featuredNews);
+  const [rasipalaluList, setRasipalaluList] = useState(rasipalaluNews);
+  const [districtList, setDistrictList] = useState(districtNews);
+  const [adyathmikamList, setAdyathmikamList] = useState(adyathmikamNews);
+
+  useEffect(() => {
+    try {
+      setPoliticsList(getMergedArticles(politicsNews, 'politics'));
+      setSportsList(getMergedArticles(sportsNews, 'sports'));
+      setEntertainmentList(getMergedArticles(entertainmentNews, 'entertainment'));
+      setBusinessList(getMergedArticles(businessNews, 'business'));
+      setTechnologyList(getMergedArticles(technologyNews, 'technology'));
+      setViralList(getMergedArticles(viralNews, 'viral'));
+      setHealthList(getMergedArticles(healthNews, 'health'));
+      setRasipalaluList(getMergedArticles(rasipalaluNews, 'rasipalalu'));
+      setAdyathmikamList(getMergedArticles(adyathmikamNews, 'adyathmikam'));
+      setDistrictList(getMergedArticles(districtNews));
+
+      const mergedAll = getMergedArticles(featuredNews);
+      const customFeatured = mergedAll.filter((art: any) => art.isBreaking || art.isFeatured || art.categorySlug === 'featured');
+      const featuredToPrepend = customFeatured.length > 0 ? customFeatured : mergedAll.slice(0, 3);
+      const featuredIds = new Set(featuredToPrepend.map((a: any) => a.id));
+      const filteredFeaturedStatic = featuredNews.filter((art) => !featuredIds.has(art.id));
+      setFeaturedList([...featuredToPrepend, ...filteredFeaturedStatic]);
+    } catch (e) {
+      console.error('Error loading custom articles on homepage', e);
+    }
+  }, []);
+
   // Filter district news for AP and Telangana tab feeds
-  const apNews = districtNews.filter((n) => n.categorySlug === 'andhra-pradesh');
-  const tgNews = districtNews.filter((n) => n.categorySlug === 'telangana');
-  const adyathmikamFeed = adyathmikamNews.slice(0, 5);
-  const businessFeed = businessNews.slice(0, 5);
+  const apNews = districtList.filter((n) => n.categorySlug === 'andhra-pradesh');
+  const tgNews = districtList.filter((n) => n.categorySlug === 'telangana');
+  const adyathmikamFeed = adyathmikamList.slice(0, 5);
+  const businessFeed = businessList.slice(0, 5);
 
   return (
     <div className="min-h-screen bg-[#f4f6f8]">
@@ -262,7 +308,7 @@ export default function HomePage() {
 
                 {/* Compact news grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                  {[...featuredNews, ...politicsNews].slice(1, 7).map((article) => (
+                  {[...featuredList, ...politicsList].slice(1, 7).map((article) => (
                     <Link
                       href={`/news/${article.slug}`}
                       key={article.id}
@@ -336,19 +382,19 @@ export default function HomePage() {
               <AdBanner position="lalitha-jewellery" />
             </div>
 
-            <NewsSection title="పాలిటిక్స్" titleTelugu="పాలిటిక్స్" articles={politicsNews} viewAllLink="/category/politics" accentColor="#02599c" layout="featured-left" />
+            <NewsSection title="పాలిటిక్స్" titleTelugu="పాలిటిక్స్" articles={politicsList} viewAllLink="/category/politics" accentColor="#02599c" layout="featured-left" />
 
             {/* Mobile-only Ad (JioFiber) */}
             <div className="lg:hidden">
               <AdBanner position="jiofiber" />
             </div>
-            <NewsSection title="Entertainment" titleTelugu="ఫిల్మ్" articles={entertainmentNews} viewAllLink="/category/entertainment" accentColor="#db2777" layout="featured-left" />
+            <NewsSection title="Entertainment" titleTelugu="ఫిల్మ్" articles={entertainmentList} viewAllLink="/category/entertainment" accentColor="#db2777" layout="featured-left" />
 
             {/* Mobile-only Ad (Ramraj Cottons) */}
             <div className="lg:hidden">
               <AdBanner position="ramraj" />
             </div>
-            <NewsSection title="Sports" titleTelugu="స్పోర్ట్స్" articles={sportsNews} viewAllLink="/category/sports" accentColor="#ea580c" layout="featured-left" />
+            <NewsSection title="Sports" titleTelugu="స్పోర్ట్స్" articles={sportsList} viewAllLink="/category/sports" accentColor="#ea580c" layout="featured-left" />
 
 
             {/* Mobile-only single full-width Ad */}
@@ -360,14 +406,14 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
               <div>
-                <NewsSection title="Business" titleTelugu="బిజినెస్" articles={businessNews} viewAllLink="/category/business" accentColor="#15803d" layout="list" />
+                <NewsSection title="Business" titleTelugu="బిజినెస్" articles={businessList} viewAllLink="/category/business" accentColor="#15803d" layout="list" />
                 {/* Mobile-only Ad (SBI Home Loans) */}
                 <div className="lg:hidden">
                   <AdBanner position="sbi" />
                 </div>
               </div>
               <div>
-                <NewsSection title="Technology" titleTelugu="టెక్నాలజీ" articles={technologyNews} viewAllLink="/category/technology" accentColor="#02599c" layout="list" />
+                <NewsSection title="Technology" titleTelugu="టెక్నాలజీ" articles={technologyList} viewAllLink="/category/technology" accentColor="#02599c" layout="list" />
                 {/* Mobile-only Ad (OnePlus 12) */}
                 <div className="lg:hidden">
                   <AdBanner position="oneplus" />
@@ -379,14 +425,14 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
               <div>
-                <NewsSection title="Viral" titleTelugu="వైరల్" articles={viralNews} viewAllLink="/category/viral" accentColor="#dc2626" layout="list" />
+                <NewsSection title="Viral" titleTelugu="వైరల్" articles={viralList} viewAllLink="/category/viral" accentColor="#dc2626" layout="list" />
                 {/* Mobile-only Ad (HDFC) */}
                 <div className="lg:hidden">
                   <AdBanner position="hdfc" />
                 </div>
               </div>
               <div>
-                <NewsSection title="Health" titleTelugu="హెల్త్" articles={healthNews} viewAllLink="/category/health" accentColor="#0891b2" layout="list" />
+                <NewsSection title="Health" titleTelugu="హెల్త్" articles={healthList} viewAllLink="/category/health" accentColor="#0891b2" layout="list" />
                 {/* Mobile-only Ad (PharmEasy) */}
                 <div className="lg:hidden">
                   <AdBanner position="pharmeasy" />
@@ -394,7 +440,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <NewsSection title="Horoscopes" titleTelugu="శుభఫలాలు" articles={rasipalaluNews} viewAllLink="/category/rasipalalu" accentColor="#b45309" layout="grid3" />
+            <NewsSection title="Horoscopes" titleTelugu="శుభఫలాలు" articles={rasipalaluList} viewAllLink="/category/rasipalalu" accentColor="#b45309" layout="grid3" />
             {/* Mobile-only Dummy Ad Box */}
             <div className="lg:hidden">
               <AdBanner position="dummy" />

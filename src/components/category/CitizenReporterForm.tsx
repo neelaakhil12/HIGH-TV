@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Send, CheckCircle2, User, Phone, FileText, Image as ImageIcon, Type, Sparkles, X } from 'lucide-react';
+import { Send, CheckCircle2, User, Phone, FileText, Image as ImageIcon, Type, Sparkles, X, MapPin } from 'lucide-react';
 
 export default function CitizenReporterForm() {
   const [formData, setFormData] = useState({
@@ -11,11 +11,51 @@ export default function CitizenReporterForm() {
     category: '',
     summary: '',
     details: '',
+    location: '',
   });
   
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('మీ బ్రౌజర్ స్థాన సేవను సపోర్ట్ చేయదు (Geolocation is not supported by your browser)');
+      return;
+    }
+
+    setLocationLoading(true);
+    setLocationError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+        setFormData(prev => ({ ...prev, location: mapsUrl }));
+        setLocationLoading(false);
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        setLocationLoading(false);
+        let errorMsg = 'స్థానాన్ని పొందడంలో విఫలమైంది (Failed to get location)';
+        if (error.code === error.PERMISSION_DENIED) {
+          errorMsg = 'స్థాన అనుమతి తిరస్కరించబడింది. దయచేసి బ్రౌజర్ సెట్టింగ్లలో అనుమతించండి (Location permission denied. Please enable it in browser settings)';
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          errorMsg = 'స్థాన సమాచారం అందుబాటులో లేదు (Location information is unavailable)';
+        } else if (error.code === error.TIMEOUT) {
+          errorMsg = 'స్థానాన్ని పొందడం సమయం మించిపోయింది (Request to get location timed out)';
+        }
+        setLocationError(errorMsg);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -35,9 +75,37 @@ export default function CitizenReporterForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.location) {
+      setLocationError('దయచేసి మీ ప్రస్తుత స్థానాన్ని గుర్తించండి (Please determine your current location)');
+      return;
+    }
     setIsSubmitting(true);
     
-    // Simulate API call to send news for verification
+    const categoryNames: Record<string, string> = {
+      'telangana': 'తెలంగాణ (Telangana)',
+      'andhra-pradesh': 'ఆంధ్రప్రదేశ్ (Andhra Pradesh)',
+      'national': 'జాతీయం (National)',
+      'international': 'అంతర్జాతీయం (International)',
+      'business': 'వ్యాపారం (Business)',
+      'sports': 'క్రీడలు (Sports)',
+      'entertainment': 'సినిమా (Film)',
+      'other': 'ఇతర వార్తలు (Other)'
+    };
+    
+    const readableCategory = categoryNames[formData.category] || formData.category;
+
+    const message = `*సిటిజన్ రిపోర్టర్ వార్తా సమాచారం (Citizen Reporter Submission)*
+
+*రిపోర్టర్ పేరు (Name):* ${formData.reporterName}
+*మొబైల్ సంఖ్య (Mobile):* ${formData.mobileNumber}
+*వార్త శీర్షిక (Headline):* ${formData.headline}
+*వార్త వర్గం (Category):* ${readableCategory}
+*వార్త సారాంశం (Summary):* ${formData.summary}
+*పూర్తి వివరాలు (Details):* ${formData.details}
+*ప్రస్తుత స్థానం (Location Link):* ${formData.location}`;
+
+    const whatsappUrl = `https://wa.me/919705999515?text=${encodeURIComponent(message)}`;
+
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
@@ -49,9 +117,13 @@ export default function CitizenReporterForm() {
         category: '',
         summary: '',
         details: '',
+        location: '',
       });
       setImagePreview(null);
-    }, 1800);
+      
+      // Redirect to WhatsApp
+      window.open(whatsappUrl, '_blank');
+    }, 1000);
   };
 
   if (isSubmitted) {
@@ -116,7 +188,8 @@ export default function CitizenReporterForm() {
               onChange={handleInputChange}
               required
               placeholder="మీ పేరు రాయండి"
-              className="w-full bg-gray-50 border border-gray-200 focus:border-[#cc0000] focus:bg-white rounded-xl px-4 py-2.5 text-[14.5px] font-semibold text-gray-800 outline-none transition-all placeholder-gray-400"
+              className="w-full bg-gray-50 border border-gray-200 focus:border-[#cc0000] focus:bg-white rounded-xl px-4 py-2.5 text-[14.5px] font-semibold text-gray-800 outline-none transition-all placeholder-gray-400 indent-2"
+              style={{ textIndent: '8px' }}
             />
           </div>
 
@@ -154,7 +227,8 @@ export default function CitizenReporterForm() {
               onChange={handleInputChange}
               required
               placeholder="వార్తకు సరిపోయే ముఖ్యమైన శీర్షిక రాయండి"
-              className="w-full bg-gray-50 border border-gray-200 focus:border-[#cc0000] focus:bg-white rounded-xl px-4 py-2.5 text-[14.5px] font-semibold text-gray-800 outline-none transition-all placeholder-gray-400"
+              className="w-full bg-gray-50 border border-gray-200 focus:border-[#cc0000] focus:bg-white rounded-xl px-4 py-2.5 text-[14.5px] font-semibold text-gray-800 outline-none transition-all placeholder-gray-400 indent-2"
+              style={{ textIndent: '8px' }}
             />
           </div>
 
@@ -216,6 +290,54 @@ export default function CitizenReporterForm() {
             placeholder="వార్తకు సంబంధించిన పూర్తి వివరాలను ఇక్కడ వివరించండి (ఎక్కడ జరిగింది, ఎప్పుడు జరిగింది మొదలైనవి)"
             className="w-full bg-gray-50 border border-gray-200 focus:border-[#cc0000] focus:bg-white rounded-xl px-4 py-2.5 text-[14.5px] font-semibold text-gray-800 outline-none transition-all placeholder-gray-400 resize-y"
           />
+        </div>
+
+        {/* Current Location Field */}
+        <div className="flex flex-col gap-2">
+          <label className="text-[14px] font-extrabold text-gray-700 telugu-text flex items-center gap-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+            <MapPin size={15} className="text-[#cc0000]" />
+            ప్రస్తుత స్థానం (Current Location) <span className="text-[#cc0000]">*</span>
+          </label>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              type="button"
+              onClick={handleGetLocation}
+              disabled={locationLoading}
+              className={`inline-flex items-center justify-center gap-2 bg-[#02599c] hover:bg-[#036bb8] text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer shrink-0 text-[14px] telugu-text ${
+                locationLoading ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
+              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+            >
+              {locationLoading ? (
+                <>
+                  <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  స్థానాన్ని గుర్తిస్తోంది...
+                </>
+              ) : (
+                <>
+                  <MapPin size={16} />
+                  స్థానాన్ని గుర్తించండి (Get Location)
+                </>
+              )}
+            </button>
+            <input
+              type="url"
+              name="location"
+              value={formData.location}
+              readOnly
+              required
+              placeholder="స్థానాన్ని గుర్తించడానికి పై బటన్ పై క్లిక్ చేయండి"
+              className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-[13.5px] font-semibold text-gray-700 outline-none transition-all placeholder-gray-400 cursor-not-allowed"
+            />
+          </div>
+          {locationError && (
+            <p className="text-[12.5px] text-[#cc0000] font-semibold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              {locationError}
+            </p>
+          )}
         </div>
 
         {/* Image Attachment File Zone */}

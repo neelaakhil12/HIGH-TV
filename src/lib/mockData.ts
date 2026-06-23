@@ -1545,3 +1545,44 @@ export function formatTimeAgo(dateStr: string): string {
   const h = hours % 12 || 12;
   return `${h}:${mins} ${ampm}`;
 }
+
+export function getMergedArticles(staticArticles: NewsArticle[], categorySlug?: string): NewsArticle[] {
+  if (typeof window === 'undefined') return staticArticles;
+  try {
+    const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
+    const deletedIds = new Set(JSON.parse(localStorage.getItem('deleted_news_articles') || '[]'));
+    const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
+
+    // 1. Filter and merge custom articles matching category
+    const filteredCustom = custom.filter((art: any) => {
+      if (deletedIds.has(art.id)) return false;
+      if (categorySlug) {
+        return art.categorySlug === categorySlug || (categorySlug === 'latest' && art.isBreaking);
+      }
+      return true;
+    }).map((art: any) => {
+      if (modified[art.id]) {
+        return { ...art, ...modified[art.id] };
+      }
+      return art;
+    });
+
+    // 2. Process static articles: filter deleted, apply modifications
+    const processedStatic = staticArticles.filter((art) => !deletedIds.has(art.id))
+      .map((art) => {
+        if (modified[art.id]) {
+          return { ...art, ...modified[art.id] };
+        }
+        return art;
+      });
+
+    // 3. Prevent duplicate ids between custom and static
+    const customIds = new Set(filteredCustom.map((a: any) => a.id));
+    const finalStatic = processedStatic.filter((art) => !customIds.has(art.id));
+
+    return [...filteredCustom, ...finalStatic];
+  } catch (e) {
+    console.error('Error merging articles', e);
+    return staticArticles;
+  }
+}

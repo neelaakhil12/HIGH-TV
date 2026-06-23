@@ -6,8 +6,8 @@ import PromotionPopup from './PromotionPopup';
 export default function GlobalPromotionPopup() {
   const pathname = usePathname();
 
-  // Do not show the popup on the admin configurations page
-  if (pathname === '/admin') {
+  // Do not show the popup on the admin configurations or login page
+  if (pathname === '/admin' || pathname === '/superadminlogin') {
     return null;
   }
 

@@ -3,22 +3,51 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { featuredNews } from '@/lib/mockData';
+import { featuredNews, getMergedArticles } from '@/lib/mockData';
 
 export default function HeroSlider() {
   const [current, setCurrent] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const slides = featuredNews;
+  const [slides, setSlides] = useState<any[]>(featuredNews);
+
+  useEffect(() => {
+    try {
+      const savedSlides = localStorage.getItem('homepage_banner_slides');
+      if (savedSlides) {
+        const parsed = JSON.parse(savedSlides);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setSlides(parsed.map((item: any, index: number) => ({
+            id: `custom-slide-${index}`,
+            title: item.title,
+            image: item.image,
+            link: item.link || '',
+            slug: item.link ? '' : `custom-slide-${index}`
+          })));
+          return;
+        }
+      }
+
+      const mergedAll = getMergedArticles(featuredNews);
+      const customFeatured = mergedAll.filter((art: any) => art.isBreaking || art.isFeatured || art.categorySlug === 'featured');
+      const featuredToPrepend = customFeatured.length > 0 ? customFeatured : mergedAll.slice(0, 3);
+      
+      const customIds = new Set(featuredToPrepend.map((a: any) => a.id));
+      const filteredStatic = mergedAll.filter((art) => !customIds.has(art.id));
+      setSlides([...featuredToPrepend, ...filteredStatic]);
+    } catch (e) {
+      console.error('Error loading custom slider news', e);
+    }
+  }, []);
 
   const next = useCallback(() => {
-    if (isAnimating) return;
+    if (isAnimating || slides.length === 0) return;
     setIsAnimating(true);
     setCurrent((prev) => (prev + 1) % slides.length);
     setTimeout(() => setIsAnimating(false), 600);
   }, [isAnimating, slides.length]);
 
   const prev = () => {
-    if (isAnimating) return;
+    if (isAnimating || slides.length === 0) return;
     setIsAnimating(true);
     setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
     setTimeout(() => setIsAnimating(false), 600);
@@ -26,17 +55,22 @@ export default function HeroSlider() {
 
   // Auto-advance
   useEffect(() => {
-    const timer = setInterval(next, 2000);
+    const timer = setInterval(next, 4000);
     return () => clearInterval(timer);
   }, [next]);
 
-  const slide = slides[current];
+  if (slides.length === 0) return null;
+
+  const slide = slides[current] || slides[0];
+  if (!slide) return null;
+
+  const redirectUrl = slide.link || (slide.slug ? `/news/${slide.slug}` : '#');
 
   return (
     <div className="bg-white md:rounded-lg md:border md:border-gray-200 overflow-hidden flex flex-col md:shadow-xs w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 border-y border-gray-150 md:border-y-0">
       {/* Slider Image Container */}
       <div className="relative w-full aspect-[16/9] bg-neutral-950 overflow-hidden group">
-        <Link href={`/news/${slide.slug}`} className="absolute inset-0 block cursor-pointer">
+        <Link href={redirectUrl} className="absolute inset-0 block cursor-pointer">
           {/* Blurred background image */}
           <div className="absolute inset-0 opacity-45 blur-lg scale-105 pointer-events-none">
             <img
@@ -81,7 +115,7 @@ export default function HeroSlider() {
       <div className="card-padding select-none bg-white">
         <div key={current} className="slide-fade-in">
           {/* News Headline - exactly one line */}
-          <Link href={`/news/${slide.slug}`} className="block group">
+          <Link href={redirectUrl} className="block group">
             <h2
               className="secondary-headline headline-hover telugu-text pl-1 pb-1"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}

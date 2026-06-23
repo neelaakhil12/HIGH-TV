@@ -24,9 +24,8 @@ export default function ScrollToTopButton() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const shareWhatsApp = () => {
-    const shareText = `${document.title} - ${window.location.href}`;
-    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+  const contactWhatsApp = () => {
+    const url = 'https://wa.me/919705999515';
     window.open(url, '_blank');
   };
 
@@ -34,8 +33,8 @@ export default function ScrollToTopButton() {
     <>
       {/* Floating WhatsApp Button (Always Visible) */}
       <button
-        onClick={shareWhatsApp}
-        title="వాట్సాప్‌లో షేర్ చేయండి"
+        onClick={contactWhatsApp}
+        title="వాట్సాప్ ద్వారా మమ్మల్ని సంప్రదించండి"
         className="fixed bottom-[116px] md:bottom-[60px] right-3 md:right-6 z-50 w-9 h-9 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 cursor-pointer"
       >
         <WhatsAppIcon />

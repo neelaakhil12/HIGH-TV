@@ -69,8 +69,8 @@ interface ArticlePageClientProps {
 }
 
 export default function ArticlePageClient({
-  article,
-  reporter,
+  article: initialArticle,
+  reporter: initialReporter,
   trendingNews,
   latestNews,
   apDistrictNews,
@@ -83,6 +83,64 @@ export default function ArticlePageClient({
   const [isExpanded, setIsExpanded] = useState(!isCompact);
   const [inlineImage, setInlineImage] = useState<string | null>(null);
   const [inlineCaption, setInlineCaption] = useState<string>('యోగ ఆసనాలు వేస్తున్న మోదీ..');
+
+  const [mediaLibrary, setMediaLibrary] = useState<Record<string, string>>({});
+  useEffect(() => {
+    try {
+      setMediaLibrary(JSON.parse(localStorage.getItem('custom_media_library') || '{}'));
+    } catch (e) {
+      console.error('Error loading media library:', e);
+    }
+  }, []);
+
+  const resolveMediaPlaceholders = (htmlContent: string) => {
+    if (!htmlContent) return '';
+    let resolved = htmlContent;
+    // Replace media library URL placeholders with actual base64 data
+    Object.entries(mediaLibrary).forEach(([url, base64]) => {
+      resolved = resolved.split(url).join(base64);
+    });
+    // Translate admin class names to inline styles so images render correctly
+    resolved = resolved
+      .replace(/class="inline-img-full"/g,
+        'style="width:100%;height:auto;border-radius:12px;margin:16px 0;display:block"')
+      .replace(/class="inline-img-medium"/g,
+        'style="width:60%;height:auto;border-radius:12px;margin:16px auto;display:block"')
+      .replace(/class="inline-vid-full"/g,
+        'style="width:100%;height:auto;border-radius:12px;margin:16px 0;display:block"');
+    return resolved;
+  };
+
+  const [article, setArticle] = useState(initialArticle);
+  const [reporter, setReporter] = useState(initialReporter);
+
+  useEffect(() => {
+    try {
+      const pathSegments = window.location.pathname.split('/');
+      const slugFromUrl = pathSegments[pathSegments.length - 1];
+      
+      const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
+      const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
+      
+      const foundCustom = custom.find((art: any) => art.slug === slugFromUrl);
+      if (foundCustom) {
+        const activeCustom = modified[foundCustom.id] ? { ...foundCustom, ...modified[foundCustom.id] } : foundCustom;
+        setArticle(activeCustom);
+        setReporter({
+          name: activeCustom.reporter || 'హై టీవీ డెస్క్',
+          slug: 'hightv-reporter',
+          avatar: '/logo.png',
+          bio: 'హై టీవీ డెస్క్'
+        });
+      } else if (modified[initialArticle.id]) {
+        setArticle({ ...initialArticle, ...modified[initialArticle.id] });
+      } else {
+        setArticle(initialArticle);
+      }
+    } catch (e) {
+      console.error('Error looking up custom article', e);
+    }
+  }, [initialArticle]);
 
   useEffect(() => {
     const isEnabled = localStorage.getItem('inline_article_image_enabled') === 'true';
@@ -105,6 +163,7 @@ export default function ArticlePageClient({
   );
 
   useEffect(() => {
+    setCurrentCategorySlug(article.isBreaking ? 'latest' : article.categorySlug);
     if (typeof window !== 'undefined' && document.referrer) {
       const ref = document.referrer;
       const match = ref.match(/\/category\/([a-zA-Z0-9_-]+)/);
@@ -274,7 +333,7 @@ export default function ArticlePageClient({
 
               {/* Description summary */}
               <p
-                className="hidden md:block article-summary telugu-text text-gray-700 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r mb-4"
+                className="block article-summary telugu-text text-gray-700 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r mb-4 text-[14.5px] md:text-base leading-relaxed"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {article.description}
@@ -292,9 +351,32 @@ export default function ArticlePageClient({
 
 
               {/* Full Article Body */}
-              <div className="telugu-text space-y-[18px] text-gray-800 article-body" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                <p>{article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. హై టీవీ డెస్క్ నుండి తాజా సమాచారం ఇక్కడ లభిస్తుంది.</p>
-                <p>అధికారులు తెలిపిన వివరాల ప్రకారం, ఈ నిర్ణయం రాష్ట్ర ప్రజలకు అత్యంత ప్రయోజనకరంగా ఉంటుందని భావిస్తున్నారు. ఈ పరిణామాలు భవిష్యత్తులో మరింత సానుకూలమైన ఫలితాలను ఇస్తాయని నిపుణులు అభిప్రాయపడుతున్నారు.</p>
+              <div className="telugu-text text-gray-800 article-body" style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.95' }}>
+                {article.body ? (
+                  (() => {
+                    // Normalize: ensure img/video/headings are on their own lines
+                    const normalized = article.body
+                      .replace(/(<img\b[^>]*\/?>)/gi, '\n$1\n')
+                      .replace(/(<video\b[\s\S]*?<\/video>)/gi, '\n$1\n')
+                      .replace(/(<h[1-6]>[\s\S]*?<\/h[1-6]>)/gi, '\n$1\n');
+
+                    return normalized.split('\n').map((para: string, idx: number) => {
+                      const trimmed = para.trim();
+                      if (trimmed === '') {
+                        return <div key={idx} style={{ height: '0.7em' }} />;
+                      }
+                      if (/^<(img|video|h[1-6]|ul|ol|li|figure|blockquote|table|br|div)/i.test(trimmed)) {
+                        return <div key={idx} dangerouslySetInnerHTML={{ __html: resolveMediaPlaceholders(trimmed) }} />;
+                      }
+                      return <p key={idx} style={{ margin: '0 0 0.6em 0' }} dangerouslySetInnerHTML={{ __html: resolveMediaPlaceholders(para) }} />;
+                    });
+                  })()
+                ) : (
+                  <>
+                    <p>{article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. హై టీవీ డెస్క్ నుండి తాజా సమాచారం ఇక్కడ లభిస్తుంది.</p>
+                    <p>అధికారులు తెలిపిన వివరాల ప్రకారం, ఈ నిర్ణయం రాష్ట్ర ప్రజలకు అత్యంత ప్రయోజనకరంగా ఉంటుందని భావిస్తున్నారు. ఈ పరిణామాలు భవిష్యత్తులో మరింత సానుకూలమైన ఫలితాలను ఇస్తాయని నిపుణులు అభిప్రాయపడుతున్నారు.</p>
+                  </>
+                )}
 
 
 

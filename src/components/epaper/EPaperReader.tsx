@@ -467,8 +467,41 @@ export default function EPaperReader() {
     if (!pdfjs) return;
     const loadDefaultPdf = async () => {
       try {
-        const loadingTask = pdfjs.getDocument({ url: '/BalagamTV_Main_Edition__13_Jun_2026.pdf' });
-        const pdf = await loadingTask.promise;
+        // Check IndexedDB first
+        let customData = null;
+        try {
+          const db = await new Promise<IDBDatabase>((resolve, reject) => {
+            const req = indexedDB.open('epaper_db', 1);
+            req.onupgradeneeded = () => {
+              const d = req.result;
+              if (!d.objectStoreNames.contains('pdfs')) {
+                d.createObjectStore('pdfs', { keyPath: 'key' });
+              }
+            };
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+          });
+          customData = await new Promise<any>((resolve, reject) => {
+            const tx = db.transaction('pdfs', 'readonly');
+            const store = tx.objectStore('pdfs');
+            const key = `${selectedDate}_${selectedEdition}`;
+            const req = store.get(key);
+            req.onsuccess = () => resolve(req.result ? req.result.data : null);
+            req.onerror = () => reject(req.error);
+          });
+        } catch (dbErr) {
+          console.warn('IndexedDB not available or failed:', dbErr);
+        }
+
+        let pdf;
+        if (customData) {
+          const loadingTask = pdfjs.getDocument({ data: customData });
+          pdf = await loadingTask.promise;
+        } else {
+          const loadingTask = pdfjs.getDocument({ url: '/BalagamTV_Main_Edition__13_Jun_2026.pdf' });
+          pdf = await loadingTask.promise;
+        }
+
         setDefaultPdfDoc(pdf);
         setDefaultTotalPages(pdf.numPages);
         
@@ -484,7 +517,7 @@ export default function EPaperReader() {
       }
     };
     loadDefaultPdf();
-  }, [pdfjs]);
+  }, [pdfjs, selectedDate, selectedEdition]);
 
   const isArticleView = urlParams?.get('view') === 'article';
   const targetDate = isArticleView ? activeArticleDate : selectedDate;
@@ -496,34 +529,69 @@ export default function EPaperReader() {
     const loadReaderPdf = async () => {
       try {
         setLoadError(false);
-        const url = getPdfUrlForDate(targetDate);
         
-        let pdfExists = false;
+        // Check IndexedDB first
+        let customData = null;
         try {
-          const checkRes = await fetch(url, { method: 'HEAD' });
-          if (checkRes.ok) {
-            pdfExists = true;
-          } else if (checkRes.status === 405) {
-            const checkResGet = await fetch(url);
-            pdfExists = checkResGet.ok;
-          }
-        } catch {
-          pdfExists = false;
+          const db = await new Promise<IDBDatabase>((resolve, reject) => {
+            const req = indexedDB.open('epaper_db', 1);
+            req.onupgradeneeded = () => {
+              const d = req.result;
+              if (!d.objectStoreNames.contains('pdfs')) {
+                d.createObjectStore('pdfs', { keyPath: 'key' });
+              }
+            };
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+          });
+          customData = await new Promise<any>((resolve, reject) => {
+            const tx = db.transaction('pdfs', 'readonly');
+            const store = tx.objectStore('pdfs');
+            const key = `${targetDate}_${selectedEdition}`;
+            const req = store.get(key);
+            req.onsuccess = () => resolve(req.result ? req.result.data : null);
+            req.onerror = () => reject(req.error);
+          });
+        } catch (dbErr) {
+          console.warn('IndexedDB not available or failed:', dbErr);
         }
 
-        const targetUrl = pdfExists ? url : '/BalagamTV_Main_Edition__13_Jun_2026.pdf';
-        const loadingTask = pdfjs.getDocument({ url: targetUrl });
-        const pdf = await loadingTask.promise;
-        setPdfDoc(pdf);
-        setTotalPages(pdf.numPages);
-        setLoadedPdfUrl(targetUrl);
+        if (customData) {
+          const loadingTask = pdfjs.getDocument({ data: customData });
+          const pdf = await loadingTask.promise;
+          setPdfDoc(pdf);
+          setTotalPages(pdf.numPages);
+          const blob = new Blob([customData], { type: 'application/pdf' });
+          setLoadedPdfUrl(URL.createObjectURL(blob));
+        } else {
+          const url = getPdfUrlForDate(targetDate);
+          let pdfExists = false;
+          try {
+            const checkRes = await fetch(url, { method: 'HEAD' });
+            if (checkRes.ok) {
+              pdfExists = true;
+            } else if (checkRes.status === 405) {
+              const checkResGet = await fetch(url);
+              pdfExists = checkResGet.ok;
+            }
+          } catch {
+            pdfExists = false;
+          }
+
+          const targetUrl = pdfExists ? url : '/BalagamTV_Main_Edition__13_Jun_2026.pdf';
+          const loadingTask = pdfjs.getDocument({ url: targetUrl });
+          const pdf = await loadingTask.promise;
+          setPdfDoc(pdf);
+          setTotalPages(pdf.numPages);
+          setLoadedPdfUrl(targetUrl);
+        }
       } catch (err) {
         console.error('Error loading reader PDF:', err);
         setLoadError(true);
       }
     };
     loadReaderPdf();
-  }, [pdfjs, targetDate]);
+  }, [pdfjs, targetDate, selectedEdition]);
 
   // Adjust aspect ratio based on page dimensions
   useEffect(() => {

@@ -66,7 +66,7 @@ export default function DistrictDropdown({ state, currentSlug, districts }: Prop
                       setOpen(false);
                       router.push(`/district/${state}/${d.slug}`);
                     }}
-                    className={`text-left px-2.5 py-1.5 rounded-lg text-[13px] font-semibold telugu-text transition-all cursor-pointer truncate ${
+                    className={`text-left px-2.5 py-1.5 rounded-lg text-[13px] md:text-[15.5px] font-semibold telugu-text transition-all cursor-pointer truncate ${
                       isActive
                         ? 'bg-[#025390] text-white'
                         : 'text-gray-700 hover:bg-blue-50 hover:text-[#025390]'

@@ -96,7 +96,7 @@ export default function Header() {
     return () => window.removeEventListener('click', handleOutsideClick);
   }, []);
 
-  const trendingItems = [
+  const [trendingItems, setTrendingItems] = useState([
     { text: "ఎన్నికల ఫలితాలు", link: "/search?q=ఎన్నికల ఫలితాలు" },
     { text: "ఆంధ్రప్రదేశ్‌లో భారీ వర్షాలు", link: "/search?q=వర్షాలు" },
     { text: "హైదరాబాద్ మెట్రో విస్తరణ", link: "/search?q=మెట్రో" },
@@ -104,10 +104,22 @@ export default function Header() {
     { text: "టీమిండియా వన్డే సిరీస్ విజయం", link: "/search?q=క్రికెట్" },
     { text: "నేటి రాశిఫలాలు", link: "/search?q=రాశిఫలాలు" },
     { text: "వెబ్ స్టోరీస్ గ్యాలరీ", link: "/category/webstories" }
-  ];
+  ]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('trending_news_items');
+    if (saved) {
+      try {
+        setTrendingItems(JSON.parse(saved));
+      } catch (e) {
+        console.error("Error parsing trending items", e);
+      }
+    }
+  }, []);
 
   // Randomize trending headline on mount and rotate it periodically
   useEffect(() => {
+    if (trendingItems.length === 0) return;
     const randomIndex = Math.floor(Math.random() * trendingItems.length);
     setTrendingIndex(randomIndex);
 
@@ -120,7 +132,7 @@ export default function Header() {
     }, 4000); // cycle every 4 seconds
 
     return () => clearInterval(timer);
-  }, []);
+  }, [trendingItems.length]);
 
   // Set Telugu date on mount to avoid server-side hydration mismatches
   useEffect(() => {
@@ -524,13 +536,13 @@ export default function Header() {
                 TRENDING :
               </span>
               <Link 
-                href={trendingItems[trendingIndex].link}
+                href={trendingItems[trendingIndex]?.link || '#'}
                 className={`text-[14px] md:text-[16.5px] font-black text-gray-800 hover:text-[#0b2545] transition-all duration-300 telugu-text truncate block pl-1.5 ${
                   trendingFade ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'
                 }`}
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.6' }}
               >
-                {trendingItems[trendingIndex].text}
+                {trendingItems[trendingIndex]?.text || ''}
               </Link>
             </div>
 

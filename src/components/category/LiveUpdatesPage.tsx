@@ -222,8 +222,9 @@ const simulatedUpdates: Omit<LiveUpdateItem, 'id'>[] = [
 ];
 
 export default function LiveUpdatesPage() {
+  const [listings, setListings] = useState<ListingItem[]>([]);
   const [selectedUpdate, setSelectedUpdate] = useState<ListingItem | null>(null);
-  const [updates, setUpdates] = useState<LiveUpdateItem[]>(initialLiveUpdates);
+  const [updates, setUpdates] = useState<LiveUpdateItem[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [currentTime, setCurrentTime] = useState<string>('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -232,6 +233,35 @@ export default function LiveUpdatesPage() {
   const [pulse, setPulse] = useState<boolean>(true);
   const [visibleCount, setVisibleCount] = useState<number>(8);
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
+
+  // Load Day Listings on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('live_updates_listings');
+    if (saved) {
+      setListings(JSON.parse(saved));
+    } else {
+      setListings(listingItems);
+    }
+  }, []);
+
+  // Load timeline updates when selected day changes
+  useEffect(() => {
+    if (!selectedUpdate) {
+      setUpdates([]);
+      return;
+    }
+    const savedFeed = localStorage.getItem(`live_updates_feed_${selectedUpdate.slug}`);
+    if (savedFeed) {
+      setUpdates(JSON.parse(savedFeed));
+    } else {
+      if (selectedUpdate.slug === '21st-june-2026') {
+        setUpdates(initialLiveUpdates);
+      } else {
+        setUpdates([]);
+      }
+    }
+    setVisibleCount(8); // Reset pagination view limit when switching days
+  }, [selectedUpdate]);
 
   // Time Tick Clock
   useEffect(() => {
@@ -398,7 +428,7 @@ export default function LiveUpdatesPage() {
                   transition={{ duration: 0.2 }}
                   className="space-y-4"
                 >
-                  {listingItems.map(item => (
+                  {listings.map(item => (
                     <div
                       key={item.id}
                       onClick={() => setSelectedUpdate(item)}
@@ -643,6 +673,17 @@ export default function LiveUpdatesPage() {
                                   </li>
                                 ))}
                               </ul>
+
+                              {/* Optional timeline item image */}
+                              {update.image && (
+                                <div className="mt-3.5 max-w-full sm:max-w-[480px] rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-slate-50">
+                                  <img 
+                                    src={update.image} 
+                                    alt={update.title} 
+                                    className="w-full h-auto object-cover max-h-[300px]" 
+                                  />
+                                </div>
+                              )}
                             </motion.div>
                           );
                         })}

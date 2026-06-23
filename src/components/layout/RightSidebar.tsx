@@ -1,15 +1,24 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AdBanner from '@/components/home/AdBanner';
 import PollWidget from '@/components/home/PollWidget';
-import { politicsNews, featuredNews } from '@/lib/mockData';
-
-
+import { politicsNews, featuredNews, getMergedArticles } from '@/lib/mockData';
 
 export default function RightSidebar() {
-  // Select 5 popular articles to display as Trending News in the sidebar
-  const trendingArticles = [...featuredNews, ...politicsNews].slice(0, 5);
+  const [trendingList, setTrendingList] = useState<any[]>([]);
+
+  useEffect(() => {
+    try {
+      const staticArticles = [...featuredNews, ...politicsNews];
+      setTrendingList(getMergedArticles(staticArticles));
+    } catch (e) {
+      console.error('Error loading custom trending articles in RightSidebar', e);
+    }
+  }, []);
+
+  const activeTrending = trendingList.length > 0 ? trendingList.slice(0, 5) : [...featuredNews, ...politicsNews].slice(0, 5);
 
   return (
     <aside className="w-full lg:col-span-3 flex flex-col gap-4 select-none">
@@ -35,7 +44,7 @@ export default function RightSidebar() {
           </h3>
         </div>
         <div className="space-y-3.5">
-          {trendingArticles.map((article, idx) => (
+          {activeTrending.map((article, idx) => (
             <Link
               key={`${article.id}-${idx}`}
               href={`/news/${article.slug}`}
