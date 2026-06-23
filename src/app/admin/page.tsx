@@ -355,8 +355,8 @@ export default function AdminPage() {
           mediaLibrary[mediaPath] = base64;
           localStorage.setItem('custom_media_library', JSON.stringify(mediaLibrary));
           
-          // Insert actual HTML image element in editor
-          const imgHTML = `<img src="${mediaPath}" class="w-full h-auto rounded-xl my-4 block" alt="inline-img" />`;
+          // Insert actual HTML image element in editor with raw base64 as src
+          const imgHTML = `<img src="${base64}" class="w-full h-auto rounded-xl my-4 block" alt="inline-img" />`;
           insertElementAtCursor(imgHTML);
         } catch {
           alert('Local media library is full! Compress your image or clear browser history.');
@@ -383,8 +383,8 @@ export default function AdminPage() {
           mediaLibrary[mediaPath] = reader.result as string;
           localStorage.setItem('custom_media_library', JSON.stringify(mediaLibrary));
           
-          // Insert actual video element in editor
-          const videoHTML = `<video src="${mediaPath}" controls class="w-full h-auto rounded-xl my-4 block"></video>`;
+          // Insert actual video element in editor with raw dataURL as src
+          const videoHTML = `<video src="${reader.result as string}" controls class="w-full h-auto rounded-xl my-4 block"></video>`;
           insertElementAtCursor(videoHTML);
         } catch {
           alert('Local media library is full! Please use shorter videos.');
@@ -560,9 +560,25 @@ export default function AdminPage() {
     // Resolve Telugu category name
     const resolvedCat = MAIN_CATEGORIES_LIST.find(c => c.slug === categorySlug)?.name.split(' ')[0] || categorySlug;
 
-    const excerptText = newsDescription.trim() || editorRef.current.innerText.slice(0, 140).trim().replace(/<[^>]*>/g, '') + '...';
+    // Helper to convert base64 strings back to media library URL placeholders for storage efficiency
+    const convertBase64ToPlaceholders = (htmlContent: string) => {
+      if (!htmlContent) return '';
+      let resolved = htmlContent;
+      try {
+        const mediaLibrary = JSON.parse(localStorage.getItem('custom_media_library') || '{}');
+        Object.entries(mediaLibrary).forEach(([mediaPath, base64]) => {
+          if (typeof base64 === 'string' && base64.startsWith('data:')) {
+            resolved = resolved.split(base64).join(mediaPath);
+          }
+        });
+      } catch (e) {
+        console.error('Error converting base64:', e);
+      }
+      return resolved;
+    };
 
-    const cleanBodyHTML = editorRef.current.innerHTML;
+    const cleanBodyHTML = convertBase64ToPlaceholders(editorRef.current.innerHTML);
+    const excerptText = newsDescription.trim() || (editorRef.current ? editorRef.current.innerText.slice(0, 140).trim().replace(/<[^>]*>/g, '') + '...' : '');
 
     if (newsViewMode === 'add') {
       const newArticle = {
@@ -628,10 +644,27 @@ export default function AdminPage() {
     if (art.districtSlug) activeCheckboxes.push(art.districtSlug);
     setSelectedCategories(activeCheckboxes);
 
+    // Helper to resolve media library URL placeholders to raw base64 for local editor view
+    const convertPlaceholdersToBase64 = (htmlContent: string) => {
+      if (!htmlContent) return '';
+      let resolved = htmlContent;
+      try {
+        const mediaLibrary = JSON.parse(localStorage.getItem('custom_media_library') || '{}');
+        Object.entries(mediaLibrary).forEach(([mediaPath, base64]) => {
+          if (typeof base64 === 'string' && base64.startsWith('data:')) {
+            resolved = resolved.split(mediaPath).join(base64);
+          }
+        });
+      } catch (e) {
+        console.error('Error loading placeholders:', e);
+      }
+      return resolved;
+    };
+
     setNewsViewMode('edit');
     setTimeout(() => {
       if (editorRef.current) {
-        editorRef.current.innerHTML = art.body || art.content || '';
+        editorRef.current.innerHTML = convertPlaceholdersToBase64(art.body || art.content || '');
       }
     }, 100);
   };
