@@ -67,6 +67,7 @@ import {
 
 // Main 22 Pages/Categories List (excluding subpages)
 const MAIN_CATEGORIES_LIST = [
+  { slug: 'latest', name: 'బ్రేకింగ్ న్యూస్ (Breaking)' },
   { slug: 'politics', name: 'రాజకీయాలు (Politics)' },
   { slug: 'national', name: 'నేషనల్ (National)' },
   { slug: 'international', name: 'వరల్డ్ (World)' },
