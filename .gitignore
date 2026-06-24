@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+ssh_db_config.json
+check_db.js
+image copy 2.png
+/scratch/

@@ -1,4 +1,6 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
+export const dynamic = 'force-dynamic';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ArticlePageClient from '@/components/layout/ArticlePageClient';
@@ -86,19 +88,40 @@ const englishCategories: Record<string, string> = {
   'citizen-reporter': 'Citizen Reporter'
 };
 
+import { prisma } from '@/lib/prisma';
+
 export async function generateStaticParams() {
   return allNews.map((n) => ({ slug: n.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const article = allNews.find((n) => n.slug === slug);
+  const decodedSlug = decodeURIComponent(slug);
+  
+  let article = await prisma.article.findFirst({
+    where: { slug: decodedSlug }
+  });
+
+  if (article && article.isDeleted) {
+    article = null;
+  }
+
+  if (!article) {
+    // Check if this static article has been deleted in the database
+    const isStaticDeleted = await prisma.article.findFirst({
+      where: { slug: decodedSlug, isDeleted: true }
+    });
+    if (!isStaticDeleted) {
+      article = allNews.find((n) => n.slug === decodedSlug) as any;
+    }
+  }
+
   return {
     title: article ? `${article.title} | హై టీవీ` : 'వార్త | హై టీవీ',
-    description: article?.description,
+    description: article?.description || undefined,
     openGraph: {
       title: article?.title,
-      description: article?.description,
+      description: article?.description || undefined,
       images: article?.image ? [article.image] : [],
     },
   };
@@ -106,31 +129,108 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const article = allNews.find((n) => n.slug === slug) || allNews[0];
+  const decodedSlug = decodeURIComponent(slug);
+
+  // Check if article is deleted in DB
+  const dbArticle = await prisma.article.findFirst({
+    where: { slug: decodedSlug }
+  });
+
+  const isStaticDeleted = !dbArticle && await prisma.article.findFirst({
+    where: { slug: decodedSlug, isDeleted: true }
+  });
+
+  if ((dbArticle && dbArticle.isDeleted) || isStaticDeleted) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Header />
+        <div className="flex-1 max-w-[1050px] mx-auto bg-white px-4 py-16 flex items-center justify-center border-x border-gray-200 w-full text-center">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-black text-gray-800 mb-3 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              వార్త అందుబాటులో లేదు
+            </h1>
+            <p className="text-slate-500 mb-6 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              ఈ వార్తా కథనం తొలగించబడింది లేదా అందుబాటులో లేదు.
+            </p>
+            <Link href="/" className="bg-[#02599c] hover:bg-[#013f70] text-white font-bold py-2.5 px-6 rounded-lg transition-colors telugu-text cursor-pointer" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              హోమ్ పేజీకి వెళ్ళండి
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // 1. Fetch latest articles from the live database
+  let dbArticles: any[] = [];
+  let deletedArticles: any[] = [];
+  try {
+    [dbArticles, deletedArticles] = await Promise.all([
+      prisma.article.findMany({
+        where: { isDeleted: false },
+        orderBy: { publishedAt: 'desc' },
+        take: 100
+      }),
+      prisma.article.findMany({
+        where: { isDeleted: true },
+        select: { id: true, slug: true }
+      })
+    ]);
+  } catch (e) {
+    console.error('Error fetching articles for page:', e);
+  }
+
+  const deletedIds = new Set(deletedArticles.map(a => a.id));
+  const deletedSlugs = new Set(deletedArticles.map(a => a.slug));
+
+  // 2. Map database articles and combine with static mock articles
+  const mappedDbArticles = dbArticles.map((art) => ({
+    ...art,
+    content: art.body || '',
+  }));
+
+  const filteredAllNews = allNews.filter(art => !deletedIds.has(art.id) && !deletedSlugs.has(art.slug));
+  const combinedNews = [...mappedDbArticles, ...filteredAllNews];
+  const seenSlugs = new Set<string>();
+  const allArticles = combinedNews.filter((n) => {
+    if (seenSlugs.has(n.slug)) return false;
+    seenSlugs.add(n.slug);
+    return true;
+  });
+
+  const article = allArticles.find((n) => n.slug === decodedSlug) || allArticles[0];
   const reporter = getReporterByAuthor(article.author);
 
-  // Other news for bottom grid (excluding current)
-  const otherNews = allNews
+  // Trending for in-text promo links — filtered by article's category first, fall back to all
+  const categoryArticles = allArticles.filter(
+    (n) => n.id !== article.id && n.categorySlug === article.categorySlug
+  );
+  const trendingNews = (
+    categoryArticles.length >= 3
+      ? categoryArticles.sort((a, b) => (b.views || 0) - (a.views || 0))
+      : allArticles.filter((n) => n.id !== article.id).sort((a, b) => (b.views || 0) - (a.views || 0))
+  ).slice(0, 8);
+
+  // Latest news for sidebar — category-filtered first, fall back to all
+  const latestNews = (
+    categoryArticles.length >= 3
+      ? categoryArticles
+      : allArticles.filter((n) => n.id !== article.id)
+  ).slice(0, 8);
+
+  // Other news for bottom grid (excluding current) — always all categories
+  const otherNews = allArticles
     .filter((n) => n.id !== article.id)
     .slice(0, 9);
 
-  // Trending for in-text promo links
-  const trendingNews = allNews
-    .filter((n) => n.id !== article.id)
-    .sort((a, b) => (b.views || 0) - (a.views || 0))
-    .slice(0, 8);
-
-  // Latest news for sidebar
-  const latestNews = allNews
-    .filter((n) => n.id !== article.id)
-    .slice(0, 8);
-
   // District news
-  const apDistrictNews = districtNews.filter((n) => n.categorySlug === 'andhra-pradesh').slice(0, 5);
-  const tgDistrictNews = districtNews.filter((n) => n.categorySlug === 'telangana').slice(0, 5);
+  const apDistrictNews = allArticles.filter((n) => n.categorySlug === 'andhra-pradesh' && n.districtSlug).slice(0, 5);
+  const tgDistrictNews = allArticles.filter((n) => n.categorySlug === 'telangana' && n.districtSlug).slice(0, 5);
 
   return (
     <div className="min-h-screen bg-[#f0f2f5]">
+
       <Header />
 
       <Suspense fallback={null}>

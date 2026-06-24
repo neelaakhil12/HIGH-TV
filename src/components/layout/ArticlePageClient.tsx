@@ -9,8 +9,9 @@ import ShareButton from '@/components/layout/ShareButton';
 import DistrictNewsTabs from '@/components/layout/DistrictNewsTabs';
 import AdBanner from '@/components/home/AdBanner';
 import { Home, ChevronRight, Clock, Calendar, ThumbsUp, TrendingUp } from 'lucide-react';
+import { tgDistricts, apDistricts } from '@/lib/mockData';
 
-function FallbackImage({ src, alt, className, fill, width, height, ...props }: {
+function FallbackImage({ src, alt, className = '', fill, width, height, ...props }: {
   src: string;
   alt: string;
   className?: string;
@@ -33,13 +34,15 @@ function FallbackImage({ src, alt, className, fill, width, height, ...props }: {
     };
   }, [src]);
 
+  const isContain = className.includes('object-contain');
+
   if (fill) {
     return (
       <img
         src={imgSrc}
         alt={alt}
         className={className}
-        style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+        style={{ position: 'absolute', top: 0, left: 0, objectFit: isContain ? 'contain' : 'cover', width: '100%', height: '100%' }}
         {...props}
       />
     );
@@ -52,6 +55,7 @@ function FallbackImage({ src, alt, className, fill, width, height, ...props }: {
       className={className}
       width={width}
       height={height}
+      style={{ display: 'block', ...(isContain ? { objectFit: 'contain' } : {}), ...props.style }}
       {...props}
     />
   );
@@ -83,6 +87,9 @@ export default function ArticlePageClient({
   const [isExpanded, setIsExpanded] = useState(!isCompact);
   const [inlineImage, setInlineImage] = useState<string | null>(null);
   const [inlineCaption, setInlineCaption] = useState<string>('యోగ ఆసనాలు వేస్తున్న మోదీ..');
+  // Initialize as false — localStorage check runs in useEffect after hydration to avoid mismatch
+  const [inlinePromosEnabled, setInlinePromosEnabled] = useState<boolean>(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const [mediaLibrary, setMediaLibrary] = useState<Record<string, string>>({});
   useEffect(() => {
@@ -96,18 +103,51 @@ export default function ArticlePageClient({
   const resolveMediaPlaceholders = (htmlContent: string) => {
     if (!htmlContent) return '';
     let resolved = htmlContent;
-    // Replace media library URL placeholders with actual base64 data
+
+    // 1. Replace any old-style localStorage placeholder paths with actual base64 (if available)
     Object.entries(mediaLibrary).forEach(([url, base64]) => {
       resolved = resolved.split(url).join(base64);
     });
-    // Translate admin class names to inline styles so images render correctly
+
+    // 2. For any remaining unresolved /uploaded-media/ placeholder paths (broken images
+    //    saved before the base64-direct fix), replace with a subtle notice instead of
+    //    showing the wrong image or a broken icon.
+    resolved = resolved.replace(
+      /<img[^>]*src="\/uploaded-media\/[^"]+"[^>]*\/?>/gi,
+      '<span style="display:block;padding:12px 16px;margin:12px 0;background:#fef9c3;border:1px dashed #ca8a04;border-radius:8px;font-size:12px;color:#92400e;font-family:sans-serif;">⚠️ Image not available – please re-save this article in the admin panel to restore the image.</span>'
+    );
+
+    // 3. Strip inline styling properties that break readability and layout
+    resolved = resolved
+      .replace(/font-family\s*:\s*[^;"]+;?/gi, '')
+      .replace(/white-space\s*:\s*[^;"]+;?/gi, '')
+      .replace(/line-height\s*:\s*[^;"]+;?/gi, '');
+
+    // 4. Translate admin class names to inline styles so images render correctly
     resolved = resolved
       .replace(/class="inline-img-full"/g,
-        'style="width:100%;height:auto;border-radius:12px;margin:16px 0;display:block"')
+        'style="width:100%;height:auto;margin:16px 0;display:block"')
       .replace(/class="inline-img-medium"/g,
-        'style="width:60%;height:auto;border-radius:12px;margin:16px auto;display:block"')
+        'style="width:60%;height:auto;margin:16px auto;display:block"')
       .replace(/class="inline-vid-full"/g,
-        'style="width:100%;height:auto;border-radius:12px;margin:16px 0;display:block"');
+        'style="width:100%;height:auto;margin:16px 0;display:block"');
+
+    // 5. Ensure all inline <img> tags without explicit width styling get max-width:100%
+    //    so they never overflow the article column
+    resolved = resolved.replace(
+      /<img(?![^>]*style[^>]*max-width)([^>]*)(src="data:[^"]+"|src="https?:[^"]+")([^>]*)>/g,
+      (match) => {
+        if (match.includes('style=')) {
+          // Inject max-width into existing style attribute
+          return match.replace(/style="([^"]*)"/, (_, s) =>
+            `style="${s};max-width:100%;height:auto;display:block;margin:12px auto"`
+          );
+        }
+        // Add a new style attribute
+        return match.replace('<img', '<img style="max-width:100%;height:auto;display:block;margin:12px auto"');
+      }
+    );
+
     return resolved;
   };
 
@@ -117,7 +157,7 @@ export default function ArticlePageClient({
   useEffect(() => {
     try {
       const pathSegments = window.location.pathname.split('/');
-      const slugFromUrl = pathSegments[pathSegments.length - 1];
+      const slugFromUrl = decodeURIComponent(pathSegments[pathSegments.length - 1]);
       
       const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
       const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
@@ -156,6 +196,10 @@ export default function ArticlePageClient({
     } else {
       setInlineImage(null);
     }
+
+    const savedPromos = localStorage.getItem('inline_article_promos_enabled');
+    setInlinePromosEnabled(savedPromos === null ? true : savedPromos === 'true');
+    setIsMounted(true); // Mark as mounted so promo blocks now render with correct state
   }, []);
   
   const [currentCategorySlug, setCurrentCategorySlug] = useState<string>(
@@ -172,6 +216,152 @@ export default function ArticlePageClient({
       }
     }
   }, [article]);
+
+  const [selectedDistrictSlug, setSelectedDistrictSlug] = useState<string>(
+    article.districtSlug || ''
+  );
+
+  useEffect(() => {
+    setSelectedDistrictSlug(article.districtSlug || '');
+  }, [article.districtSlug]);
+
+  const [displayTrending, setDisplayTrending] = useState<any[]>([]);
+  const [displayLatest, setDisplayLatest] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadPinnedNews = async () => {
+      try {
+        const savedPins = localStorage.getItem('sidebar_category_pins');
+        if (!savedPins) {
+          setDisplayTrending([]);
+          setDisplayLatest([]);
+          return;
+        }
+        const parsed = JSON.parse(savedPins);
+        const catPins = parsed[currentCategorySlug] || { trending: [], breaking: [] };
+        // Also check district-specific pins if the article or selection has a districtSlug
+        const activeDistrictSlug = selectedDistrictSlug || article.districtSlug;
+        const districtCategorySlug = activeDistrictSlug
+          ? (currentCategorySlug === 'telangana' ? 'telangana-districts'
+            : currentCategorySlug === 'andhra-pradesh' ? 'andhra-pradesh-districts'
+            : null)
+          : null;
+        const districtCatPins = districtCategorySlug ? (parsed[districtCategorySlug] || { trending: [], breaking: [] }) : { trending: [], breaking: [] };
+        // Also check the per-district key (district-adilabad etc.)
+        const perDistrictKey = activeDistrictSlug ? `district-${activeDistrictSlug}` : null;
+        const perDistrictPins = perDistrictKey ? (parsed[perDistrictKey] || { trending: [], breaking: [] }) : { trending: [], breaking: [] };
+
+        // Merge pins: if district is active, only show district pins; otherwise show category pins
+        const pinnedTrendingIds: string[] = activeDistrictSlug
+          ? [
+              ...(perDistrictPins.trending || []).map(String),
+              ...(districtCatPins.trending || []).map(String),
+            ].filter((id, idx, arr) => arr.indexOf(id) === idx)
+          : (catPins.trending || []).map(String);
+        const pinnedBreakingIds: string[] = activeDistrictSlug
+          ? [
+              ...(perDistrictPins.breaking || []).map(String),
+              ...(districtCatPins.breaking || []).map(String),
+            ].filter((id, idx, arr) => arr.indexOf(id) === idx)
+          : (catPins.breaking || []).map(String);
+
+        if (pinnedTrendingIds.length === 0 && pinnedBreakingIds.length === 0) {
+          setDisplayTrending([]);
+          setDisplayLatest([]);
+          return;
+        }
+
+        // Fetch details of pinned articles if not already in the prop lists
+        const allProps = [...(trendingNews || []), ...(latestNews || []), ...(otherNews || [])];
+        const missingIds = new Set<string>();
+        pinnedTrendingIds.forEach(id => missingIds.add(id));
+        pinnedBreakingIds.forEach(id => missingIds.add(id));
+
+        allProps.forEach((a: any) => {
+          if (a) missingIds.delete(String(a.id));
+        });
+
+        // Load custom and modified articles from localStorage
+        let localCustom: any[] = [];
+        let localModified: Record<string, any> = {};
+        try {
+          localCustom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
+          localModified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
+        } catch (e) {
+          console.error("Error parsing custom/modified articles from localStorage in ArticlePageClient:", e);
+        }
+
+        const fetchedMissing: any[] = [];
+        // First resolve any missing ids from localStorage custom or modified lists
+        missingIds.forEach(id => {
+          const foundCustom = localCustom.find((art: any) => String(art.id) === String(id));
+          if (foundCustom) {
+            const activeCustom = localModified[foundCustom.id] ? { ...foundCustom, ...localModified[foundCustom.id] } : foundCustom;
+            fetchedMissing.push(activeCustom);
+            missingIds.delete(id);
+          } else {
+            if (localModified[id]) {
+              const staticArt = allProps.find((a: any) => String(a.id) === String(id));
+              if (staticArt) {
+                fetchedMissing.push({ ...staticArt, ...localModified[id] });
+                missingIds.delete(id);
+              }
+            }
+          }
+        });
+
+        if (missingIds.size > 0) {
+          const promises = Array.from(missingIds).map(async (id) => {
+            try {
+              const res = await fetch(`/api/articles/${id}`);
+              if (res.ok) {
+                const fetched = await res.json();
+                return localModified[id] ? { ...fetched, ...localModified[id] } : fetched;
+              }
+            } catch (e) {
+              console.error("Error loading missing pinned article in client:", e);
+            }
+            return null;
+          });
+          const resolved = await Promise.all(promises);
+          resolved.forEach(r => {
+            if (r) fetchedMissing.push(r);
+          });
+        }
+
+        const lookupMap = new Map<string, any>();
+        [...allProps, ...fetchedMissing].forEach((a: any) => {
+          if (a) lookupMap.set(String(a.id), a);
+        });
+
+        // Re-construct trending list (excluding current article) - ONLY show pinned articles
+        let finalT = pinnedTrendingIds
+          .map(id => lookupMap.get(id))
+          .filter((a: any) => a && String(a.id) !== String(article.id));
+
+        // Re-construct breaking/latest list (excluding current article) - ONLY show pinned articles
+        let finalB = pinnedBreakingIds
+          .map(id => lookupMap.get(id))
+          .filter((a: any) => a && String(a.id) !== String(article.id));
+
+        // Prevent mingling: filter out district articles from state sidebar and state articles from district sidebar
+        if (activeDistrictSlug) {
+          finalT = finalT.filter((a: any) => a.districtSlug);
+          finalB = finalB.filter((a: any) => a.districtSlug);
+        } else if (currentCategorySlug === 'telangana' || currentCategorySlug === 'andhra-pradesh') {
+          finalT = finalT.filter((a: any) => !a.districtSlug);
+          finalB = finalB.filter((a: any) => !a.districtSlug);
+        }
+
+        setDisplayTrending(finalT);
+        setDisplayLatest(finalB);
+      } catch (err) {
+        console.error("Error loading pinned sidebar news in ArticlePageClient", err);
+      }
+    };
+
+    loadPinnedNews();
+  }, [currentCategorySlug, trendingNews, latestNews, otherNews, article.id, selectedDistrictSlug]);
 
   function formatDate(dateStr: string) {
     const d = new Date(dateStr);
@@ -190,6 +380,29 @@ export default function ArticlePageClient({
     const mins = String(d.getMinutes()).padStart(2, '0');
     return `${hours}:${mins}`;
   }
+
+  // Create suggestion pool excluding current article
+  const suggestionPool = [
+    ...(displayTrending || []),
+    ...(displayLatest || []),
+    ...(otherNews || [])
+  ].filter(item => item && item.id !== article.id && item.slug !== article.slug);
+
+  const uniqueSuggestions: any[] = [];
+  const seenIds = new Set();
+  for (const item of suggestionPool) {
+    if (!seenIds.has(item.id)) {
+      seenIds.add(item.id);
+      uniqueSuggestions.push(item);
+    }
+  }
+
+  // Find matching district if article has districtSlug
+  const allDist = [...tgDistricts, ...apDistricts];
+  const matchedDistrict = article.districtSlug ? allDist.find(d => d.slug === article.districtSlug) : null;
+  const isTelanganaDist = tgDistricts.some(d => d.slug === article.districtSlug);
+  const districtStateSlug = isTelanganaDist ? 'telangana' : 'andhra-pradesh';
+  const districtStateName = isTelanganaDist ? 'తెలంగాణ' : 'ఆంధ్రప్రదేశ్';
 
   // Define two distinct layouts based on isExpanded
   if (isExpanded) {
@@ -222,9 +435,21 @@ export default function ArticlePageClient({
               <Home size={14} className="flex-shrink-0" /> Home
             </Link>
             <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
-            <Link href={`/category/${currentCategorySlug}`} className="hover:text-brand-blue transition-colors font-bold flex-shrink-0">
-              {englishCategories[currentCategorySlug] || article.category}
-            </Link>
+            {matchedDistrict ? (
+              <>
+                <Link href={`/category/${districtStateSlug}`} className="hover:text-brand-blue transition-colors font-bold flex-shrink-0 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  {districtStateName}
+                </Link>
+                <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
+                <Link href={`/district/${districtStateSlug}/${article.districtSlug}`} className="hover:text-brand-blue transition-colors font-bold flex-shrink-0 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  {matchedDistrict.name}
+                </Link>
+              </>
+            ) : (
+              <Link href={`/category/${currentCategorySlug}`} className="hover:text-brand-blue transition-colors font-bold flex-shrink-0">
+                {englishCategories[currentCategorySlug] || article.category}
+              </Link>
+            )}
             <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
             <span className="text-gray-400 truncate max-w-[200px] telugu-text flex-shrink-0" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
               {article.title}
@@ -240,6 +465,33 @@ export default function ArticlePageClient({
           
           {/* Left Sidebar */}
           <aside className="hidden lg:flex flex-col gap-3">
+            {/* District Selector */}
+            {!!article.districtSlug && (
+              <div className="bg-white border border-gray-200 rounded p-2.5 flex flex-col gap-2 shadow-xs">
+                <label className="text-xs font-bold text-gray-500 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  జిల్లా ఎంచుకోండి:
+                </label>
+                <select
+                  value={selectedDistrictSlug}
+                  onChange={(e) => setSelectedDistrictSlug(e.target.value)}
+                  className="w-full bg-[#025390] text-white font-bold text-[12px] md:text-[13px] telugu-text px-2 py-1.5 rounded transition-colors cursor-pointer border-none outline-none"
+                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                >
+                  <option value="" className="bg-white text-gray-800">మొత్తం వార్తలు (All)</option>
+                  <optgroup label="తెలంగాణ జిల్లాలు" className="bg-white text-gray-800 font-bold">
+                    {tgDistricts.map(d => (
+                      <option key={d.slug} value={d.slug} className="bg-white text-gray-800 font-medium">{d.name}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="ఆంధ్రప్రదేశ్ జిల్లాలు" className="bg-white text-gray-800 font-bold">
+                    {apDistricts.map(d => (
+                      <option key={d.slug} value={d.slug} className="bg-white text-gray-800 font-medium">{d.name}</option>
+                    ))}
+                  </optgroup>
+                </select>
+              </div>
+            )}
+
             {/* Ad 1 — Jewellery */}
             <div className="bg-white border border-gray-200 rounded overflow-hidden">
               <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
@@ -261,7 +513,7 @@ export default function ArticlePageClient({
                 </span>
               </div>
               <ul className="divide-y divide-gray-100">
-                {trendingNews.slice(0, 8).map((item) => (
+                {displayTrending.map((item) => (
                   <li key={item.id}>
                     <Link
                       href={`/news/${item.slug}`}
@@ -294,7 +546,7 @@ export default function ArticlePageClient({
           </aside>
 
           {/* Middle: Full Article Content */}
-          <article className="bg-white border border-gray-200 rounded overflow-hidden flex-1 max-w-[750px] mx-auto">
+          <article className="bg-white border border-gray-200 rounded overflow-hidden flex-1 min-w-0 w-full max-w-[750px] mx-auto">
             <div className="p-4 md:p-5">
               {article.isBreaking && (
                 <div className="flex items-center gap-2 mb-3">
@@ -340,18 +592,20 @@ export default function ArticlePageClient({
               </p>
 
               {/* Hero Image */}
-              <div className="rounded overflow-hidden mb-5 border border-gray-100 relative aspect-video flex items-center justify-center bg-gray-50">
+              <div className="overflow-hidden mb-5 w-full">
                 <FallbackImage
                   src={article.image}
                   alt={article.title}
-                  className="w-full h-auto max-h-[450px] object-cover"
+                  fill={false}
+                  width={1200}
+                  height={675}
+                  className="w-full h-auto block"
+                  style={{ display: 'block', width: '100%', height: 'auto' }}
                 />
               </div>
 
-
-
               {/* Full Article Body */}
-              <div className="telugu-text text-gray-800 article-body" style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.95' }}>
+              <div className="telugu-text text-gray-800 article-body" style={{ fontFamily: 'Mandali, "Noto Sans Telugu", sans-serif', lineHeight: '1.85' }}>
                 {article.body ? (
                   (() => {
                     // Normalize: ensure img/video/headings are on their own lines
@@ -360,16 +614,47 @@ export default function ArticlePageClient({
                       .replace(/(<video\b[\s\S]*?<\/video>)/gi, '\n$1\n')
                       .replace(/(<h[1-6]>[\s\S]*?<\/h[1-6]>)/gi, '\n$1\n');
 
-                    return normalized.split('\n').map((para: string, idx: number) => {
+                    const paras = normalized.split('\n');
+                    const elements: any[] = [];
+                    let textParaCount = 0;
+                    let promoIndex = 0;
+
+                    paras.forEach((para: string, idx: number) => {
                       const trimmed = para.trim();
                       if (trimmed === '') {
-                        return <div key={idx} style={{ height: '0.7em' }} />;
+                        elements.push(<div key={`empty-${idx}`} style={{ height: '0.7em' }} />);
+                        return;
                       }
-                      if (/^<(img|video|h[1-6]|ul|ol|li|figure|blockquote|table|br|div)/i.test(trimmed)) {
-                        return <div key={idx} dangerouslySetInnerHTML={{ __html: resolveMediaPlaceholders(trimmed) }} />;
+
+                      const isTag = /^<(img|video|h[1-6]|ul|ol|li|figure|blockquote|table|br|div)/i.test(trimmed);
+
+                      if (isTag) {
+                        elements.push(<div key={`tag-${idx}`} dangerouslySetInnerHTML={{ __html: resolveMediaPlaceholders(trimmed) }} />);
+                      } else {
+                        // It is a text paragraph
+                        elements.push(<p key={`para-${idx}`} style={{ margin: '0 0 0.6em 0' }} dangerouslySetInnerHTML={{ __html: resolveMediaPlaceholders(para) }} />);
+                        textParaCount++;
+
+                        // Insert suggestion promo box after every 2 text paragraphs (only after client mount)
+                        if (isMounted && inlinePromosEnabled && textParaCount > 0 && textParaCount % 2 === 0) {
+                          const suggestion = uniqueSuggestions[promoIndex % uniqueSuggestions.length];
+                          if (suggestion) {
+                            elements.push(
+                              <div key={`promo-${idx}`} className="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4 text-[14px] md:text-[18px] select-none">
+                                <span className="text-[#e60000] font-black flex-shrink-0 telugu-text font-bold" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                  ఈ వార్తా చదవండి:
+                                </span>
+                                <Link href={`/news/${suggestion.slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                  {suggestion.title}
+                                </Link>
+                              </div>
+                            );
+                            promoIndex++;
+                          }
+                        }
                       }
-                      return <p key={idx} style={{ margin: '0 0 0.6em 0' }} dangerouslySetInnerHTML={{ __html: resolveMediaPlaceholders(para) }} />;
                     });
+                    return elements;
                   })()
                 ) : (
                   <>
@@ -380,54 +665,58 @@ export default function ArticlePageClient({
 
 
 
-                {/* ఈ వార్తా చదవండి promo 1 */}
-                {trendingNews[0] && (
-                  <div className="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4 text-[14px] md:text-[18px]">
-                    <span className="text-[#e60000] font-black flex-shrink-0 telugu-text font-bold" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      ఈ వార్తా చదవండి:
-                    </span>
-                    <Link href={`/news/${trendingNews[0].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      {trendingNews[0].title}
-                    </Link>
-                  </div>
-                )}
-
-                <p>ఈ అంశంపై స్థానిక ప్రజలు, నిపుణులు వివిధ అభిప్రాయాలు వ్యక్తం చేశారు. కొందరు ఈ నిర్ణయాన్ని స్వాగతిస్తున్నారు, మరికొందరు దీనిపై సందేహాలు వ్యక్తం చేస్తున్నారు.</p>
-
-                {/* Inline Image Section */}
-                {inlineImage && (
-                  <div className="my-5 w-full text-center">
-                    <div className="relative w-full overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-black/5">
-                      {/* Red slide indicator similar to screenshot */}
-                      <div className="absolute top-3 left-3 bg-[#cc0000] text-white text-[11px] font-black px-2 py-0.5 rounded tracking-wide z-10 font-sans">
-                        1/1
-                      </div>
-                      <FallbackImage
-                        src={inlineImage}
-                        alt={inlineCaption}
-                        className="w-full h-auto object-contain block max-h-[500px] mx-auto"
-                      />
-                    </div>
-                    {inlineCaption && (
-                      <div className="mt-2 text-center text-[13.5px] font-bold text-gray-700 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                        {inlineCaption}
+                {!article.body && (
+                  <>
+                    {/* ఈ వార్తా చదవండి promo 1 — only renders client-side to avoid hydration mismatch */}
+                    {isMounted && inlinePromosEnabled && displayTrending[0] && (
+                      <div className="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4 text-[14px] md:text-[18px]">
+                        <span className="text-[#e60000] font-black flex-shrink-0 telugu-text font-bold" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                          ఈ వార్తా చదవండి:
+                        </span>
+                        <Link href={`/news/${displayTrending[0].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                          {displayTrending[0].title}
+                        </Link>
                       </div>
                     )}
-                  </div>
-                )}
 
-                <p>హై టీవీ ఈ అంశాన్ని నిరంతరం ట్రాక్ చేస్తూ తాజా అప్‌డేట్‌లను అందిస్తుంది. మరిన్ని వివరాలకు మా వెబ్‌సైట్‌ను అనుసరించండి.</p>
+                    <p>ఈ అంశంపై స్థానిక ప్రజలు, నిపుణులు వివిధ అభిప్రాయాలు వ్యక్తం చేశారు. కొందరు ఈ నిర్ణయాన్ని స్వాగతిస్తున్నారు, మరికొందరు దీనిపై సందేహాలు వ్యక్తం చేస్తున్నారు.</p>
 
-                {/* ఈ వార్తా చదవండి promo 2 */}
-                {trendingNews[1] && (
-                  <div className="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4 text-[14px] md:text-[18px]">
-                    <span className="text-[#e60000] font-black flex-shrink-0 telugu-text font-bold" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      ఈ వార్తా చదవండి:
-                    </span>
-                    <Link href={`/news/${trendingNews[1].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      {trendingNews[1].title}
-                    </Link>
-                  </div>
+                    {/* Inline Image Section */}
+                    {inlineImage && (
+                      <div className="my-5 w-full text-center">
+                        <div className="relative w-full overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-black/5">
+                          {/* Red slide indicator similar to screenshot */}
+                          <div className="absolute top-3 left-3 bg-[#cc0000] text-white text-[11px] font-black px-2 py-0.5 rounded tracking-wide z-10 font-sans">
+                            1/1
+                          </div>
+                          <FallbackImage
+                            src={inlineImage}
+                            alt={inlineCaption}
+                            className="w-full h-auto object-contain block max-h-[500px] mx-auto"
+                          />
+                        </div>
+                        {inlineCaption && (
+                          <div className="mt-2 text-center text-[13.5px] font-bold text-gray-700 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                            {inlineCaption}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <p>హై టీవీ ఈ అంశాన్ని నిరంతరం ట్రాక్ చేస్తూ తాజా అప్‌డేట్‌లను అందిస్తుంది. మరిన్ని వివరాలకు మా వెబ్‌సైట్‌ను అనుసరించండి.</p>
+
+                    {/* ఈ వార్తా చదవండి promo 2 — only renders client-side to avoid hydration mismatch */}
+                    {isMounted && inlinePromosEnabled && displayTrending[1] && (
+                      <div className="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4 text-[14px] md:text-[18px]">
+                        <span className="text-[#e60000] font-black flex-shrink-0 telugu-text font-bold" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                          ఈ వార్తా చదవండి:
+                        </span>
+                        <Link href={`/news/${displayTrending[1].slug}`} className="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                          {displayTrending[1].title}
+                        </Link>
+                      </div>
+                    )}
+                  </>
                 )}
 
 
@@ -521,6 +810,33 @@ export default function ArticlePageClient({
 
           {/* Right Sidebar */}
           <aside className="hidden lg:flex flex-col gap-3">
+            {/* District Selector */}
+            {!!article.districtSlug && (
+              <div className="bg-white border border-gray-200 rounded p-2.5 flex flex-col gap-2 shadow-xs">
+                <label className="text-xs font-bold text-gray-500 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  జిల్లా ఎంచుకోండి:
+                </label>
+                <select
+                  value={selectedDistrictSlug}
+                  onChange={(e) => setSelectedDistrictSlug(e.target.value)}
+                  className="w-full bg-[#cc0000] text-white font-bold text-[12px] md:text-[13px] telugu-text px-2 py-1.5 rounded transition-colors cursor-pointer border-none outline-none"
+                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                >
+                  <option value="" className="bg-white text-gray-800">మొత్తం వార్తలు (All)</option>
+                  <optgroup label="తెలంగాణ జిల్లాలు" className="bg-white text-gray-800 font-bold">
+                    {tgDistricts.map(d => (
+                      <option key={d.slug} value={d.slug} className="bg-white text-gray-800 font-medium">{d.name}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="ఆంధ్రప్రదేశ్ జిల్లాలు" className="bg-white text-gray-800 font-bold">
+                    {apDistricts.map(d => (
+                      <option key={d.slug} value={d.slug} className="bg-white text-gray-800 font-medium">{d.name}</option>
+                    ))}
+                  </optgroup>
+                </select>
+              </div>
+            )}
+
             {/* Ad 3 — Real Estate */}
             <div className="bg-white border border-gray-200 rounded overflow-hidden">
               <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
@@ -541,7 +857,7 @@ export default function ArticlePageClient({
                 </span>
               </div>
               <ul className="divide-y divide-gray-100">
-                {latestNews.slice(0, 8).map((item) => (
+                {displayLatest.map((item) => (
                   <li key={item.id}>
                     <Link
                       href={`/news/${item.slug}`}
@@ -591,9 +907,21 @@ export default function ArticlePageClient({
             <Home size={14} className="flex-shrink-0" /> Home
           </Link>
           <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
-          <Link href={`/category/${currentCategorySlug}`} className="hover:text-brand-blue transition-colors font-bold flex-shrink-0">
-            {englishCategories[currentCategorySlug] || article.category}
-          </Link>
+          {matchedDistrict ? (
+            <>
+              <Link href={`/category/${districtStateSlug}`} className="hover:text-brand-blue transition-colors font-bold flex-shrink-0 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                {districtStateName}
+              </Link>
+              <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
+              <Link href={`/district/${districtStateSlug}/${article.districtSlug}`} className="hover:text-brand-blue transition-colors font-bold flex-shrink-0 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                {matchedDistrict.name}
+              </Link>
+            </>
+          ) : (
+            <Link href={`/category/${currentCategorySlug}`} className="hover:text-brand-blue transition-colors font-bold flex-shrink-0">
+              {englishCategories[currentCategorySlug] || article.category}
+            </Link>
+          )}
           <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
           <span className="text-gray-400 truncate max-w-[200px] telugu-text flex-shrink-0" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
             {article.title}
@@ -609,12 +937,15 @@ export default function ArticlePageClient({
         
         {/* Left Column: Hero Image & Ad */}
         <div className="md:col-span-6 lg:col-span-7 flex flex-col gap-3">
-          <div className="rounded-lg overflow-hidden border border-gray-200 shadow-sm relative w-full h-[220px] sm:h-[280px] md:h-[260px] lg:h-[290px] flex items-center justify-center bg-gray-50">
+          <div className="overflow-hidden w-full">
             <FallbackImage
               src={article.image}
               alt={article.title}
-              fill
-              className="object-cover"
+              fill={false}
+              width={900}
+              height={600}
+              className="w-full h-auto block"
+              style={{ display: 'block', width: '100%', height: 'auto' }}
             />
           </div>
 
@@ -638,9 +969,9 @@ export default function ArticlePageClient({
           </h1>
 
           {/* Limited Description & Toggled Read Button */}
-          <div className="telugu-text space-y-[18px] text-gray-800 article-body" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+          <div className="telugu-text space-y-[18px] text-gray-800 article-body" style={{ fontFamily: 'Mandali, "Noto Sans Telugu", sans-serif', lineHeight: '1.85' }}>
             {/* Inline Image Section */}
-            {inlineImage && (
+            {!article.body && inlineImage && (
               <div className="my-5 w-full text-center">
                 <div className="relative w-full overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-black/5">
                   {/* Red slide indicator similar to screenshot */}
@@ -661,7 +992,9 @@ export default function ArticlePageClient({
               </div>
             )}
 
-            <p className="article-summary telugu-text">{article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. తాజా సమాచారం ఇక్కడ లభిస్తుంది.</p>
+            <p className="article-summary telugu-text">
+              {article.body ? article.description : `${article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. తాజా సమాచారం ఇక్కడ లభిస్తుంది.`}
+            </p>
           </div>
 
 

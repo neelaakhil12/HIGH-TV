@@ -6,18 +6,25 @@ import Link from 'next/link';
 import { Flame, ArrowRight } from 'lucide-react';
 import { featuredNews, getMergedArticles } from '@/lib/mockData';
 
-export default function TrendingSection() {
+export default function TrendingSection({ dbArticles }: { dbArticles?: any[] }) {
   const [trending, setTrending] = useState<any[]>([]);
 
   useEffect(() => {
     try {
-      const mergedAll = getMergedArticles(featuredNews);
+      let mergedAll = featuredNews;
+      if (dbArticles && Array.isArray(dbArticles)) {
+        const dbIds = new Set(dbArticles.map(a => a.id));
+        const filteredStatic = featuredNews.filter(a => !dbIds.has(a.id));
+        mergedAll = [...dbArticles, ...filteredStatic];
+      } else {
+        mergedAll = getMergedArticles(featuredNews);
+      }
       const customTrending = mergedAll.filter((n: any) => n.isTrending);
       setTrending(customTrending.slice(0, 5));
     } catch (e) {
       console.error('Error loading custom trending articles', e);
     }
-  }, []);
+  }, [dbArticles]);
 
   const activeTrending = trending.length > 0 ? trending : featuredNews.filter((n) => n.isTrending).slice(0, 5);
 
@@ -88,13 +95,13 @@ export default function TrendingSection() {
               <div className="absolute right-2 top-0 trending-number">
                 {index + 2}
               </div>
-              <div className="img-zoom-container flex-shrink-0 rounded-lg overflow-hidden w-24 h-16">
+              <div className="img-zoom-container flex-shrink-0 rounded-lg overflow-hidden w-24 h-16 bg-slate-50 border border-gray-150">
                 <Image
                   src={article.image}
                   alt={article.title}
                   width={96}
                   height={64}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
               <div className="flex-1 min-w-0 relative z-10">

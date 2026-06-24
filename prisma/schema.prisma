@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+
+
+// ── All CMS news articles (custom + static overrides) ──────────────────────
+model Article {
+  id           String   @id @default(cuid())
+  title        String   @db.Text
+  slug         String   @unique @db.VarChar(500)
+  categorySlug String   @db.VarChar(100)
+  districtSlug String?  @db.VarChar(100)
+  category     String?  @db.VarChar(100)
+  author       String   @default("హై టీవీ డెస్క్") @db.VarChar(200)
+  publishedAt  DateTime @default(now())
+  description  String?  @db.Text
+  body         String?  @db.LongText
+  image        String?  @db.LongText
+  views        Int      @default(0)
+  isBreaking   Boolean  @default(false)
+  isTrending   Boolean  @default(false)
+  isFeatured   Boolean  @default(false)
+  isDeleted    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([categorySlug])
+  @@index([isBreaking])
+  @@index([isTrending])
+  @@index([isFeatured])
+  @@index([publishedAt])
+}
+
+// ── Flash News Ticker scrolling items ──────────────────────────────────────
+model FlashNews {
+  id        Int      @id @default(autoincrement())
+  text      String   @db.Text
+  link      String   @db.VarChar(500)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+// ── Trending News Ticker rotating headlines ────────────────────────────────
+model TrendingNews {
+  id        Int      @id @default(autoincrement())
+  text      String   @db.Text
+  link      String   @db.VarChar(500)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+// ── Homepage Hero Banner Slides ────────────────────────────────────────────
+model BannerSlide {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.Text
+  image     String   @db.LongText
+  link      String?  @db.VarChar(500)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+// ── E-Paper PDF Editions ───────────────────────────────────────────────────
+model Epaper {
+  id        String   @id @default(cuid())
+  title     String   @db.VarChar(500)
+  date      String   @db.VarChar(20)
+  pdfUrl    String   @db.VarChar(1000)
+  createdAt DateTime @default(now())
+}
+
+// ── Admin Session (optional – for server-side auth later) ─────────────────
+model AdminSession {
+  id        String   @id @default(cuid())
+  token     String   @unique @db.VarChar(500)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

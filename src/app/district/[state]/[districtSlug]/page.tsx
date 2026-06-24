@@ -1,4 +1,6 @@
 import Link from 'next/link';
+export const dynamic = 'force-dynamic';
+import { prisma } from '@/lib/prisma';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import BackButton from '@/components/layout/BackButton';
@@ -64,10 +66,47 @@ export default async function DistrictPage({
   const stateName = state === 'telangana' ? 'తెలంగాణ' : 'ఆంధ్రప్రదేశ్';
   const stateCategory = state === 'telangana' ? 'telangana' : 'andhra-pradesh';
 
+  // 1. Fetch latest articles from the live database
+  let dbArticles: any[] = [];
+  let deletedArticles: any[] = [];
+  try {
+    [dbArticles, deletedArticles] = await Promise.all([
+      prisma.article.findMany({
+        where: { isDeleted: false },
+        orderBy: { publishedAt: 'desc' },
+        take: 100
+      }),
+      prisma.article.findMany({
+        where: { isDeleted: true },
+        select: { id: true, slug: true }
+      })
+    ]);
+  } catch (e) {
+    console.error('Error fetching articles for district page:', e);
+  }
+
+  const deletedIds = new Set(deletedArticles.map(a => a.id));
+  const deletedSlugs = new Set(deletedArticles.map(a => a.slug));
+
+  // 2. Map database articles and combine with static mock articles
+  const mappedDbArticles = dbArticles.map((art) => ({
+    ...art,
+    content: art.body || '',
+  }));
+
+  const filteredDistrictNews = districtNews.filter(art => !deletedIds.has(art.id) && !deletedSlugs.has(art.slug));
+  const combinedNews = [...mappedDbArticles, ...filteredDistrictNews];
+  const seenSlugs = new Set<string>();
+  const allArticles = combinedNews.filter((n) => {
+    if (seenSlugs.has(n.slug)) return false;
+    seenSlugs.add(n.slug);
+    return true;
+  });
+
   // Filter district news
-  let articles = districtNews.filter((n) => n.districtSlug === districtSlug);
+  let articles = allArticles.filter((n) => n.districtSlug === districtSlug);
   if (articles.length === 0) {
-    articles = allNews.slice(0, 12).map((a, i) => ({ ...a, id: `fallback-${i}`, districtSlug }));
+    articles = [];
   }
 
   const topRow = articles.slice(0, 3);
@@ -174,7 +213,7 @@ export default async function DistrictPage({
           </div>
 
           {/* Sidebar (30%) */}
-          <RightSidebar />
+          <RightSidebar categorySlug={`district-${districtSlug}`} />
         </div>
       </main>
 

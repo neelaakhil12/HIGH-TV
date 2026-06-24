@@ -40,11 +40,6 @@ export default function CategoryArticlesFeed({
   return (
     <div className={isHealthGrid ? "grid grid-cols-1 sm:grid-cols-2 gap-5" : "grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-0"}>
       {articlesList.map((article, index) => {
-        const d = new Date(article.publishedAt || Date.now());
-        const h = d.getHours() % 12 || 12;
-        const m = String(d.getMinutes()).padStart(2, '0');
-        const timeStr = `${h}:${m}`;
-
         if (isHealthGrid) {
           return (
             <div key={article.id} className="contents">
@@ -62,12 +57,11 @@ export default function CategoryArticlesFeed({
                       className="text-base font-bold text-[#02599c] hover:text-[#013f70] hover:underline leading-relaxed telugu-text pb-1"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                     >
-                      {article.title}{' '}
-                      <span className="text-[#e60000] font-black text-[14px] font-sans">[{timeStr}]</span>
+                      {article.title}
                     </h3>
                   </Link>
                   <p
-                    className="text-sm text-gray-500 mt-1 line-clamp-3 telugu-text leading-relaxed"
+                    className="text-sm text-gray-550 mt-1 line-clamp-3 telugu-text leading-relaxed"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     {article.description}
@@ -92,11 +86,11 @@ export default function CategoryArticlesFeed({
               className="flex gap-3 items-start py-3 px-2 border-b border-gray-100 hover:bg-blue-50/40 transition-colors group"
             >
               {/* Thumbnail */}
-              <div className="w-[120px] h-[80px] flex-shrink-0 rounded overflow-hidden bg-gray-100 border border-gray-150 relative">
+              <div className="w-[120px] h-[80px] flex-shrink-0 rounded overflow-hidden bg-slate-50 border border-gray-150 relative">
                 <img
                   src={article.image}
                   alt={article.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
                 />
               </div>
               {/* Text */}
@@ -105,8 +99,7 @@ export default function CategoryArticlesFeed({
                   className={`${headlineClass} font-black text-[#02599c] group-hover:text-[#013f70] line-clamp-2 telugu-text pl-2.5`}
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
-                  {article.title}{' '}
-                  <span className="text-[#e60000] font-black text-[14px] md:text-[15px] font-sans">[{timeStr}]</span>
+                  {article.title}
                 </h3>
                 <p
                   className={`${summaryClass} text-gray-500 mt-1 line-clamp-2 telugu-text pl-2.5`}

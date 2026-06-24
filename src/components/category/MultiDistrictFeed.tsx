@@ -33,64 +33,26 @@ export default function MultiDistrictFeed({
         // Find matching article (first checking districtSlug matches)
         let art = merged.find((n: any) => n.districtSlug === dist.slug);
         
-        if (!art) {
-          // Fallback if no news exists for this district yet
-          art = {
-            id: `fallback-dist-${dist.slug}`,
-            slug: `district-news-fallback-${dist.slug}`,
-            title: `${dist.name} లో తాజా పరిణామాలు మరియు విశేషాలు`,
-            description: `${dist.name} జిల్లాకు సంబంధించిన తాజా ముఖ్యాంశాలు మరియు సమగ్ర సమాచారం ఇక్కడ లభిస్తాయి.`,
-            content: '',
-            category: state === 'telangana' ? 'తెలంగాణ' : 'ఆంధ్రప్రదేశ్',
-            categorySlug: state,
-            categoryColor: '',
-            image: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop",
-            author: 'హై టీవీ డెస్క్',
-            publishedAt: new Date().toISOString(),
-            isBreaking: false,
-            isTrending: false,
-            isFeatured: false,
-            views: 0,
-            tags: [],
-            districtSlug: dist.slug,
-          };
-        }
+        if (!art) return null;
 
         return {
           ...art,
           districtName: dist.name,
         };
-      });
+      }).filter(Boolean);
 
       setDistrictListArticles(list);
     } catch (e) {
       console.error('Error loading multi-district feed', e);
       // Fallback mapping using initialArticles
       const fallbackList = districts.map((dist) => {
-        const art = initialArticles.find((n: any) => n.districtSlug === dist.slug) || {
-          id: `fallback-${dist.slug}`,
-          slug: `district-news-fallback-${dist.slug}`,
-          title: `${dist.name} వార్తలు`,
-          description: '',
-          content: '',
-          category: '',
-          categorySlug: '',
-          categoryColor: '',
-          image: '',
-          author: 'హై టీవీ డెస్క్',
-          publishedAt: new Date().toISOString(),
-          isBreaking: false,
-          isTrending: false,
-          isFeatured: false,
-          views: 0,
-          tags: [],
-          districtSlug: dist.slug,
-        };
+        const art = initialArticles.find((n: any) => n.districtSlug === dist.slug);
+        if (!art) return null;
         return {
           ...art,
           districtName: dist.name,
         };
-      });
+      }).filter(Boolean);
       setDistrictListArticles(fallbackList);
     }
   }, [state, districts, initialArticles]);

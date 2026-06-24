@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { NewsArticle } from '@/lib/mockData';
+import NewsCard from '@/components/cards/NewsCard';
 
 interface TabbedNewsWidgetProps {
   apNews: NewsArticle[];
@@ -55,66 +55,9 @@ export default function TabbedNewsWidget({
       {/* Tab Content */}
       <div className="p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Main article inside tab */}
-          {currentTab.data[0] && (
-            <div className="flex flex-col group border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 md:pr-4">
-              <Link href={`/news/${currentTab.data[0].slug}`} className="block overflow-hidden rounded-lg mb-3 img-zoom-container">
-                <Image
-                  src={currentTab.data[0].image}
-                  alt={currentTab.data[0].title}
-                  width={400}
-                  height={225}
-                  className="w-full h-44 object-cover"
-                />
-              </Link>
-              <span className="text-xs uppercase font-bold text-brand-blue tracking-wide mb-1 block">
-                {currentTab.data[0].category}
-              </span>
-              <Link href={`/news/${currentTab.data[0].slug}`}>
-                <h3
-                  className="secondary-headline font-black text-gray-900 group-hover:text-brand-blue transition-colors mb-2 line-clamp-2 telugu-text pl-2.5"
-                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                >
-                  {currentTab.data[0].title}
-                </h3>
-              </Link>
-              <p
-                className="news-summary text-gray-550 pb-1 line-clamp-3 telugu-text pl-2.5"
-                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-              >
-                {currentTab.data[0].description}
-              </p>
-            </div>
-          )}
-
-          {/* List of other articles in this tab */}
-          <div className="flex flex-col divide-y divide-gray-50 justify-center">
-            {currentTab.data.slice(1, 5).map((article) => (
-              <Link
-                key={article.id}
-                href={`/news/${article.slug}`}
-                className="flex items-center gap-3 py-2.5 hover:bg-blue-50/50 px-2 rounded-lg transition-colors group"
-              >
-                <div className="w-14 h-11 flex-shrink-0 overflow-hidden rounded bg-gray-100 img-zoom-container">
-                  <Image
-                    src={article.image}
-                    alt={article.title}
-                    width={60}
-                    height={45}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1 py-0.5 pl-2.5 pr-1">
-                  <p
-                    className="text-[14.5px] md:text-[16px] font-bold text-gray-800 group-hover:text-brand-blue transition-colors line-clamp-2 leading-relaxed pb-1 telugu-text pl-2.5"
-                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                  >
-                    {article.title}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {currentTab.data.slice(0, 4).map((article) => (
+            <NewsCard key={article.id} article={article} variant="horizontal" />
+          ))}
         </div>
 
         {/* View All button */}

@@ -87,13 +87,23 @@ export default function Header() {
     setIsHealthDropdownOpen(false);
   };
 
-  // Close dropdowns on outside click
   useEffect(() => {
     const handleOutsideClick = () => {
       closeAllDropdowns();
     };
     window.addEventListener('click', handleOutsideClick);
     return () => window.removeEventListener('click', handleOutsideClick);
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/deleted-articles?t=' + Date.now())
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && Array.isArray(data.deletedIds)) {
+          localStorage.setItem('db_deleted_news_articles', JSON.stringify(data.deletedIds));
+        }
+      })
+      .catch(err => console.error('Error fetching deleted articles list:', err));
   }, []);
 
   const [trendingItems, setTrendingItems] = useState([

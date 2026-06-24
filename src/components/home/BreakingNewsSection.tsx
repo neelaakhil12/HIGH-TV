@@ -3,24 +3,46 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AlertCircle, ArrowRight } from 'lucide-react';
-import { politicsNews, formatTimeAgo, getMergedArticles } from '@/lib/mockData';
+import {
+  politicsNews,
+  entertainmentNews,
+  sportsNews,
+  technologyNews,
+  businessNews,
+  formatTimeAgo,
+  getMergedArticles,
+} from '@/lib/mockData';
 
-export default function BreakingNewsSection() {
+export default function BreakingNewsSection({ dbArticles }: { dbArticles?: any[] }) {
   const [breakingList, setBreakingList] = useState<any[]>([]);
   const [latestList, setLatestList] = useState<any[]>([]);
 
   useEffect(() => {
     try {
-      const mergedAll = getMergedArticles(politicsNews);
-      setBreakingList(mergedAll.filter((n) => n.isBreaking));
-      setLatestList(mergedAll.slice(0, 3));
+      if (dbArticles && Array.isArray(dbArticles)) {
+        // Get all breaking articles from DB, sorted newest first
+        const dbBreaking = dbArticles
+          .filter(n => n.isBreaking)
+          .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+
+        setBreakingList(dbBreaking);
+      } else {
+        setBreakingList([]);
+      }
     } catch (e) {
       console.error('Error loading custom articles in BreakingNewsSection', e);
     }
-  }, []);
+  }, [dbArticles]);
 
-  const activeBreaking = breakingList.length > 0 ? breakingList : politicsNews.filter((n) => n.isBreaking);
-  const activeLatest = latestList.length > 0 ? latestList : [...politicsNews].slice(0, 3);
+  const defaultLatest = [
+    ...politicsNews,
+    ...entertainmentNews,
+    ...sportsNews,
+    ...technologyNews,
+    ...businessNews
+  ].slice(0, 6);
+
+  const displayArticles = breakingList.length > 0 ? breakingList.slice(0, 6) : defaultLatest;
 
   return (
     <section className="mb-5">
@@ -37,45 +59,69 @@ export default function BreakingNewsSection() {
         </Link>
       </div>
       <div className="bg-white rounded-b-xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[270px]">
-          <div className="border-r border-gray-100 overflow-hidden flex flex-col">
-            {activeLatest.map((article, index) => (
-              <Link
-                key={`${article.id}-${index}`}
-                href={`/news/${article.slug}`}
-                className="flex items-center gap-3 px-3 py-2 border-b border-gray-55 hover:bg-blue-50 transition-colors group last:border-b-0 flex-1"
-              >
-                <div className="w-14 h-10 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
-                  <img
-                    src={article.image}
-                    alt={article.title}
-                    className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
-                  />
-                </div>
-                <div className="min-w-0 flex-1 py-1 px-1">
-                  <span className="secondary-headline headline-hover block telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                    {article.title}
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-          <div className="relative overflow-hidden h-[180px] lg:h-full">
-            {activeBreaking[0] && (
-              <>
-                <img src={activeBreaking[0].image} alt={activeBreaking[0].title} className="w-full h-full object-cover" loading="eager" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 pb-5 px-4 pt-2">
-                  <span className="bg-brand-red text-white text-[11px] font-black px-1.5 py-0.5 rounded breaking-badge mb-1 inline-block">🔴 BREAKING</span>
-                  <Link href={`/news/${activeBreaking[0].slug}`}>
-                    <h3 className="secondary-headline text-white hover:text-hover-yellow transition-colors telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      {activeBreaking[0].title}
-                    </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 divide-gray-100">
+          {[0, 1, 2].map((rowIndex) => {
+            const leftArticle = displayArticles[rowIndex * 2];
+            const rightArticle = displayArticles[rowIndex * 2 + 1];
+            if (!leftArticle && !rightArticle) return null;
+
+            return (
+              <div key={rowIndex} className="flex flex-col md:contents divide-y md:divide-y-0">
+                {leftArticle && (
+                  <Link
+                    href={`/news/${leftArticle.slug}`}
+                    className={`flex items-center gap-3 px-3 py-2.5 hover:bg-blue-50 transition-colors group md:border-r border-gray-100 ${
+                      rowIndex < 2 ? 'md:border-b' : ''
+                    }`}
+                  >
+                    <div className="w-16 h-11 flex-shrink-0 overflow-hidden bg-gray-100 border border-gray-150 relative">
+                      <img
+                        src={leftArticle.image}
+                        alt={leftArticle.title}
+                        className="w-full h-full object-contain group-hover:scale-[1.05] transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1 py-0.5">
+                      {leftArticle.isBreaking && (
+                        <span className="inline-block bg-brand-red text-white text-[10px] font-black px-1.5 py-0.5 rounded mb-1 breaking-badge">🔴 BREAKING</span>
+                      )}
+                      <span className="secondary-headline headline-hover block telugu-text line-clamp-2 pl-1.5 pb-0.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                        {leftArticle.title}
+                      </span>
+                    </div>
                   </Link>
-                </div>
-              </>
-            )}
-          </div>
+                )}
+                {rightArticle && (
+                  <Link
+                    href={`/news/${rightArticle.slug}`}
+                    className={`flex items-center gap-3 px-3 py-2.5 hover:bg-blue-50 transition-colors group ${
+                      rowIndex < 2 ? 'md:border-b' : ''
+                    }`}
+                  >
+                    <div className="w-16 h-11 flex-shrink-0 overflow-hidden bg-gray-100 border border-gray-150 relative">
+                      <img
+                        src={rightArticle.image}
+                        alt={rightArticle.title}
+                        className="w-full h-full object-contain group-hover:scale-[1.05] transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1 py-0.5">
+                      {rightArticle.isBreaking && (
+                        <span className="inline-block bg-brand-red text-white text-[10px] font-black px-1.5 py-0.5 rounded mb-1 breaking-badge">🔴 BREAKING</span>
+                      )}
+                      <span className="secondary-headline headline-hover block telugu-text line-clamp-2 pl-1.5 pb-0.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                        {rightArticle.title}
+                      </span>
+                    </div>
+                  </Link>
+                )}
+                {/* Fallback empty cell if left exists but right doesn't (to preserve grid layout) */}
+                {leftArticle && !rightArticle && (
+                  <div className={`hidden md:block ${rowIndex < 2 ? 'md:border-b' : ''}`} />
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

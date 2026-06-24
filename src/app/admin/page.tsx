@@ -97,6 +97,45 @@ const MAIN_CATEGORIES_LIST = [
   { slug: 'epaper', name: 'ఈ-పేపర్' },
 ];
 
+const SIDEBAR_CATEGORIES = [
+  { slug: 'home', name: 'హోమ్ పేజీ (Home Page)' },
+  { slug: 'latest', name: 'బ్రేకింగ్ న్యూస్ (Breaking)' },
+  { slug: 'telangana', name: 'తెలంగాణ (Telangana)' },
+  { slug: 'telangana-districts', name: 'తెలంగాణ జిల్లా వార్తలు' },
+  { slug: 'andhra-pradesh', name: 'ఆంధ్రప్రదేశ్ (Andhra Pradesh)' },
+  { slug: 'andhra-pradesh-districts', name: 'ఆంధ్రప్రదేశ్ జిల్లా వార్తలు' },
+  { slug: 'politics', name: 'రాజకీయాలు (Politics)' },
+  { slug: 'national', name: 'నేషనల్ (National)' },
+  { slug: 'international', name: 'వరల్డ్ (World)' },
+  { slug: 'business', name: 'బిజినెస్ (Business)' },
+  { slug: 'sports', name: 'స్పోర్ట్స్ (Sports)' },
+  { slug: 'entertainment', name: 'సినిమా (Film)' },
+  { slug: 'technology', name: 'టెక్నాలజీ (Technology)' },
+  { slug: 'health', name: 'ఆరోగ్యం (Health)' },
+  { slug: 'viral', name: 'వైరల్ (Viral)' },
+  { slug: 'lifestyle', name: 'లైఫ్ స్టైల్ (Lifestyle)' },
+  { slug: 'women', name: 'ఆమె (Women)' },
+  { slug: 'adyathmikam', name: 'దైవం (Daivam / Devotional)' },
+  { slug: 'vidya', name: 'విద్య (Vidya)' },
+  { slug: 'upadi', name: 'ఉపాధి (Upadi)' },
+  { slug: 'rasipalalu', name: 'శుభఫలాలు (Astrology)' },
+  { slug: 'sampadakiyam', name: 'ఎడిటోరియల్ (Editorial)' },
+  { slug: 'antharmadanam', name: 'వ్యక్తిత్వ వికాసం (Opinion)' },
+];
+
+const getArticleCategoryName = (art: any) => {
+  if (art.districtSlug) {
+    const allDist = [...tgDistricts, ...apDistricts];
+    const dist = allDist.find(d => d.slug === art.districtSlug);
+    const engName = art.districtSlug
+      .split('-')
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+    return dist ? `${engName} (${dist.name})` : engName;
+  }
+  return art.category || art.categorySlug || 'News';
+};
+
 export default function AdminPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -109,6 +148,7 @@ export default function AdminPage() {
   
   // Mode inside News Management: 'list', 'add', 'edit'
   const [newsViewMode, setNewsViewMode] = useState<'list' | 'add' | 'edit'>('list');
+  const [isSavingArticle, setIsSavingArticle] = useState(false);
   
   // General configs states
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
@@ -120,6 +160,12 @@ export default function AdminPage() {
 
   // Search filter
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Sidebar category news pins
+  const [sidebarCategoryPins, setSidebarCategoryPins] = useState<Record<string, { trending: string[]; breaking: string[] }>>({});
+  const [activeSidebarCategory, setActiveSidebarCategory] = useState<string>('home');
+  const [activeSidebarDistrict, setActiveSidebarDistrict] = useState<string>(''); // for district sub-selection
+  const [sidebarNewsSearch, setSidebarNewsSearch] = useState<string>('');
 
   // Expandable sections for sidebar groups
   const [expandedSidebar, setExpandedSidebar] = useState<Record<string, boolean>>({
@@ -160,6 +206,9 @@ export default function AdminPage() {
   const [newSlideImage, setNewSlideImage] = useState('');
   const [newSlideLink, setNewSlideLink] = useState('');
   const [editingSlideIndex, setEditingSlideIndex] = useState<number | null>(null);
+  // Article-picker for slider: set of article IDs selected to show in the homepage slider
+  const [sliderSelectedIds, setSliderSelectedIds] = useState<Set<string>>(new Set());
+  const [sliderSearchQuery, setSliderSearchQuery] = useState('');
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
@@ -168,6 +217,13 @@ export default function AdminPage() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const featuredImageInputRef = useRef<HTMLInputElement>(null);
+
+  // Image Resizer overlay state
+  const [selectedImage, setSelectedImage] = useState<HTMLImageElement | null>(null);
+  const [resizerStyle, setResizerStyle] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
+  const resizerRef = useRef<HTMLDivElement>(null);
+  const resizeDragRef = useRef<{ startX: number; startY: number; startW: number; startH: number; handle: string } | null>(null);
+  const editorWrapperRef = useRef<HTMLDivElement>(null);
 
   // General Banners / Ad configs
   const [customAds, setCustomAds] = useState<Record<string, { enabled: boolean; image: string; link: string }>>({});
@@ -181,12 +237,16 @@ export default function AdminPage() {
   const [newNewsText, setNewNewsText] = useState('');
   const [newNewsLink, setNewNewsLink] = useState('');
   const [editingFlashIndex, setEditingFlashIndex] = useState<number | null>(null);
+  const [showFlashArticlePicker, setShowFlashArticlePicker] = useState(false);
+  const [flashArticleSearch, setFlashArticleSearch] = useState('');
 
   // Trending News Ticker config
   const [trendingNewsList, setTrendingNewsList] = useState<{ text: string; link: string }[]>([]);
   const [newTrendingText, setNewTrendingText] = useState('');
   const [newTrendingLink, setNewTrendingLink] = useState('');
   const [editingTrendingIndex, setEditingTrendingIndex] = useState<number | null>(null);
+  const [showTrendingArticlePicker, setShowTrendingArticlePicker] = useState(false);
+  const [trendingArticleSearch, setTrendingArticleSearch] = useState('');
 
   // Homepage Settings: youtube list
   const [videosList, setVideosList] = useState<{ id: string; title: string; thumbnail: string }[]>([]);
@@ -206,6 +266,18 @@ export default function AdminPage() {
   const [inlineImageEnabled, setInlineImageEnabled] = useState(false);
   const [inlineImageData, setInlineImageData] = useState('');
   const [inlineImageCaption, setInlineImageCaption] = useState('యోగ ఆసనాలు వేస్తున్న మోదీ..');
+  
+  // Inline Article Promo Config
+  const [inlinePromosEnabled, setInlinePromosEnabled] = useState(true);
+
+  // Rich Text Editor Related News Inserter Modal Config
+  const [showPromoLinkModal, setShowPromoLinkModal] = useState(false);
+  const [promoSearchQuery, setPromoSearchQuery] = useState('');
+  const [customPromoTitle, setCustomPromoTitle] = useState('');
+  const [customPromoSlug, setCustomPromoSlug] = useState('');
+  const savedSelectionRangeRef = useRef<Range | null>(null);
+  const [selectedPromoBox, setSelectedPromoBox] = useState<HTMLDivElement | null>(null);
+  const [promoBoxStyle, setPromoBoxStyle] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
 
   // E-Paper PDF Config
   const [epapersList, setEpapersList] = useState<{ id: string; title: string; date: string; pdfUrl: string }[]>([]);
@@ -227,12 +299,46 @@ export default function AdminPage() {
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    // Load Custom News Articles
-    try {
-      setCustomNewsList(JSON.parse(localStorage.getItem('custom_news_articles') || '[]'));
-    } catch {
-      setCustomNewsList([]);
-    }
+    // Load Custom News Articles from Database API and merge with localStorage custom articles
+    fetch('/api/articles?limit=500&t=' + Date.now())
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          try {
+            const localCustom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
+            const localDeleted = new Set(JSON.parse(localStorage.getItem('deleted_news_articles') || '[]'));
+            const localModified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
+
+            const activeLocal = localCustom
+              .filter((art: any) => !localDeleted.has(art.id))
+              .map((art: any) => {
+                if (localModified[art.id]) {
+                  return { ...art, ...localModified[art.id] };
+                }
+                return art;
+              });
+
+            const combined = [...data];
+            const seenIds = new Set(data.map((art: any) => art.id));
+            const seenSlugs = new Set(data.map((art: any) => art.slug));
+
+            activeLocal.forEach((art: any) => {
+              if (!seenIds.has(art.id) && !seenSlugs.has(art.slug)) {
+                combined.push(art);
+                seenIds.add(art.id);
+                seenSlugs.add(art.slug);
+              }
+            });
+
+            setCustomNewsList(combined);
+          } catch (e) {
+            console.error('Error merging local custom articles in admin:', e);
+            setCustomNewsList(data);
+          }
+        }
+      })
+      .catch(err => console.error('Error loading articles in admin:', err));
+
 
     // Load Flash news
     try {
@@ -317,6 +423,10 @@ export default function AdminPage() {
     setInlineImageData(localStorage.getItem('inline_article_image_data') || '');
     setInlineImageCaption(localStorage.getItem('inline_article_image_caption') || 'యోగ ఆసనాలు వేస్తున్న మోదీ..');
 
+    // Inline Promos
+    const savedInlinePromos = localStorage.getItem('inline_article_promos_enabled');
+    setInlinePromosEnabled(savedInlinePromos === null ? true : savedInlinePromos === 'true');
+
     // E-paper list
     try {
       setEpapersList(JSON.parse(localStorage.getItem('custom_epapers') || '[]'));
@@ -337,25 +447,48 @@ export default function AdminPage() {
         }));
         setSliderSlidesList(defaults);
       }
+      // Load selected slider article IDs
+      const savedSliderIds = localStorage.getItem('homepage_slider_article_ids');
+      if (savedSliderIds) {
+        setSliderSelectedIds(new Set(JSON.parse(savedSliderIds)));
+      }
     } catch {
       setSliderSlidesList([]);
     }
+
+    // Load Category Sidebar news pins
+    try {
+      const savedPins = localStorage.getItem('sidebar_category_pins');
+      if (savedPins) {
+        setSidebarCategoryPins(JSON.parse(savedPins));
+      }
+    } catch (e) {
+      console.error("Error loading sidebar_category_pins", e);
+    }
   }, [isAuthenticated, popupScope, activeAdSpot, refreshCounter]);
 
-  // Set default published date when switching to add article view
+  // Clear published date when switching to add mode — it will be set automatically at publish time
   useEffect(() => {
     if (newsViewMode === 'add') {
-      setNewsPublishedDate(new Date().toISOString().slice(0, 16));
+      setNewsPublishedDate(''); // Will be auto-set to current time when Publish is clicked
       setNewsTitle('');
       setNewsSlug('');
       setNewsDescription('');
       setNewsImage('');
       setEditingArticle(null);
-      setIsBreakingChecked(false);
-      setIsTrendingChecked(false);
-      setIsFeaturedChecked(false);
+      
+      // Auto-check Target Placement based on current sidebar filterCategory
+      setIsBreakingChecked(filterCategory === 'latest');
+      setIsTrendingChecked(filterCategory === 'trending');
+      setIsFeaturedChecked(filterCategory === 'featured');
+
       // Auto-check filterCategory in classification tree
-      if (filterCategory !== 'all' && filterCategory !== 'latest') {
+      if (
+        filterCategory !== 'all' && 
+        filterCategory !== 'latest' && 
+        filterCategory !== 'trending' && 
+        filterCategory !== 'featured'
+      ) {
         setSelectedCategories([filterCategory]);
       } else {
         setSelectedCategories([]);
@@ -364,15 +497,19 @@ export default function AdminPage() {
         if (editorRef.current) editorRef.current.innerHTML = '';
       }, 50);
     }
-  }, [newsViewMode]);
+  }, [newsViewMode, filterCategory]);
 
-  // Auto slug generation based on English text input
+  // Auto slug generation — produces English-only slug (strips Telugu/non-ASCII chars)
   useEffect(() => {
     if (newsViewMode === 'add' && newsTitle) {
       const cleanTitle = newsTitle.trim().toLowerCase()
-        .replace(/[^a-z0-9\u0C00-\u0C7F ]/g, '') // Keep Telugu & English alphanumerics
-        .replace(/\s+/g, '-');
-      setNewsSlug(`${cleanTitle}-${Date.now().toString().slice(-4)}`);
+        .replace(/[\u0C00-\u0C7F\u0900-\u097F\u0600-\u06FF]/g, '') // Strip Telugu, Hindi, Arabic scripts
+        .replace(/[^a-z0-9\s-]/g, '')  // Keep only English letters, numbers, spaces, hyphens
+        .replace(/\s+/g, '-')           // Replace spaces with hyphens
+        .replace(/-+/g, '-')            // Collapse multiple hyphens
+        .replace(/^-|-$/g, '');         // Trim leading/trailing hyphens
+      const suffix = Date.now().toString().slice(-4);
+      setNewsSlug(cleanTitle ? `${cleanTitle}-${suffix}` : `article-${suffix}`);
     }
   }, [newsTitle, newsViewMode]);
 
@@ -419,6 +556,22 @@ export default function AdminPage() {
   // ── WYSIWYG execCommand formatting helpers
   const handleFormat = (command: string, value: string = '') => {
     document.execCommand(command, false, value);
+    editorRef.current?.focus();
+  };
+
+  const handleFontSize = (size: string) => {
+    if (!size) return;
+    document.execCommand('fontSize', false, '7');
+    const fontElements = editorRef.current?.getElementsByTagName('font');
+    if (fontElements) {
+      for (let i = fontElements.length - 1; i >= 0; i--) {
+        const el = fontElements[i];
+        if (el.getAttribute('size') === '7') {
+          el.removeAttribute('size');
+          el.style.fontSize = size;
+        }
+      }
+    }
     editorRef.current?.focus();
   };
 
@@ -498,67 +651,280 @@ export default function AdminPage() {
     }
   };
 
-  // Compile full article listings (mock news databases + custom news articles database)
-  const allArticles = useMemo(() => {
-    const staticArticles = [
-      ...politicsNews,
-      ...entertainmentNews,
-      ...sportsNews,
-      ...technologyNews,
-      ...businessNews,
-      ...healthNews,
-      ...viralNews,
-      ...featuredNews,
-      ...videoNews,
-      ...rasipalaluNews,
-      ...adyathmikamNews,
-      ...sampadakiyamNews,
-      ...womenNews,
-      ...lifestyleNews,
-      ...districtNews,
-      ...vidyaNews,
-      ...admissionsNews,
-      ...currentAffairsNews,
-      ...upadiNews,
-      ...notificationNews,
-      ...webstoriesNews,
-      ...antharmadanamNews
-    ];
+  const handleOpenPromoModal = () => {
+    // Save current range before opening modal
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      savedSelectionRangeRef.current = selection.getRangeAt(0).cloneRange();
+    } else {
+      savedSelectionRangeRef.current = null;
+    }
+    setPromoSearchQuery('');
+    setCustomPromoTitle('');
+    setCustomPromoSlug('');
+    setShowPromoLinkModal(true);
+  };
 
-    // Read modified and deleted maps
-    let modified = {};
-    let deleted: string[] = [];
-    try {
-      modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
-      deleted = JSON.parse(localStorage.getItem('deleted_news_articles') || '[]');
-    } catch {}
+  const handleInsertPromoLink = (title: string, slug: string) => {
+    const cleanSlug = slug.trim().replace(/^\//, ''); // Clean leading slash if any
+    const linkUrl = cleanSlug.startsWith('http') ? cleanSlug : `/news/${cleanSlug}`;
+    const promoHtml = `<div data-promo-box="true" class="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2.5 bg-red-50/50 border-l-4 border-[#e60000] rounded px-4 py-3 my-4 text-[14px] md:text-[18px] select-none" contenteditable="false" style="border-left: 4px solid #e60000; background-color: rgba(254, 242, 242, 0.5); padding: 12px 16px; margin: 16px 0; border-radius: 4px; display: flex; flex-direction: row; gap: 10px; align-items: flex-start; text-align: left;"><span class="text-[#e60000] font-black flex-shrink-0 telugu-text font-bold" style="font-family: 'Noto Sans Telugu', sans-serif; color: #e60000; font-weight: bold; flex-shrink: 0; white-space: nowrap;">ఈ వార్తా చదవండి:</span><a href="${linkUrl}" class="text-[#02599c] font-bold hover:text-[#e60000] hover:underline transition-colors telugu-text leading-snug" style="font-family: 'Noto Sans Telugu', sans-serif; color: #02599c; font-weight: bold; text-decoration: none; line-height: 1.375;">${title}</a></div>`;
 
-    // Filter, modify and merge
-    const activeStatic = staticArticles
-      .filter((art) => !deleted.includes(art.id))
-      .map((art) => {
-        if ((modified as any)[art.id]) {
-          return { ...art, ...(modified as any)[art.id] };
-        }
-        return art;
-      });
-
-    const activeCustom = customNewsList.filter((art) => !deleted.includes(art.id));
-
-    // De-duplicate in case static arrays overlap
-    const seenIds = new Set<string>();
-    const merged: any[] = [];
-
-    [...activeCustom, ...activeStatic].forEach((art) => {
-      if (!seenIds.has(art.id)) {
-        seenIds.add(art.id);
-        merged.push(art);
+    editorRef.current?.focus();
+    const selection = window.getSelection();
+    if (selection) {
+      selection.removeAllRanges();
+      if (savedSelectionRangeRef.current) {
+        selection.addRange(savedSelectionRangeRef.current);
       }
-    });
+    }
 
-    // Sort by publication date
-    return merged.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-  }, [customNewsList, refreshCounter]);
+    insertElementAtCursor(promoHtml);
+    setShowPromoLinkModal(false);
+  };
+
+  // ── Image Resizer: calculate and show overlay over clicked image
+  const updateResizerPosition = (img: HTMLImageElement) => {
+    const wrapper = editorWrapperRef.current;
+    if (!wrapper) return;
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const imgRect = img.getBoundingClientRect();
+    setResizerStyle({
+      top: imgRect.top - wrapperRect.top + wrapper.scrollTop,
+      left: imgRect.left - wrapperRect.left,
+      width: imgRect.width,
+      height: imgRect.height,
+    });
+  };
+
+  const updatePromoBoxPosition = (box: HTMLDivElement) => {
+    const wrapper = editorWrapperRef.current;
+    if (!wrapper) return;
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const boxRect = box.getBoundingClientRect();
+    setPromoBoxStyle({
+      top: boxRect.top - wrapperRect.top + wrapper.scrollTop,
+      left: boxRect.left - wrapperRect.left,
+      width: boxRect.width,
+      height: boxRect.height,
+    });
+  };
+
+  const handleEditorImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    
+    // 1. Check if we clicked on or inside a related news promo box
+    const promoBox = target.closest('[data-promo-box="true"]') as HTMLDivElement | null;
+    if (promoBox) {
+      setSelectedPromoBox(promoBox);
+      updatePromoBoxPosition(promoBox);
+      
+      // Clear image selection
+      setSelectedImage(null);
+      setResizerStyle(null);
+      return;
+    } else {
+      setSelectedPromoBox(null);
+      setPromoBoxStyle(null);
+    }
+
+    // 2. Original Image Selection
+    if (target.tagName === 'IMG') {
+      const img = target as HTMLImageElement;
+      setSelectedImage(img);
+      updateResizerPosition(img);
+    } else {
+      // Click outside image — deselect
+      setSelectedImage(null);
+      setResizerStyle(null);
+    }
+  };
+
+  const handleResizerMouseDown = (e: React.MouseEvent<HTMLDivElement>, handle: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!selectedImage || !resizerStyle) return;
+    resizeDragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      startW: resizerStyle.width,
+      startH: resizerStyle.height,
+      handle,
+    };
+    const onMouseMove = (ev: MouseEvent) => {
+      if (!resizeDragRef.current || !selectedImage) return;
+      const { startX, startY, startW, startH, handle: h } = resizeDragRef.current;
+      let dx = ev.clientX - startX;
+      let dy = ev.clientY - startY;
+      let newW = startW;
+      let newH = startH;
+      const aspectRatio = startH / startW;
+
+      if (h === 'se') { newW = Math.max(60, startW + dx); newH = Math.round(newW * aspectRatio); }
+      else if (h === 'sw') { newW = Math.max(60, startW - dx); newH = Math.round(newW * aspectRatio); }
+      else if (h === 'ne') { newW = Math.max(60, startW + dx); newH = Math.round(newW * aspectRatio); }
+      else if (h === 'nw') { newW = Math.max(60, startW - dx); newH = Math.round(newW * aspectRatio); }
+      else if (h === 'e') { newW = Math.max(60, startW + dx); newH = Math.round(newW * aspectRatio); }
+      else if (h === 'w') { newW = Math.max(60, startW - dx); newH = Math.round(newW * aspectRatio); }
+      else if (h === 's') { newH = Math.max(40, startH + dy); newW = Math.round(newH / aspectRatio); }
+      else if (h === 'n') { newH = Math.max(40, startH - dy); newW = Math.round(newH / aspectRatio); }
+
+      selectedImage.style.width = `${newW}px`;
+      selectedImage.style.height = `${newH}px`;
+      updateResizerPosition(selectedImage);
+    };
+    const onMouseUp = () => {
+      resizeDragRef.current = null;
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
+  // Update resizer when window/editor scrolls
+  const handleEditorScroll = () => {
+    if (selectedImage) updateResizerPosition(selectedImage);
+    if (selectedPromoBox) updatePromoBoxPosition(selectedPromoBox);
+  };
+
+  // ── Image Drag-to-Move handler
+  const handleImageMoveStart = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!selectedImage) return;
+
+    const img = selectedImage;
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    // Create ghost element that follows the cursor
+    const ghost = document.createElement('div');
+    ghost.style.cssText = [
+      'position:fixed',
+      'pointer-events:none',
+      'z-index:9999',
+      'opacity:0.55',
+      'border:2px dashed #2563eb',
+      'border-radius:6px',
+      'background:#dbeafe',
+      `width:${img.offsetWidth}px`,
+      `height:${img.offsetHeight}px`,
+      'transition:none',
+    ].join(';');
+    const ghostImg = document.createElement('img');
+    ghostImg.src = img.src;
+    ghostImg.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:4px;display:block;';
+    ghost.appendChild(ghostImg);
+    document.body.appendChild(ghost);
+
+    // Offset so ghost is centered on cursor
+    const offsetX = img.offsetWidth / 2;
+    const offsetY = img.offsetHeight / 2;
+
+    const moveGhost = (ev: MouseEvent) => {
+      ghost.style.left = `${ev.clientX - offsetX}px`;
+      ghost.style.top  = `${ev.clientY - offsetY}px`;
+    };
+    moveGhost(e.nativeEvent);
+
+    // Show cursor drop indicator inside editor while dragging
+    let dropIndicator: HTMLElement | null = null;
+
+    const onMouseMove = (ev: MouseEvent) => {
+      moveGhost(ev);
+
+      // Highlight drop position using caret
+      if (dropIndicator) { dropIndicator.remove(); dropIndicator = null; }
+
+      const range = (() => {
+        if ((document as any).caretRangeFromPoint) {
+          return (document as any).caretRangeFromPoint(ev.clientX, ev.clientY) as Range | null;
+        }
+        if ((document as any).caretPositionFromPoint) {
+          const pos = (document as any).caretPositionFromPoint(ev.clientX, ev.clientY);
+          if (pos) {
+            const r = document.createRange();
+            r.setStart(pos.offsetNode, pos.offset);
+            r.collapse(true);
+            return r;
+          }
+        }
+        return null;
+      })();
+
+      if (range && editor.contains(range.startContainer)) {
+        dropIndicator = document.createElement('span');
+        dropIndicator.style.cssText = 'display:inline-block;width:2px;height:1.2em;background:#2563eb;vertical-align:text-top;animation:none;pointer-events:none;border-radius:1px;';
+        range.insertNode(dropIndicator);
+      }
+    };
+
+    const onMouseUp = (ev: MouseEvent) => {
+      ghost.remove();
+      if (dropIndicator) { dropIndicator.remove(); dropIndicator = null; }
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+
+      // Find drop range in editor
+      const range = (() => {
+        if ((document as any).caretRangeFromPoint) {
+          return (document as any).caretRangeFromPoint(ev.clientX, ev.clientY) as Range | null;
+        }
+        if ((document as any).caretPositionFromPoint) {
+          const pos = (document as any).caretPositionFromPoint(ev.clientX, ev.clientY);
+          if (pos) {
+            const r = document.createRange();
+            r.setStart(pos.offsetNode, pos.offset);
+            r.collapse(true);
+            return r;
+          }
+        }
+        return null;
+      })();
+
+      if (!range || !editor.contains(range.startContainer)) {
+        // Dropped outside editor — do nothing
+        updateResizerPosition(img);
+        return;
+      }
+
+      // Don't move if drop target is the image itself
+      if (range.startContainer === img || img.contains(range.startContainer)) {
+        updateResizerPosition(img);
+        return;
+      }
+
+      // Remove the image from its current position
+      const imgParent = img.parentNode;
+      const imgNextSibling = img.nextSibling;
+      imgParent?.removeChild(img);
+
+      // Re-insert at drop position
+      try {
+        range.insertNode(img);
+      } catch {
+        // Fallback: restore original position
+        if (imgParent) {
+          if (imgNextSibling) imgParent.insertBefore(img, imgNextSibling);
+          else imgParent.appendChild(img);
+        }
+      }
+
+      // Update selection to new position
+      setSelectedImage(img);
+      setTimeout(() => updateResizerPosition(img), 30);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
+  // Compile full article listings from the live database list
+  const allArticles = useMemo(() => {
+    return [...customNewsList].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  }, [customNewsList]);
+
 
   // Filter articles based on sidebar category filter selection
   const filteredArticles = useMemo(() => {
@@ -571,10 +937,13 @@ export default function AdminPage() {
           return art.isBreaking || art.categorySlug === 'latest';
         }
         if (filterCategory === 'trending') {
-          return art.isTrending;
+          return art.isTrending || art.categorySlug === 'trending';
         }
         if (filterCategory === 'featured') {
           return art.isFeatured || art.categorySlug === 'featured';
+        }
+        if (filterCategory === 'telangana' || filterCategory === 'andhra-pradesh') {
+          return art.categorySlug === filterCategory && !art.districtSlug;
         }
         const categoriesToCheck = [art.categorySlug, art.districtSlug].filter(Boolean);
         return categoriesToCheck.includes(filterCategory);
@@ -595,35 +964,29 @@ export default function AdminPage() {
   }, [allArticles, filterCategory, searchQuery]);
 
   // Quick Action: Toggle flags (isBreaking, isTrending, isFeatured) directly from news list table or edit form
-  const toggleArticleFlag = (articleId: string, flag: 'isBreaking' | 'isTrending' | 'isFeatured') => {
+  const toggleArticleFlag = async (articleId: string, flag: 'isBreaking' | 'isTrending' | 'isFeatured') => {
     try {
-      if (articleId.startsWith('custom-art-')) {
-        const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
-        const updated = custom.map((art: any) => {
-          if (art.id === articleId) {
-            return { ...art, [flag]: !art[flag] };
-          }
-          return art;
-        });
-        localStorage.setItem('custom_news_articles', JSON.stringify(updated));
-        setCustomNewsList(updated);
+      const art = customNewsList.find(a => a.id === articleId);
+      if (!art) return;
+      const updatedValue = !art[flag];
+      
+      const response = await fetch(`/api/articles/${articleId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [flag]: updatedValue })
+      });
+      
+      if (response.ok) {
+        const updated = await response.json();
+        setCustomNewsList(prev => prev.map(a => a.id === articleId ? updated : a));
       } else {
-        const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
-        const current = modified[articleId] || {};
-        const staticArt = allArticles.find(a => a.id === articleId);
-        const currentValue = current[flag] !== undefined ? current[flag] : (staticArt ? staticArt[flag] : false);
-        modified[articleId] = {
-          ...current,
-          id: articleId,
-          [flag]: !currentValue
-        };
-        localStorage.setItem('modified_news_articles', JSON.stringify(modified));
+        alert('Failed to update article flag');
       }
-      setRefreshCounter(prev => prev + 1);
     } catch (e) {
       console.error('Error toggling article flag:', e);
     }
   };
+
 
   // Custom Banner Slides Configuration helpers
   const handleAddBannerSlide = (e: React.FormEvent) => {
@@ -686,6 +1049,58 @@ export default function AdminPage() {
     }
   };
 
+  // Toggle an article in/out of the homepage hero slider
+  const toggleSliderArticle = (article: any) => {
+    const id = String(article.id);
+    setSliderSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      // Persist selected IDs
+      localStorage.setItem('homepage_slider_article_ids', JSON.stringify([...next]));
+      // Also update sliderSlidesList so HeroSlider picks them up via the existing key
+      const allArticlesForSlider = [...customNewsList]; // customNewsList has latest DB articles
+      const selectedSlides = [...next].map(sid => {
+        const art = allArticlesForSlider.find((a: any) => String(a.id) === sid);
+        if (!art) return null;
+        return { title: art.title, image: art.image, link: `/news/${art.slug}`, articleId: sid };
+      }).filter(Boolean);
+      setSliderSlidesList(selectedSlides);
+      localStorage.setItem('homepage_banner_slides', JSON.stringify(selectedSlides));
+      return next;
+    });
+  };
+
+  // Toggle sidebar news pin (trending or breaking) for a category
+  const toggleSidebarNewsPin = (category: string, type: 'trending' | 'breaking', articleId: any) => {
+    const artIdStr = String(articleId);
+    setSidebarCategoryPins(prev => {
+      const catPins = prev[category] || { trending: [], breaking: [] };
+      const currentList = catPins[type] || [];
+      let newList;
+      if (currentList.includes(artIdStr)) {
+        newList = currentList.filter(id => id !== artIdStr);
+      } else {
+        newList = [...currentList, artIdStr];
+      }
+      
+      const updated = {
+        ...prev,
+        [category]: {
+          ...catPins,
+          [type]: newList
+        }
+      };
+      
+      localStorage.setItem('sidebar_category_pins', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+
   // Sidebar dynamic navigation list builders
   const toggleSidebarGroup = (group: string) => {
     setExpandedSidebar((prev) => ({ ...prev, [group]: !prev[group] }));
@@ -707,15 +1122,24 @@ export default function AdminPage() {
   };
 
   // Submit new news article or edit existing article details
-  const handleSaveArticle = (e: React.FormEvent) => {
+  const handleSaveArticle = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSavingArticle) return;
     if (!newsTitle.trim() || !editorRef.current?.innerHTML.trim()) {
       alert('Title and Article Body Content are required!');
       return;
     }
 
+    setIsSavingArticle(true);
+    try {
+
     // Determine category configurations from checked boxes
     let categorySlug = 'politics';
+    if (selectedCategories.length === 0) {
+      if (filterCategory === 'latest' || filterCategory === 'trending' || filterCategory === 'featured') {
+        categorySlug = filterCategory;
+      }
+    }
     let districtSlug = '';
     
     // Auto-resolve AP/TG district names, or categories
@@ -743,74 +1167,131 @@ export default function AdminPage() {
     // Resolve Telugu category name
     const resolvedCat = MAIN_CATEGORIES_LIST.find(c => c.slug === categorySlug)?.name.split(' ')[0] || categorySlug;
 
-    // Helper to convert base64 strings back to media library URL placeholders for storage efficiency
-    const convertBase64ToPlaceholders = (htmlContent: string) => {
-      if (!htmlContent) return '';
-      let resolved = htmlContent;
-      try {
-        const mediaLibrary = JSON.parse(localStorage.getItem('custom_media_library') || '{}');
-        Object.entries(mediaLibrary).forEach(([mediaPath, base64]) => {
-          if (typeof base64 === 'string' && base64.startsWith('data:')) {
-            resolved = resolved.split(base64).join(mediaPath);
-          }
-        });
-      } catch (e) {
-        console.error('Error converting base64:', e);
-      }
-      return resolved;
-    };
-
-    const cleanBodyHTML = convertBase64ToPlaceholders(editorRef.current.innerHTML);
+    // Save the raw HTML directly — base64 images are stored as-is in the DB
+    // (No placeholder conversion: images display reliably without localStorage dependency)
+    const cleanBodyHTML = editorRef.current.innerHTML;
     const excerptText = newsDescription.trim() || (editorRef.current ? editorRef.current.innerText.slice(0, 140).trim().replace(/<[^>]*>/g, '') + '...' : '');
 
+    const slugToUse = newsSlug.trim() || (() => {
+      const base = newsTitle.trim().toLowerCase()
+        .replace(/[\u0C00-\u0C7F\u0900-\u097F\u0600-\u06FF]/g, '') // Strip Telugu/Hindi/Arabic
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+      return (base || 'article') + '-' + Date.now().toString().slice(-4);
+    })();
+
+    const articleData = {
+      title: newsTitle.trim(),
+      slug: slugToUse,
+      categorySlug,
+      category: resolvedCat,
+      districtSlug,
+      author: newsAuthor.trim() || 'హై టీవీ డెస్క్',
+      // For new articles: always use the exact current time when Publish is clicked
+      // For edited articles: use the existing/manually set date
+      publishedAt: newsViewMode === 'add'
+        ? new Date().toISOString()
+        : new Date(newsPublishedDate || Date.now()).toISOString(),
+      description: excerptText,
+      body: cleanBodyHTML,
+      image: newsImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop',
+      isBreaking: isBreakingChecked,
+      isTrending: isTrendingChecked,
+      isFeatured: isFeaturedChecked
+    };
+
     if (newsViewMode === 'add') {
-      const newArticle = {
-        id: `custom-art-${Date.now()}`,
-        title: newsTitle.trim(),
-        slug: newsSlug.trim() || `${newsTitle.trim().toLowerCase().replace(/\s+/g, '-')}-${Date.now().toString().slice(-4)}`,
-        categorySlug,
-        category: resolvedCat,
-        districtSlug,
-        author: newsAuthor.trim() || 'హై టీవీ డెస్క్',
-        publishedAt: new Date(newsPublishedDate).toISOString(),
-        description: excerptText,
-        body: cleanBodyHTML,
-        image: newsImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop',
-        views: 0,
-        isBreaking: isBreakingChecked,
-        isTrending: isTrendingChecked,
-        isFeatured: isFeaturedChecked
-      };
+        const response = await fetch('/api/articles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(articleData)
+        });
+        if (response.ok) {
+          const added = await response.json();
+          setCustomNewsList(prev => [added, ...prev]);
+          alert('Article published successfully!');
+        } else {
+          const errData = await response.json().catch(() => ({}));
+          alert('Failed to publish article: ' + (errData.error || response.statusText || 'Unknown error'));
+        }
+      } else if (newsViewMode === 'edit' && editingArticle) {
+        // Always update in localStorage first if it's a local article
+        let updatedLocally = false;
+        try {
+          const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
+          const idx = custom.findIndex((art: any) => art.id === editingArticle.id);
+          if (idx !== -1) {
+            custom[idx] = { ...custom[idx], ...articleData, id: editingArticle.id };
+            localStorage.setItem('custom_news_articles', JSON.stringify(custom));
+            updatedLocally = true;
+          }
+          
+          // Also update in modified list
+          const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
+          modified[editingArticle.id] = { ...modified[editingArticle.id], ...articleData };
+          localStorage.setItem('modified_news_articles', JSON.stringify(modified));
+        } catch (e) {
+          console.error('Error updating article in localStorage:', e);
+        }
 
-      const updated = [newArticle, ...customNewsList];
-      setCustomNewsList(updated);
-      localStorage.setItem('custom_news_articles', JSON.stringify(updated));
-      alert('Article published successfully!');
-    } else if (newsViewMode === 'edit' && editingArticle) {
-      const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
-      modified[editingArticle.id] = {
-        id: editingArticle.id,
-        slug: editingArticle.slug,
-        title: newsTitle.trim(),
-        categorySlug,
-        category: resolvedCat,
-        districtSlug,
-        author: newsAuthor.trim() || 'హై టీవీ డెస్క్',
-        publishedAt: new Date(newsPublishedDate).toISOString(),
-        description: excerptText,
-        body: cleanBodyHTML,
-        image: newsImage,
-        isBreaking: isBreakingChecked,
-        isTrending: isTrendingChecked,
-        isFeatured: isFeaturedChecked
-      };
-      localStorage.setItem('modified_news_articles', JSON.stringify(modified));
-      alert('Article updated successfully!');
+        try {
+          const response = await fetch(`/api/articles/${editingArticle.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(articleData)
+          });
+
+          if (response.ok) {
+            const updated = await response.json();
+            setCustomNewsList(prev => prev.map(a => a.id === editingArticle.id ? updated : a));
+            alert('Article updated successfully!');
+          } else {
+            // Database update failed. If it was local-only, try migrating it to the database using POST!
+            const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
+            const isLocal = custom.some((art: any) => art.id === editingArticle.id);
+            
+            if (isLocal) {
+              // Try to migrate to the database
+              const createResponse = await fetch('/api/articles', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...articleData, id: editingArticle.id })
+              });
+              
+              if (createResponse.ok) {
+                const added = await createResponse.json();
+                setCustomNewsList(prev => prev.map(a => a.id === editingArticle.id ? added : a));
+                alert('Article updated and saved to database successfully!');
+              } else {
+                // If migration fails, keep local update
+                setCustomNewsList(prev => prev.map(a => a.id === editingArticle.id ? { ...a, ...articleData } : a));
+                alert('Article updated locally successfully!');
+              }
+            } else {
+              const errData = await response.json().catch(() => ({}));
+              alert('Failed to update article: ' + (errData.details || errData.error || response.statusText));
+            }
+          }
+        } catch (e: any) {
+          console.error('Error saving article edit:', e);
+          if (updatedLocally) {
+            setCustomNewsList(prev => prev.map(a => a.id === editingArticle.id ? { ...a, ...articleData } : a));
+            alert('Article updated locally successfully!');
+          } else {
+            alert('Failed to update article: ' + (e?.message || String(e)));
+          }
+        }
+      }
+      setNewsViewMode('list');
+      setRefreshCounter(prev => prev + 1);
+    } catch (e) {
+      console.error('Error saving article:', e);
+      alert('Error saving article.');
+    } finally {
+      setIsSavingArticle(false);
     }
-
-    // Reset view
-    setNewsViewMode('list');
-    setRefreshCounter(prev => prev + 1);
   };
 
   const startEditing = (art: any) => {
@@ -851,32 +1332,78 @@ export default function AdminPage() {
     setNewsViewMode('edit');
     setTimeout(() => {
       if (editorRef.current) {
-        editorRef.current.innerHTML = convertPlaceholdersToBase64(art.body || art.content || '');
+        // Resolve any old-style placeholder paths back to base64 for articles that were
+        // saved before this fix, then display the body as-is for newer articles
+        const rawBody = art.body || art.content || '';
+        let displayBody = rawBody;
+        try {
+          const mediaLibrary = JSON.parse(localStorage.getItem('custom_media_library') || '{}');
+          Object.entries(mediaLibrary).forEach(([mediaPath, base64]) => {
+            if (typeof base64 === 'string' && base64.startsWith('data:')) {
+              displayBody = displayBody.split(mediaPath).join(base64);
+            }
+          });
+        } catch (e) {
+          console.error('Error resolving old placeholders:', e);
+        }
+        editorRef.current.innerHTML = displayBody;
       }
     }, 100);
   };
 
-  const handleDeleteArticle = (articleId: string) => {
+  const handleDeleteArticle = async (articleId: string) => {
     if (!confirm('Are you sure you want to delete this article?')) return;
+
+    // Always clean from localStorage first for client-side custom articles fallback
+    let deletedLocally = false;
     try {
-      if (articleId.startsWith('custom-art-')) {
-        const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
-        const updated = custom.filter((art: any) => art.id !== articleId);
-        localStorage.setItem('custom_news_articles', JSON.stringify(updated));
-        setCustomNewsList(updated);
-      } else {
-        const deleted = JSON.parse(localStorage.getItem('deleted_news_articles') || '[]');
-        if (!deleted.includes(articleId)) {
-          deleted.push(articleId);
-          localStorage.setItem('deleted_news_articles', JSON.stringify(deleted));
-        }
+      const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
+      const filtered = custom.filter((art: any) => art.id !== articleId);
+      if (custom.length !== filtered.length) {
+        localStorage.setItem('custom_news_articles', JSON.stringify(filtered));
+        deletedLocally = true;
       }
-      setRefreshCounter(prev => prev + 1);
-      alert('Article deleted successfully!');
-    } catch {
-      alert('Failed to delete article.');
+
+      // Clean from modified/deleted track lists
+      const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
+      if (modified[articleId]) {
+        delete modified[articleId];
+        localStorage.setItem('modified_news_articles', JSON.stringify(modified));
+      }
+
+      const deletedIds = JSON.parse(localStorage.getItem('deleted_news_articles') || '[]');
+      if (!deletedIds.includes(articleId)) {
+        deletedIds.push(articleId);
+        localStorage.setItem('deleted_news_articles', JSON.stringify(deletedIds));
+      }
+    } catch (e) {
+      console.error('Error clearing localStorage entry:', e);
+    }
+
+    try {
+      const response = await fetch(`/api/articles/${articleId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok || deletedLocally) {
+        setCustomNewsList(prev => prev.filter(art => art.id !== articleId));
+        alert('Article deleted successfully!');
+      } else {
+        alert('Failed to delete article.');
+      }
+    } catch (e) {
+      console.error('Error deleting article:', e);
+      if (deletedLocally) {
+        setCustomNewsList(prev => prev.filter(art => art.id !== articleId));
+        alert('Article deleted successfully!');
+      } else {
+        alert('Failed to delete article.');
+      }
     }
   };
+
+
+
 
   // Save configurations helper (Popups, ads ticker)
   const handleSaveConfigs = (e: React.FormEvent) => {
@@ -898,6 +1425,9 @@ export default function AdminPage() {
       localStorage.setItem('inline_article_image_enabled', String(inlineImageEnabled));
       localStorage.setItem('inline_article_image_data', inlineImageData);
       localStorage.setItem('inline_article_image_caption', inlineImageCaption);
+
+      // Save Inline promos
+      localStorage.setItem('inline_article_promos_enabled', String(inlinePromosEnabled));
     } else if (activeTab === 'categories') {
       // Save youtube videos and sliders
       localStorage.setItem('latest_videos', JSON.stringify(videosList));
@@ -1188,6 +1718,18 @@ export default function AdminPage() {
             <div className="flex items-center gap-2.5">
               <Sliders className="w-4 h-4" />
               <span>Homepage Slides</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('sidebar-news'); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'sidebar-news' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <FileCheck className="w-4 h-4" />
+              <span>Sidebar News Config</span>
             </div>
           </button>
 
@@ -1604,14 +2146,13 @@ export default function AdminPage() {
                         <th className="p-4 text-[10px] uppercase tracking-wider">Article Info</th>
                         <th className="p-4 text-[10px] uppercase tracking-wider">Category</th>
                         <th className="p-4 text-[10px] uppercase tracking-wider">Author</th>
-                        <th className="p-4 text-[10px] uppercase tracking-wider">Placements</th>
                         <th className="p-4 text-[10px] uppercase tracking-wider text-center">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {filteredArticles.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="p-10 text-center text-slate-400 font-bold">
+                          <td colSpan={4} className="p-10 text-center text-slate-400 font-bold">
                             No articles found matching filters. Select a different category or add one above!
                           </td>
                         </tr>
@@ -1637,51 +2178,19 @@ export default function AdminPage() {
                             </td>
                             <td className="p-4 capitalize">
                               <span className="px-2.5 py-1 rounded-md text-[10px] font-black bg-slate-100 text-slate-500 border border-slate-200/50">
-                                {art.category || art.categorySlug}
+                                {art.districtSlug
+                                  ? getArticleCategoryName(art)
+                                  : (filterCategory === 'latest' 
+                                      ? 'Breaking News' 
+                                      : filterCategory === 'trending' 
+                                        ? 'Trending News' 
+                                        : filterCategory === 'featured' 
+                                          ? 'Featured News' 
+                                          : (art.category || art.categorySlug))}
                               </span>
                             </td>
                             <td className="p-4 text-slate-500 font-bold capitalize">
                               {art.author}
-                            </td>
-                            <td className="p-4">
-                              <div className="flex items-center gap-1.5 select-none">
-                                <button
-                                  type="button"
-                                  onClick={() => toggleArticleFlag(art.id, 'isBreaking')}
-                                  className={`px-2 py-0.5 rounded text-[9px] font-black border transition-all cursor-pointer ${
-                                    art.isBreaking 
-                                      ? 'bg-rose-500 border-rose-500 text-white shadow-xs animate-pulse-subtle' 
-                                      : 'bg-white border-slate-250 text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-                                  }`}
-                                  title="Toggle Breaking placement"
-                                >
-                                  Breaking
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => toggleArticleFlag(art.id, 'isTrending')}
-                                  className={`px-2 py-0.5 rounded text-[9px] font-black border transition-all cursor-pointer ${
-                                    art.isTrending 
-                                      ? 'bg-amber-500 border-amber-500 text-white shadow-xs' 
-                                      : 'bg-white border-slate-250 text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-                                  }`}
-                                  title="Toggle Trending placement"
-                                >
-                                  Trending
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => toggleArticleFlag(art.id, 'isFeatured')}
-                                  className={`px-2 py-0.5 rounded text-[9px] font-black border transition-all cursor-pointer ${
-                                    art.isFeatured 
-                                      ? 'bg-[#02599c] border-[#02599c] text-white shadow-xs' 
-                                      : 'bg-white border-slate-250 text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-                                  }`}
-                                  title="Toggle Featured placement"
-                                >
-                                  Featured
-                                </button>
-                              </div>
                             </td>
                             <td className="p-4 text-center">
                               <div className="flex items-center justify-center gap-1">
@@ -1743,11 +2252,18 @@ export default function AdminPage() {
 
                 <button
                   type="button"
+                  disabled={isSavingArticle}
                   onClick={handleSaveArticle}
-                  className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-1.5 hover:scale-[1.01]"
+                  className={`${
+                    isSavingArticle ? 'bg-rose-400 cursor-not-allowed' : 'bg-rose-600 hover:bg-rose-700 cursor-pointer hover:scale-[1.01]'
+                  } text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all shadow-md flex items-center gap-1.5`}
                 >
                   <FileCheck className="w-4 h-4" />
-                  <span>{newsViewMode === 'add' ? 'Publish Review' : 'Update Details'}</span>
+                  <span>
+                    {isSavingArticle 
+                      ? (newsViewMode === 'add' ? 'Publishing...' : 'Updating...') 
+                      : (newsViewMode === 'add' ? 'Publish Review' : 'Update Details')}
+                  </span>
                 </button>
               </div>
 
@@ -1818,6 +2334,26 @@ export default function AdminPage() {
                         </select>
                       </div>
 
+                      <div className="relative">
+                        <select 
+                          onChange={(e) => handleFontSize(e.target.value)}
+                          className="bg-white border border-slate-200 text-[10px] font-black rounded-lg px-2 py-1 outline-none cursor-pointer text-slate-700"
+                          defaultValue=""
+                        >
+                          <option value="" disabled>Size</option>
+                          <option value="12px">12 px</option>
+                          <option value="14px">14 px</option>
+                          <option value="16px">16 px</option>
+                          <option value="18px">18 px</option>
+                          <option value="20px">20 px</option>
+                          <option value="22px">22 px</option>
+                          <option value="24px">24 px</option>
+                          <option value="28px">28 px</option>
+                          <option value="32px">32 px</option>
+                          <option value="36px">36 px</option>
+                        </select>
+                      </div>
+
                       <div className="w-px h-5 bg-slate-200 my-1 mx-0.5" />
 
                       <button type="button" onClick={() => handleFormat('bold')} className="p-1 hover:bg-slate-200 rounded cursor-pointer" title="Bold"><Bold className="w-3.5 h-3.5" /></button>
@@ -1862,18 +2398,347 @@ export default function AdminPage() {
 
                       <button type="button" onClick={() => imageInputRef.current?.click()} className="p-1 hover:bg-slate-200 rounded cursor-pointer" title="Upload Inline Image"><ImageIcon className="w-3.5 h-3.5" /></button>
                       <button type="button" onClick={() => videoInputRef.current?.click()} className="p-1 hover:bg-slate-200 rounded cursor-pointer" title="Upload Inline Video"><Video className="w-3.5 h-3.5" /></button>
+                      <button type="button" onClick={handleOpenPromoModal} className="p-1.5 hover:bg-rose-100 text-[#e60000] rounded-lg border border-red-200/50 bg-red-50/30 cursor-pointer flex items-center gap-1" title="Insert Related Article (ఈ వార్తా చదవండి)">
+                        <Tv className="w-3.5 h-3.5 text-[#cc0000]" />
+                        <span className="text-[9px] font-bold select-none telugu-text text-[#cc0000]" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఈ వార్తా చదవండి</span>
+                      </button>
                       <button type="button" onClick={() => handleFormat('removeFormat')} className="p-1 hover:bg-slate-200 rounded cursor-pointer" title="Clear Formatting"><Eraser className="w-3.5 h-3.5" /></button>
                     </div>
 
-                    {/* contenteditable editing panel */}
-                    <div 
-                      ref={editorRef}
-                      contentEditable
-                      suppressContentEditableWarning
-                      data-placeholder="వార్త పూర్తి సమాచారాన్ని ఇక్కడ రాయండి..."
-                      className="wysiwyg-editor w-full bg-slate-50 border border-slate-200/60 focus:bg-white focus:border-rose-500 rounded-2xl p-5 text-sm outline-none transition-all text-slate-800 overflow-y-auto leading-relaxed telugu-text"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                    />
+                    {/* contenteditable editing panel + image resizer overlay wrapper */}
+                    <div ref={editorWrapperRef} className="relative" onScroll={handleEditorScroll}>
+                      <div 
+                        ref={editorRef}
+                        contentEditable
+                        suppressContentEditableWarning
+                        data-placeholder="వార్త పూర్తి సమాచారాన్ని ఇక్కడ రాయండి..."
+                        className="wysiwyg-editor w-full bg-slate-50 border border-slate-200/60 focus:bg-white focus:border-rose-500 rounded-2xl p-5 text-sm outline-none transition-all text-slate-800 overflow-y-auto leading-relaxed telugu-text"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        onClick={handleEditorImageClick}
+                      />
+
+                      {/* ── Blue Image Resizer Overlay ── */}
+                      {resizerStyle && selectedImage && (
+                        <div
+                          ref={resizerRef}
+                          style={{
+                            position: 'absolute',
+                            top: resizerStyle.top,
+                            left: resizerStyle.left,
+                            width: resizerStyle.width,
+                            height: resizerStyle.height,
+                            pointerEvents: 'none',
+                            zIndex: 50,
+                          }}
+                        >
+                          {/* ── Floating Toolbar above image ── */}
+                          <div style={{
+                            position: 'absolute',
+                            top: -42,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            background: '#1e293b',
+                            border: '1px solid #334155',
+                            borderRadius: 8,
+                            padding: '4px 6px',
+                            boxShadow: '0 4px 16px rgba(0,0,0,0.35)',
+                            pointerEvents: 'all',
+                            whiteSpace: 'nowrap',
+                          }}>
+                            {/* Align Left */}
+                            <button
+                              type="button"
+                              title="Align Left"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!selectedImage) return;
+                                const parent = selectedImage.parentElement;
+                                if (parent && (parent.dataset.imgAlign === 'true')) {
+                                  parent.style.textAlign = 'left';
+                                } else {
+                                  selectedImage.style.display = 'block';
+                                  selectedImage.style.marginLeft = '0';
+                                  selectedImage.style.marginRight = 'auto';
+                                  if (parent) { parent.style.textAlign = 'left'; }
+                                }
+                                updateResizerPosition(selectedImage);
+                              }}
+                              style={{
+                                background: 'transparent', border: 'none', cursor: 'pointer',
+                                color: '#94a3b8', padding: '2px 6px', borderRadius: 4,
+                                fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3,
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+                              Left
+                            </button>
+
+                            <div style={{ width: 1, height: 18, background: '#334155' }} />
+
+                            {/* Align Center */}
+                            <button
+                              type="button"
+                              title="Align Center"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!selectedImage) return;
+                                selectedImage.style.display = 'block';
+                                selectedImage.style.marginLeft = 'auto';
+                                selectedImage.style.marginRight = 'auto';
+                                const parent = selectedImage.parentElement;
+                                if (parent) parent.style.textAlign = 'center';
+                                updateResizerPosition(selectedImage);
+                              }}
+                              style={{
+                                background: 'transparent', border: 'none', cursor: 'pointer',
+                                color: '#60a5fa', padding: '2px 6px', borderRadius: 4,
+                                fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3,
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                              Center
+                            </button>
+
+                            <div style={{ width: 1, height: 18, background: '#334155' }} />
+
+                            {/* Align Right */}
+                            <button
+                              type="button"
+                              title="Align Right"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!selectedImage) return;
+                                selectedImage.style.display = 'block';
+                                selectedImage.style.marginLeft = 'auto';
+                                selectedImage.style.marginRight = '0';
+                                const parent = selectedImage.parentElement;
+                                if (parent) parent.style.textAlign = 'right';
+                                updateResizerPosition(selectedImage);
+                              }}
+                              style={{
+                                background: 'transparent', border: 'none', cursor: 'pointer',
+                                color: '#94a3b8', padding: '2px 6px', borderRadius: 4,
+                                fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3,
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>
+                              Right
+                            </button>
+
+                            <div style={{ width: 1, height: 18, background: '#334155' }} />
+
+                            {/* Full Width */}
+                            <button
+                              type="button"
+                              title="Full Width"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!selectedImage) return;
+                                selectedImage.style.width = '100%';
+                                selectedImage.style.height = 'auto';
+                                selectedImage.style.display = 'block';
+                                selectedImage.style.marginLeft = '0';
+                                selectedImage.style.marginRight = '0';
+                                updateResizerPosition(selectedImage);
+                              }}
+                              style={{
+                                background: 'transparent', border: 'none', cursor: 'pointer',
+                                color: '#94a3b8', padding: '2px 6px', borderRadius: 4,
+                                fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3,
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="8 8 3 12 8 16"/><polyline points="16 8 21 12 16 16"/></svg>
+                              Full
+                            </button>
+
+                            <div style={{ width: 1, height: 18, background: '#334155' }} />
+
+                            {/* Deselect / Close */}
+                            <button
+                              type="button"
+                              title="Deselect Image"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                setSelectedImage(null);
+                                setResizerStyle(null);
+                              }}
+                              style={{
+                                background: 'transparent', border: 'none', cursor: 'pointer',
+                                color: '#f87171', padding: '2px 5px', borderRadius: 4,
+                                fontSize: 13, fontWeight: 900,
+                              }}
+                            >✕</button>
+                          </div>
+
+                          {/* Blue selection border */}
+                          <div style={{
+                            position: 'absolute', inset: 0,
+                            border: '2px solid #2563eb',
+                            borderRadius: 2,
+                            boxShadow: '0 0 0 1px rgba(37,99,235,0.25)',
+                            pointerEvents: 'none',
+                          }} />
+
+                          {/* ── Full-image drag-to-move area ── */}
+                          <div
+                            title="Drag to move image"
+                            onMouseDown={handleImageMoveStart}
+                            style={{
+                              position: 'absolute', inset: 0,
+                              cursor: 'grab',
+                              pointerEvents: 'all',
+                              zIndex: 2,
+                              borderRadius: 2,
+                              // Subtle blue tint only on hover (via inline hover workaround)
+                            }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(37,99,235,0.07)'; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
+                          >
+                            {/* Move icon badge in the center */}
+                            <div style={{
+                              position: 'absolute',
+                              top: '50%', left: '50%',
+                              transform: 'translate(-50%, -50%)',
+                              background: 'rgba(30,41,59,0.82)',
+                              border: '1px solid rgba(255,255,255,0.18)',
+                              borderRadius: 8,
+                              padding: '5px 10px',
+                              display: 'flex', alignItems: 'center', gap: 5,
+                              pointerEvents: 'none',
+                              color: '#e2e8f0',
+                              fontSize: 11, fontWeight: 700,
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+                              whiteSpace: 'nowrap',
+                            }}>
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                <polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/>
+                                <polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/>
+                                <line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/>
+                              </svg>
+                              Drag to Move
+                            </div>
+                          </div>
+
+                          {/* Image size badge */}
+                          <div style={{
+                            position: 'absolute', bottom: -26, left: 0,
+                            background: '#2563eb', color: '#fff',
+                            fontSize: 10, fontWeight: 700, padding: '2px 8px',
+                            borderRadius: 4, whiteSpace: 'nowrap',
+                            pointerEvents: 'none',
+                          }}>
+                            {Math.round(resizerStyle.width)} × {Math.round(resizerStyle.height)} px
+                          </div>
+
+                          {/* Drag handles — 8 positions */}
+                          {(['nw','n','ne','e','se','s','sw','w'] as const).map((handle) => {
+                            const isCorner = ['nw','ne','se','sw'].includes(handle);
+                            const posStyle: React.CSSProperties = {
+                              position: 'absolute', width: 10, height: 10,
+                              background: '#2563eb', border: '1.5px solid #fff',
+                              borderRadius: isCorner ? 2 : 3,
+                              pointerEvents: 'all',
+                              cursor:
+                                handle === 'nw' || handle === 'se' ? 'nwse-resize' :
+                                handle === 'ne' || handle === 'sw' ? 'nesw-resize' :
+                                handle === 'n' || handle === 's' ? 'ns-resize' : 'ew-resize',
+                              transform: 'translate(-50%, -50%)',
+                              boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+                              top:
+                                handle.includes('n') ? 0 :
+                                handle.includes('s') ? '100%' : '50%',
+                              left:
+                                handle.includes('w') ? 0 :
+                                handle.includes('e') ? '100%' : '50%',
+                            };
+                            return (
+                              <div
+                                key={handle}
+                                style={posStyle}
+                                onMouseDown={(e) => handleResizerMouseDown(e, handle)}
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* ── Floating Delete Button for Promo Box ── */}
+                      {promoBoxStyle && selectedPromoBox && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: promoBoxStyle.top,
+                            left: promoBoxStyle.left,
+                            width: promoBoxStyle.width,
+                            height: promoBoxStyle.height,
+                            pointerEvents: 'none',
+                            zIndex: 50,
+                          }}
+                        >
+                          <div style={{
+                            position: 'absolute',
+                            top: -42,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            background: '#1e293b',
+                            border: '1px solid #334155',
+                            borderRadius: 8,
+                            padding: '4px 6px',
+                            boxShadow: '0 4px 16px rgba(0,0,0,0.35)',
+                            pointerEvents: 'all',
+                            whiteSpace: 'nowrap',
+                          }}>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (selectedPromoBox) {
+                                  selectedPromoBox.remove();
+                                  setSelectedPromoBox(null);
+                                  setPromoBoxStyle(null);
+                                }
+                              }}
+                              className="text-white hover:bg-red-750 bg-red-600 font-black text-[10px] px-3 py-1.5 rounded-md flex items-center gap-1 transition-colors cursor-pointer border-none"
+                              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-white" />
+                              <span>Remove Promo Link</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSelectedPromoBox(null);
+                                setPromoBoxStyle(null);
+                              }}
+                              className="text-slate-400 hover:text-white font-black text-[10px] px-2 py-1.5 rounded-md transition-colors cursor-pointer border-none bg-transparent"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                          {/* Dotted highlight border around the promo box */}
+                          <div style={{
+                            position: 'absolute',
+                            inset: 0,
+                            border: '2px dashed #ef4444',
+                            borderRadius: 4,
+                            pointerEvents: 'none',
+                          }} />
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Metadata fields (Author and date) */}
@@ -1890,14 +2755,27 @@ export default function AdminPage() {
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Publish Date & Time</label>
-                      <input
-                        type="datetime-local"
-                        required
-                        value={newsPublishedDate}
-                        onChange={(e) => setNewsPublishedDate(e.target.value)}
-                        className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800"
-                      />
+                      <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest flex items-center gap-2">
+                        Publish Date &amp; Time
+                        {newsViewMode === 'add' && (
+                          <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full normal-case tracking-normal">
+                            Auto
+                          </span>
+                        )}
+                      </label>
+                      {newsViewMode === 'add' ? (
+                        <div className="bg-slate-100 border border-slate-200/60 rounded-xl px-4 py-3 text-xs text-slate-500 flex items-center gap-2">
+                          <span>Auto-set to current time when published</span>
+                        </div>
+                      ) : (
+                        <input
+                          type="datetime-local"
+                          required
+                          value={newsPublishedDate}
+                          onChange={(e) => setNewsPublishedDate(e.target.value)}
+                          className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800"
+                        />
+                      )}
                     </div>
                   </div>
 
@@ -2223,13 +3101,34 @@ export default function AdminPage() {
                       className="flex-1 bg-white border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                     />
-                    <input
-                      type="text"
-                      value={newNewsLink}
-                      onChange={(e) => setNewNewsLink(e.target.value)}
-                      placeholder="Redirect URL path (optional)"
-                      className="flex-1 bg-white border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs font-mono outline-none transition-colors text-slate-800"
-                    />
+
+                    {/* Article Picker — replaces URL input */}
+                    <div className="flex-1 flex items-center gap-2">
+                      {newNewsLink ? (
+                        // Show selected article link as badge
+                        <div className="flex-1 flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 min-w-0">
+                          <span className="text-[10px] font-bold text-blue-700 truncate flex-1 font-mono">{newNewsLink}</span>
+                          <button
+                            type="button"
+                            onClick={() => setNewNewsLink('')}
+                            className="text-blue-400 hover:text-red-500 flex-shrink-0 cursor-pointer transition-colors"
+                            title="Clear selected article"
+                          >
+                            <span className="text-sm font-black">✕</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => { setShowFlashArticlePicker(true); setFlashArticleSearch(''); }}
+                          className="flex-1 bg-white border border-dashed border-slate-300 hover:border-[#02599c] hover:bg-blue-50 text-slate-500 hover:text-[#02599c] font-bold text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
+                        >
+                          <FileText className="w-4 h-4 flex-shrink-0" />
+                          <span>Select Article to Link</span>
+                        </button>
+                      )}
+                    </div>
+
                     <button
                       type="button"
                       onClick={handleAddFlashNews}
@@ -2254,7 +3153,106 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* Grid Table lists */}
+                {/* Flash News Article Picker Modal */}
+                {showFlashArticlePicker && (() => {
+                  const filteredFlashArticles = flashArticleSearch.trim()
+                    ? allArticles.filter((a: any) =>
+                        a.title?.toLowerCase().includes(flashArticleSearch.toLowerCase()) ||
+                        a.category?.toLowerCase().includes(flashArticleSearch.toLowerCase()) ||
+                        a.categorySlug?.toLowerCase().includes(flashArticleSearch.toLowerCase())
+                      )
+                    : allArticles;
+
+                  return (
+                    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-fade-in">
+                      <div className="bg-white border border-slate-200/80 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col overflow-hidden max-h-[80vh] animate-scale-up text-left">
+                        {/* Modal Header */}
+                        <div className="bg-[#02599c] text-white p-5 flex items-center justify-between flex-shrink-0">
+                          <div className="flex items-center gap-2">
+                            <FileText className="w-5 h-5" />
+                            <h3 className="font-black text-sm">Select Article to Link Flash Headline</h3>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowFlashArticlePicker(false)}
+                            className="text-white/80 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer transition-colors font-bold"
+                          >✕</button>
+                        </div>
+
+                        {/* Search */}
+                        <div className="p-4 border-b border-slate-100 flex-shrink-0">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                              type="text"
+                              autoFocus
+                              value={flashArticleSearch}
+                              onChange={e => setFlashArticleSearch(e.target.value)}
+                              placeholder="Search by title or category..."
+                              className="w-full pl-9 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 focus:border-[#02599c] rounded-xl outline-none text-slate-800"
+                            />
+                          </div>
+                          <p className="text-[10px] text-slate-400 mt-2 font-bold">
+                            {filteredFlashArticles.length} articles found. Click any article to set it as the redirect destination.
+                          </p>
+                        </div>
+
+                        {/* Articles List */}
+                        <div className="overflow-y-auto flex-1 divide-y divide-slate-50">
+                          {filteredFlashArticles.length === 0 ? (
+                            <div className="p-10 text-center text-slate-400 font-bold text-sm">No articles found.</div>
+                          ) : (
+                            filteredFlashArticles.map((art: any) => (
+                              <button
+                                key={art.id}
+                                type="button"
+                                onClick={() => {
+                                  setNewNewsLink(`/news/${art.slug}`);
+                                  // Auto-fill headline text if empty
+                                  if (!newNewsText.trim()) {
+                                    setNewNewsText(art.title);
+                                  }
+                                  setShowFlashArticlePicker(false);
+                                }}
+                                className="w-full flex items-start gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors text-left group"
+                              >
+                                {/* Thumbnail */}
+                                <div className="w-16 h-11 flex-shrink-0 rounded overflow-hidden bg-slate-100 border border-slate-200">
+                                  <img
+                                    src={art.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&h=120&fit=crop'}
+                                    alt={art.title}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                {/* Info */}
+                                <div className="flex-1 min-w-0 py-0.5">
+                                  <p
+                                    className="text-xs font-bold text-slate-800 group-hover:text-[#02599c] telugu-text line-clamp-2 leading-relaxed transition-colors"
+                                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                                  >
+                                    {art.title}
+                                  </p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-[10px] text-slate-400 font-bold">{getArticleCategoryName(art)}</span>
+                                    {art.publishedAt && (
+                                      <span className="text-[10px] text-slate-350">• {new Date(art.publishedAt).toLocaleDateString('te-IN')}</span>
+                                    )}
+                                    <span className="text-[10px] font-mono text-slate-300">• /news/{art.slug}</span>
+                                  </div>
+                                </div>
+                                <span className="flex-shrink-0 text-[10px] font-bold text-[#02599c] bg-blue-50 group-hover:bg-[#02599c] group-hover:text-white px-2 py-1 rounded-lg transition-colors mt-0.5">
+                                  Select
+                                </span>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+
                 <div className="border border-slate-200/80 rounded-2xl overflow-hidden">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
@@ -2335,13 +3333,33 @@ export default function AdminPage() {
                       className="flex-1 bg-white border border-slate-200/60 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                     />
-                    <input
-                      type="text"
-                      value={newTrendingLink}
-                      onChange={(e) => setNewTrendingLink(e.target.value)}
-                      placeholder="Redirect URL path (optional)"
-                      className="flex-1 bg-white border border-slate-200/60 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs font-mono outline-none transition-colors text-slate-800"
-                    />
+
+                    {/* Article Picker — replaces URL input */}
+                    <div className="flex-1 flex items-center gap-2">
+                      {newTrendingLink ? (
+                        <div className="flex-1 flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 min-w-0">
+                          <span className="text-[10px] font-bold text-amber-700 truncate flex-1 font-mono">{newTrendingLink}</span>
+                          <button
+                            type="button"
+                            onClick={() => setNewTrendingLink('')}
+                            className="text-amber-400 hover:text-red-500 flex-shrink-0 cursor-pointer transition-colors"
+                            title="Clear selected article"
+                          >
+                            <span className="text-sm font-black">✕</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => { setShowTrendingArticlePicker(true); setTrendingArticleSearch(''); }}
+                          className="flex-1 bg-white border border-dashed border-amber-300 hover:border-amber-500 hover:bg-amber-50 text-amber-500 hover:text-amber-700 font-bold text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
+                        >
+                          <FileText className="w-4 h-4 flex-shrink-0" />
+                          <span>Select Article to Link</span>
+                        </button>
+                      )}
+                    </div>
+
                     <button
                       type="button"
                       onClick={handleAddTrendingNews}
@@ -2366,7 +3384,104 @@ export default function AdminPage() {
                   </div>
                 </div>
 
+                {/* Trending Article Picker Modal */}
+                {showTrendingArticlePicker && (() => {
+                  const filteredTrendingArticles = trendingArticleSearch.trim()
+                    ? allArticles.filter((a: any) =>
+                        a.title?.toLowerCase().includes(trendingArticleSearch.toLowerCase()) ||
+                        a.category?.toLowerCase().includes(trendingArticleSearch.toLowerCase()) ||
+                        a.categorySlug?.toLowerCase().includes(trendingArticleSearch.toLowerCase())
+                      )
+                    : allArticles;
+
+                  return (
+                    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-fade-in">
+                      <div className="bg-white border border-slate-200/80 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col overflow-hidden max-h-[80vh] animate-scale-up text-left">
+                        {/* Modal Header */}
+                        <div className="bg-amber-500 text-white p-5 flex items-center justify-between flex-shrink-0">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5" />
+                            <h3 className="font-black text-sm">Select Article to Link Trending Headline</h3>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowTrendingArticlePicker(false)}
+                            className="text-white/80 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer transition-colors font-bold"
+                          >✕</button>
+                        </div>
+
+                        {/* Search */}
+                        <div className="p-4 border-b border-slate-100 flex-shrink-0">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                              type="text"
+                              autoFocus
+                              value={trendingArticleSearch}
+                              onChange={e => setTrendingArticleSearch(e.target.value)}
+                              placeholder="Search by title or category..."
+                              className="w-full pl-9 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 focus:border-amber-500 rounded-xl outline-none text-slate-800"
+                            />
+                          </div>
+                          <p className="text-[10px] text-slate-400 mt-2 font-bold">
+                            {filteredTrendingArticles.length} articles found. Click any article to set it as the redirect destination.
+                          </p>
+                        </div>
+
+                        {/* Articles List */}
+                        <div className="overflow-y-auto flex-1 divide-y divide-slate-50">
+                          {filteredTrendingArticles.length === 0 ? (
+                            <div className="p-10 text-center text-slate-400 font-bold text-sm">No articles found.</div>
+                          ) : (
+                            filteredTrendingArticles.map((art: any) => (
+                              <button
+                                key={art.id}
+                                type="button"
+                                onClick={() => {
+                                  setNewTrendingLink(`/news/${art.slug}`);
+                                  if (!newTrendingText.trim()) {
+                                    setNewTrendingText(art.title);
+                                  }
+                                  setShowTrendingArticlePicker(false);
+                                }}
+                                className="w-full flex items-start gap-3 px-4 py-3 hover:bg-amber-50 cursor-pointer transition-colors text-left group"
+                              >
+                                <div className="w-16 h-11 flex-shrink-0 rounded overflow-hidden bg-slate-100 border border-slate-200">
+                                  <img
+                                    src={art.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&h=120&fit=crop'}
+                                    alt={art.title}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="flex-1 min-w-0 py-0.5">
+                                  <p
+                                    className="text-xs font-bold text-slate-800 group-hover:text-amber-700 telugu-text line-clamp-2 leading-relaxed transition-colors"
+                                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                                  >
+                                    {art.title}
+                                  </p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-[10px] text-slate-400 font-bold">{getArticleCategoryName(art)}</span>
+                                    {art.publishedAt && (
+                                      <span className="text-[10px] text-slate-350">• {new Date(art.publishedAt).toLocaleDateString('te-IN')}</span>
+                                    )}
+                                    <span className="text-[10px] font-mono text-slate-300">• /news/{art.slug}</span>
+                                  </div>
+                                </div>
+                                <span className="flex-shrink-0 text-[10px] font-bold text-amber-600 bg-amber-50 group-hover:bg-amber-500 group-hover:text-white px-2 py-1 rounded-lg transition-colors mt-0.5">
+                                  Select
+                                </span>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {/* Grid Table lists */}
+
                 <div className="border border-slate-200/80 rounded-2xl overflow-hidden">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
@@ -2878,6 +3993,31 @@ export default function AdminPage() {
                 </div>
               </div>
 
+              {/* 3. Related News Promo Box Toggle */}
+              <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 flex flex-col gap-4 shadow-sm mt-2">
+                <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5">
+                  🔗 Inner Article Related Promos ("ఈ వార్తా చదవండి :")
+                </h3>
+
+                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs font-black text-slate-850">Enable Related News Promos</span>
+                      <span className="text-[10px] text-slate-400">Dynamically inserts related news suggestion boxes inside the article body text.</span>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={inlinePromosEnabled}
+                        onChange={(e) => setInlinePromosEnabled(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-10 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#02599c]"></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
               {/* Action Submit */}
               <div className="flex justify-end pt-2 border-t border-slate-200">
                 <button
@@ -3010,176 +4150,564 @@ export default function AdminPage() {
           )}
 
           {/* ══════════════ VIEW: HOMEPAGE SLIDES ══════════════ */}
-          {activeTab === 'slider' && (
-            <div className="flex flex-col gap-6 animate-fade-in text-left">
-              <div>
-                <h2 className="text-2xl font-black text-slate-800">Homepage Slider Banner Config</h2>
-                <p className="text-slate-500 text-xs">Configure high-resolution banner slides displayed in the homepage hero carousel.</p>
-              </div>
+          {activeTab === 'slider' && (() => {
+            const sliderArticles = allArticles; // all articles from DB + local
+            const filteredSliderArticles = sliderSearchQuery.trim()
+              ? sliderArticles.filter((a: any) =>
+                  a.title?.toLowerCase().includes(sliderSearchQuery.toLowerCase()) ||
+                  a.category?.toLowerCase().includes(sliderSearchQuery.toLowerCase())
+                )
+              : sliderArticles;
 
-              {/* Alert Note */}
-              <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-4 flex items-start gap-3 shadow-3xs">
-                <Info className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-                <div className="text-xs text-slate-600 leading-relaxed">
-                  <span className="font-extrabold text-slate-800 block mb-1">Banner Carousel Syncing:</span>
-                  Slides configured here will instantly overwrite the default hero section slider on the homepage. Keep slide titles short and ensure image aspect ratios are landscape for best display presentation.
+            return (
+              <div className="flex flex-col gap-6 animate-fade-in text-left">
+                {/* Header */}
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800">Homepage Slider Picker</h2>
+                    <p className="text-slate-500 text-xs mt-1">
+                      Tick the checkbox on any article to add it to the home page hero slider. Uncheck to remove.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 text-xs font-bold text-emerald-700 flex-shrink-0">
+                    <CheckCircle className="w-4 h-4" />
+                    <span>{sliderSelectedIds.size} selected</span>
+                  </div>
+                </div>
+
+                {/* Info banner */}
+                <div className="bg-blue-50 border border-blue-200/60 rounded-2xl p-4 flex items-start gap-3">
+                  <Info className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                  <div className="text-xs text-blue-700 leading-relaxed">
+                    <span className="font-extrabold text-blue-900 block mb-1">How it works:</span>
+                    Select articles below using the checkbox. Selected articles automatically appear in the homepage hero slider. The slider updates instantly — no save button needed.
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                  {/* LEFT: Article picker list */}
+                  <div className="lg:col-span-2 bg-white border border-slate-200/60 rounded-2xl shadow-sm flex flex-col overflow-hidden">
+                    {/* Search bar */}
+                    <div className="p-4 border-b border-slate-100">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <input
+                          type="text"
+                          value={sliderSearchQuery}
+                          onChange={e => setSliderSearchQuery(e.target.value)}
+                          placeholder="Search articles by title or category..."
+                          className="w-full pl-9 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 focus:border-rose-400 rounded-xl outline-none text-slate-800"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Articles list */}
+                    <div className="overflow-y-auto max-h-[560px] divide-y divide-slate-50">
+                      {filteredSliderArticles.length === 0 ? (
+                        <div className="p-10 text-center text-slate-400 font-bold text-sm">
+                          No articles found.
+                        </div>
+                      ) : (
+                        filteredSliderArticles.map(art => {
+                          const isSelected = sliderSelectedIds.has(String(art.id));
+                          return (
+                            <label
+                              key={art.id}
+                              className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${isSelected ? 'bg-blue-50 border-l-4 border-[#02599c]' : 'hover:bg-slate-50 border-l-4 border-transparent'}`}
+                            >
+                              {/* Checkbox */}
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => toggleSliderArticle(art)}
+                                className="w-4 h-4 accent-[#02599c] flex-shrink-0 cursor-pointer rounded"
+                              />
+                              {/* Thumbnail */}
+                              <div className="w-16 h-11 flex-shrink-0 rounded overflow-hidden bg-slate-100 border border-slate-200">
+                                <img
+                                  src={art.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&h=120&fit=crop'}
+                                  alt={art.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              {/* Info */}
+                              <div className="flex-1 min-w-0">
+                                <p
+                                  className="text-xs font-bold text-slate-800 telugu-text line-clamp-2 leading-relaxed"
+                                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                                >
+                                  {art.title}
+                                </p>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span className="text-[10px] text-slate-400 font-bold">{getArticleCategoryName(art)}</span>
+                                  {art.publishedAt && (
+                                    <span className="text-[10px] text-slate-350">• {new Date(art.publishedAt).toLocaleDateString('te-IN')}</span>
+                                  )}
+                                </div>
+                              </div>
+                              {/* Selected badge */}
+                              {isSelected && (
+                                <span className="flex-shrink-0 text-[10px] font-black text-white bg-[#02599c] px-2 py-0.5 rounded-full">
+                                  In Slider ✓
+                                </span>
+                              )}
+                            </label>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+
+                  {/* RIGHT: Selected slides preview */}
+                  <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm flex flex-col overflow-hidden">
+                    <div className="p-4 border-b border-slate-100">
+                      <h3 className="text-sm font-black text-slate-800">
+                        Slider Preview ({sliderSelectedIds.size})
+                      </h3>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Articles selected for the hero slider</p>
+                    </div>
+                    <div className="flex-1 overflow-y-auto divide-y divide-slate-50 max-h-[520px]">
+                      {sliderSelectedIds.size === 0 ? (
+                        <div className="p-8 text-center text-slate-400">
+                          <div className="text-3xl mb-2">🖼️</div>
+                          <p className="text-xs font-bold">No articles selected yet.</p>
+                          <p className="text-[11px] text-slate-350 mt-1">Tick checkboxes on the left to add articles.</p>
+                        </div>
+                      ) : (
+                        sliderSlidesList.map((slide, idx) => (
+                          <div key={idx} className="flex items-start gap-2.5 p-3 hover:bg-slate-50">
+                            <img
+                              src={slide.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100&fit=crop'}
+                              alt={slide.title}
+                              className="w-14 h-10 object-cover rounded border border-slate-200 flex-shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p
+                                className="text-[11px] font-bold text-slate-700 telugu-text line-clamp-2 leading-relaxed"
+                                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                              >
+                                {slide.title}
+                              </p>
+                              <p className="text-[10px] text-slate-400 font-mono mt-0.5 truncate">{slide.link}</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const art = allArticles.find((a: any) => String(a.id) === String(slide.articleId));
+                                if (art) toggleSliderArticle(art);
+                              }}
+                              className="text-red-400 hover:text-red-600 p-1 flex-shrink-0 cursor-pointer"
+                              title="Remove from slider"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    {sliderSelectedIds.size > 0 && (
+                      <div className="p-3 border-t border-slate-100">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!confirm('Remove ALL articles from the slider?')) return;
+                            setSliderSelectedIds(new Set());
+                            setSliderSlidesList([]);
+                            localStorage.setItem('homepage_slider_article_ids', '[]');
+                            localStorage.setItem('homepage_banner_slides', '[]');
+                          }}
+                          className="w-full text-[11px] font-bold text-red-500 hover:text-red-700 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                        >
+                          Clear All Slider Articles
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ══════════════ VIEW: SIDEBAR NEWS CONFIG ══════════════ */}
+          {activeTab === 'sidebar-news' && (() => {
+            // Find articles belonging to the selected sidebar category
+            // Determine the effective district list for the dropdown
+            const isDistrictCat = activeSidebarCategory === 'telangana-districts' || activeSidebarCategory === 'andhra-pradesh-districts';
+            const districtListForDropdown = activeSidebarCategory === 'telangana-districts' ? tgDistricts
+              : activeSidebarCategory === 'andhra-pradesh-districts' ? apDistricts
+              : [];
+            // Effective pin key: if a district is selected use district-{slug}, else use the category slug
+            const effectivePinKey = (isDistrictCat && activeSidebarDistrict)
+              ? `district-${activeSidebarDistrict}`
+              : activeSidebarCategory;
+
+            const catArticles = (activeSidebarCategory === 'home' || activeSidebarCategory === 'latest')
+              ? allArticles
+              : activeSidebarCategory === 'telangana-districts'
+              ? (activeSidebarDistrict
+                  ? allArticles.filter((art: any) => art.categorySlug === 'telangana' && art.districtSlug === activeSidebarDistrict)
+                  : allArticles.filter((art: any) => art.categorySlug === 'telangana' && art.districtSlug))
+              : activeSidebarCategory === 'andhra-pradesh-districts'
+              ? (activeSidebarDistrict
+                  ? allArticles.filter((art: any) => art.categorySlug === 'andhra-pradesh' && art.districtSlug === activeSidebarDistrict)
+                  : allArticles.filter((art: any) => art.categorySlug === 'andhra-pradesh' && art.districtSlug))
+              : allArticles.filter((art: any) => {
+                  const matchesCategory = art.categorySlug === activeSidebarCategory || art.category?.toLowerCase() === activeSidebarCategory.toLowerCase();
+                  if (activeSidebarCategory === 'telangana' || activeSidebarCategory === 'andhra-pradesh') {
+                    return matchesCategory && !art.districtSlug;
+                  }
+                  return matchesCategory;
+                });
+
+            // Filter these category articles based on search query
+            const filteredCatArticles = sidebarNewsSearch.trim()
+              ? catArticles.filter((a: any) =>
+                  a.title?.toLowerCase().includes(sidebarNewsSearch.toLowerCase())
+                )
+              : catArticles;
+
+            // Get pins for the effective key (either district-specific or category)
+            const pins = sidebarCategoryPins[effectivePinKey] || { trending: [], breaking: [] };
+
+            return (
+              <div className="flex flex-col gap-6 animate-fade-in text-left">
+                {/* Header */}
+                <div>
+                  <h2 className="text-2xl font-black text-slate-800">Sidebar News Configuration</h2>
+                  <p className="text-slate-500 text-xs mt-1">
+                    Select a category page from the list below, then pin specific articles to its sidebar's Trending or Breaking sections.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                  {/* Left Column: Pages List */}
+                  <div className="lg:col-span-1 bg-white border border-slate-200/60 rounded-2xl p-4 shadow-sm flex flex-col gap-2">
+                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2 mb-2">
+                      Select Page (Category)
+                    </h3>
+                    <div className="flex flex-col gap-1.5 overflow-y-auto max-h-[500px] pr-1">
+                      {SIDEBAR_CATEGORIES.map((cat) => {
+                        const catPins = sidebarCategoryPins[cat.slug] || { trending: [], breaking: [] };
+                        const tCount = catPins.trending?.length || 0;
+                        const bCount = catPins.breaking?.length || 0;
+                        const isActive = activeSidebarCategory === cat.slug;
+
+                        return (
+                          <button
+                            key={cat.slug}
+                            type="button"
+                            onClick={() => {
+                              setActiveSidebarCategory(cat.slug);
+                              setActiveSidebarDistrict('');
+                              setSidebarNewsSearch('');
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left cursor-pointer transition-all ${
+                              isActive
+                                ? 'bg-[#02599c] text-white shadow-md font-black scale-[1.01]'
+                                : 'hover:bg-slate-50 text-slate-700 font-semibold'
+                            }`}
+                          >
+                            <span className="text-xs telugu-text font-sans truncate pr-1">
+                              {cat.name.split(' ')[0]}
+                            </span>
+                            {(tCount > 0 || bCount > 0) && (
+                              <div className="flex items-center gap-1 shrink-0">
+                                {tCount > 0 && (
+                                  <span className={`text-[8px] px-1.5 py-0.5 rounded-md font-black ${isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800'}`}>
+                                    {tCount}T
+                                  </span>
+                                )}
+                                {bCount > 0 && (
+                                  <span className={`text-[8px] px-1.5 py-0.5 rounded-md font-black ${isActive ? 'bg-white/20 text-white' : 'bg-red-100 text-red-800'}`}>
+                                    {bCount}B
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Right Column: Article Selector & Pin Buttons */}
+                  <div className="lg:col-span-3 bg-white border border-slate-200/60 rounded-2xl shadow-sm flex flex-col overflow-hidden">
+                    <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div>
+                        <h3 className="text-sm font-black text-slate-800 flex items-center gap-2 telugu-text">
+                          {SIDEBAR_CATEGORIES.find(c => c.slug === activeSidebarCategory)?.name}
+                          {isDistrictCat && activeSidebarDistrict && (
+                            <span className="text-[10px] font-black bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                              📍 {districtListForDropdown.find(d => d.slug === activeSidebarDistrict)?.name}
+                            </span>
+                          )}
+                        </h3>
+                        <p className="text-[10px] text-slate-400 mt-0.5">
+                          Configure custom sidebar news for this page. (Unpinned items default to normal sorting)
+                        </p>
+                        {/* District dropdown — only shown for district categories */}
+                        {isDistrictCat && (
+                          <div className="mt-2">
+                            <select
+                              value={activeSidebarDistrict}
+                              onChange={e => { setActiveSidebarDistrict(e.target.value); setSidebarNewsSearch(''); }}
+                              className="w-full md:w-72 text-xs font-bold border border-slate-200 rounded-xl px-3 py-2 bg-white text-slate-700 focus:border-[#02599c] outline-none cursor-pointer"
+                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                            >
+                              <option value="">-- అన్ని జిల్లాలు (All Districts) --</option>
+                              {districtListForDropdown.map(d => {
+                                const dPins = sidebarCategoryPins[`district-${d.slug}`] || { trending: [], breaking: [] };
+                                const dT = dPins.trending?.length || 0;
+                                const dB = dPins.breaking?.length || 0;
+                                return (
+                                  <option key={d.slug} value={d.slug}>
+                                    {d.name}{dT > 0 || dB > 0 ? ` (T:${dT} B:${dB})` : ''}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </div>
+                        )}
+                      </div>
+                      <div className="relative w-full md:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                        <input
+                          type="text"
+                          value={sidebarNewsSearch}
+                          onChange={e => setSidebarNewsSearch(e.target.value)}
+                          placeholder="Search this page's articles..."
+                          className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-slate-200 focus:border-[#02599c] rounded-xl outline-none text-slate-800"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Articles list */}
+                    <div className="overflow-y-auto divide-y divide-slate-50 max-h-[500px]">
+                      {filteredCatArticles.length === 0 ? (
+                        <div className="p-16 text-center text-slate-400">
+                          <div className="text-3xl mb-2">📰</div>
+                          <p className="text-xs font-bold">No articles found in this category.</p>
+                          <p className="text-[11px] text-slate-350 mt-1">
+                            Create news articles classified under this page first.
+                          </p>
+                        </div>
+                      ) : (
+                        filteredCatArticles.map((art) => {
+                          const artId = String(art.id);
+                          const isTrendingPinned = pins.trending.includes(artId);
+                          const isBreakingPinned = pins.breaking.includes(artId);
+
+                          return (
+                            <div
+                              key={art.id}
+                              className={`flex flex-col md:flex-row md:items-center gap-4 px-4 py-3.5 hover:bg-slate-50 transition-colors ${
+                                isTrendingPinned || isBreakingPinned ? 'bg-blue-50/30' : ''
+                              }`}
+                            >
+                              {/* Thumbnail */}
+                              <div className="w-16 h-11 flex-shrink-0 rounded overflow-hidden bg-slate-100 border border-slate-200">
+                                <img
+                                  src={art.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&fit=crop'}
+                                  alt={art.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+
+                              {/* Details */}
+                              <div className="flex-1 min-w-0">
+                                <h4
+                                  className="text-xs font-bold text-slate-800 telugu-text line-clamp-2 leading-relaxed"
+                                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                                >
+                                  {art.title}
+                                </h4>
+                                <div className="flex items-center gap-3 mt-1 text-[9px] text-slate-400 font-bold">
+                                  <span>ID: {art.id.slice(0, 8)}...</span>
+                                  {art.publishedAt && (
+                                    <span>• {new Date(art.publishedAt).toLocaleString('te-IN')}</span>
+                                  )}
+                                  {(art.categorySlug || art.districtSlug) && (
+                                    <span className="bg-blue-100 text-blue-700 text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wide">
+                                      {getArticleCategoryName(art)}
+                                    </span>
+                                  )}
+                                  {isTrendingPinned && (
+                                    <span className="bg-amber-100 text-amber-800 text-[8px] font-black px-1.5 py-0.5 rounded-md">
+                                      Trending Sidebar Pin
+                                    </span>
+                                  )}
+                                  {isBreakingPinned && (
+                                    <span className="bg-red-100 text-red-800 text-[8px] font-black px-1.5 py-0.5 rounded-md">
+                                      Breaking Sidebar Pin
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Buttons */}
+                              <div className="flex items-center gap-2.5 shrink-0 self-end md:self-auto">
+                                <button
+                                  type="button"
+                                  onClick={() => toggleSidebarNewsPin(effectivePinKey, 'trending', art.id)}
+                                  className={`text-[10px] font-black py-2 px-3 rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1 ${
+                                    isTrendingPinned
+                                      ? 'bg-amber-500 hover:bg-amber-600 text-white'
+                                      : 'bg-white hover:bg-amber-50 border border-amber-300 text-amber-600 hover:text-amber-800'
+                                  }`}
+                                >
+                                  <span>🔥 {isTrendingPinned ? 'Trending (Pinned)' : 'Add to Trending'}</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleSidebarNewsPin(effectivePinKey, 'breaking', art.id)}
+                                  className={`text-[10px] font-black py-2 px-3 rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1 ${
+                                    isBreakingPinned
+                                      ? 'bg-red-600 hover:bg-red-700 text-white'
+                                      : 'bg-white hover:bg-red-50 border border-red-300 text-red-600 hover:text-red-800'
+                                  }`}
+                                >
+                                  <span>🚨 {isBreakingPinned ? 'Breaking (Pinned)' : 'Add to Breaking'}</span>
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+
+        </div>
+      </main>
+
+      {/* ── Related News Promos Inserter Modal ── */}
+      {showPromoLinkModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white border border-slate-200/80 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col overflow-hidden max-h-[85vh] animate-scale-up text-left">
+            
+            {/* Modal Header */}
+            <div className="bg-[#02599c] text-white p-5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Tv className="w-5 h-5" />
+                <h3 className="font-black text-sm select-none">Related News Inserter (ఈ వార్తా చదవండి)</h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setShowPromoLinkModal(false)}
+                className="text-white/80 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer transition-colors text-base font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto flex flex-col gap-5">
+              
+              {/* Option A: Search & Select from Existing Articles */}
+              <div className="flex flex-col gap-2.5">
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">Option A: Link Existing Article</h4>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={promoSearchQuery}
+                    onChange={(e) => setPromoSearchQuery(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-[#02599c] focus:bg-white rounded-xl pl-10 pr-4 py-3 text-xs outline-none text-slate-900"
+                    placeholder="Search articles by title or category..."
+                  />
+                  <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
+                </div>
+
+                <div className="border border-slate-200 rounded-xl overflow-hidden max-h-[200px] overflow-y-auto divide-y divide-slate-100 bg-slate-50">
+                  {(() => {
+                    const query = promoSearchQuery.trim().toLowerCase();
+                    const list = allArticles.filter(art => 
+                      !query || 
+                      art.title.toLowerCase().includes(query) || 
+                      (art.category && art.category.toLowerCase().includes(query))
+                    );
+
+                    if (list.length === 0) {
+                      return <div className="p-5 text-center text-slate-400 text-xs font-bold">No articles match your query.</div>;
+                    }
+
+                    return list.map((art) => (
+                      <button
+                        key={art.id}
+                        type="button"
+                        onClick={() => handleInsertPromoLink(art.title, art.slug)}
+                        className="w-full text-left p-3.5 hover:bg-[#02599c]/5 active:bg-[#02599c]/10 transition-colors flex items-center justify-between gap-4 cursor-pointer text-xs"
+                      >
+                        <span className="font-bold text-slate-800 line-clamp-2 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                          {art.title}
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-bold bg-white border border-slate-200 rounded px-2 py-0.5 whitespace-nowrap">
+                          {getArticleCategoryName(art)}
+                        </span>
+                      </button>
+                    ));
+                  })()}
                 </div>
               </div>
 
-              {/* Add New Slide Form */}
-              <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-4">
-                <h3 className="text-sm font-black text-slate-850 border-b border-slate-100 pb-2.5">
-                  {editingSlideIndex !== null ? '✏️ Edit Homepage Slide' : '➕ Add New Homepage Slide'}
-                </h3>
-                <form onSubmit={handleAddBannerSlide} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="flex flex-col gap-1 md:col-span-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Slide Title (Telugu/English)</label>
+              {/* Divider */}
+              <div className="relative flex py-1 items-center">
+                <div className="flex-grow border-t border-slate-200"></div>
+                <span className="flex-shrink mx-4 text-slate-400 text-[10px] font-black uppercase tracking-widest">or</span>
+                <div className="flex-grow border-t border-slate-200"></div>
+              </div>
+
+              {/* Option B: Enter Custom Title and Slug/URL manually */}
+              <div className="flex flex-col gap-3.5">
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">Option B: Custom Promo Box</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Custom Title (Telugu/English)</label>
                     <input
                       type="text"
-                      required
-                      value={newSlideTitle}
-                      onChange={(e) => setNewSlideTitle(e.target.value)}
-                      placeholder="e.g. బ్రేకింగ్: ఏపీలో భారీగా పెరిగిన వర్షపాతం..."
-                      className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3.5 py-2.5 text-xs outline-none font-bold text-slate-800 telugu-text"
+                      value={customPromoTitle}
+                      onChange={(e) => setCustomPromoTitle(e.target.value)}
+                      placeholder="e.g. ఇక్కడ వేరే వార్త టైటిల్ రాయండి"
+                      className="bg-slate-50 border border-slate-200 focus:border-[#02599c] focus:bg-white rounded-xl px-3 py-2.5 text-xs outline-none text-slate-900 font-bold telugu-text"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Redirect Link (e.g. /news/my-slug)</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Article Slug or Full URL</label>
                     <input
                       type="text"
-                      value={newSlideLink}
-                      onChange={(e) => setNewSlideLink(e.target.value)}
-                      placeholder="Redirect URL path"
-                      className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3.5 py-2.5 text-xs font-mono outline-none text-slate-800"
+                      value={customPromoSlug}
+                      onChange={(e) => setCustomPromoSlug(e.target.value)}
+                      placeholder="e.g. ap-heavy-rains-alert-2024"
+                      className="bg-slate-50 border border-slate-200 focus:border-[#02599c] focus:bg-white rounded-xl px-3 py-2.5 text-xs outline-none text-slate-900 font-mono"
                     />
                   </div>
-                  <div className="flex flex-col gap-1 md:col-span-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Slide Landscape Image</label>
-                    <div className="border border-dashed border-slate-250 bg-slate-50/50 hover:border-[#02599c] rounded-xl p-4 text-center relative cursor-pointer min-h-[110px] flex items-center justify-center transition-colors">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleNewSlideImageUpload}
-                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                      />
-                      {!newSlideImage ? (
-                        <div className="flex flex-col items-center gap-1.5 text-slate-500">
-                          <Upload className="w-5 h-5 text-slate-400" />
-                          <span className="text-xs font-bold">Select high-res landscape slide cover</span>
-                        </div>
-                      ) : (
-                        <div className="relative max-w-[320px]">
-                          <img src={newSlideImage} alt="new-slide" className="max-h-[80px] w-auto rounded border border-slate-200" />
-                          <button
-                            type="button"
-                            onClick={(e) => { e.preventDefault(); setNewSlideImage(''); }}
-                            className="absolute -top-2 -right-2 bg-black/60 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]"
-                          >✕</button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="md:col-span-3 flex justify-end gap-2.5">
-                    {editingSlideIndex !== null && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditingSlideIndex(null);
-                          setNewSlideTitle('');
-                          setNewSlideImage('');
-                          setNewSlideLink('');
-                        }}
-                        className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-1.5 hover:scale-[1.01]"
-                      >
-                        Cancel Edit
-                      </button>
-                    )}
-                    <button
-                      type="submit"
-                      className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-1.5 hover:scale-[1.01]"
-                    >
-                      {editingSlideIndex !== null ? (
-                        <>
-                          <CheckCircle className="w-4 h-4" />
-                          <span>Update Carousel Slide</span>
-                        </>
-                      ) : (
-                        <>
-                          <Plus className="w-4 h-4" />
-                          <span>Add Carousel Slide</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </form>
-              </div>
-
-              {/* Stored Banner Slides List */}
-              <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-4 mt-2">
-                <h3 className="text-sm font-black text-slate-850 border-b border-slate-100 pb-2.5">
-                  Configured Carousel Slides ({sliderSlidesList.length})
-                </h3>
-
-                <div className="border border-slate-200 rounded-2xl overflow-hidden">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="bg-slate-50 border-b border-slate-200 text-slate-400 font-black">
-                        <th className="p-3 text-[10px] uppercase tracking-wider">Preview</th>
-                        <th className="p-3 text-[10px] uppercase tracking-wider">Slide Title</th>
-                        <th className="p-3 text-[10px] uppercase tracking-wider">Redirect Destination</th>
-                        <th className="p-3 text-[10px] uppercase tracking-wider text-center">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {sliderSlidesList.length === 0 ? (
-                        <tr>
-                          <td colSpan={4} className="p-8 text-center text-slate-450 font-bold">
-                            No custom banner slides configured. Add one above!
-                          </td>
-                        </tr>
-                      ) : (
-                        sliderSlidesList.map((slide, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50/50">
-                            <td className="p-3">
-                              <img src={slide.image} alt={slide.title} className="w-20 h-11 object-cover rounded border border-slate-200 bg-slate-100" />
-                            </td>
-                            <td className="p-3 font-bold text-slate-800 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                              {slide.title}
-                            </td>
-                            <td className="p-3 font-mono text-[10px] text-slate-400 truncate max-w-[220px]">{slide.link || 'None (no clickthrough)'}</td>
-                            <td className="p-3 text-center">
-                              <div className="flex items-center justify-center gap-1.5">
-                                <button
-                                  type="button"
-                                  onClick={() => startEditingSlide(idx)}
-                                  className="text-slate-500 hover:text-rose-600 p-1.5 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-slate-100"
-                                  title="Edit Slide"
-                                >
-                                  <Pencil className="w-4 h-4" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteBannerSlide(idx)}
-                                  className="text-red-500 hover:text-red-700 p-1.5 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-red-500/10"
-                                  title="Delete Slide"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
                 </div>
-              </div>
-            </div>
-          )}
 
+                <button
+                  type="button"
+                  disabled={!customPromoTitle.trim() || !customPromoSlug.trim()}
+                  onClick={() => handleInsertPromoLink(customPromoTitle, customPromoSlug)}
+                  className={`mt-1 font-black text-xs py-3 px-6 rounded-xl transition-all cursor-pointer text-center shadow-md flex items-center justify-center gap-1.5 ${
+                    customPromoTitle.trim() && customPromoSlug.trim()
+                      ? 'bg-rose-600 hover:bg-rose-700 text-white hover:scale-[1.01]'
+                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  }`}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Insert Custom Promo Box</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
         </div>
-      </main>
+      )}
+
     </div>
   );
 }

@@ -82,7 +82,7 @@ export default function NewsSection({
         </div>
 
         {/* 2 in a Row Grid (2x2 Layout) */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {articles.slice(0, 4).map((article) => (
             <NewsCard key={article.id} article={article} variant="horizontal" />
           ))}
@@ -109,7 +109,7 @@ export default function NewsSection({
           </Link>
         </div>
         <div className="space-y-0">
-          {articles.slice(0, 5).map((article) => (
+          {articles.slice(0, 4).map((article) => (
             <NewsCard key={article.id} article={article} variant="mini" />
           ))}
         </div>

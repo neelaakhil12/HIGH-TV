@@ -357,16 +357,39 @@ body {
     line-height: 1.8;
   }
 }
-/* Telugu Override: +0.2 Line Height and 16px Minimum Font Size */
+/* Telugu Override: +0.2 Line Height and reduced Font Size to prevent overflow */
 .article-body.telugu-text {
-  font-size: 16px !important; /* enforces minimum body size */
-  line-height: 2.0;
+  font-size: 14.5px !important;
+  line-height: 1.85;
 }
 @media (min-width: 768px) {
   .article-body.telugu-text {
-    font-size: 19px !important; /* 19px is >= 16px */
-    line-height: 2.0;
+    font-size: 16.5px !important;
+    line-height: 1.85;
   }
+}
+
+/* Force line wrapping and prevent overflow inside article body (handles copy-pasted inline styles) */
+.article-body,
+.article-body * {
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Allow code/pre blocks to preserve formatting while wrapping safely */
+.article-body pre,
+.article-body code {
+  white-space: pre-wrap !important;
+}
+
+/* Article inline images — sharp square edges (no border-radius) */
+.article-body img {
+  border-radius: 0 !important;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 16px auto;
 }
 
 /* Category Label: News categories like Politics, Sports, Business */
@@ -523,7 +546,7 @@ body {
 .wysiwyg-editor img {
   max-width: 100%;
   height: auto;
-  border-radius: 12px;
+  border-radius: 0;
   margin: 16px 0;
   display: block;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -531,14 +554,22 @@ body {
 .wysiwyg-editor video {
   max-width: 100%;
   height: auto;
-  border-radius: 12px;
+  border-radius: 0;
   margin: 16px 0;
   display: block;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 .wysiwyg-editor p {
-  margin-bottom: 12px;
+  margin-top: 0;
+  margin-bottom: 4px;   /* Reduced from 12px — allows backspace to close gaps */
   line-height: 1.6;
+}
+/* Empty paragraphs (just a <br> or nothing) collapse to minimal height */
+.wysiwyg-editor p:empty,
+.wysiwyg-editor p br:only-child {
+  margin: 0;
+  line-height: 1;
+  min-height: 0;
 }
 .wysiwyg-editor h1 {
   font-size: 1.8rem;
@@ -580,13 +611,8 @@ body {
 }
 
 /* Fix squished/clipped Telugu & English category names in admin sidebar and forms */
-.admin-theme-wrapper .telugu-text,
-.admin-theme-wrapper button,
-.admin-theme-wrapper span,
-.admin-theme-wrapper select,
-.admin-theme-wrapper input,
-.admin-theme-wrapper textarea,
-.admin-theme-wrapper aside nav button span {
+.admin-theme-wrapper,
+.admin-theme-wrapper * {
   font-family: 'Mandali', 'Noto Sans Telugu', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
   line-height: 1.6 !important;
 }

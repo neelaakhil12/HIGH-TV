@@ -136,29 +136,25 @@ interface NewsCardProps {
 export default function NewsCard({ article, variant = 'default', className, imageClassName }: NewsCardProps) {
   if (variant === 'horizontal') {
     return (
-      <article className={`news-card flex flex-col gap-2.5 bg-white rounded-lg overflow-hidden border border-gray-100 hover:border-blue-100 card-padding text-left flex-shrink-0 w-full snap-start sm:w-auto ${className || ''}`}>
-        <Link href={`/news/${article.slug}`} className="block img-zoom-container rounded-md overflow-hidden w-full aspect-video relative">
+      <article className={`news-card flex flex-row items-center gap-3.5 bg-white rounded-lg overflow-hidden border border-gray-100 hover:border-blue-100 p-2.5 sm:p-3.5 text-left flex-shrink-0 w-full snap-start sm:w-auto ${className || ''}`}>
+        <Link href={`/news/${article.slug}`} className="flex-shrink-0 w-24 h-16 sm:w-28 sm:h-20 img-zoom-container rounded-md overflow-hidden relative border border-gray-100 bg-gray-50">
           <Image
             src={article.image}
             alt={article.title}
             fill
             className="object-cover"
-            sizes="(max-width: 640px) 100vw, 300px"
+            sizes="(max-width: 640px) 96px, 112px"
           />
         </Link>
-        <div className="flex-1 min-w-0 flex flex-col justify-between">
-          <div>
-
-            <Link href={`/news/${article.slug}`}>
-              <h3
-                className="secondary-headline headline-hover telugu-text line-clamp-3 pl-2.5 pr-1 pb-1"
-                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-              >
-                {article.title}
-              </h3>
-            </Link>
-          </div>
-
+        <div className="flex-1 min-w-0">
+          <Link href={`/news/${article.slug}`}>
+            <h3
+              className="secondary-headline headline-hover telugu-text line-clamp-2 pl-1.5 pb-0.5"
+              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+            >
+              {article.title}
+            </h3>
+          </Link>
         </div>
       </article>
     );
@@ -167,13 +163,13 @@ export default function NewsCard({ article, variant = 'default', className, imag
   if (variant === 'mini') {
     return (
       <article className={`flex gap-2 py-2.5 border-b border-gray-100 last:border-b-0 group ${className || ''}`}>
-        <Link href={`/news/${article.slug}`} className="flex-shrink-0 img-zoom-container rounded overflow-hidden w-20 h-14">
+        <Link href={`/news/${article.slug}`} className="flex-shrink-0 img-zoom-container rounded overflow-hidden w-20 h-14 bg-slate-50 border border-gray-150">
           <Image
             src={article.image}
             alt={article.title}
             width={80}
             height={56}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         </Link>
         <div className="flex-1">

@@ -4,24 +4,252 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AdBanner from '@/components/home/AdBanner';
 import PollWidget from '@/components/home/PollWidget';
-import { politicsNews, featuredNews, getMergedArticles } from '@/lib/mockData';
+import { politicsNews, featuredNews, getMergedArticles, tgDistricts, apDistricts } from '@/lib/mockData';
 
-export default function RightSidebar() {
+// Categories where sidebar shows ALL mixed news (not filtered by category)
+const MIXED_CATEGORIES = new Set(['latest', 'home', '']);
+
+interface RightSidebarProps {
+  categorySlug?: string; // If provided and not in MIXED_CATEGORIES, shows filtered news
+}
+
+export default function RightSidebar({ categorySlug }: RightSidebarProps) {
   const [trendingList, setTrendingList] = useState<any[]>([]);
+  const [breakingList, setBreakingList] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const initialDistrict = categorySlug?.startsWith('district-') ? categorySlug.replace('district-', '') : '';
+  const [selectedDistrict, setSelectedDistrict] = useState<string>(initialDistrict);
 
   useEffect(() => {
-    try {
-      const staticArticles = [...featuredNews, ...politicsNews];
-      setTrendingList(getMergedArticles(staticArticles));
-    } catch (e) {
-      console.error('Error loading custom trending articles in RightSidebar', e);
-    }
-  }, []);
+    const init = categorySlug?.startsWith('district-') ? categorySlug.replace('district-', '') : '';
+    setSelectedDistrict(init);
+  }, [categorySlug]);
 
-  const activeTrending = trendingList.length > 0 ? trendingList.slice(0, 5) : [...featuredNews, ...politicsNews].slice(0, 5);
+  const currentDistrictSlug = selectedDistrict || (categorySlug?.startsWith('district-') ? categorySlug.replace('district-', '') : '');
+  const activeCat = currentDistrictSlug ? `district-${currentDistrictSlug}` : (categorySlug || 'home');
+  const filterByCategory = activeCat !== 'home' && activeCat !== 'latest';
+
+  // For district-specific slugs (district-adilabad, district-hyderabad, etc.) derive the real API category
+  const isDistrictSlug = activeCat.startsWith('district-');
+  const districtSlugValue = isDistrictSlug ? activeCat.replace('district-', '') : '';
+  const apiCat = activeCat === 'telangana-districts' ? 'telangana'
+    : activeCat === 'andhra-pradesh-districts' ? 'andhra-pradesh'
+    : isDistrictSlug
+    ? (tgDistricts.some(d => d.slug === districtSlugValue) ? 'telangana' : 'andhra-pradesh')
+    : activeCat;
+
+  useEffect(() => {
+    setIsLoading(true);
+    const controller = new AbortController();
+
+    const fetchCategoryNews = async () => {
+      try {
+        let trendUrl = `/api/articles?category=${apiCat}&limit=12`;
+        if (apiCat === 'home' || apiCat === 'latest') {
+          trendUrl = `/api/articles?category=trending&limit=15`;
+        }
+
+        const [trendRes, breakRes] = await Promise.all([
+          fetch(trendUrl, { signal: controller.signal }),
+          fetch(`/api/articles?category=latest&limit=15`, { signal: controller.signal }),
+        ]);
+
+        if (!trendRes.ok || !breakRes.ok) throw new Error('Fetch failed');
+
+        const [allCatArticles, allBreaking] = await Promise.all([
+          trendRes.json(),
+          breakRes.json(),
+        ]);
+
+        // Filter breaking news to this category
+        const catBreaking = apiCat === 'home' || apiCat === 'latest'
+          ? allBreaking
+          : allBreaking.filter((a: any) => a.categorySlug === apiCat);
+
+        // Load custom sidebar configuration pins from localStorage
+        let pinnedTrendingIds: string[] = [];
+        let pinnedBreakingIds: string[] = [];
+        try {
+          const savedPins = localStorage.getItem('sidebar_category_pins');
+          if (savedPins) {
+            const parsed = JSON.parse(savedPins);
+            // Read from activeCat (e.g. telangana-districts) and also base slug (e.g. telangana)
+            const isDistrict = activeCat.startsWith('district-') || activeCat.endsWith('-districts');
+            const catPins = parsed[activeCat] || { trending: [], breaking: [] };
+            const basePins = (activeCat !== apiCat && !isDistrict) ? (parsed[apiCat] || { trending: [], breaking: [] }) : { trending: [], breaking: [] };
+            // Merge and deduplicate
+            pinnedTrendingIds = [
+              ...(catPins.trending || []).map(String),
+              ...(basePins.trending || []).map(String),
+            ].filter((id, idx, arr) => arr.indexOf(id) === idx);
+            pinnedBreakingIds = [
+              ...(catPins.breaking || []).map(String),
+              ...(basePins.breaking || []).map(String),
+            ].filter((id, idx, arr) => arr.indexOf(id) === idx);
+          }
+        } catch (err) {
+          console.error("Error reading sidebar_category_pins in sidebar", err);
+        }
+
+        // Fetch any missing pinned articles by ID from /api/articles/[id]
+        const missingIds = new Set<string>();
+        pinnedTrendingIds.forEach(id => missingIds.add(id));
+        pinnedBreakingIds.forEach(id => missingIds.add(id));
+        
+        // Remove IDs that are already present in allCatArticles or allBreaking
+        const existingArticles = [...allCatArticles, ...allBreaking];
+        existingArticles.forEach((a: any) => {
+          missingIds.delete(String(a.id));
+        });
+
+        // Load custom and modified articles from localStorage
+        let localCustom: any[] = [];
+        let localModified: Record<string, any> = {};
+        try {
+          localCustom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
+          localModified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
+        } catch (e) {
+          console.error("Error parsing custom/modified articles from localStorage in RightSidebar:", e);
+        }
+        
+        // Fetch remaining missing articles in parallel
+        const missingArticlesList: any[] = [];
+        // First resolve any missing ids from localStorage custom or modified lists
+        missingIds.forEach(id => {
+          const foundCustom = localCustom.find((art: any) => String(art.id) === String(id));
+          if (foundCustom) {
+            const activeCustom = localModified[foundCustom.id] ? { ...foundCustom, ...localModified[foundCustom.id] } : foundCustom;
+            missingArticlesList.push(activeCustom);
+            missingIds.delete(id);
+          } else {
+            if (localModified[id]) {
+              const staticArt = existingArticles.find((a: any) => String(a.id) === String(id));
+              if (staticArt) {
+                missingArticlesList.push({ ...staticArt, ...localModified[id] });
+                missingIds.delete(id);
+              }
+            }
+          }
+        });
+
+        if (missingIds.size > 0) {
+          const fetchPromises = Array.from(missingIds).map(async (id) => {
+            try {
+              const res = await fetch(`/api/articles/${id}`, { signal: controller.signal });
+              if (res.ok) {
+                const fetched = await res.json();
+                return localModified[id] ? { ...fetched, ...localModified[id] } : fetched;
+              }
+            } catch (err) {
+              console.error(`Error fetching pinned article ${id}`, err);
+            }
+            return null;
+          });
+          const fetchedMissing = await Promise.all(fetchPromises);
+          fetchedMissing.forEach(a => {
+            if (a) missingArticlesList.push(a);
+          });
+        }
+        
+        // Combine them all
+        const lookupMap = new Map<string, any>();
+        [...allCatArticles, ...allBreaking, ...missingArticlesList].forEach((a: any) => {
+          lookupMap.set(String(a.id), a);
+        });
+
+        // Resolve trending list: ONLY show pinned articles
+        let finalTrending = pinnedTrendingIds.map(id => lookupMap.get(id)).filter(Boolean);
+
+        // Resolve breaking list: ONLY show pinned articles
+        let finalBreaking = pinnedBreakingIds.map(id => lookupMap.get(id)).filter(Boolean);
+
+        // Prevent mingling: filter out district articles from state sidebar and state articles from district sidebar
+        const isDistrictView = activeCat.startsWith('district-') || activeCat.endsWith('-districts');
+        if (isDistrictView) {
+          finalTrending = finalTrending.filter((a: any) => a.districtSlug);
+          finalBreaking = finalBreaking.filter((a: any) => a.districtSlug);
+        } else if (apiCat === 'telangana' || apiCat === 'andhra-pradesh') {
+          finalTrending = finalTrending.filter((a: any) => !a.districtSlug);
+          finalBreaking = finalBreaking.filter((a: any) => !a.districtSlug);
+        }
+
+        setTrendingList(finalTrending);
+        setBreakingList(finalBreaking);
+      } catch (e: any) {
+        if (e.name === 'AbortError') return;
+        console.error('Error loading category news in RightSidebar', e);
+        setTrendingList([]);
+        setBreakingList([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCategoryNews();
+    return () => controller.abort();
+  }, [categorySlug, activeCat]);
+
+  const activeTrending = trendingList;
+
+  // Category display name for sidebar headers
+  const categoryDisplayNames: Record<string, string> = {
+    'home': 'హోమ్',
+    'latest': 'బ్రేకింగ్',
+    'telangana': 'తెలంగాణ',
+    'andhra-pradesh': 'ఆంధ్రప్రదేశ్',
+    'national': 'జాతీయ',
+    'international': 'అంతర్జాతీయ',
+    'business': 'వ్యాపారం',
+    'politics': 'రాజకీయాలు',
+    'sports': 'స్పోర్ట్స్',
+    'entertainment': 'సినిమా',
+    'technology': 'టెక్నాలజీ',
+    'health': 'ఆరోగ్యం',
+    'viral': 'వైరల్',
+    'women': 'మహిళ',
+    'lifestyle': 'లైఫ్‌స్టైల్',
+    'vidya': 'విద్య',
+    'upadi': 'ఉపాధి',
+  };
+  const currentDistrictObj = tgDistricts.find(d => d.slug === currentDistrictSlug) || apDistricts.find(d => d.slug === currentDistrictSlug);
+  const catLabel = currentDistrictObj 
+    ? currentDistrictObj.name 
+    : (filterByCategory ? (categoryDisplayNames[activeCat] || activeCat) : null);
+
+  const showDistrictSelector = categorySlug === 'telangana-districts' || 
+                              categorySlug === 'andhra-pradesh-districts' || 
+                              categorySlug?.startsWith('district-');
 
   return (
     <aside className="w-full lg:col-span-3 flex flex-col gap-4 select-none">
+      
+      {/* District Selector */}
+      {showDistrictSelector && (
+        <div className="bg-white border border-gray-200 rounded-xl p-3 flex flex-col gap-2 shadow-sm text-left">
+          <label className="text-xs font-bold text-gray-500 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+            జిల్లా ఎంచుకోండి:
+          </label>
+          <select
+            value={selectedDistrict}
+            onChange={(e) => setSelectedDistrict(e.target.value)}
+            className="w-full bg-[#025390] text-white font-bold text-[13px] md:text-[14px] telugu-text px-3 py-2 rounded-lg cursor-pointer border-none outline-none"
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            <option value="" className="bg-white text-gray-800">మొత్తం వార్తలు (All)</option>
+            <optgroup label="తెలంగాణ జిల్లాలు" className="bg-white text-gray-800 font-bold">
+              {tgDistricts.map(d => (
+                <option key={d.slug} value={d.slug} className="bg-white text-gray-800 font-medium">{d.name}</option>
+              ))}
+            </optgroup>
+            <optgroup label="ఆంధ్రప్రదేశ్ జిల్లాలు" className="bg-white text-gray-800 font-bold">
+              {apDistricts.map(d => (
+                <option key={d.slug} value={d.slug} className="bg-white text-gray-800 font-medium">{d.name}</option>
+              ))}
+            </optgroup>
+          </select>
+        </div>
+      )}
       
       {/* 1. Health Portal Link (Arogyam Banner) */}
       <Link href="/category/health" className="hidden lg:block w-full group overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-white hover:border-gray-300 transition-colors duration-200">
@@ -35,55 +263,108 @@ export default function RightSidebar() {
       {/* 2. Top Sponsored Ad */}
       <AdBanner position="rectangle" />
 
-      {/* 3. New Widget: Trending News (ట్రెండింగ్ వార్తలు) */}
+      {/* 3. Category Breaking News — only shown when filtering by category */}
+      {filterByCategory && breakingList.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left">
+          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100">
+            <div className="w-1.5 h-6 bg-[#e60000] rounded-full"></div>
+            <h3 className="font-black text-gray-900 text-[18px] md:text-[20px] pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              {catLabel} బ్రేకింగ్ న్యూస్
+            </h3>
+          </div>
+          <div className="space-y-3.5">
+            {breakingList.map((article, idx) => (
+              <Link
+                key={`break-${article.id}-${idx}`}
+                href={`/news/${article.slug}`}
+                className="flex items-start gap-3 pb-3 last:pb-0 last:border-b-0 border-b border-gray-55 group cursor-pointer"
+              >
+                {/* Image thumbnail */}
+                <div className="w-20 h-14 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
+                  <img
+                    src={article.image}
+                    alt={article.title}
+                    className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
+                  />
+                </div>
+                {/* Text */}
+                <div className="min-w-0 flex-1 py-0.5">
+                  <h4
+                    className="text-[14.5px] md:text-[15.5px] font-bold text-gray-800 group-hover:text-[#e60000] transition-colors leading-relaxed telugu-text line-clamp-2 pl-1.5 pb-0.5"
+                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                  >
+                    {article.title}
+                  </h4>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 4. Trending News Widget (ట్రెండింగ్ వార్తలు) */}
       <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left">
         <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100">
           <div className="w-1.5 h-6 bg-[#e60000] rounded-full"></div>
           <h3 className="font-black text-gray-900 text-[18px] md:text-[20px] pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-            ట్రెండింగ్ వార్తలు
+            {catLabel ? `${catLabel} ట్రెండింగ్` : 'ట్రెండింగ్ వార్తలు'}
           </h3>
         </div>
-        <div className="space-y-3.5">
-          {activeTrending.map((article, idx) => (
-            <Link
-              key={`${article.id}-${idx}`}
-              href={`/news/${article.slug}`}
-              className="flex items-start gap-3 pb-3 last:pb-0 last:border-b-0 border-b border-gray-55 group cursor-pointer"
-            >
-              {/* Image thumbnail */}
-              <div className="w-20 h-14 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
-                <img
-                  src={article.image}
-                  alt={article.title}
-                  className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
-                />
-              </div>
-              {/* Text */}
-              <div className="min-w-0 flex-1 py-0.5">
-                <h4
-                  className="text-[14.5px] md:text-[15.5px] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-relaxed telugu-text line-clamp-2"
-                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                >
-                  {article.title}
-                </h4>
-                <span className="text-[12px] text-gray-400 mt-0.5 block"></span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
 
+        {isLoading ? (
+          <div className="space-y-3.5">
+            {[1,2,3,4,5].map(i => (
+              <div key={i} className="flex items-start gap-3 pb-3 border-b border-gray-100 animate-pulse">
+                <div className="w-20 h-14 flex-shrink-0 bg-gray-200 rounded"></div>
+                <div className="flex-1 space-y-2 py-1">
+                  <div className="h-3 bg-gray-200 rounded w-full"></div>
+                  <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-3.5">
+            {activeTrending.map((article, idx) => (
+              <Link
+                key={`${article.id}-${idx}`}
+                href={`/news/${article.slug}`}
+                className="flex items-start gap-3 pb-3 last:pb-0 last:border-b-0 border-b border-gray-55 group cursor-pointer"
+              >
+                {/* Image thumbnail */}
+                <div className="w-20 h-14 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
+                  <img
+                    src={article.image}
+                    alt={article.title}
+                    className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
+                  />
+                </div>
+                {/* Text */}
+                <div className="min-w-0 flex-1 py-0.5">
+                  <h4
+                    className="text-[14.5px] md:text-[15.5px] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-relaxed telugu-text line-clamp-2 pl-1.5 pb-0.5"
+                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                  >
+                    {article.title}
+                  </h4>
+                  <span className="text-[12px] text-gray-400 mt-0.5 block"></span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Poll Widget */}
       <PollWidget />
 
-      {/* Mobile-only ads removal under Trending News section */}
+      {/* Desktop-only ads */}
       <div className="hidden lg:flex lg:flex-col lg:gap-4">
-        {/* 4. Astrology / Sidebar Ads */}
+        {/* Astrology / Sidebar Ads */}
         <AdBanner position="astrology" />
         <AdBanner position="sidebar" />
 
-        {/* 5. Sponsored Ad: Zomato */}
+        {/* Sponsored Ad: Zomato */}
         <div className="w-full bg-gradient-to-b from-[#1a0a00] via-[#7d1206] to-[#1a0a00] border border-red-900/40 rounded-xl overflow-hidden shadow-md relative text-left">
           <div className="h-1 w-full bg-gradient-to-r from-red-400 via-orange-300 to-red-400" />
           <div className="absolute top-2.5 left-3 bg-black/40 text-red-300 text-[6px] font-black px-1.5 py-0.5 rounded uppercase leading-none">SPONSORED</div>
@@ -108,10 +389,10 @@ export default function RightSidebar() {
           <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-red-400/50 to-transparent" />
         </div>
 
-        {/* 6. AdBanner: Gold Loan */}
+        {/* AdBanner: Gold Loan */}
         <AdBanner position="gold-loan" />
 
-        {/* 7. Sponsored Ad: Myntra */}
+        {/* Sponsored Ad: Myntra */}
         <div className="w-full bg-gradient-to-b from-[#0d0520] via-[#3b0764] to-[#0d0520] border border-purple-800/40 rounded-xl overflow-hidden shadow-md relative text-left">
           <div className="h-1 w-full bg-gradient-to-r from-pink-400 via-purple-300 to-pink-400" />
           <div className="absolute top-2.5 left-3 bg-black/40 text-pink-300 text-[6px] font-black px-1.5 py-0.5 rounded uppercase leading-none">SPONSORED</div>
@@ -142,11 +423,11 @@ export default function RightSidebar() {
           <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-pink-400/50 to-transparent" />
         </div>
 
-        {/* 8. AdBanner: Coaching */}
+        {/* AdBanner: Coaching */}
         <AdBanner position="coaching" />
       </div>
 
-      {/* 9. Trending Tags Box */}
+      {/* Trending Tags Box */}
       <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left">
         <h3 className="font-black text-gray-800 text-[15px] mb-3 pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ట్రెండింగ్ ట్యాగ్స్</h3>
         <div className="flex flex-wrap gap-2">
@@ -157,7 +438,6 @@ export default function RightSidebar() {
           ))}
         </div>
       </div>
-
 
     </aside>
   );

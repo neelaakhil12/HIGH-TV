@@ -1,4 +1,5 @@
 import Header from '@/components/layout/Header';
+export const dynamic = 'force-dynamic';
 import DistrictDropdown from '@/components/layout/DistrictDropdown';
 import { MapPin } from 'lucide-react';
 import BackButton from '@/components/layout/BackButton';
@@ -37,6 +38,8 @@ import {
 } from '@/lib/mockData';
 import { Home, ChevronRight, X } from 'lucide-react';
 import type { Metadata } from 'next';
+import { prisma } from '@/lib/prisma';
+
 
 const allNews = [
   ...politicsNews,
@@ -135,14 +138,64 @@ export default async function CategoryPage({
   const districtSlug = sParams?.district;
   const viewType = sParams?.view;
 
+  // 1. Fetch latest articles from the database
+  let dbArticles: any[] = [];
+  let deletedArticles: any[] = [];
+  try {
+    [dbArticles, deletedArticles] = await Promise.all([
+      prisma.article.findMany({
+        where: { isDeleted: false },
+        orderBy: { publishedAt: 'desc' },
+        take: 100
+      }),
+      prisma.article.findMany({
+        where: { isDeleted: true },
+        select: { id: true, slug: true }
+      })
+    ]);
+  } catch (e) {
+    console.error('Error fetching articles for category page:', e);
+  }
+
+  const deletedIds = new Set(deletedArticles.map(a => a.id));
+  const deletedSlugs = new Set(deletedArticles.map(a => a.slug));
+
+  // 2. Map and combine
+  const mappedDbArticles = dbArticles.map((art) => ({
+    ...art,
+    content: art.body || '',
+  }));
+
+  const filteredAllNews = allNews.filter(art => !deletedIds.has(art.id) && !deletedSlugs.has(art.slug));
+  const combinedNews = [...mappedDbArticles, ...filteredAllNews];
+  const seenSlugs = new Set<string>();
+  const allArticlesList = combinedNews.filter((n) => {
+    if (seenSlugs.has(n.slug)) return false;
+    seenSlugs.add(n.slug);
+    return true;
+  });
+
   const cat = categories.find((c) => c.slug === category);
   
   // Get all articles for this category
-  let articles = allNews.filter((n) => n.categorySlug === category);
+  let articles = allArticlesList.filter((n) => n.categorySlug === category);
+  if ((category === 'telangana' || category === 'andhra-pradesh') && viewType !== 'districts' && !districtSlug) {
+    articles = articles.filter((n) => !n.districtSlug);
+  }
   if (category === 'latest') {
-    articles = allNews.filter((n) => n.isBreaking);
+    articles = allArticlesList.filter((n) => n.isBreaking);
     if (articles.length === 0) {
-      articles = allNews.slice(0, 12);
+      articles = allArticlesList.slice(0, 12);
+    }
+  } else if (category === 'trending') {
+    articles = allArticlesList.filter((n) => n.isTrending);
+    if (articles.length === 0) {
+      articles = allArticlesList.slice(0, 12);
+    }
+  } else if (category === 'featured') {
+    articles = allArticlesList.filter((n) => n.isFeatured);
+    if (articles.length === 0) {
+      articles = allArticlesList.slice(0, 12);
     }
   }
 
@@ -159,12 +212,14 @@ export default async function CategoryPage({
   // If no articles match this category slug, adapt generic news items so the page displays a fully-populated grid
   const allArticles = articles.length > 0 
     ? articles 
-    : allNews.slice(0, 12).map((art, idx) => ({
-        ...art,
-        id: `fallback-${category}-${idx}`,
-        category: cat?.name || category,
-        categorySlug: category,
-      }));
+    : (category === 'telangana' || category === 'andhra-pradesh')
+      ? []
+      : allArticlesList.slice(0, 12).map((art, idx) => ({
+          ...art,
+          id: `fallback-${category}-${idx}`,
+          category: cat?.name || category,
+          categorySlug: category,
+        }));
 
   const breadcrumbName = (category === 'andhra-pradesh' || category === 'telangana')
     ? 'రాష్ట్ర వార్తలు'
@@ -174,7 +229,7 @@ export default async function CategoryPage({
   const targetDistricts = category === 'andhra-pradesh' ? apDistricts : tgDistricts;
 
   // Set up filtered district articles
-  let filteredDistrictArticles = districtNews.filter((n) => n.categorySlug === category);
+  let filteredDistrictArticles = allArticlesList.filter((n) => n.categorySlug === category && n.districtSlug);
   if (districtSlug) {
     filteredDistrictArticles = filteredDistrictArticles.filter((n) => n.districtSlug === districtSlug);
   }
@@ -191,16 +246,18 @@ export default async function CategoryPage({
           publishedTimeOnly: `[${19 - (idx % 3)}:${((50 - idx * 12) % 60 + 60) % 60}`.padEnd(7, '0').replace('NaN', '30') + ']'
         };
       })
-    : allNews.slice(0, 12).map((art, idx) => {
-        const dist = activeDistrictObj || targetDistricts[idx % targetDistricts.length];
-        return {
-          ...art,
-          id: `fallback-dist-${category}-${idx}`,
-          districtSlug: dist.slug,
-          districtName: dist.name,
-          publishedTimeOnly: `[${19 - (idx % 3)}:${((50 - idx * 12) % 60 + 60) % 60}`.padEnd(7, '0') + ']'
-        };
-      });
+    : (category === 'telangana' || category === 'andhra-pradesh')
+      ? []
+      : allArticlesList.slice(0, 12).map((art, idx) => {
+          const dist = activeDistrictObj || targetDistricts[idx % targetDistricts.length];
+          return {
+            ...art,
+            id: `fallback-dist-${category}-${idx}`,
+            districtSlug: dist.slug,
+            districtName: dist.name,
+            publishedTimeOnly: `[${19 - (idx % 3)}:${((50 - idx * 12) % 60 + 60) % 60}`.padEnd(7, '0') + ']'
+          };
+        });
 
   const topRow = mappedDistrictArticles.slice(0, 3);
   const bottomRow = mappedDistrictArticles.slice(3, 12);
@@ -304,7 +361,7 @@ export default async function CategoryPage({
             </div>
             {/* Right Sidebar Column (30%) with Ads */}
             <div className="w-full lg:col-span-3">
-              <RightSidebar />
+              <RightSidebar categorySlug={category} />
             </div>
           </div>
         </main>
@@ -405,11 +462,11 @@ export default async function CategoryPage({
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-gray-100">
                       {bottomRow.map((art) => (
                         <div key={art.id} className="flex gap-3 items-start p-2 hover:bg-blue-50/35 rounded-lg transition-colors">
-                          <Link href={`/news/${art.slug}`} className="w-[100px] h-[68px] flex-shrink-0 rounded overflow-hidden bg-gray-50 border border-gray-150 relative block">
+                          <Link href={`/news/${art.slug}`} className="w-[100px] h-[68px] flex-shrink-0 rounded overflow-hidden bg-slate-50 border border-gray-150 relative block">
                             <img
                               src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
                               alt={art.title}
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                              className="w-full h-full object-contain hover:scale-105 transition-transform duration-200"
                             />
                           </Link>
                           <div className="flex-1 flex flex-col text-left justify-between min-h-[68px]">
@@ -439,7 +496,7 @@ export default async function CategoryPage({
                   </div>
 
                   {/* Sidebar (30%) */}
-                  <RightSidebar />
+                  <RightSidebar categorySlug={`${category}-districts`} />
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-6">
@@ -448,11 +505,11 @@ export default async function CategoryPage({
                     <MultiDistrictFeed
                       state={category}
                       districts={targetDistricts}
-                      initialArticles={districtNews}
+                      initialArticles={allArticlesList}
                     />
                   </div>
                   {/* Sidebar (30%) */}
-                  <RightSidebar />
+                  <RightSidebar categorySlug={`${category}-districts`} />
                 </div>
               )}
             </>
@@ -514,7 +571,7 @@ export default async function CategoryPage({
                 </div>
 
                 {/* Sidebar (30%) */}
-                <RightSidebar />
+                <RightSidebar categorySlug={category} />
               </div>
             </>
           )}

@@ -8,7 +8,6 @@ import HeroSlider from '@/components/home/HeroSlider';
 import BreakingNewsSection from '@/components/home/BreakingNewsSection';
 import WebStoriesSection from '@/components/home/WebStoriesSection';
 import RightSidebar from '@/components/layout/RightSidebar';
-import TrendingSection from '@/components/home/TrendingSection';
 import NewsSection from '@/components/home/NewsSection';
 import VideoSection from '@/components/home/VideoSection';
 import PhotoGallery from '@/components/home/PhotoGallery';
@@ -167,19 +166,45 @@ function LatestNewsFeed() {
   const [latestArticles, setLatestArticles] = useState<any[]>([]);
 
   useEffect(() => {
-    try {
-      const mergedP = getMergedArticles(politicsNews, 'politics');
-      const mergedS = getMergedArticles(sportsNews, 'sports');
-      const mergedB = getMergedArticles(businessNews, 'business');
-      const mergedT = getMergedArticles(technologyNews, 'technology');
-      
-      const all = [...mergedP, ...mergedS, ...mergedB, ...mergedT]
-        .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
-        .slice(0, 12);
-      setLatestArticles(all);
-    } catch (e) {
-      console.error('Error in LatestNewsFeed:', e);
-    }
+    fetch('/api/articles?limit=500&t=' + Date.now())
+      .then(res => res.json())
+      .then(dbArticles => {
+        if (!Array.isArray(dbArticles)) return;
+        
+        const mappedArticles = dbArticles.map((art: any) => ({
+          ...art,
+          content: art.body || '',
+        }));
+
+        const getMergedList = (staticList: any[], categorySlug?: string) => {
+          const localDeleted = new Set([
+            ...JSON.parse(localStorage.getItem('deleted_news_articles') || '[]'),
+            ...JSON.parse(localStorage.getItem('db_deleted_news_articles') || '[]')
+          ]);
+          const dbFiltered = mappedArticles.filter(art => {
+            if (categorySlug) {
+              return art.categorySlug === categorySlug || (categorySlug === 'latest' && art.isBreaking);
+            }
+            return true;
+          });
+          const dbIds = new Set(dbFiltered.map(a => a.id));
+          const filteredStatic = staticList.filter(a => !dbIds.has(a.id) && !localDeleted.has(a.id));
+          return [...dbFiltered, ...filteredStatic];
+        };
+
+        const mergedP = getMergedList(politicsNews, 'politics');
+        const mergedS = getMergedList(sportsNews, 'sports');
+        const mergedB = getMergedList(businessNews, 'business');
+        const mergedT = getMergedList(technologyNews, 'technology');
+        
+        const all = [...mergedP, ...mergedS, ...mergedB, ...mergedT]
+          .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+          .slice(0, 12);
+        setLatestArticles(all);
+      })
+      .catch(e => {
+        console.error('Error in LatestNewsFeed:', e);
+      });
   }, []);
 
   return (
@@ -231,36 +256,102 @@ export default function HomePage() {
   const [rasipalaluList, setRasipalaluList] = useState(rasipalaluNews);
   const [districtList, setDistrictList] = useState(districtNews);
   const [adyathmikamList, setAdyathmikamList] = useState(adyathmikamNews);
+  const [dbArticles, setDbArticles] = useState<any[]>([]);
+  const [trendingList, setTrendingList] = useState<any[]>(featuredNews.filter((n) => n.isTrending));
+  const [activeRegionalFeed, setActiveRegionalFeed] = useState<'default' | 'tg' | 'ap'>('default');
 
   useEffect(() => {
-    try {
-      setPoliticsList(getMergedArticles(politicsNews, 'politics'));
-      setSportsList(getMergedArticles(sportsNews, 'sports'));
-      setEntertainmentList(getMergedArticles(entertainmentNews, 'entertainment'));
-      setBusinessList(getMergedArticles(businessNews, 'business'));
-      setTechnologyList(getMergedArticles(technologyNews, 'technology'));
-      setViralList(getMergedArticles(viralNews, 'viral'));
-      setHealthList(getMergedArticles(healthNews, 'health'));
-      setRasipalaluList(getMergedArticles(rasipalaluNews, 'rasipalalu'));
-      setAdyathmikamList(getMergedArticles(adyathmikamNews, 'adyathmikam'));
-      setDistrictList(getMergedArticles(districtNews));
+    fetch('/api/articles?limit=500&t=' + Date.now())
+      .then(res => res.json())
+      .then(dbArticlesData => {
+        if (!Array.isArray(dbArticlesData)) return;
+        
+        const mappedArticles = dbArticlesData.map((art: any) => ({
+          ...art,
+          content: art.body || '',
+        }));
 
-      const mergedAll = getMergedArticles(featuredNews);
-      const customFeatured = mergedAll.filter((art: any) => art.isBreaking || art.isFeatured || art.categorySlug === 'featured');
-      const featuredToPrepend = customFeatured.length > 0 ? customFeatured : mergedAll.slice(0, 3);
-      const featuredIds = new Set(featuredToPrepend.map((a: any) => a.id));
-      const filteredFeaturedStatic = featuredNews.filter((art) => !featuredIds.has(art.id));
-      setFeaturedList([...featuredToPrepend, ...filteredFeaturedStatic]);
-    } catch (e) {
-      console.error('Error loading custom articles on homepage', e);
-    }
+        setDbArticles(mappedArticles);
+
+        const getMergedList = (staticList: any[], categorySlug?: string) => {
+          const localDeleted = new Set([
+            ...JSON.parse(localStorage.getItem('deleted_news_articles') || '[]'),
+            ...JSON.parse(localStorage.getItem('db_deleted_news_articles') || '[]')
+          ]);
+          const dbFiltered = mappedArticles.filter(art => {
+            if (categorySlug) {
+              return art.categorySlug === categorySlug || (categorySlug === 'latest' && art.isBreaking);
+            }
+            return true;
+          });
+          const dbIds = new Set(dbFiltered.map(a => a.id));
+          const filteredStatic = staticList.filter(a => !dbIds.has(a.id) && !localDeleted.has(a.id));
+          return [...dbFiltered, ...filteredStatic];
+        };
+
+        setPoliticsList(getMergedList(politicsNews, 'politics'));
+        setSportsList(getMergedList(sportsNews, 'sports'));
+        setEntertainmentList(getMergedList(entertainmentNews, 'entertainment'));
+        setBusinessList(getMergedList(businessNews, 'business'));
+        setTechnologyList(getMergedList(technologyNews, 'technology'));
+        setViralList(getMergedList(viralNews, 'viral'));
+        setHealthList(getMergedList(healthNews, 'health'));
+        setRasipalaluList(getMergedList(rasipalaluNews, 'rasipalalu'));
+        setAdyathmikamList(getMergedList(adyathmikamNews, 'adyathmikam'));
+        setDistrictList(getMergedList(districtNews));
+
+        const mergedAll = getMergedList(featuredNews);
+        const customFeatured = mergedAll.filter((art: any) => art.isBreaking || art.isFeatured || art.categorySlug === 'featured');
+        const featuredToPrepend = customFeatured.length > 0 ? customFeatured : mergedAll.slice(0, 3);
+        const featuredIds = new Set(featuredToPrepend.map((a: any) => a.id));
+        const filteredFeaturedStatic = featuredNews.filter((art) => !featuredIds.has(art.id));
+        setFeaturedList([...featuredToPrepend, ...filteredFeaturedStatic]);
+
+        // Compute and set trendingList
+        const customTrending = mergedAll.filter((art: any) => art.isTrending);
+        setTrendingList(customTrending);
+      })
+      .catch(e => {
+        console.error('Error loading custom articles on homepage', e);
+      });
   }, []);
 
-  // Filter district news for AP and Telangana tab feeds
-  const apNews = districtList.filter((n) => n.categorySlug === 'andhra-pradesh');
-  const tgNews = districtList.filter((n) => n.categorySlug === 'telangana');
+  // Filter district news for AP and Telangana tab feeds, sorted by newest first
+  const apDistrictNews = districtList
+    .filter((n) => n.categorySlug === 'andhra-pradesh' && n.districtSlug)
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  const tgDistrictNews = districtList
+    .filter((n) => n.categorySlug === 'telangana' && n.districtSlug)
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  
+  let apStateNews = districtList
+    .filter((n) => n.categorySlug === 'andhra-pradesh' && !n.districtSlug)
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  let tgStateNews = districtList
+    .filter((n) => n.categorySlug === 'telangana' && !n.districtSlug)
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
   const adyathmikamFeed = adyathmikamList.slice(0, 5);
   const businessFeed = businessList.slice(0, 5);
+
+  // Deduplicate featured & politics articles to prevent React duplicate key warnings in the compact grid
+  const uniqueCompactArticles: any[] = [];
+  const seenIds = new Set<string>();
+  [...featuredList, ...politicsList].forEach((art) => {
+    if (art && art.id && !seenIds.has(art.id)) {
+      uniqueCompactArticles.push(art);
+      seenIds.add(art.id);
+    }
+  });
+
+  // Determine which list to display in the compact news grid (6 slots limit)
+  let regionalArticlesList = [...apDistrictNews, ...tgDistrictNews]
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    .slice(0, 6);
+  if (activeRegionalFeed === 'tg') {
+    regionalArticlesList = tgDistrictNews.slice(0, 6);
+  } else if (activeRegionalFeed === 'ap') {
+    regionalArticlesList = apDistrictNews.slice(0, 6);
+  }
 
   return (
     <div className="min-h-screen bg-[#f4f6f8]">
@@ -290,24 +381,34 @@ export default function HomePage() {
 
               {/* Hero Slider column */}
               <div className="lg:col-span-7 flex flex-col gap-3">
-                <HeroSlider />
+                <HeroSlider dbArticles={dbArticles} />
 
                 {/* Regional Shortcut Buttons */}
                 <div className="grid grid-cols-3 gap-2">
-                  <Link
-                    href="/category/telangana?view=districts"
-                    className="bg-[#16a34a] hover:bg-[#15803d] text-white font-black py-2 px-1 rounded text-center text-[12px] md:text-[13px] lg:text-sm transition-colors shadow-xs telugu-text flex items-center justify-center"
+                  <button
+                    type="button"
+                    onClick={() => setActiveRegionalFeed(activeRegionalFeed === 'tg' ? 'default' : 'tg')}
+                    className={`font-black py-2 px-1 rounded text-center text-[12px] md:text-[13px] lg:text-sm transition-colors shadow-xs telugu-text flex items-center justify-center cursor-pointer select-none ${
+                      activeRegionalFeed === 'tg'
+                        ? 'bg-white text-[#16a34a] border-2 border-[#16a34a]'
+                        : 'bg-[#16a34a] text-white hover:bg-[#15803d]'
+                    }`}
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     తెలంగాణ జిల్లాల వార్తలు
-                  </Link>
-                  <Link
-                    href="/category/andhra-pradesh?view=districts"
-                    className="bg-[#ea580c] hover:bg-[#c2410c] text-white font-black py-2 px-1 rounded text-center text-[12px] md:text-[13px] lg:text-sm transition-colors shadow-xs telugu-text flex items-center justify-center"
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveRegionalFeed(activeRegionalFeed === 'ap' ? 'default' : 'ap')}
+                    className={`font-black py-2 px-1 rounded text-center text-[12px] md:text-[13px] lg:text-sm transition-colors shadow-xs telugu-text flex items-center justify-center cursor-pointer select-none ${
+                      activeRegionalFeed === 'ap'
+                        ? 'bg-white text-[#ea580c] border-2 border-[#ea580c]'
+                        : 'bg-[#ea580c] text-white hover:bg-[#c2410c]'
+                    }`}
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   >
                     ఆంధ్రప్రదేశ్ జిల్లాల వార్తలు
-                  </Link>
+                  </button>
                   <Link
                     href="/category/live-updates"
                     className="bg-[#5c2d91] hover:bg-[#4a2078] text-white font-black py-2 px-1 rounded text-center text-[12px] md:text-[13px] lg:text-sm transition-colors shadow-xs flex items-center justify-center gap-2 telugu-text cursor-pointer"
@@ -323,17 +424,17 @@ export default function HomePage() {
 
                 {/* Compact news grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                  {[...featuredList, ...politicsList].slice(1, 7).map((article) => (
+                  {regionalArticlesList.map((article) => (
                     <Link
                       href={`/news/${article.slug}`}
                       key={article.id}
                       className="flex gap-2.5 p-2 bg-gray-50/50 hover:bg-blue-50/45 border border-gray-150 rounded-lg transition-colors group text-left"
                     >
-                      <div className="w-[80px] h-[62px] relative overflow-hidden rounded-md flex-shrink-0 border border-gray-100 bg-gray-100">
+                      <div className="w-[80px] h-[62px] relative overflow-hidden rounded-md flex-shrink-0 border border-gray-150 bg-slate-50">
                         <img
                           src={article.image}
                           alt={article.title}
-                          className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-200"
+                          className="w-full h-full object-contain group-hover:scale-[1.04] transition-transform duration-200"
                         />
                       </div>
                       <div className="flex-1 min-w-0 py-1 px-1">
@@ -363,7 +464,7 @@ export default function HomePage() {
             </div>
 
             {/* Breaking News */}
-            <BreakingNewsSection />
+            <BreakingNewsSection dbArticles={dbArticles} />
 
             <AdBanner position="rectangle" />
 
@@ -377,8 +478,8 @@ export default function HomePage() {
 
             {/* Dynamic Tabbed News Section */}
             <TabbedNewsWidget
-              apNews={apNews}
-              tgNews={tgNews}
+              apNews={apStateNews}
+              tgNews={tgStateNews}
               adyathmikamNews={adyathmikamFeed}
               businessNews={businessFeed}
             />
@@ -390,7 +491,7 @@ export default function HomePage() {
 
             <WeatherWidget />
 
-            <TrendingSection />
+            <NewsSection title="Trending" titleTelugu="ట్రెండింగ్ వార్తలు" articles={trendingList} viewAllLink="/category/trending" accentColor="#ea580c" layout="featured-left" />
 
             {/* Mobile-only Ad (Lalitha Jewellery) */}
             <div className="lg:hidden">
@@ -455,7 +556,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <NewsSection title="Horoscopes" titleTelugu="శుభఫలాలు" articles={rasipalaluList} viewAllLink="/category/rasipalalu" accentColor="#b45309" layout="grid3" />
+            <NewsSection title="Horoscopes" titleTelugu="శుభఫలాలు" articles={rasipalaluList} viewAllLink="/category/rasipalalu" accentColor="#b45309" layout="grid4" />
             {/* Mobile-only Dummy Ad Box */}
             <div className="lg:hidden">
               <AdBanner position="dummy" />

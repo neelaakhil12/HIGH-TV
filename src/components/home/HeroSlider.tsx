@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { featuredNews, getMergedArticles } from '@/lib/mockData';
 
-export default function HeroSlider() {
+export default function HeroSlider({ dbArticles }: { dbArticles?: any[] }) {
   const [current, setCurrent] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [slides, setSlides] = useState<any[]>(featuredNews);
@@ -27,7 +27,15 @@ export default function HeroSlider() {
         }
       }
 
-      const mergedAll = getMergedArticles(featuredNews);
+      let mergedAll = featuredNews;
+      if (dbArticles && Array.isArray(dbArticles)) {
+        const dbIds = new Set(dbArticles.map(a => a.id));
+        const filteredStatic = featuredNews.filter(a => !dbIds.has(a.id));
+        mergedAll = [...dbArticles, ...filteredStatic];
+      } else {
+        mergedAll = getMergedArticles(featuredNews);
+      }
+
       const customFeatured = mergedAll.filter((art: any) => art.isBreaking || art.isFeatured || art.categorySlug === 'featured');
       const featuredToPrepend = customFeatured.length > 0 ? customFeatured : mergedAll.slice(0, 3);
       
@@ -37,7 +45,7 @@ export default function HeroSlider() {
     } catch (e) {
       console.error('Error loading custom slider news', e);
     }
-  }, []);
+  }, [dbArticles]);
 
   const next = useCallback(() => {
     if (isAnimating || slides.length === 0) return;
@@ -67,26 +75,16 @@ export default function HeroSlider() {
   const redirectUrl = slide.link || (slide.slug ? `/news/${slide.slug}` : '#');
 
   return (
-    <div className="bg-white md:rounded-lg md:border md:border-gray-200 overflow-hidden flex flex-col md:shadow-xs w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 border-y border-gray-150 md:border-y-0">
+    <div className="bg-white md:border md:border-gray-200 overflow-hidden flex flex-col md:shadow-xs w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 border-y border-gray-150 md:border-y-0">
       {/* Slider Image Container */}
-      <div className="relative w-full aspect-[16/9] bg-neutral-950 overflow-hidden group">
+      <div className="relative w-full aspect-[16/9] overflow-hidden group">
         <Link href={redirectUrl} className="absolute inset-0 block cursor-pointer">
-          {/* Blurred background image */}
-          <div className="absolute inset-0 opacity-45 blur-lg scale-105 pointer-events-none">
-            <img
-              src={slide.image}
-              alt=""
-              className="w-full h-full object-cover"
-            />
-          </div>
-          {/* Foreground contain image */}
-          <div className="relative w-full h-full flex items-center justify-center">
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover md:max-w-full md:max-h-full md:object-contain"
-            />
-          </div>
+          {/* Full-fill cover image — no black bars */}
+          <img
+            src={slide.image}
+            alt={slide.title}
+            className="w-full h-full object-cover"
+          />
         </Link>
 
         {/* Navigation Chevrons (Centered vertically on the image) */}

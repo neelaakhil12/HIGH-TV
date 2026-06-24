@@ -31,8 +31,8 @@ export default function PhotoGallery() {
       </div>
 
       {/* Uniform Grid / Horizontal Scroll */}
-      <div className="flex md:grid md:grid-cols-3 overflow-x-auto md:overflow-x-visible gap-4 pb-2.5 md:pb-0 snap-x snap-mandatory scroll-smooth hide-scrollbar">
-        {galleryImages.slice(0, 3).map((img, index) => (
+      <div className="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-x-visible gap-4 pb-2.5 md:pb-0 snap-x snap-mandatory scroll-smooth hide-scrollbar">
+        {galleryImages.slice(0, 4).map((img, index) => (
           <div
             key={img.id}
             className="flex-shrink-0 w-[140px] aspect-[9/16] md:w-auto md:aspect-auto md:h-48 rounded-xl overflow-hidden group cursor-pointer img-zoom-container shadow-sm border border-gray-100 snap-start relative"
@@ -43,7 +43,7 @@ export default function PhotoGallery() {
               alt={img.alt}
               fill
               className="object-cover group-hover:scale-[1.04] transition-transform duration-300"
-              sizes="(max-width: 640px) 50vw, 33vw"
+              sizes="(max-width: 640px) 50vw, 25vw"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
               <ZoomIn size={28} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />

@@ -29,9 +29,9 @@ export default function VideoSection() {
 
       {/* Scrollable Container */}
       <div 
-        className="flex overflow-x-auto gap-4 pb-2.5 snap-x hide-scrollbar md:grid md:grid-cols-3 md:pb-0"
+        className="flex overflow-x-auto gap-4 pb-2.5 snap-x hide-scrollbar md:grid md:grid-cols-4 md:pb-0"
       >
-        {videoNews.map((video) => (
+        {videoNews.slice(0, 4).map((video) => (
           <article key={video.id} className="news-card bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 group cursor-pointer flex-shrink-0 w-full snap-start md:w-auto">
             <div className="relative img-zoom-container" style={{ paddingTop: '56.25%' }}>
               <Image
@@ -39,7 +39,7 @@ export default function VideoSection() {
                 alt={video.title}
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 33vw"
+                sizes="(max-width: 768px) 100vw, 25vw"
               />
               {/* Dark overlay */}
               <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors"></div>
