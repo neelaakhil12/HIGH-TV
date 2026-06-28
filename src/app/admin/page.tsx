@@ -9022,34 +9022,7 @@ export default function AdminPage() {
                     </div>
                   )}
 
-                  {/* Article Form */}
-                  {(editorialFormMode === 'add-article' || editorialFormMode === 'edit-article') && (
-                    <div className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
-                      <h3 className="text-base font-black text-slate-800">{editorialFormMode === 'add-article' ? '+ Add Article' : '✏️ Edit Article'}</h3>
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Title *</label>
-                        <input type="text" value={editorialArticleTitle} onChange={(e) => { setEditorialArticleTitle(e.target.value); if (editorialFormMode === 'add-article') setEditorialArticleSlug(e.target.value.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 80) + '-' + Date.now().toString().slice(-5)); }} placeholder="వార్త శీర్షిక ఇక్కడ రాయండి..." className="bg-slate-50 border border-slate-200 focus:border-[#02599c] rounded-xl px-3 py-2.5 text-sm outline-none text-slate-900 font-bold telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }} />
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Featured Image</label>
-                        <div className="flex items-start gap-4">
-                          <button type="button" onClick={() => editorialImageInputRef.current?.click()} className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-black text-xs py-2.5 px-4 rounded-xl cursor-pointer"><Upload className="w-4 h-4" />Upload Image</button>
-                          <input type="file" accept="image/*" ref={editorialImageInputRef} className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleCompressAndSetImage(f, setEditorialArticleImage); }} />
-                          {editorialArticleImage && (<div className="relative w-24 h-16 rounded-lg overflow-hidden border border-slate-200"><img src={editorialArticleImage} alt="preview" className="w-full h-full object-cover" /><button onClick={() => setEditorialArticleImage('')} className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-black">×</button></div>)}
-                          {!editorialArticleImage && <span className="text-xs text-slate-400 font-bold mt-2">No image selected</span>}
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Body *</label>
-                        <MiniWysiwygToolbar editorRef={editorialEditorRef} />
-                        <div ref={editorialEditorRef} contentEditable suppressContentEditableWarning className="min-h-[200px] bg-white border border-slate-200 border-t-0 rounded-b-xl p-4 text-sm text-slate-800 outline-none telugu-text leading-relaxed" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }} />
-                      </div>
-                      <div className="flex gap-2">
-                        <button disabled={isSavingEditorialArticle} onClick={async () => { const t = editorialArticleTitle.trim(); const b = editorialEditorRef.current?.innerHTML?.trim() || ''; if (!t || !b) { alert('Title and Body required!'); return; } const sec = editorialSections.find(s => s.slug === editorialActiveSection); setIsSavingEditorialArticle(true); const data = { title: t, slug: editorialArticleSlug || `editorial-${Date.now().toString().slice(-6)}`, categorySlug: editorialActiveSection, category: sec?.title || 'ఎడిటోరియల్', author: 'హై టీవీ డెస్క్', publishedAt: new Date().toISOString(), description: t, body: b, image: editorialArticleImage || '', isBreaking: false, isTrending: false, isFeatured: false }; try { if (editorialFormMode === 'add-article') { const r = await fetch('/api/articles', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); if (r.ok) { const a = await r.json(); setCustomNewsList(p => [a, ...p]); alert('Article added!'); } else alert('Failed to save.'); } else if (editorialEditingArticle) { const r = await fetch(`/api/articles/${editorialEditingArticle.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); if (r.ok) { const a = await r.json(); setCustomNewsList(p => p.map(x => x.id === editorialEditingArticle.id ? a : x)); alert('Updated!'); } else alert('Failed to update.'); } setEditorialFormMode('none'); setEditorialEditingArticle(null); setEditorialArticleTitle(''); setEditorialArticleSlug(''); setEditorialArticleImage(''); if (editorialEditorRef.current) editorialEditorRef.current.innerHTML = ''; } catch (e: any) { alert('Error: ' + e.message); } finally { setIsSavingEditorialArticle(false); } }} className={`font-black text-xs py-2.5 px-6 rounded-xl cursor-pointer shadow-sm flex items-center gap-2 ${isSavingEditorialArticle ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-rose-600 hover:bg-rose-700 text-white'}`}>{isSavingEditorialArticle ? 'Saving...' : (editorialFormMode === 'add-article' ? 'Publish Article' : 'Save Changes')}</button>
-                        <button onClick={() => { setEditorialFormMode('none'); setEditorialEditingArticle(null); setEditorialArticleTitle(''); setEditorialArticleSlug(''); setEditorialArticleImage(''); if (editorialEditorRef.current) editorialEditorRef.current.innerHTML = ''; }} className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs py-2.5 px-5 rounded-xl cursor-pointer">Cancel</button>
-                      </div>
-                    </div>
-                  )}
+
 
                   {/* Articles list */}
                   {editorialFormMode === 'none' && (() => {
@@ -9062,7 +9035,7 @@ export default function AdminPage() {
                             <h3 className="text-base font-black text-slate-800 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>{sec?.title || editorialActiveSection}</h3>
                             <p className="text-xs text-slate-400 font-bold mt-0.5">{arts.length} article{arts.length !== 1 ? 's' : ''} · slug: <code className="font-mono bg-slate-100 px-1 rounded">{editorialActiveSection}</code></p>
                           </div>
-                          <button onClick={() => { setEditorialArticleTitle(''); setEditorialArticleSlug(''); setEditorialArticleImage(''); if (editorialEditorRef.current) editorialEditorRef.current.innerHTML = ''; setEditorialEditingArticle(null); setEditorialFormMode('add-article'); }} className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2 px-4 rounded-xl cursor-pointer flex items-center gap-1.5 shadow-sm"><Plus className="w-3.5 h-3.5" />Add Article</button>
+                          <button onClick={() => { setSelectedCategories([editorialActiveSection]); setIsBreakingChecked(false); setIsTrendingChecked(false); setIsFeaturedChecked(false); setNewsViewMode('add'); setActiveTab('news'); }} className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2 px-4 rounded-xl cursor-pointer flex items-center gap-1.5 shadow-sm"><Plus className="w-3.5 h-3.5" />Add Article</button>
                         </div>
                         {arts.length === 0 ? (
                           <div className="p-10 text-center text-slate-400"><FileText className="w-10 h-10 mx-auto mb-3 opacity-30" /><p className="text-sm font-bold">No articles in this section yet.</p><p className="text-xs mt-1">Click "Add Article" to add the first one.</p></div>
@@ -9074,7 +9047,7 @@ export default function AdminPage() {
                                 <div className="flex-1 min-w-0"><p className="text-sm font-black text-slate-800 line-clamp-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>{art.title}</p><p className="text-[11px] text-slate-400 mt-0.5 font-mono truncate">{art.slug}</p></div>
                                 <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                                   <Link href={`/news/${art.slug}`} target="_blank" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-[#02599c]" title="Preview"><Eye className="w-4 h-4" /></Link>
-                                  <button onClick={() => { setEditorialEditingArticle(art); setEditorialArticleTitle(art.title||''); setEditorialArticleSlug(art.slug||''); setEditorialArticleImage(art.image||''); setEditorialFormMode('edit-article'); setTimeout(() => { if (editorialEditorRef.current) editorialEditorRef.current.innerHTML = art.body||''; }, 100); }} className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600" title="Edit"><Pencil className="w-4 h-4" /></button>
+                                  <button onClick={() => { startEditing(art); setActiveTab('news'); }} className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600" title="Edit"><Pencil className="w-4 h-4" /></button>
                                   <button onClick={async () => { if (!confirm(`Delete "${art.title}"?`)) return; try { await fetch(`/api/articles/${art.id}`, { method: 'DELETE' }); setCustomNewsList(p => p.filter(a => a.id !== art.id)); } catch { alert('Error deleting.'); } }} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-600" title="Delete"><Trash2 className="w-4 h-4" /></button>
                                 </div>
                               </div>
