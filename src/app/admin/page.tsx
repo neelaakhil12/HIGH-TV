@@ -1983,14 +1983,13 @@ export default function AdminPage() {
   // Compile full article listings from the live database list
   const allArticles = useMemo(() => {
     return [...customNewsList]
-      .filter((art) => art.categorySlug !== 'polls')
       .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
   }, [customNewsList]);
 
 
   // Filter articles based on sidebar category filter selection
   const filteredArticles = useMemo(() => {
-    let result = allArticles;
+    let result = allArticles.filter((art) => art.categorySlug !== 'polls');
 
     // Filter by category
     if (filterCategory !== 'all') {
