@@ -8890,8 +8890,8 @@ export default function AdminPage() {
               {/* LIST MODE */}
               {adFormMode === 'list' && (
                 <div className="flex flex-col gap-6">
-                  {/* Tabs Toggle (Category vs Article Left vs Article Right Ads) */}
-                  <div className="flex bg-white border border-slate-200/60 rounded-2xl p-2 gap-2 shadow-sm max-w-2xl">
+                  {/* Tabs Toggle (Category vs Article Left vs Article Right vs Header Ads) */}
+                  <div className="flex flex-wrap bg-white border border-slate-200/60 rounded-2xl p-2 gap-2 shadow-sm max-w-3xl">
                     <button
                       onClick={() => setAdActiveSubTab('category')}
                       className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
@@ -8921,6 +8921,16 @@ export default function AdminPage() {
                       }`}
                     >
                       వార్తల కుడి సైడ్‌బార్ యాడ్స్
+                    </button>
+                    <button
+                      onClick={() => setAdActiveSubTab('header-ad')}
+                      className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
+                        adActiveSubTab === 'header-ad'
+                          ? 'bg-amber-500 text-white shadow-sm'
+                          : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                      }`}
+                    >
+                      🏠 హెడర్ యాడ్ (Header Ad)
                     </button>
                   </div>
 
