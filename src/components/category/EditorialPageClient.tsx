@@ -14,6 +14,7 @@ interface Article {
   categorySlug?: string;
   publishedAt?: any;
   body?: string | null;
+  description?: string | null;
 }
 
 function getArticleHref(art: any) {
@@ -48,38 +49,59 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-10 gap-4 mb-5">
-        {/* Left Big Featured Article */}
-        <div className="md:col-span-7 w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mb-5">
+        {/* Left Big Featured Article (Horizontal Card - Image on side) */}
+        <div className="lg:col-span-6 w-full">
           {mainArticle && (
-            <Link href={getArticleHref(mainArticle)} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
-              <img
-                src={mainArticle.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                alt={mainArticle.title}
-                className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5 pointer-events-none">
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  {mainArticle.title}
-                </h3>
+            <Link href={getArticleHref(mainArticle)} className="flex flex-col sm:flex-row gap-4 bg-white rounded-xl p-3 border border-gray-150 shadow-3xs hover:border-[#02599c]/35 transition-colors group h-full">
+              <div className="sm:w-[45%] aspect-[4/3] rounded-lg overflow-hidden relative shrink-0 bg-slate-50 border border-slate-100">
+                <img
+                  src={mainArticle.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
+                  alt={mainArticle.title}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
+                />
+              </div>
+              <div className="flex-1 flex flex-col justify-between py-1 text-left min-w-0">
+                <div>
+                  <h3 className="text-lg md:text-xl font-black text-slate-800 group-hover:text-[#02599c] transition-colors leading-snug telugu-text line-clamp-3" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    {mainArticle.title}
+                  </h3>
+                  {mainArticle.description && (
+                    <p className="text-xs text-slate-550 line-clamp-4 mt-2.5 telugu-text leading-relaxed" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      {mainArticle.description.replace(/<[^>]*>/g, '')}
+                    </p>
+                  )}
+                </div>
+                {mainArticle.publishedAt && (
+                  <span className="text-[10px] text-slate-400 font-mono mt-3 block">
+                    {new Date(mainArticle.publishedAt).toLocaleDateString('te-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </span>
+                )}
               </div>
             </Link>
           )}
         </div>
 
-        {/* Right Stacked Featured Articles */}
-        <div className="md:col-span-3 flex flex-col gap-4 w-full justify-between">
+        {/* Right Stacked Featured Articles (Horizontal Cards - Image on side) */}
+        <div className="lg:col-span-4 flex flex-col gap-4 w-full">
           {rightArticles.map((art) => (
-            <Link key={art.id} href={getArticleHref(art)} className="relative flex-1 aspect-[16/9] md:aspect-auto rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5 min-h-[125px]">
-              <img
-                src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                alt={art.title}
-                className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-3 pointer-events-none">
-                <h4 className="text-base md:text-lg lg:text-[19px] font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text line-clamp-2 pl-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+            <Link key={art.id} href={getArticleHref(art)} className="flex gap-4 bg-white rounded-xl p-3 border border-gray-150 shadow-3xs hover:border-[#02599c]/35 transition-colors group flex-1 items-center min-h-[110px]">
+              <div className="w-[110px] h-[82px] rounded-lg overflow-hidden relative shrink-0 bg-slate-50 border border-slate-100">
+                <img
+                  src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
+                  alt={art.title}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
+                />
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <h4 className="text-sm font-black text-slate-800 group-hover:text-[#02599c] transition-colors leading-snug telugu-text line-clamp-3" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   {art.title}
                 </h4>
+                {art.publishedAt && (
+                  <span className="text-[9px] text-slate-400 font-mono mt-2 block">
+                    {new Date(art.publishedAt).toLocaleDateString('te-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </span>
+                )}
               </div>
             </Link>
           ))}
