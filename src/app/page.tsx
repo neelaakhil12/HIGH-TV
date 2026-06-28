@@ -40,17 +40,17 @@ function SidebarLatestVideos() {
     {
       id: "p_kI2pXWkAc",
       title: "దేవర పార్ట్-1 అఫీషియల్ ట్రైలర్ - జూనియర్ ఎన్టీఆర్, కొరటాల శివ",
-      thumbnail: "/hightv_breaking.png"
+      thumbnail: ""
     },
     {
       id: "1kVkYOS9I18",
       title: "పుష్ప-2 ది రూల్ అఫీషియల్ టీజర్ - అల్లు అర్జున్, సుకుమార్",
-      thumbnail: "/hightv_breaking.png"
+      thumbnail: ""
     },
     {
       id: "q6h3C_s8sSw",
       title: "గేమ్ చేంజర్ అఫీషియల్ సాంగ్ - రామ్ చరణ్, శంకర్",
-      thumbnail: "/hightv_breaking.png"
+      thumbnail: ""
     }
   ]);
 

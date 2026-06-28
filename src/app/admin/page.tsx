@@ -904,7 +904,28 @@ export default function AdminPage() {
 
     // Load Videos list
     try {
-      setVideosList(JSON.parse(localStorage.getItem('latest_videos') || '[]'));
+      const saved = localStorage.getItem('latest_videos');
+      if (saved) {
+        setVideosList(JSON.parse(saved));
+      } else {
+        setVideosList([
+          {
+            id: "p_kI2pXWkAc",
+            title: "దేవర పార్ట్-1 అఫీషియల్ ట్రైలర్ - జూనియర్ ఎన్టీఆర్, కొరటాల శివ",
+            thumbnail: ""
+          },
+          {
+            id: "1kVkYOS9I18",
+            title: "పుష్ప-2 ది రూల్ అఫీషియల్ టీజర్ - అల్లు అర్జున్, సుకుమార్",
+            thumbnail: ""
+          },
+          {
+            id: "q6h3C_s8sSw",
+            title: "గేమ్ చేంజర్ అఫీషియల్ సాంగ్ - రామ్ చరణ్, శంకర్",
+            thumbnail: ""
+          }
+        ]);
+      }
     } catch {
       setVideosList([]);
     }
@@ -5190,47 +5211,7 @@ export default function AdminPage() {
                               style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: 'normal' }}
                             />
                           </div>
-                          <div className="col-span-1 md:col-span-2 flex flex-col gap-2">
-                            <label className="text-[10px] font-black text-slate-455 uppercase tracking-wide">థంబ్‌నెయిల్ చిత్రం అప్‌లోడ్ (Upload Thumbnail)</label>
-                            <div className="flex flex-wrap items-center gap-3">
-                              <label className="bg-slate-900 hover:bg-slate-850 text-white font-black text-[11px] py-2.5 px-4 rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5 w-fit">
-                                <Upload className="w-3.5 h-3.5" />
-                                <span>చిత్రాన్ని ఎంచుకోండి (Choose Image)</span>
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  className="hidden"
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                      handleCompressAndSetImage(file, (base64) => {
-                                        handleVideoFieldChange(idx, 'thumbnail', base64);
-                                      });
-                                    }
-                                  }}
-                                />
-                              </label>
-
-                              {video.thumbnail && !video.thumbnail.startsWith('https://img.youtube.com/vi/') && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-                                    const match = video.id.match(regExp);
-                                    const ytId = (match && match[2].length === 11) ? match[2] : video.id.trim();
-                                    const defaultThumb = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '';
-                                    handleVideoFieldChange(idx, 'thumbnail', defaultThumb);
-                                  }}
-                                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold text-[11px] py-2.5 px-4 rounded-xl transition-all cursor-pointer flex items-center gap-1"
-                                >
-                                  యూట్యూబ్ డిఫాల్ట్ ఉపయోగించండి (Use YouTube Default)
-                                </button>
-                              )}
-                            </div>
-                            <p className="text-[10px] text-slate-400 font-bold leading-normal">
-                              * ఏదైనా కస్టమ్ చిత్రం అప్‌లోడ్ చేయవచ్చు. లేదంటే ఆటోమేటిక్‌గా యూట్యూబ్ డిఫాల్ట్ థంబ్‌నెయిల్ ఉపయోగించబడుతుంది.
-                            </p>
-                          </div>
+                          
                         </div>
                         <div className="w-full md:w-[130px] aspect-video border border-slate-200/80 rounded-xl overflow-hidden bg-black flex items-center justify-center shrink-0">
                           {video.id ? (
@@ -8506,15 +8487,11 @@ export default function AdminPage() {
                       {config.type === 'ad' && (
                         <div className="flex flex-col gap-4 bg-slate-50 border border-slate-200/50 rounded-2xl p-4">
                           <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">విజ్ఞాపన వివరాలు (Ad Details)</h4>
-                          
                           {/* Image Upload instead of URL */}
                           <div className="flex flex-col gap-2">
-                            <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide flex items-center justify-between gap-1 w-full">
+                            <label className="text-[10px] font-black text-slate-455 uppercase tracking-wide flex items-center justify-between gap-1 w-full">
                               <span className="flex items-center gap-1">
                                 <ImageIcon className="w-3.5 h-3.5 text-slate-500" /> విజ్ఞాపన చిత్రం (Ad Image)
-                              </span>
-                              <span className="text-sky-600 font-black normal-case text-[10px] bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100">
-                                {config.adOrientation === 'horizontal' ? 'Exact Size: 1050 x 680 px' : 'Exact Size: 600 x 870 px'}
                               </span>
                             </label>
                             <div className="flex items-center gap-3">
@@ -8595,12 +8572,6 @@ export default function AdminPage() {
                                 Vertical (నిలువుగా - Tall)
                               </button>
                             </div>
-                            <p className="text-[9.5px] text-slate-400 font-bold mt-1.5 bg-slate-100 p-2 rounded-xl flex items-center gap-1 border border-slate-200/40">
-                              💡 <span>సలహా ఇవ్వబడిన సైజు (Exact Size):</span>
-                              <span className="text-sky-600 font-black">
-                                {config.adOrientation === 'horizontal' ? '1050 x 680 px' : '600 x 870 px'}
-                              </span>
-                            </p>
                           </div>
 
                           {/* Ad Link URL */}

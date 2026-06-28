@@ -151,7 +151,7 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
         </button>
 
         {/* Content body */}
-        <div className={`p-0 flex-1 overflow-hidden h-auto ${
+        <div className={`p-0 flex-1 overflow-y-auto h-auto ${
           popupType === 'ad' ? 'w-fit mx-auto' : 'w-full'
         }`}>
           {popupType === 'ad' ? (
@@ -173,8 +173,8 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
                   alt="Advertisement"
                   className={`h-auto object-contain mx-auto select-none hover:opacity-95 transition-opacity block ${
                     adOrientation === 'horizontal'
-                      ? 'w-auto max-w-[95vw] lg:max-w-[1050px] max-h-[90vh]'
-                      : 'w-auto max-w-[95vw] md:max-w-[540px] lg:max-w-[600px] max-h-[90vh]'
+                      ? 'w-full max-w-[95vw] md:w-[800px] md:max-w-[800px] lg:w-[950px] lg:max-w-[950px] max-h-[88vh]'
+                      : 'w-full max-w-[95vw] md:w-[650px] md:max-w-[650px] lg:w-[750px] lg:max-w-[750px] max-h-[88vh]'
                   }`}
                 />
               </a>

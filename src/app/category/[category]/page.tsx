@@ -16,6 +16,7 @@ import PhotosPage from '@/components/category/PhotosPage';
 import CitizenReporterForm from '@/components/category/CitizenReporterForm';
 import LiveUpdatesPage from '@/components/category/LiveUpdatesPage';
 import MultiDistrictFeed from '@/components/category/MultiDistrictFeed';
+import EditorialPageClient from '@/components/category/EditorialPageClient';
 import { 
   categories, 
   politicsNews, 
@@ -279,6 +280,10 @@ export default async function CategoryPage({
       {category === 'live-updates' ? (
         <main className="flex-1 w-full">
           <LiveUpdatesPage />
+        </main>
+      ) : category === 'sampadakiyam' ? (
+        <main className="flex-1 w-full">
+          <EditorialPageClient allArticles={allArticlesList} />
         </main>
       ) : category === 'epaper' ? (
         <main className="flex-1 w-full">
