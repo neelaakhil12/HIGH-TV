@@ -1120,6 +1120,7 @@ export default function AdminPage() {
   const [epaperSection, setEpaperSection] = useState('main');
   const [customEpaperSection, setCustomEpaperSection] = useState('');
   const [epaperDistrict, setEpaperDistrict] = useState('');
+  const [editingEpaperId, setEditingEpaperId] = useState<string | null>(null);
   const [isSavingEpaper, setIsSavingEpaper] = useState(false);
   const [epaperSections, setEpaperSections] = useState<{ id: string; name: string; key: string }[]>([]);
   const [newSectionName, setNewSectionName] = useState('');
@@ -2930,8 +2931,39 @@ export default function AdminPage() {
     setWebStoryFormMode('edit');
   };
 
+  const handleStartEditEpaper = (paper: { id: string; title: string; date: string; pdfUrl: string; section: string }) => {
+    setEditingEpaperId(paper.id);
+    setEpaperTitle(paper.title);
+    setEpaperDate(paper.date);
+    setEpaperPdf(paper.pdfUrl);
 
+    const sec = paper.section || 'main';
+    if (sec === 'main' || sec === 'general-main' || sec === 'telangana-main' || sec === 'ap-main' || sec === 'hyderabad-main') {
+      setEpaperSection('main');
+      setEpaperDistrict(sec === 'main' ? '' : sec);
+    } else if (sec.startsWith('telangana-')) {
+      setEpaperSection('telangana');
+      setEpaperDistrict(sec.replace('telangana-', ''));
+    } else if (sec.startsWith('ap-')) {
+      setEpaperSection('ap');
+      setEpaperDistrict(sec.replace('ap-', ''));
+    } else {
+      setEpaperSection(sec);
+      setEpaperDistrict('');
+    }
 
+    window.scrollTo({ top: 400, behavior: 'smooth' });
+  };
+
+  const handleCancelEditEpaper = () => {
+    setEditingEpaperId(null);
+    setEpaperTitle('');
+    setEpaperDate('');
+    setEpaperPdf('');
+    setEpaperSection('main');
+    setCustomEpaperSection('');
+    setEpaperDistrict('');
+  };
 
   // Save configurations helper (Popups, ads ticker)
   const handleSaveConfigs = (e: React.FormEvent) => {
@@ -3147,17 +3179,24 @@ export default function AdminPage() {
     }
     setIsSavingEpaper(true);
     try {
+      const method = editingEpaperId ? 'PUT' : 'POST';
+      const payload: any = {
+        title: epaperTitle.trim(),
+        date: epaperDate,
+        pdfUrl: epaperPdf,
+        section: finalSection,
+      };
+      if (editingEpaperId) {
+        payload.id = editingEpaperId;
+      }
+
       const res = await fetch('/api/epapers', {
-        method: 'POST',
+        method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: epaperTitle.trim(),
-          date: epaperDate,
-          pdfUrl: epaperPdf,
-          section: finalSection,
-        })
+        body: JSON.stringify(payload)
       });
       if (res.ok) {
+        setEditingEpaperId(null);
         setEpaperTitle('');
         setEpaperDate('');
         setEpaperPdf('');
@@ -3165,10 +3204,10 @@ export default function AdminPage() {
         setCustomEpaperSection('');
         setEpaperDistrict('');
         fetchEpapersData();
-        alert('E-Paper edition added successfully!');
+        alert(editingEpaperId ? 'E-Paper edition updated successfully!' : 'E-Paper edition added successfully!');
       } else {
         const errText = await res.text();
-        alert('Failed to publish E-Paper! Server details: ' + errText);
+        alert('Failed to save E-Paper! Server details: ' + errText);
       }
     } catch (err) {
       console.error(err);
@@ -5942,14 +5981,32 @@ export default function AdminPage() {
                     </div>
                   )}
 
-                  <div className="md:col-span-4 flex justify-end">
+                  <div className="md:col-span-4 flex items-center justify-end gap-2">
+                    {editingEpaperId && (
+                      <button
+                        type="button"
+                        onClick={handleCancelEditEpaper}
+                        className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer"
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
                     <button
                       type="submit"
                       disabled={isSavingEpaper}
-                      className="bg-rose-600 hover:bg-rose-700 disabled:bg-slate-350 text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-1 hover:scale-[1.01]"
+                      className={`${editingEpaperId ? 'bg-amber-600 hover:bg-amber-700' : 'bg-rose-600 hover:bg-rose-700'} disabled:bg-slate-350 text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-1 hover:scale-[1.01]`}
                     >
-                      <Plus className="w-4 h-4" />
-                      <span>{isSavingEpaper ? 'Publishing...' : 'Publish E-Paper'}</span>
+                      {editingEpaperId ? (
+                        <>
+                          <Pencil className="w-4 h-4" />
+                          <span>{isSavingEpaper ? 'Updating...' : 'Update E-Paper Edition'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-4 h-4" />
+                          <span>{isSavingEpaper ? 'Publishing...' : 'Publish E-Paper'}</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </form>
@@ -6079,14 +6136,24 @@ export default function AdminPage() {
                             </td>
                             <td className="p-3 font-mono text-[10px] text-slate-400 truncate max-w-[200px]">{paper.pdfUrl}</td>
                             <td className="p-3 text-center">
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteEpaper(paper.id)}
-                                className="text-red-500 hover:text-red-700 p-1.5 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-red-500/10"
-                                title="Delete E-Paper"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
+                              <div className="flex items-center justify-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleStartEditEpaper(paper)}
+                                  className="text-amber-600 hover:text-amber-800 p-1.5 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-amber-500/10"
+                                  title="Edit E-Paper Edition"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteEpaper(paper.id)}
+                                  className="text-red-500 hover:text-red-700 p-1.5 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-red-500/10"
+                                  title="Delete E-Paper"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))

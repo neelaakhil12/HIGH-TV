@@ -70,6 +70,57 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
 
+  if (method === 'PUT') {
+    try {
+      let data = req.body;
+      if (typeof data === 'string') {
+        try {
+          data = JSON.parse(data);
+        } catch (e) {}
+      }
+      const { id, title, date, pdfUrl, section } = data;
+      if (!id) return res.status(400).json({ error: 'Missing epaper id' });
+
+      const existing = await prisma.epaper.findUnique({ where: { id } });
+      let finalPdfUrl = existing?.pdfUrl || pdfUrl;
+
+      if (pdfUrl && pdfUrl.startsWith('data:application/pdf;base64,')) {
+        if (existing && existing.pdfUrl && existing.pdfUrl.startsWith('/uploads/epapers/')) {
+          const oldPath = path.join(process.cwd(), 'public', existing.pdfUrl);
+          if (fs.existsSync(oldPath)) {
+            try { fs.unlinkSync(oldPath); } catch (e) {}
+          }
+        }
+
+        const base64Data = pdfUrl.replace(/^data:application\/pdf;base64,/, '');
+        const buffer = Buffer.from(base64Data, 'base64');
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'epapers');
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        const cleanTitleSlug = (title || 'edition').toLowerCase().replace(/[^a-z0-9]/g, '-').substring(0, 20);
+        const fileName = `epaper-${Date.now()}-${cleanTitleSlug}.pdf`;
+        const filePath = path.join(uploadDir, fileName);
+        fs.writeFileSync(filePath, buffer);
+        finalPdfUrl = `/uploads/epapers/${fileName}`;
+      }
+
+      const updated = await prisma.epaper.update({
+        where: { id },
+        data: {
+          title,
+          date,
+          pdfUrl: finalPdfUrl,
+          section
+        }
+      });
+      return res.status(200).json(updated);
+    } catch (error: any) {
+      console.error('Error updating epaper in Pages API:', error);
+      return res.status(500).json({ error: 'Failed to update epaper', message: error?.message });
+    }
+  }
+
   if (method === 'DELETE') {
     try {
       const id = String(req.query.id || '');
@@ -88,6 +139,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
 
-  res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
+  res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
   return res.status(405).end(`Method ${method} Not Allowed`);
 }
