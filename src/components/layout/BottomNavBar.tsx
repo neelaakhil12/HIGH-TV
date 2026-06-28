@@ -42,7 +42,7 @@ export default function BottomNavBar() {
     { label: 'టెక్నాలజీ', href: '/category/technology' },
     { label: 'శుభఫలాలు', href: '/category/rasipalalu' },
     { label: 'వైరల్', href: '/category/viral' },
-    { label: 'ఆల్బమ్‌లు', href: '/category/photos' },
+    { label: 'ఫోటో గ్యాలరీ', href: '/category/photos' },
     { label: 'షార్ట్స్', href: '/category/shorts' },
     { label: 'ఆమె', href: '/category/women' },
     { label: 'లైఫ్ స్టైల్', href: '/category/lifestyle' },

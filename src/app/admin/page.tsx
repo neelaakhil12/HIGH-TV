@@ -1261,7 +1261,7 @@ export default function AdminPage() {
       title: photoTitle.trim(),
       slug: (photosFormMode === 'edit' && editingPhotoAlbum) ? editingPhotoAlbum.slug : `photo-${Date.now().toString().slice(-6)}`,
       categorySlug: 'photos',
-      category: 'ఆల్బమ్‌లు',
+      category: 'ఫోటో గ్యాలరీ',
       districtSlug: '',
       author: 'హై టీవీ డెస్క్',
       publishedAt: new Date().toISOString(),

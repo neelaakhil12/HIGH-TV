@@ -38,7 +38,7 @@ export const categories = [
   { name: 'వైరల్', slug: 'viral', color: '#dc2626' },
   { name: 'లైఫ్ స్టైల్', slug: 'lifestyle', color: '#9333ea' },
   { name: 'శుభఫలాలు', slug: 'rasipalalu', color: '#b45309' },
-  { name: 'ఆల్బమ్‌లు', slug: 'photos', color: '#64748b' },
+  { name: 'ఫోటో గ్యాలరీ', slug: 'photos', color: '#64748b' },
   { name: 'వెబ్ స్టోరీస్', slug: 'webstories', color: '#ec4899' },
   { name: 'ఎడిటోరియల్', slug: 'sampadakiyam', color: '#be123c' },
   { name: 'ఎడిటోరియల్', slug: 'editorial', color: '#be123c' },

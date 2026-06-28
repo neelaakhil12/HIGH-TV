@@ -351,7 +351,7 @@ export default function Header() {
           <Link href="/category/entertainment"  className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/entertainment')}`}>ఫిల్మ్</Link>
           <Link href="/category/technology"     className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/technology')}`}>టెక్నాలజీ</Link>
           <Link href="/category/viral"          className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/viral')}`}>వైరల్</Link>
-          <Link href="/category/photos"         className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/photos')}`}>ఆల్బమ్‌లు</Link>
+          <Link href="/category/photos"         className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/photos')}`}>ఫోటో గ్యాలరీ</Link>
           <Link href="/category/women"          className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/women')}`}>ఆమె</Link>
           <Link href="/category/lifestyle"      className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/lifestyle')}`}>లైఫ్ స్టైల్</Link>
           <Link href="/category/webstories"     className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/webstories')}`}>వెబ్ స్టోరీస్</Link>
@@ -511,7 +511,7 @@ export default function Header() {
                         <Link onClick={closeAllDropdowns} href="/category/entertainment" className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఫిల్మ్</Link>
                         <Link onClick={closeAllDropdowns} href="/category/rasipalalu"    className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>శుభఫలాలు</Link>
                         <Link onClick={closeAllDropdowns} href="/category/viral"         className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వైరల్</Link>
-                        <Link onClick={closeAllDropdowns} href="/category/photos"        className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఆల్బమ్‌లు</Link>
+                        <Link onClick={closeAllDropdowns} href="/category/photos"        className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఫోటో గ్యాలరీ</Link>
                         <Link onClick={closeAllDropdowns} href="/category/shorts"        className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>షార్ట్స్</Link>
                         <Link onClick={closeAllDropdowns} href="/category/women"         className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఆమె</Link>
                         <Link onClick={closeAllDropdowns} href="/category/lifestyle"     className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>లైఫ్ స్టైల్</Link>
@@ -649,7 +649,7 @@ export default function Header() {
                   { href: '/category/technology',     label: 'టెక్నాలజీ'      },
                   { href: '/category/rasipalalu',     label: 'శుభఫలాలు'      },
                   { href: '/category/viral',          label: 'వైరల్'          },
-                  { href: '/category/photos',         label: 'ఆల్బమ్‌లు'      },
+                  { href: '/category/photos',         label: 'ఫోటో గ్యాలరీ'      },
                   { href: '/category/shorts',         label: 'షార్ట్స్'       },
                   { href: '/category/women',          label: 'ఆమె'           },
                   { href: '/category/lifestyle',      label: 'లైఫ్ స్టైల్'   },
