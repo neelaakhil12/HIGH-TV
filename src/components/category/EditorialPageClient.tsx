@@ -223,9 +223,9 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
         </div>
       )}
 
-      {/* 3. Bottom Grid for remaining unused articles */}
+      {/* 3. Bottom list for remaining unused articles */}
       {remainingArticles.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-5 border-t border-gray-100 mt-5">
+        <div className="flex flex-col gap-5 pt-5 border-t border-gray-100 mt-5">
           {remainingArticles.map((art) => {
             const cleanTitle = art.title ? art.title.replace(/<[^>]*>/g, '').trim() : '';
             const cleanDesc = art.description ? art.description.replace(/<[^>]*>/g, '').trim() : '';
