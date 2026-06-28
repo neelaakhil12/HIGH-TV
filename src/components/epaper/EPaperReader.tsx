@@ -135,6 +135,34 @@ const generateMockZonesForPage = (pageIdx: number): ArticleZone[] => {
   return zones;
 };
 
+interface DynamicCardThumbnailProps {
+  pdfjs: any;
+  pdfUrl: string;
+}
+
+export function DynamicCardThumbnail({ pdfjs, pdfUrl }: DynamicCardThumbnailProps) {
+  const [pdfDoc, setPdfDoc] = useState<any>(null);
+
+  useEffect(() => {
+    if (!pdfjs || !pdfUrl) return;
+    pdfjs.getDocument({ url: pdfUrl }).promise
+      .then((pdf: any) => setPdfDoc(pdf))
+      .catch((err: any) => console.error('Error loading card thumbnail pdf:', err));
+  }, [pdfjs, pdfUrl]);
+
+  if (!pdfDoc) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center select-none bg-slate-50">
+        <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-[#cc0000] font-black text-xs mb-1 animate-pulse">B</div>
+        <span className="text-[8px] text-gray-500 font-bold uppercase">Balagam TV</span>
+        <span className="text-[6px] text-red-500 font-bold mt-0.5 uppercase tracking-wider">Loading...</span>
+      </div>
+    );
+  }
+
+  return <NewspaperPDFPage pdfDoc={pdfDoc} pageNum={1} zoom={25} className="w-full h-full block" />;
+}
+
 interface EditionCardThumbnailProps {
   pdfDoc: any;
   cardIdx: number;
@@ -312,38 +340,23 @@ export default function EPaperReader() {
 
   const getEditionsForSection = (sectionKey: string, staticList: any[]) => {
     const dbPapers = dbEpapers.filter(p => p.section === sectionKey);
-    const merged = staticList.map(item => {
-      const dbMatch = dbPapers.find(
-        p => p.title.toLowerCase() === item.value.toLowerCase() ||
-             p.title === item.value ||
-             p.title === item.name
+    const list = dbPapers.map(paper => {
+      const staticMatch = staticList.find(
+        item => item.value.toLowerCase() === paper.title.toLowerCase() ||
+                item.value === paper.title ||
+                item.name === paper.title
       );
       return {
-        name: item.nameTe || item.name,
-        nameTe: item.nameTe || item.name,
-        value: item.value,
-        pdfUrl: dbMatch ? dbMatch.pdfUrl : null,
-        isDb: !!dbMatch
+        name: staticMatch ? (staticMatch.nameTe || staticMatch.name) : paper.title,
+        nameTe: staticMatch ? (staticMatch.nameTe || staticMatch.name) : paper.title,
+        value: paper.title,
+        pdfUrl: paper.pdfUrl,
+        isDb: true
       };
     });
 
-    dbPapers.forEach(paper => {
-      const alreadyMerged = merged.some(
-        m => m.value.toLowerCase() === paper.title.toLowerCase() || m.value === paper.title
-      );
-      if (!alreadyMerged) {
-        merged.push({
-          name: paper.title,
-          nameTe: paper.title,
-          value: paper.title,
-          pdfUrl: paper.pdfUrl,
-          isDb: true
-        });
-      }
-    });
-
-    if (!searchQuery) return merged;
-    return merged.filter(ed => 
+    if (!searchQuery) return list;
+    return list.filter(ed => 
       ed.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
       ed.nameTe.includes(searchQuery)
     );
@@ -1177,7 +1190,7 @@ export default function EPaperReader() {
     );
   };
 
-  const renderCarousel = (id: string, itemsList: typeof AP_EDITIONS) => {
+  const renderCarousel = (id: string, itemsList: any[]) => {
     if (itemsList.length === 0) return null;
     return (
       <div className="relative w-full group select-none">
@@ -1207,7 +1220,12 @@ export default function EPaperReader() {
                 className="relative overflow-hidden bg-white border border-gray-250 shadow-xs rounded-t-lg"
                 style={{ aspectRatio: `1 / ${defaultPageAspectRatio}` }}
               >
-                {defaultPdfDoc ? (
+                {item.pdfUrl ? (
+                  <DynamicCardThumbnail
+                    pdfjs={pdfjs}
+                    pdfUrl={item.pdfUrl}
+                  />
+                ) : defaultPdfDoc ? (
                   <EditionCardThumbnail
                     pdfDoc={pdfDoc || defaultPdfDoc}
                     cardIdx={idx}
@@ -1760,7 +1778,12 @@ export default function EPaperReader() {
                         className="relative overflow-hidden bg-white border border-gray-250 shadow-md rounded-t-lg group-hover:border-red-500 transition-all duration-200"
                         style={{ aspectRatio: `1 / ${defaultPageAspectRatio}` }}
                       >
-                        {defaultPdfDoc ? (
+                        {item.pdfUrl ? (
+                          <DynamicCardThumbnail
+                            pdfjs={pdfjs}
+                            pdfUrl={item.pdfUrl}
+                          />
+                        ) : defaultPdfDoc ? (
                           <EditionCardThumbnail
                             pdfDoc={pdfDoc || defaultPdfDoc}
                             cardIdx={idx}
