@@ -26,9 +26,49 @@ function getArticleHref(art: any) {
   return `/news/${art.slug}`;
 }
 
+function getLinkedArticle(imgArt: Article, allArticles: Article[]) {
+  if (!imgArt.body) return null;
+  const match = imgArt.body.match(/\[LINKED_ARTICLE_SLUG\]:\s*(.+)/);
+  if (!match) return null;
+  const targetSlug = match[1].trim();
+  return allArticles.find(a => a.slug === targetSlug);
+}
+
 function EditorialSection({ title, articles, categorySlug }: { title: string; articles: Article[]; categorySlug: string }) {
-  const mainArticle = articles[0];
-  const rightArticles = articles.slice(1, 3);
+  // Separate image link articles and normal articles
+  const imageLinkArticles = articles.filter(a => a.slug?.startsWith('editorial-img-'));
+  const normalArticles = articles.filter(a => !a.slug?.startsWith('editorial-img-'));
+
+  const usedNormalIds = new Set<string>();
+  const rows: { imgArt: Article; linkedArt: Article | null }[] = [];
+
+  if (imageLinkArticles.length > 0) {
+    imageLinkArticles.forEach(imgArt => {
+      // Find the linked article
+      let linkedArt = getLinkedArticle(imgArt, normalArticles);
+      if (linkedArt) {
+        usedNormalIds.add(linkedArt.id);
+      } else {
+        // Fallback: take the first unused normal article
+        linkedArt = normalArticles.find(a => !usedNormalIds.has(a.id)) || null;
+        if (linkedArt) usedNormalIds.add(linkedArt.id);
+      }
+      rows.push({ imgArt, linkedArt });
+    });
+  }
+
+  const fallbackRows: { imgArt: Article | null; linkedArts: Article[] } = { imgArt: null, linkedArts: [] };
+  if (imageLinkArticles.length === 0 && normalArticles.length > 0) {
+    const mainArt = normalArticles[0];
+    const rightArts = normalArticles.slice(1, 3);
+    fallbackRows.imgArt = mainArt;
+    fallbackRows.linkedArts = rightArts;
+    
+    usedNormalIds.add(mainArt.id);
+    rightArts.forEach(a => usedNormalIds.add(a.id));
+  }
+
+  const remainingArticles = normalArticles.filter(a => !usedNormalIds.has(a.id));
 
   return (
     <div className="mb-12 text-left">
@@ -44,62 +84,122 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
         </Link>
       </div>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-10 gap-5 mb-5">
-        {/* Left Big Featured Article */}
-        <div className="md:col-span-6 w-full">
-          {mainArticle && (
-            <Link href={getArticleHref(mainArticle)} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
+      {/* 1. Custom Image-Link Rows */}
+      {rows.map(({ imgArt, linkedArt }) => (
+        <div key={imgArt.id} className="grid grid-cols-1 md:grid-cols-10 gap-5 mb-6 items-center">
+          {/* Left Big Image */}
+          <div className="md:col-span-6 w-full">
+            <Link href={linkedArt ? getArticleHref(linkedArt) : '#'} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
               <img
-                src={mainArticle.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                alt={mainArticle.title}
+                src={imgArt.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
+                alt={linkedArt ? linkedArt.title : ''}
+                className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
+              />
+              {linkedArt && (
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5 pointer-events-none">
+                  <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    {linkedArt.title}
+                  </h3>
+                </div>
+              )}
+            </Link>
+          </div>
+
+          {/* Right Linked Article Card */}
+          <div className="md:col-span-4 w-full">
+            {linkedArt ? (
+              (() => {
+                const cleanTitle = linkedArt.title ? linkedArt.title.replace(/<[^>]*>/g, '').trim() : '';
+                const cleanDesc = linkedArt.description ? linkedArt.description.replace(/<[^>]*>/g, '').trim() : '';
+                return (
+                  <div className="flex gap-4 items-start group bg-white hover:bg-slate-50/50 p-2.5 rounded-xl border border-transparent hover:border-slate-100 transition-all">
+                    <Link href={getArticleHref(linkedArt)} className="w-20 h-14 sm:w-24 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 block shadow-3xs relative">
+                      <img
+                        src={linkedArt.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
+                        alt={cleanTitle}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      />
+                    </Link>
+                    <div className="flex-1 text-left min-w-0">
+                      <Link href={getArticleHref(linkedArt)}>
+                        <h4 className="text-[15px] sm:text-[16px] md:text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                          {cleanTitle}
+                        </h4>
+                      </Link>
+                      {cleanDesc && (
+                        <p className="text-xs sm:text-[13px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                          {cleanDesc}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()
+            ) : (
+              <div className="p-4 text-center text-slate-400 text-xs font-bold border border-dashed border-slate-200 rounded-xl">
+                No linked article.
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+
+      {/* 2. Fallback Grid (when no custom Image Link articles exist) */}
+      {fallbackRows.imgArt && (
+        <div className="grid grid-cols-1 md:grid-cols-10 gap-5 mb-5">
+          {/* Left Big Featured Article */}
+          <div className="md:col-span-6 w-full">
+            <Link href={getArticleHref(fallbackRows.imgArt)} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
+              <img
+                src={fallbackRows.imgArt.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
+                alt={fallbackRows.imgArt.title}
                 className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5 pointer-events-none">
                 <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  {mainArticle.title}
+                  {fallbackRows.imgArt.title}
                 </h3>
               </div>
             </Link>
-          )}
-        </div>
+          </div>
 
-        {/* Right Stacked Featured Articles */}
-        <div className="md:col-span-4 flex flex-col gap-4 w-full">
-          {rightArticles.map((art) => {
-            const cleanTitle = art.title ? art.title.replace(/<[^>]*>/g, '').trim() : '';
-            const cleanDesc = art.description ? art.description.replace(/<[^>]*>/g, '').trim() : '';
-            return (
-              <div key={art.id} className="flex gap-4 items-start group bg-white hover:bg-slate-50/50 p-2.5 rounded-xl border border-transparent hover:border-slate-100 transition-all">
-                <Link href={getArticleHref(art)} className="w-20 h-14 sm:w-24 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 block shadow-3xs relative">
-                  <img
-                    src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                    alt={cleanTitle}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                  />
-                </Link>
-                <div className="flex-1 text-left min-w-0">
-                  <Link href={getArticleHref(art)}>
-                    <h4 className="text-[15px] sm:text-[16px] md:text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      {cleanTitle}
-                    </h4>
+          {/* Right Stacked Featured Articles */}
+          <div className="md:col-span-4 flex flex-col gap-4 w-full">
+            {fallbackRows.linkedArts.map((art) => {
+              const cleanTitle = art.title ? art.title.replace(/<[^>]*>/g, '').trim() : '';
+              const cleanDesc = art.description ? art.description.replace(/<[^>]*>/g, '').trim() : '';
+              return (
+                <div key={art.id} className="flex gap-4 items-start group bg-white hover:bg-slate-50/50 p-2.5 rounded-xl border border-transparent hover:border-slate-100 transition-all">
+                  <Link href={getArticleHref(art)} className="w-20 h-14 sm:w-24 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 block shadow-3xs relative">
+                    <img
+                      src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
+                      alt={cleanTitle}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    />
                   </Link>
-                  {cleanDesc && (
-                    <p className="text-xs sm:text-[13px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      {cleanDesc}
-                    </p>
-                  )}
+                  <div className="flex-1 text-left min-w-0">
+                    <Link href={getArticleHref(art)}>
+                      <h4 className="text-[15px] sm:text-[16px] md:text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                        {cleanTitle}
+                      </h4>
+                    </Link>
+                    {cleanDesc && (
+                      <p className="text-xs sm:text-[13px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                        {cleanDesc}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Bottom Grid */}
-      {articles.length > 3 && (
+      {/* 3. Bottom Grid for remaining unused articles */}
+      {remainingArticles.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-5 border-t border-gray-100 mt-5">
-          {articles.slice(3, 14).map((art) => {
+          {remainingArticles.map((art) => {
             const cleanTitle = art.title ? art.title.replace(/<[^>]*>/g, '').trim() : '';
             const cleanDesc = art.description ? art.description.replace(/<[^>]*>/g, '').trim() : '';
             
