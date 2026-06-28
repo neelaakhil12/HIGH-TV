@@ -341,7 +341,7 @@ export default function EPaperReader() {
   }, []);
 
   useEffect(() => {
-    fetch(`/api/epapers?date=${selectedDate}&t=` + Date.now())
+    fetch(`/api/epapers?t=` + Date.now())
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -352,13 +352,23 @@ export default function EPaperReader() {
   }, [selectedDate]);
 
   const getEditionsForSection = (sectionKey: string, staticList: any[]) => {
-    let dbPapers = dbEpapers.filter(p => p.section === sectionKey);
-    if (sectionKey === 'main') {
-      dbPapers = dbEpapers.filter(p => p.section === 'main' || p.section === 'general-main' || p.section.endsWith('-main'));
-    } else if (sectionKey === 'telangana') {
-      dbPapers = dbEpapers.filter(p => p.section === 'telangana' || (p.section.startsWith('telangana-') && p.section !== 'telangana-main') || tgDistricts.some(d => d.slug === p.section));
-    } else if (sectionKey === 'ap') {
-      dbPapers = dbEpapers.filter(p => p.section === 'ap' || (p.section.startsWith('ap-') && p.section !== 'ap-main') || apDistricts.some(d => d.slug === p.section));
+    const keyLower = (sectionKey || '').toLowerCase();
+    let dbPapers = dbEpapers.filter(p => (p.section || '').toLowerCase() === keyLower);
+    if (keyLower === 'main') {
+      dbPapers = dbEpapers.filter(p => {
+        const sec = (p.section || '').toLowerCase();
+        return sec === 'main' || sec === 'general-main' || sec.endsWith('-main');
+      });
+    } else if (keyLower === 'telangana') {
+      dbPapers = dbEpapers.filter(p => {
+        const sec = (p.section || '').toLowerCase();
+        return sec === 'telangana' || (sec.startsWith('telangana-') && sec !== 'telangana-main') || tgDistricts.some(d => d.slug === sec);
+      });
+    } else if (keyLower === 'ap') {
+      dbPapers = dbEpapers.filter(p => {
+        const sec = (p.section || '').toLowerCase();
+        return sec === 'ap' || (sec.startsWith('ap-') && sec !== 'ap-main') || apDistricts.some(d => d.slug === sec);
+      });
     }
 
     const list = dbPapers.map(paper => {
