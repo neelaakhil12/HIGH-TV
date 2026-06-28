@@ -234,16 +234,29 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
 }
 
 export default function EditorialPageClient({ allArticles }: { allArticles: Article[] }) {
+  const [sections, setSections] = React.useState<{ id: string; title: string; slug: string }[]>([
+    { id: 'sec-editorial', title: 'సంపాదకీయం', slug: 'sampadakiyam' },
+    { id: 'sec-gitanjali', title: 'గీతాంజలి', slug: 'adyathmikam' },
+    { id: 'sec-kothapaluku', title: 'కొత్త పలుకు', slug: 'antharmadanam' },
+  ]);
+
+  React.useEffect(() => {
+    try {
+      const saved = localStorage.getItem('editorial_sections_config');
+      if (saved) {
+        setSections(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error('Error loading dynamic editorial sections config:', e);
+    }
+  }, []);
+
   // Helper to filter articles by category (only explicitly added articles show here)
   const getSectionArticles = (categorySlug: string) => {
     return allArticles
       .filter(art => art.categorySlug === categorySlug)
       .slice(0, 14);
   };
-
-  const sampadakiyamArticles = getSectionArticles('sampadakiyam');
-  const gitanjaliArticles = getSectionArticles('adyathmikam'); // using adyathmikam (devotional/spiritual/literature)
-  const kothaPalukuArticles = getSectionArticles('antharmadanam'); // using antharmadanam (opinion/column)
 
   return (
     <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
@@ -266,26 +279,21 @@ export default function EditorialPageClient({ allArticles }: { allArticles: Arti
       {/* Main Grid Content */}
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-5">
         <div className="w-full lg:col-span-7">
-          {/* Section 1: సంపాదకీయం */}
-          <EditorialSection 
-            title="సంపాదకీయం" 
-            articles={sampadakiyamArticles} 
-            categorySlug="sampadakiyam" 
-          />
-
-          {/* Section 2: గీతాంజలి */}
-          <EditorialSection 
-            title="గీతాంజలి" 
-            articles={gitanjaliArticles} 
-            categorySlug="adyathmikam" 
-          />
-
-          {/* Section 3: కొత్త పలుకు */}
-          <EditorialSection 
-            title="కొత్త పలుకు" 
-            articles={kothaPalukuArticles} 
-            categorySlug="antharmadanam" 
-          />
+          {sections.map((sec) => {
+            const secArticles = getSectionArticles(sec.slug);
+            if (secArticles.length === 0 && sections.length > 1) {
+              // If there are no articles in this section, and it's not the only section, we can skip it
+              return null;
+            }
+            return (
+              <EditorialSection 
+                key={sec.id}
+                title={sec.title} 
+                articles={secArticles} 
+                categorySlug={sec.slug} 
+              />
+            );
+          })}
         </div>
 
         {/* Right Sidebar Column */}
