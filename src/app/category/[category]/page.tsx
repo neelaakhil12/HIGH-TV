@@ -354,8 +354,15 @@ export default async function CategoryPage({
             </h1>
           </div>
           
-          <div className="mt-6">
-            <ShortsPage articles={allArticles} />
+          {/* 70% Left and 30% Right Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-6">
+            <div className="w-full lg:col-span-7">
+              <ShortsPage articles={allArticles} />
+            </div>
+            {/* Sidebar (30%) */}
+            <div className="w-full lg:col-span-3">
+              <RightSidebar categorySlug={category} />
+            </div>
           </div>
         </main>
       ) : category === 'photos' ? (
@@ -385,8 +392,15 @@ export default async function CategoryPage({
             </h1>
           </div>
           
-          <div className="mt-6">
-            <PhotosPage articles={allArticles} />
+          {/* 70% Left and 30% Right Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-6">
+            <div className="w-full lg:col-span-7">
+              <PhotosPage articles={allArticles} />
+            </div>
+            {/* Sidebar (30%) */}
+            <div className="w-full lg:col-span-3">
+              <RightSidebar categorySlug={category} />
+            </div>
           </div>
         </main>
       ) : category === 'citizen-reporter' ? (

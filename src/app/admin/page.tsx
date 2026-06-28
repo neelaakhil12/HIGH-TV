@@ -19,6 +19,7 @@ import {
   Upload,
   Calendar,
   User,
+  Users,
   Eye,
   CheckCircle,
   ChevronDown,
@@ -103,7 +104,6 @@ const MAIN_CATEGORIES_LIST = [
   { slug: 'antharmadanam', name: 'వ్యక్తిత్వ వికాసం (Opinion)' },
   { slug: 'adyathmikam', name: 'దైవం (Devotional)' },
   { slug: 'citizen-reporter', name: 'సిటిజన్ రిపోర్టర్' },
-  { slug: 'team', name: 'మా టీమ్' },
   { slug: 'weather', name: 'వెదర్' },
   { slug: 'epaper', name: 'ఈ-పేపర్' },
 ];
@@ -636,6 +636,311 @@ export default function AdminPage() {
     
     setPopupSaved(id);
     setTimeout(() => setPopupSaved(null), 2500);
+  };
+
+  // Team Manager states
+  const [teamFormMode, setTeamFormMode] = useState<'list' | 'add-member' | 'edit-member' | 'add-section'>('list');
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [teamSections, setTeamSections] = useState<any[]>([]);
+  const [editingMember, setEditingMember] = useState<any | null>(null);
+
+  // Member fields
+  const [memberName, setMemberName] = useState('');
+  const [memberSlug, setMemberSlug] = useState('');
+  const [memberRole, setMemberRole] = useState('');
+  const [memberBio, setMemberBio] = useState('');
+  const [memberImage, setMemberImage] = useState('');
+  const [memberSectionId, setMemberSectionId] = useState('');
+
+  // Section fields
+  const [sectionName, setSectionName] = useState('');
+  const [sectionSlug, setSectionSlug] = useState('');
+  const [isSavingTeam, setIsSavingTeam] = useState(false);
+
+  const fetchTeamData = () => {
+    fetch('/api/articles?category=team-member&limit=100&t=' + Date.now())
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setTeamMembers(data);
+        }
+      })
+      .catch(err => console.error('Error loading team members:', err));
+
+    fetch('/api/articles?category=team-section&limit=50&t=' + Date.now())
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setTeamSections(data);
+        }
+      })
+      .catch(err => console.error('Error loading team sections:', err));
+  };
+
+  useEffect(() => {
+    if (activeTab === 'team-manager') {
+      fetchTeamData();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  // Sidebar Ads Manager states
+  const [adFormMode, setAdFormMode] = useState<'list' | 'add' | 'edit'>('list');
+  const [adActiveSubTab, setAdActiveSubTab] = useState<'category' | 'article-left' | 'article-right'>('category');
+  const [sidebarAds, setSidebarAds] = useState<any[]>([]);
+  const [editingAd, setEditingAd] = useState<any | null>(null);
+
+  // Ad fields
+  const [sidebarAdTitle, setSidebarAdTitle] = useState('');
+  const [sidebarAdLink, setSidebarAdLink] = useState('');
+  const [sidebarAdImage, setSidebarAdImage] = useState('');
+  const [sidebarAdStatus, setSidebarAdStatus] = useState<'active' | 'inactive'>('active');
+  const [sidebarAdLocation, setSidebarAdLocation] = useState<'category' | 'article-left' | 'article-right' | 'both'>('category');
+  const [isSavingSidebarAd, setIsSavingSidebarAd] = useState(false);
+
+  const fetchAdsData = () => {
+    Promise.all([
+      fetch('/api/articles?category=sidebar-ad-category&limit=50&t=' + Date.now()).then(r => r.json()),
+      fetch('/api/articles?category=sidebar-ad-article-left&limit=50&t=' + Date.now()).then(r => r.json()),
+      fetch('/api/articles?category=sidebar-ad-article-right&limit=50&t=' + Date.now()).then(r => r.json()),
+      fetch('/api/articles?category=sidebar-ad-both&limit=50&t=' + Date.now()).then(r => r.json())
+    ])
+      .then(([catAds, leftAds, rightAds, bothAds]) => {
+        if (Array.isArray(catAds) && Array.isArray(leftAds) && Array.isArray(rightAds) && Array.isArray(bothAds)) {
+          setSidebarAds([...catAds, ...leftAds, ...rightAds, ...bothAds]);
+        }
+      })
+      .catch(err => console.error('Error loading ads data:', err));
+  };
+
+  useEffect(() => {
+    if (activeTab === 'sidebar-ads') {
+      fetchAdsData();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  const handleSaveAd = async () => {
+    if (!sidebarAdTitle.trim()) {
+      alert('Ad Title is required!');
+      return;
+    }
+    if (!sidebarAdImage) {
+      alert('Please upload an image for the ad!');
+      return;
+    }
+
+    setIsSavingSidebarAd(true);
+    const catSlug = sidebarAdLocation === 'category' 
+      ? 'sidebar-ad-category' 
+      : sidebarAdLocation === 'article-left' 
+        ? 'sidebar-ad-article-left' 
+        : sidebarAdLocation === 'article-right'
+          ? 'sidebar-ad-article-right'
+          : 'sidebar-ad-both';
+    const cleanSlug = adFormMode === 'edit' && editingAd ? editingAd.slug : `ad-${catSlug.slice(-3)}-${Date.now().toString().slice(-6)}`;
+    
+    const adData = {
+      title: sidebarAdTitle.trim(),
+      slug: cleanSlug,
+      categorySlug: catSlug,
+      category: sidebarAdStatus,
+      body: sidebarAdLink.trim(),
+      image: sidebarAdImage,
+      author: 'హై టీవీ డెస్క్',
+      isBreaking: false,
+      isTrending: false,
+      isFeatured: false,
+    };
+
+    try {
+      const url = adFormMode === 'edit' && editingAd ? `/api/articles/${editingAd.id}` : '/api/articles';
+      const method = adFormMode === 'edit' && editingAd ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(adData),
+      });
+
+      if (res.ok) {
+        setAdFormMode('list');
+        setEditingAd(null);
+        setSidebarAdTitle('');
+        setSidebarAdLink('');
+        setSidebarAdImage('');
+        setSidebarAdStatus('active');
+        setSidebarAdLocation('category');
+        fetchAdsData();
+      } else {
+        const errorRes = await res.json();
+        alert(errorRes.error || 'Failed to save ad!');
+      }
+    } catch (err) {
+      console.error('Error saving ad:', err);
+      alert('An error occurred while saving the ad.');
+    } finally {
+      setIsSavingSidebarAd(false);
+    }
+  };
+
+  const handleDeleteAd = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this ad?')) return;
+    try {
+      const res = await fetch(`/api/articles/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        fetchAdsData();
+      } else {
+        alert('Failed to delete ad!');
+      }
+    } catch (err) {
+      console.error('Error deleting ad:', err);
+    }
+  };
+
+  const handleToggleAdStatus = async (ad: any) => {
+    const newStatus = ad.category === 'active' ? 'inactive' : 'active';
+    try {
+      const res = await fetch(`/api/articles/${ad.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: newStatus }),
+      });
+      if (res.ok) {
+        fetchAdsData();
+      } else {
+        alert('Failed to update status!');
+      }
+    } catch (err) {
+      console.error('Error toggling ad status:', err);
+    }
+  };
+
+  const handleSaveTeamMember = async () => {
+    if (!memberName.trim()) {
+      alert('Member Name is required!');
+      return;
+    }
+    if (!memberSectionId) {
+      alert('Please select a section for this member!');
+      return;
+    }
+
+    setIsSavingTeam(true);
+    const mSlug = memberSlug.trim() || `member-${Date.now().toString().slice(-6)}`;
+    const memberData = {
+      title: memberName.trim(),
+      slug: (teamFormMode === 'edit-member' && editingMember) ? editingMember.slug : mSlug,
+      categorySlug: 'team-member',
+      category: memberRole.trim(),
+      description: memberBio.trim(),
+      body: memberSectionId,
+      image: memberImage || '',
+      author: 'హై టీవీ డెస్క్',
+      isBreaking: false,
+      isTrending: false,
+      isFeatured: false,
+      publishedAt: new Date().toISOString(),
+    };
+
+    try {
+      if (teamFormMode === 'add-member') {
+        const response = await fetch('/api/articles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(memberData),
+        });
+        if (response.ok) {
+          alert('Team member added successfully!');
+        } else {
+          alert('Failed to add team member.');
+        }
+      } else if (teamFormMode === 'edit-member' && editingMember) {
+        const response = await fetch(`/api/articles/${editingMember.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(memberData),
+        });
+        if (response.ok) {
+          alert('Team member updated successfully!');
+        } else {
+          alert('Failed to update team member.');
+        }
+      }
+      setTeamFormMode('list');
+      setEditingMember(null);
+      setMemberName('');
+      setMemberRole('');
+      setMemberBio('');
+      setMemberImage('');
+      setMemberSectionId('');
+      fetchTeamData();
+    } catch (err: any) {
+      console.error(err);
+      alert('Error saving team member: ' + (err.message || String(err)));
+    } finally {
+      setIsSavingTeam(false);
+    }
+  };
+
+  const handleSaveSection = async () => {
+    if (!sectionName.trim()) {
+      alert('Section Name is required!');
+      return;
+    }
+
+    setIsSavingTeam(true);
+    const sSlug = sectionSlug.trim() || `section-${Date.now().toString().slice(-6)}`;
+    const sectionData = {
+      title: sectionName.trim(),
+      slug: sSlug,
+      categorySlug: 'team-section',
+      author: 'హై టీవీ డెస్క్',
+      isBreaking: false,
+      isTrending: false,
+      isFeatured: false,
+      publishedAt: new Date().toISOString(),
+    };
+
+    try {
+      const response = await fetch('/api/articles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sectionData),
+      });
+      if (response.ok) {
+        alert('Section added successfully!');
+        setSectionName('');
+        setSectionSlug('');
+        setTeamFormMode('list');
+        fetchTeamData();
+      } else {
+        alert('Failed to add section.');
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert('Error saving section: ' + (err.message || String(err)));
+    } finally {
+      setIsSavingTeam(false);
+    }
+  };
+
+  const handleDeleteTeamItem = async (id: string, type: 'member' | 'section') => {
+    if (!confirm(`Are you sure you want to delete this ${type}?`)) return;
+    try {
+      const response = await fetch(`/api/articles/${id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        alert(`${type === 'member' ? 'Team member' : 'Section'} deleted successfully!`);
+        fetchTeamData();
+      } else {
+        alert(`Failed to delete ${type}.`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert(`Error deleting ${type}`);
+    }
   };
 
   // Weather page states
@@ -3056,7 +3361,37 @@ export default function AdminPage() {
             </div>
           </button>
 
+                    <button
+            onClick={() => {
+              setActiveTab('team-manager');
+              setTeamFormMode('list');
+            }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'team-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Users className="w-4 h-4" />
+              <span>మా టీమ్ (Our Team Manager)</span>
+            </div>
+          </button>
+
           <button
+            onClick={() => {
+              setActiveTab('sidebar-ads');
+              setAdFormMode('list');
+            }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'sidebar-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Megaphone className="w-4 h-4" />
+              <span>సైడ్‌బార్ యాడ్స్ (Sidebar Ads Manager)</span>
+            </div>
+          </button>
+
+<button
             onClick={() => {
               setActiveTab('editorial');
               setEditorialFormMode('none');
@@ -8518,6 +8853,684 @@ export default function AdminPage() {
                   </ul>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ══════════════ VIEW: SIDEBAR ADS MANAGER ══════════════ */}
+          {activeTab === 'sidebar-ads' && (
+            <div className="flex flex-col gap-6 animate-fade-in text-left">
+              {/* Header */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-black text-slate-800">సైడ్‌బార్ యాడ్స్ మేనేజర్ (Sidebar Ads Manager)</h2>
+                  <p className="text-slate-500 text-xs">ఇక్కడ మీరు కేటగిరీ మరియు వార్తా కథనాల పేజీల సైడ్‌బార్‌లో ప్రదర్శించబడే యాడ్‌లను నిర్వహించవచ్చు.</p>
+                </div>
+                {adFormMode === 'list' && (
+                  <button
+                    onClick={() => {
+                      setAdFormMode('add');
+                      setEditingAd(null);
+                      setSidebarAdTitle('');
+                      setSidebarAdLink('');
+                      setSidebarAdImage('');
+                      setSidebarAdStatus('active');
+                      setSidebarAdLocation('category');
+                    }}
+                    className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Plus className="w-4 h-4" />
+                    కొత్త యాడ్ చేర్చండి (Add Ad)
+                  </button>
+                )}
+              </div>
+
+              {/* LIST MODE */}
+              {adFormMode === 'list' && (
+                <div className="flex flex-col gap-6">
+                  {/* Tabs Toggle (Category vs Article Left vs Article Right Ads) */}
+                  <div className="flex bg-white border border-slate-200/60 rounded-2xl p-2 gap-2 shadow-sm max-w-2xl">
+                    <button
+                      onClick={() => setAdActiveSubTab('category')}
+                      className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
+                        adActiveSubTab === 'category'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                      }`}
+                    >
+                      కేటగిరీ సైడ్‌బార్ యాడ్స్
+                    </button>
+                    <button
+                      onClick={() => setAdActiveSubTab('article-left')}
+                      className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
+                        adActiveSubTab === 'article-left'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                      }`}
+                    >
+                      వార్తల ఎడమ సైడ్‌బార్ యాడ్స్
+                    </button>
+                    <button
+                      onClick={() => setAdActiveSubTab('article-right')}
+                      className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
+                        adActiveSubTab === 'article-right'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                      }`}
+                    >
+                      వార్తల కుడి సైడ్‌బార్ యాడ్స్
+                    </button>
+                  </div>
+
+                  {/* Ads list grid */}
+                  {(() => {
+                    const targetCategorySlug = adActiveSubTab === 'category' 
+                      ? 'sidebar-ad-category' 
+                      : adActiveSubTab === 'article-left'
+                        ? 'sidebar-ad-article-left'
+                        : 'sidebar-ad-article-right';
+                    const activeAds = sidebarAds.filter(
+                      ad => ad.categorySlug === targetCategorySlug || ad.categorySlug === 'sidebar-ad-both'
+                    );
+
+                    if (activeAds.length === 0) {
+                      return (
+                        <div className="bg-white border border-slate-200/60 rounded-3xl p-12 text-center shadow-sm">
+                          <Megaphone className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                          <p className="text-slate-500 text-xs font-bold">ఈ సెక్షన్‌లో ఎటువంటి యాడ్‌లు లేవు (No ads in this section)</p>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="flex flex-col gap-3">
+                        {activeAds.map((ad) => (
+                          <div key={ad.id} className="bg-white border border-slate-200/60 rounded-2xl p-3 flex items-center justify-between gap-4 shadow-sm hover:border-slate-300 transition-all">
+                            {/* Left: Thumbnail & Info */}
+                            <div className="flex items-center gap-3.5 min-w-0">
+                              {/* Thumbnail */}
+                              <div className="w-16 h-16 bg-slate-50 border border-slate-150 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center relative">
+                                <img src={ad.image} alt={ad.title} className="w-full h-full object-contain" />
+                              </div>
+                              {/* Info */}
+                              <div className="min-w-0 flex flex-col gap-0.5 text-left">
+                                <h4 className="text-sm font-black text-slate-800 truncate">{ad.title}</h4>
+                                <p className="text-[10px] text-slate-400 font-bold truncate">Link: {ad.body || 'No Redirect Link'}</p>
+                                
+                                {/* Badges */}
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase text-white ${
+                                    ad.category === 'active' ? 'bg-emerald-600' : 'bg-slate-400'
+                                  }`}>
+                                    {ad.category === 'active' ? 'Active' : 'Inactive'}
+                                  </span>
+                                  <span className="px-2 py-0.5 rounded text-[9px] font-black text-slate-500 bg-slate-100 border border-slate-200">
+                                    {ad.categorySlug === 'sidebar-ad-category' 
+                                      ? 'Category Only' 
+                                      : ad.categorySlug === 'sidebar-ad-article-left' 
+                                        ? 'Article Left Only' 
+                                        : ad.categorySlug === 'sidebar-ad-article-right'
+                                          ? 'Article Right Only'
+                                          : 'All Sidebars'}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Right: Actions */}
+                            <div className="flex items-center gap-3 flex-shrink-0">
+                              {/* Toggle Active Button */}
+                              <button
+                                onClick={() => handleToggleAdStatus(ad)}
+                                className={`text-xs font-black py-1.5 px-3 rounded-lg border transition-all cursor-pointer ${
+                                  ad.category === 'active'
+                                    ? 'bg-emerald-50 text-emerald-600 border-emerald-250 hover:bg-emerald-100'
+                                    : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
+                                }`}
+                              >
+                                {ad.category === 'active' ? 'దాచండి' : 'ప్రదర్శించండి'}
+                              </button>
+
+                              {/* Action Buttons */}
+                              <div className="flex items-center gap-1.5 border-l border-slate-100 pl-3">
+                                <button
+                                  onClick={() => {
+                                    setEditingAd(ad);
+                                    setSidebarAdTitle(ad.title);
+                                    setSidebarAdLink(ad.body || '');
+                                    setSidebarAdImage(ad.image || '');
+                                    setSidebarAdStatus(ad.category === 'active' ? 'active' : 'inactive');
+                                    const loc = ad.categorySlug === 'sidebar-ad-category' 
+                                      ? 'category' 
+                                      : ad.categorySlug === 'sidebar-ad-article-left' 
+                                        ? 'article-left' 
+                                        : ad.categorySlug === 'sidebar-ad-article-right'
+                                          ? 'article-right'
+                                          : 'both';
+                                    setSidebarAdLocation(loc);
+                                    setAdFormMode('edit');
+                                  }}
+                                  className="text-sky-600 hover:text-sky-700 bg-slate-50 border border-slate-200/50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                                  title="Edit Ad"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteAd(ad.id)}
+                                  className="text-rose-500 hover:text-rose-600 bg-slate-50 border border-slate-200/50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                                  title="Delete Ad"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {/* ADD / EDIT AD FORM */}
+              {(adFormMode === 'add' || adFormMode === 'edit') && (
+                <div className="bg-white border border-slate-200/60 rounded-3xl p-6 flex flex-col gap-5 max-w-xl shadow-sm">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                    <ArrowLeft 
+                      className="w-5 h-5 text-slate-500 hover:text-slate-800 cursor-pointer" 
+                      onClick={() => setAdFormMode('list')}
+                    />
+                    <h3 className="text-lg font-black text-slate-800">
+                      {adFormMode === 'add' ? 'కొత్త సైడ్‌బార్ యాడ్ చేర్చండి (Add Sidebar Ad)' : 'సైడ్‌బార్ యాడ్ సవరించండి (Edit Sidebar Ad)'}
+                    </h3>
+                  </div>
+
+                  <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); handleSaveAd(); }}>
+                    {/* Ad Title */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">యాడ్ పేరు (Ad Reference Title) <strong className="text-rose-500">*</strong></label>
+                      <input
+                        type="text"
+                        value={sidebarAdTitle}
+                        onChange={(e) => setSidebarAdTitle(e.target.value)}
+                        placeholder="e.g. CMR Shopping Mall Saree Ad"
+                        required
+                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                      />
+                    </div>
+
+                    {/* Ad Link */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">రీడైరెక్ట్ లింక్ (Redirect Link / Click URL)</label>
+                      <input
+                        type="url"
+                        value={sidebarAdLink}
+                        onChange={(e) => setSidebarAdLink(e.target.value)}
+                        placeholder="https://example.com"
+                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                      />
+                    </div>
+
+                    {/* Display Location Select */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">యాడ్ ప్రదర్శన స్థలం (Display Location) <strong className="text-rose-500">*</strong></label>
+                      <select
+                        value={sidebarAdLocation}
+                        onChange={(e) => setSidebarAdLocation(e.target.value as 'category' | 'article-left' | 'article-right' | 'both')}
+                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
+                      >
+                        <option value="category">కేటగిరీ సైడ్‌బార్ మాత్రమే (Category Pages Sidebar Only)</option>
+                        <option value="article-left">వార్తల ఎడమ సైడ్‌బార్ మాత్రమే (Article Page Left Sidebar Only)</option>
+                        <option value="article-right">వార్తల కుడి సైడ్‌బార్ మాత్రమే (Article Page Right Sidebar Only)</option>
+                        <option value="both">అన్ని సైడ్‌బార్లలోనూ (All Sidebars / Combined)</option>
+                      </select>
+                    </div>
+
+                    {/* Status Select */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">యాడ్ ప్రదర్శన స్థితి (Status) <strong className="text-rose-500">*</strong></label>
+                      <select
+                        value={sidebarAdStatus}
+                        onChange={(e) => setSidebarAdStatus(e.target.value as 'active' | 'inactive')}
+                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
+                      >
+                        <option value="active">ప్రదర్శించండి (Active / Live)</option>
+                        <option value="inactive">దాచండి (Inactive / Hidden)</option>
+                      </select>
+                    </div>
+
+                    {/* Ad Image Uploader */}
+                    <div className="flex flex-col gap-2 bg-slate-50 border border-slate-200/50 rounded-2xl p-4">
+                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide flex items-center gap-1">
+                        <ImageIcon className="w-3.5 h-3.5 text-slate-500" /> యాడ్ బ్యానర్ ఫోటో (Ad Image Banner) <strong className="text-rose-500">*</strong>
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="file"
+                          id="ad-image-input"
+                          className="hidden"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleCompressAndSetImage(file, (base64) => {
+                                setSidebarAdImage(base64);
+                              });
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => document.getElementById('ad-image-input')?.click()}
+                          className="bg-slate-900 hover:bg-slate-800 text-white font-black text-xs py-2 px-4 rounded-xl transition-colors cursor-pointer shadow-sm flex items-center gap-1.5"
+                        >
+                          <Upload className="w-3.5 h-3.5" />
+                          చిత్రాన్ని అప్‌లోడ్ చేయండి (Upload Image)
+                        </button>
+                        {sidebarAdImage && (
+                          <button
+                            type="button"
+                            onClick={() => setSidebarAdImage('')}
+                            className="border border-rose-200 hover:bg-rose-50 text-rose-500 font-bold text-xs py-2 px-3 rounded-xl transition-all cursor-pointer"
+                          >
+                            తొలగించు (Remove)
+                          </button>
+                        )}
+                      </div>
+                      {sidebarAdImage && (
+                        <div className="mt-2 border border-slate-200 bg-white p-2 rounded-xl max-w-xs">
+                          <img src={sidebarAdImage} alt="Ad Preview" className="w-full h-auto object-contain rounded-lg" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-3 mt-2">
+                      <button
+                        type="submit"
+                        disabled={isSavingSidebarAd}
+                        className="bg-rose-600 hover:bg-rose-700 disabled:bg-slate-300 text-white font-black text-xs py-3 px-6 rounded-xl transition-colors shadow-md cursor-pointer"
+                      >
+                        {isSavingSidebarAd ? 'సేవ్ అవుతోంది...' : 'యాడ్ సేవ్ చేయండి (Save Ad)'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAdFormMode('list')}
+                        className="border border-slate-250 hover:bg-slate-50 text-slate-600 font-black text-xs py-3 px-6 rounded-xl transition-colors cursor-pointer"
+                      >
+                        రద్దు చేయండి (Cancel)
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </div>
+          )
+          }          {/* ══════════════ VIEW: TEAM MANAGER ══════════════ */}
+          {activeTab === 'team-manager' && (
+            <div className="flex flex-col gap-6 animate-fade-in text-left">
+              {/* Header */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-black text-slate-800">మా టీమ్ మేనేజర్ (Our Team Manager)</h2>
+                  <p className="text-slate-500 text-xs">ఇక్కడ నుండి మీరు మా టీమ్ సభ్యులను మరియు వివిధ సెక్షన్లను నిర్వహించవచ్చు.</p>
+                </div>
+                {teamFormMode === 'list' && (
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => {
+                        setTeamFormMode('add-member');
+                        setEditingMember(null);
+                        setMemberName('');
+                        setMemberSlug('');
+                        setMemberRole('');
+                        setMemberBio('');
+                        setMemberImage('');
+                        setMemberSectionId(teamSections[0]?.slug || 'reporters');
+                      }}
+                      className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Plus className="w-4 h-4" />
+                      సభ్యుడిని చేర్చండి (Add Member)
+                    </button>
+                    <button
+                      onClick={() => {
+                        setTeamFormMode('add-section');
+                        setSectionName('');
+                        setSectionSlug('');
+                      }}
+                      className="bg-slate-900 hover:bg-slate-800 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Plus className="w-4 h-4" />
+                      సెక్షన్ చేర్చండి (Add Section)
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* LIST MODE */}
+              {teamFormMode === 'list' && (
+                <div className="flex flex-col gap-8">
+                  {/* Load dynamic sections or defaults */}
+                  {(() => {
+                    const sections = teamSections.length > 0 
+                      ? teamSections.map(s => ({ id: s.slug, name: s.title, idDB: s.id }))
+                      : [
+                          { id: 'reporters', name: 'HighTV Reporters', idDB: '' },
+                          { id: 'desk', name: 'HighTV Desk', idDB: '' }
+                        ];
+
+                    const members = teamMembers.map(m => ({
+                      id: m.id,
+                      slug: m.slug,
+                      name: m.title,
+                      role: m.category || '',
+                      bio: m.description || '',
+                      image: m.image || '',
+                      sectionId: m.body || 'reporters',
+                    }));
+
+                    return sections.map((section) => {
+                      const sectionMembers = members.filter(m => m.sectionId === section.id);
+                      return (
+                        <div key={section.id} className="bg-white border border-slate-200/60 rounded-3xl overflow-hidden shadow-sm p-6 flex flex-col gap-4">
+                          {/* Section Title */}
+                          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                            <div>
+                              <h3 className="text-base font-black text-slate-800 font-sans">{section.name}</h3>
+                              <span className="text-[10px] text-slate-400 font-bold">Slug: {section.id}</span>
+                            </div>
+                            {/* Option to delete custom sections */}
+                            {section.idDB && (
+                              <button
+                                onClick={() => handleDeleteTeamItem(section.idDB, 'section')}
+                                className="text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-2 rounded-xl transition-all cursor-pointer text-xs font-bold flex items-center gap-1"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                సెక్షన్ తొలగించండి (Delete Section)
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Section Members List */}
+                          {sectionMembers.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                              {sectionMembers.map((member) => (
+                                <div key={member.id} className="bg-slate-50 border border-slate-200/40 rounded-2xl p-4 flex gap-4 items-start relative group">
+                                  {/* Photo if present */}
+                                  {member.image && (
+                                    <div className="w-16 h-16 rounded-full overflow-hidden border border-slate-200 shadow-xs flex-shrink-0">
+                                      <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                                    </div>
+                                  )}
+                                  
+                                  {/* Info */}
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-sm font-black text-slate-800 truncate telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>{member.name}</h4>
+                                    <p className="text-[10px] font-bold text-rose-600 uppercase tracking-wide truncate">{member.role}</p>
+                                    <p className="text-slate-500 text-xs mt-1 leading-relaxed line-clamp-2 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>{member.bio}</p>
+                                  </div>
+
+                                  {/* Hover actions */}
+                                  <div className="flex items-center gap-1.5 absolute top-3 right-3 bg-slate-50/90 pl-2 rounded-lg py-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                      onClick={() => {
+                                        setEditingMember(member);
+                                        setMemberName(member.name);
+                                        setMemberSlug(member.slug);
+                                        setMemberRole(member.role);
+                                        setMemberBio(member.bio);
+                                        setMemberImage(member.image);
+                                        setMemberSectionId(member.sectionId);
+                                        setTeamFormMode('edit-member');
+                                      }}
+                                      className="text-sky-600 hover:text-sky-700 bg-white hover:bg-sky-50 border border-slate-200/50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                                      title="సభ్యుడిని సవరించు (Edit Member)"
+                                    >
+                                      <Pencil className="w-3.5 h-3.5" />
+                                    </button>
+                                    {member.id.length > 5 && (
+                                      <button
+                                        onClick={() => handleDeleteTeamItem(member.id, 'member')}
+                                        className="text-rose-500 hover:text-rose-600 bg-white hover:bg-rose-50 border border-slate-200/50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                                        title="సభ్యుడిని తొలగించు (Delete Member)"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-center py-6 text-slate-400 border border-dashed border-slate-200/80 rounded-2xl">
+                              <p className="text-xs font-bold">ఈ సెక్షన్‌లో ఎటువంటి సభ్యులు లేరు (No members in this section)</p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              )}
+
+              {/* ADD / EDIT MEMBER FORM */}
+              {(teamFormMode === 'add-member' || teamFormMode === 'edit-member') && (
+                <div className="bg-white border border-slate-200/60 rounded-3xl p-6 flex flex-col gap-5 max-w-2xl shadow-sm">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                    <ArrowLeft 
+                      className="w-5 h-5 text-slate-500 hover:text-slate-800 cursor-pointer" 
+                      onClick={() => setTeamFormMode('list')}
+                    />
+                    <h3 className="text-lg font-black text-slate-800">
+                      {teamFormMode === 'add-member' ? 'టీమ్ సభ్యుడిని చేర్చండి (Add Team Member)' : 'టీమ్ సభ్యుడి వివరాలు సవరించండి (Edit Member Details)'}
+                    </h3>
+                  </div>
+
+                  <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); handleSaveTeamMember(); }}>
+                    {/* Name */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">పేరు (Full Name) <strong className="text-rose-500">*</strong></label>
+                      <input
+                        type="text"
+                        value={memberName}
+                        onChange={(e) => setMemberName(e.target.value)}
+                        placeholder="సభ్యుడి పేరు రాయండి..."
+                        required
+                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      />
+                    </div>
+
+                    {/* Slug */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">Slug (Unique key - e.g. kalyan) <strong className="text-rose-500">*</strong></label>
+                      <input
+                        type="text"
+                        value={memberSlug}
+                        onChange={(e) => setMemberSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                        placeholder="kalyan"
+                        disabled={teamFormMode === 'edit-member'}
+                        required
+                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold disabled:bg-slate-100 disabled:cursor-not-allowed"
+                      />
+                    </div>
+
+                    {/* Role */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">హోదా / పాత్ర (Role / Designation)</label>
+                      <input
+                        type="text"
+                        value={memberRole}
+                        onChange={(e) => setMemberRole(e.target.value)}
+                        placeholder="స్టాఫ్ రిపోర్టర్ (Staff Reporter)"
+                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      />
+                    </div>
+
+                    {/* Section Select */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">సెక్షన్ (Select Section) <strong className="text-rose-500">*</strong></label>
+                      <select
+                        value={memberSectionId}
+                        onChange={(e) => setMemberSectionId(e.target.value)}
+                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
+                      >
+                        {(() => {
+                          const sections = teamSections.length > 0
+                            ? teamSections.map(s => ({ id: s.slug, name: s.title }))
+                            : [
+                                { id: 'reporters', name: 'HighTV Reporters' },
+                                { id: 'desk', name: 'HighTV Desk' }
+                              ];
+                          return sections.map(s => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                          ));
+                        })()}
+                      </select>
+                    </div>
+
+                    {/* Bio */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">పరిచయం (Short Bio / Details)</label>
+                      <textarea
+                        value={memberBio}
+                        onChange={(e) => setMemberBio(e.target.value)}
+                        placeholder="పరిచయ సమాచారం ఇక్కడ రాయండి..."
+                        rows={4}
+                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold resize-none"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      />
+                    </div>
+
+                    {/* Image Upload */}
+                    {memberSectionId === 'reporters' && (
+                      <div className="flex flex-col gap-2 bg-slate-50 border border-slate-200/50 rounded-2xl p-4">
+                        <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide flex items-center gap-1">
+                          <ImageIcon className="w-3.5 h-3.5 text-slate-500" /> ప్రొఫైల్ ఫోటో (Profile Photo)
+                        </label>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="file"
+                            id="member-photo-input"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                handleCompressAndSetImage(file, (base64) => {
+                                  setMemberImage(base64);
+                                });
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => document.getElementById('member-photo-input')?.click()}
+                            className="bg-slate-900 hover:bg-slate-800 text-white font-black text-xs py-2 px-4 rounded-xl transition-colors cursor-pointer shadow-sm flex items-center gap-1.5"
+                          >
+                            <Upload className="w-3.5 h-3.5" />
+                            ఫోటో అప్‌లోడ్ చేయండి (Upload Photo)
+                          </button>
+                          {memberImage && (
+                            <button
+                              type="button"
+                              onClick={() => setMemberImage('')}
+                              className="border border-rose-200 hover:bg-rose-50 text-rose-500 font-bold text-xs py-2 px-3 rounded-xl transition-all cursor-pointer"
+                            >
+                              తొలగించు (Remove)
+                            </button>
+                          )}
+                        </div>
+                        {memberImage && (
+                          <div className="mt-2 border border-slate-200 bg-white p-2 rounded-xl w-24 h-24">
+                            <img src={memberImage} alt="Profile Preview" className="w-full h-full object-cover rounded-lg" />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-3 mt-2">
+                      <button
+                        type="submit"
+                        disabled={isSavingTeam}
+                        className="bg-rose-600 hover:bg-rose-700 disabled:bg-slate-300 text-white font-black text-xs py-3 px-6 rounded-xl transition-colors shadow-md cursor-pointer"
+                      >
+                        {isSavingTeam ? 'సేవ్ అవుతోంది...' : 'సమాచారాన్ని సేవ్ చేయండి (Save Details)'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTeamFormMode('list')}
+                        className="border border-slate-250 hover:bg-slate-50 text-slate-600 font-black text-xs py-3 px-6 rounded-xl transition-colors cursor-pointer"
+                      >
+                        రద్దు చేయండి (Cancel)
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* ADD SECTION FORM */}
+              {teamFormMode === 'add-section' && (
+                <div className="bg-white border border-slate-200/60 rounded-3xl p-6 flex flex-col gap-5 max-w-md shadow-sm">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                    <ArrowLeft 
+                      className="w-5 h-5 text-slate-500 hover:text-slate-800 cursor-pointer" 
+                      onClick={() => setTeamFormMode('list')}
+                    />
+                    <h3 className="text-lg font-black text-slate-800">
+                      కొత్త సెక్షన్ చేర్చండి (Add New Section)
+                    </h3>
+                  </div>
+
+                  <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); handleSaveSection(); }}>
+                    {/* Section Name */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">సెక్షన్ పేరు (Section Name) <strong className="text-rose-500">*</strong></label>
+                      <input
+                        type="text"
+                        value={sectionName}
+                        onChange={(e) => setSectionName(e.target.value)}
+                        placeholder="HighTV Digital"
+                        required
+                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                      />
+                    </div>
+
+                    {/* Section Slug */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">సెక్షన్ Slug / ID (e.g. digital-team) <strong className="text-rose-500">*</strong></label>
+                      <input
+                        type="text"
+                        value={sectionSlug}
+                        onChange={(e) => setSectionSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                        placeholder="digital-team"
+                        required
+                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                      />
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-3 mt-2">
+                      <button
+                        type="submit"
+                        disabled={isSavingTeam}
+                        className="bg-rose-600 hover:bg-rose-700 disabled:bg-slate-300 text-white font-black text-xs py-3 px-6 rounded-xl transition-colors shadow-md cursor-pointer"
+                      >
+                        {isSavingTeam ? 'సేవ్ అవుతోంది...' : 'సెక్షన్ సృష్టించండి (Create Section)'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTeamFormMode('list')}
+                        className="border border-slate-250 hover:bg-slate-50 text-slate-600 font-black text-xs py-3 px-6 rounded-xl transition-colors cursor-pointer"
+                      >
+                        రద్దు చేయండి (Cancel)
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
             </div>
           )}
 

@@ -91,6 +91,27 @@ export default function ArticlePageClient({
   // Initialize as false — localStorage check runs in useEffect after hydration to avoid mismatch
   const [inlinePromosEnabled, setInlinePromosEnabled] = useState<boolean>(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [customArticleLeftAds, setCustomArticleLeftAds] = useState<any[]>([]);
+  const [customArticleRightAds, setCustomArticleRightAds] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchArticleAds = async () => {
+      try {
+        const [leftRes, rightRes, bothRes] = await Promise.all([
+          fetch('/api/articles?category=sidebar-ad-article-left&limit=50&t=' + Date.now()).then(r => r.json()),
+          fetch('/api/articles?category=sidebar-ad-article-right&limit=50&t=' + Date.now()).then(r => r.json()),
+          fetch('/api/articles?category=sidebar-ad-both&limit=50&t=' + Date.now()).then(r => r.json())
+        ]);
+        if (Array.isArray(leftRes) && Array.isArray(rightRes) && Array.isArray(bothRes)) {
+          setCustomArticleLeftAds([...leftRes, ...bothRes].filter((ad: any) => ad.category === 'active'));
+          setCustomArticleRightAds([...rightRes, ...bothRes].filter((ad: any) => ad.category === 'active'));
+        }
+      } catch (err) {
+        console.error("Error loading article sidebar ads:", err);
+      }
+    };
+    fetchArticleAds();
+  }, []);
 
   const [apNewsList, setApNewsList] = useState<any[]>(apDistrictNews);
   const [tgNewsList, setTgNewsList] = useState<any[]>(tgDistrictNews);
@@ -507,17 +528,25 @@ export default function ArticlePageClient({
               </div>
             )}
 
-            {/* Ad 1 — Jewellery */}
-            <div className="bg-white border border-gray-200 rounded overflow-hidden">
-              <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
-              <div className="bg-gradient-to-br from-[#7b2d00] to-[#c0392b] p-4 text-white text-center min-h-[180px] flex flex-col items-center justify-center gap-2">
-                <div className="text-3xl">💍</div>
-                <div className="text-base font-black leading-tight">CMR జ్యువెల్లరీ</div>
-                <div className="text-[11px] font-bold opacity-90">Gold & Diamond Sale</div>
-                <div className="text-[10px] opacity-80 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వేసవి ఆఫర్లు — 30% వరకు తగ్గింపు</div>
-                <div className="mt-2 bg-yellow-400 text-[#7b2d00] rounded-full px-3 py-1 text-[10px] font-black">Shop Now →</div>
-              </div>
-            </div>
+            {/* Dynamic Article Sidebar Ads (First 2 ads on top of Trending News) */}
+            {customArticleLeftAds.slice(0, 2).map((ad) => (
+              <a
+                key={ad.id}
+                href={ad.body || '#'}
+                target={ad.body ? '_blank' : '_self'}
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!ad.body) e.preventDefault();
+                }}
+                className="w-full h-[160px] flex items-center justify-center bg-slate-50/50 overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200 mb-3"
+              >
+                <img
+                  src={ad.image}
+                  alt={ad.title}
+                  className="w-full h-full object-contain"
+                />
+              </a>
+            ))}
 
             {/* Trending News */}
             <div className="bg-white border border-gray-200 rounded overflow-hidden">
@@ -547,17 +576,25 @@ export default function ArticlePageClient({
               </ul>
             </div>
 
-            {/* Ad 2 — Education */}
-            <div className="bg-white border border-gray-200 rounded overflow-hidden">
-              <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
-              <div className="bg-gradient-to-br from-[#1a237e] to-[#283593] p-4 text-white text-center min-h-[150px] flex flex-col items-center justify-center gap-2">
-                <div className="text-2xl">🎓</div>
-                <div className="text-sm font-black leading-tight">NARAYANA<br />IIT Academy</div>
-                <div className="text-[10px] font-bold opacity-90 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>JEE • NEET • EAMCET</div>
-                <div className="text-[9px] opacity-80">Admissions Open 2026</div>
-                <div className="mt-2 bg-yellow-300 text-[#1a237e] rounded-full px-3 py-1 text-[10px] font-black">Enroll Now</div>
-              </div>
-            </div>
+            {/* Dynamic Article Sidebar Ads (Continuous ads after Trending News) */}
+            {customArticleLeftAds.slice(2).map((ad) => (
+              <a
+                key={ad.id}
+                href={ad.body || '#'}
+                target={ad.body ? '_blank' : '_self'}
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!ad.body) e.preventDefault();
+                }}
+                className="w-full h-[160px] flex items-center justify-center bg-slate-50/50 overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200 mb-3"
+              >
+                <img
+                  src={ad.image}
+                  alt={ad.title}
+                  className="w-full h-full object-contain"
+                />
+              </a>
+            ))}
           </aside>
 
           {/* Middle: Full Article Content */}
@@ -850,18 +887,25 @@ export default function ArticlePageClient({
               </div>
             )}
 
-            {/* Ad 3 — Real Estate */}
-            <div className="bg-white border border-gray-200 rounded overflow-hidden">
-              <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
-              <div className="bg-gradient-to-br from-[#0d3b2e] to-[#1a5c45] p-4 text-white text-center min-h-[160px] flex flex-col items-center justify-center gap-2">
-                <div className="text-2xl">🏢</div>
-                <div className="text-sm font-black leading-tight">NAVANAAMI<br /><span className="text-xs font-bold opacity-80">at Kokapet</span></div>
-                <div className="text-[10px] font-bold opacity-90">2437 – 3379 SqFt</div>
-                <div className="text-[11px] font-black text-yellow-300">₹2.3 Cr* Onwards</div>
-                <div className="mt-1 bg-white text-[#0d3b2e] rounded-full px-3 py-1 text-[10px] font-black">+91 98861 88383</div>
-              </div>
-            </div>
-
+            {/* Dynamic Article Sidebar Ads (First 2 ads on top of Breaking News) */}
+            {customArticleRightAds.slice(0, 2).map((ad) => (
+              <a
+                key={ad.id}
+                href={ad.body || '#'}
+                target={ad.body ? '_blank' : '_self'}
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!ad.body) e.preventDefault();
+                }}
+                className="w-full h-[160px] flex items-center justify-center bg-slate-50/50 overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200 mb-3"
+              >
+                <img
+                  src={ad.image}
+                  alt={ad.title}
+                  className="w-full h-full object-contain"
+                />
+              </a>
+            ))}
 
             {/* Latest News */}
             <div className="bg-white border border-gray-200 rounded overflow-hidden">
@@ -890,26 +934,73 @@ export default function ArticlePageClient({
               </ul>
             </div>
 
-
-            {/* Ad 4 — Health Insurance */}
-            <div className="bg-white border border-gray-200 rounded overflow-hidden">
-              <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
-              <div className="bg-gradient-to-br from-[#e65100] to-[#bf360c] p-4 text-white text-center min-h-[140px] flex flex-col items-center justify-center gap-2">
-                <div className="text-2xl">🏥</div>
-                <div className="text-sm font-black">Star Health</div>
-                <div className="text-[10px] font-bold opacity-90 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఆరోగ్య బీమా ₹99/నెల</div>
-                <div className="text-[9px] opacity-80">Family Floater Plans Available</div>
-                <div className="mt-2 bg-white text-[#e65100] rounded-full px-3 py-1 text-[10px] font-black">Get Quote →</div>
-              </div>
-            </div>
+            {/* Dynamic Article Sidebar Ads (Next 2 ads between Breaking News and Jilla Varthalu) */}
+            {customArticleRightAds.slice(2, 4).map((ad) => (
+              <a
+                key={ad.id}
+                href={ad.body || '#'}
+                target={ad.body ? '_blank' : '_self'}
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!ad.body) e.preventDefault();
+                }}
+                className="w-full h-[160px] flex items-center justify-center bg-slate-50/50 overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200 mb-3"
+              >
+                <img
+                  src={ad.image}
+                  alt={ad.title}
+                  className="w-full h-full object-contain"
+                />
+              </a>
+            ))}
 
             {/* district news */}
             <DistrictNewsTabs apNews={apNewsList} tgNews={tgNewsList} />
+
+            {/* Dynamic Article Sidebar Ads (Next 2 ads between Jilla Varthalu and Polls) */}
+            {customArticleRightAds.slice(4, 6).map((ad) => (
+              <a
+                key={ad.id}
+                href={ad.body || '#'}
+                target={ad.body ? '_blank' : '_self'}
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!ad.body) e.preventDefault();
+                }}
+                className="w-full h-[160px] flex items-center justify-center bg-slate-50/50 overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200 mb-3"
+              >
+                <img
+                  src={ad.image}
+                  alt={ad.title}
+                  className="w-full h-full object-contain"
+                />
+              </a>
+            ))}
 
             {/* Article Page Poll Widget */}
             <div className="mt-3">
               <PollWidget scope="article" />
             </div>
+
+            {/* Dynamic Article Sidebar Ads (Remaining ads after Polls continuously) */}
+            {customArticleRightAds.slice(6).map((ad) => (
+              <a
+                key={ad.id}
+                href={ad.body || '#'}
+                target={ad.body ? '_blank' : '_self'}
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!ad.body) e.preventDefault();
+                }}
+                className="w-full h-[160px] flex items-center justify-center bg-slate-50/50 overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200 mb-3"
+              >
+                <img
+                  src={ad.image}
+                  alt={ad.title}
+                  className="w-full h-full object-contain"
+                />
+              </a>
+            ))}
           </aside>
 
         </div>

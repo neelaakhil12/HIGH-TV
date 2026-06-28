@@ -1,3 +1,4 @@
+import { prisma } from '@/lib/prisma';
 import Header from '@/components/layout/Header';
 import BackButton from '@/components/layout/BackButton';
 import Footer from '@/components/layout/Footer';
@@ -53,22 +54,72 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const profile = reporterProfiles[slug] || reporterProfiles['default'];
+  
+  // Try loading profile from DB
+  const dbMember = await prisma.article.findFirst({
+    where: { categorySlug: 'team-member', slug: slug, isDeleted: false }
+  });
+  
+  const profile = dbMember
+    ? { name: dbMember.title, bio: dbMember.description }
+    : (reporterProfiles[slug] || reporterProfiles['default']);
+
   return {
     title: `${profile.name} - మా టీమ్ ప్రొఫైల్ & వార్తలు | హై టీవీ`,
-    description: profile.bio,
+    description: profile.bio || '',
   };
 }
 
 export default async function ReporterPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const profile = reporterProfiles[slug] || reporterProfiles['default'];
   
-  // Find all articles written by this reporter
-  const reporterArticles = allNews.filter((art) => {
-    const rep = getReporterByAuthor(art.author);
-    return rep.slug === slug;
+  // Try loading profile from DB
+  const dbMember = await prisma.article.findFirst({
+    where: { categorySlug: 'team-member', slug: slug, isDeleted: false }
   });
+  
+  const profile = dbMember
+    ? {
+        name: dbMember.title,
+        slug: dbMember.slug,
+        role: dbMember.category || '',
+        bio: dbMember.description || '',
+        image: dbMember.image || ''
+      }
+    : (reporterProfiles[slug] || reporterProfiles['default']);
+  
+  // Find all articles written by this reporter in database
+  const dbArticles = await prisma.article.findMany({
+    where: { isDeleted: false },
+    orderBy: { publishedAt: 'desc' },
+  });
+
+  const reporterArticles = dbArticles
+    .map((art) => ({
+      id: art.id,
+      slug: art.slug,
+      title: art.title,
+      description: art.description || '',
+      content: art.body || '',
+      category: art.category || '',
+      categorySlug: art.categorySlug,
+      categoryColor: 'bg-brand-blue',
+      image: art.image || '',
+      author: art.author || '',
+      publishedAt: art.publishedAt.toISOString(),
+      isBreaking: art.isBreaking,
+      isTrending: art.isTrending,
+      isFeatured: art.isFeatured,
+      views: art.views,
+      tags: [] as string[],
+      districtSlug: art.districtSlug || undefined,
+    }))
+    .filter((art) => {
+      const rep = getReporterByAuthor(art.author || '');
+      if (rep.slug === slug) return true;
+      if (profile && (art.author === profile.name || art.author?.includes(profile.name))) return true;
+      return false;
+    });
 
   return (
     <div className="min-h-screen bg-[#f4f6f8] flex flex-col">
