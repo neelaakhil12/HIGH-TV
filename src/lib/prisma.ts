@@ -14,7 +14,7 @@ const globalForPrisma = globalThis as unknown as {
   mariadbAdapter: PrismaMariaDb | undefined;
 };
 
-if (!globalForPrisma.prismaV2) {
+const createPrismaClient = () => {
   const config = {
     host: process.env.DB_HOST || '13.201.118.106',
     port: parseInt(process.env.DB_PORT || '3306'),
@@ -25,13 +25,19 @@ if (!globalForPrisma.prismaV2) {
     allowPublicKeyRetrieval: true,
     connectTimeout: 30000, // 30 seconds connection timeout (bypasses remote MariaDB DNS lookup delay)
     acquireTimeout: 30000, // 30 seconds pool acquire timeout
+    maxAllowedPacket: 67108864, // 64MB max packet size for large PDF base64 payloads
+    socketTimeout: 60000, // 60 seconds socket timeout
   };
 
-  globalForPrisma.mariadbAdapter = new PrismaMariaDb(config);
-  globalForPrisma.prismaV2 = new PrismaClient({
-    adapter: globalForPrisma.mariadbAdapter,
+  const mariadbAdapter = new PrismaMariaDb(config);
+  return new PrismaClient({
+    adapter: mariadbAdapter,
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
+};
+
+if (!globalForPrisma.prismaV2 || process.env.NODE_ENV === 'development') {
+  globalForPrisma.prismaV2 = createPrismaClient();
 }
 
 export const prisma = globalForPrisma.prismaV2;
