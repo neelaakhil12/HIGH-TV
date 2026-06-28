@@ -45,62 +45,52 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 mb-8">
-        {/* Left Column: Big Featured Article */}
-        <div className="lg:col-span-6 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-10 gap-4 mb-5">
+        {/* Left Big Featured Article */}
+        <div className="md:col-span-7 w-full">
           {mainArticle && (
-            <Link href={getArticleHref(mainArticle)} className="flex flex-col rounded-2xl overflow-hidden group border border-gray-150 shadow-3xs bg-white hover:shadow-xs transition-all p-3">
-              <div className="aspect-[16/10] w-full rounded-xl overflow-hidden relative bg-black/5">
-                <img
-                  src={mainArticle.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                  alt={mainArticle.title}
-                  className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-300"
-                />
-              </div>
-              <div className="pt-4 pb-2 px-1 text-left">
-                <h3 className="text-lg md:text-xl lg:text-2xl font-black text-gray-900 hover:text-[#02599c] transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+            <Link href={getArticleHref(mainArticle)} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
+              <img
+                src={mainArticle.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
+                alt={mainArticle.title}
+                className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5 pointer-events-none">
+                <h3 className="text-xl md:text-2xl lg:text-3xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   {mainArticle.title}
                 </h3>
-                {mainArticle.description && (
-                  <p className="text-xs sm:text-sm text-gray-500 font-medium line-clamp-2 mt-2 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                    {mainArticle.description.replace(/<[^>]*>/g, '').trim()}
-                  </p>
-                )}
               </div>
             </Link>
           )}
         </div>
 
-        {/* Right Column: Supporting Stack (list of 2 articles with small images) */}
-        <div className="lg:col-span-4 flex flex-col gap-4 justify-between">
+        {/* Right Stacked Featured Articles */}
+        <div className="md:col-span-3 flex flex-col gap-4 w-full justify-between">
           {rightArticles.map((art) => {
             const cleanTitle = art.title ? art.title.replace(/<[^>]*>/g, '').trim() : '';
             const cleanDesc = art.description ? art.description.replace(/<[^>]*>/g, '').trim() : '';
-
             return (
-              <Link 
-                key={art.id} 
-                href={getArticleHref(art)} 
-                className="flex gap-4 items-start group bg-white border border-gray-150 p-3 rounded-2xl shadow-3xs hover:shadow-2xs transition-all flex-1"
-              >
-                <div className="w-[110px] h-[74px] sm:w-[130px] sm:h-[86px] flex-shrink-0 rounded-xl overflow-hidden bg-slate-50 relative block border border-slate-100">
+              <div key={art.id} className="flex gap-3 items-start group bg-white hover:bg-slate-50/50 p-2 rounded-xl border border-transparent hover:border-slate-100 transition-all">
+                <Link href={getArticleHref(art)} className="w-[100px] h-[70px] flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 relative block shadow-3xs">
                   <img
                     src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
                     alt={cleanTitle}
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                   />
-                </div>
+                </Link>
                 <div className="flex-1 text-left min-w-0">
-                  <h4 className="text-sm sm:text-base font-black text-[#02599c] group-hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                    {cleanTitle}
-                  </h4>
+                  <Link href={getArticleHref(art)}>
+                    <h4 className="text-sm font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-3" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      {cleanTitle}
+                    </h4>
+                  </Link>
                   {cleanDesc && (
-                    <p className="text-[11px] sm:text-xs text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    <p className="text-[10px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       {cleanDesc}
                     </p>
                   )}
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>
