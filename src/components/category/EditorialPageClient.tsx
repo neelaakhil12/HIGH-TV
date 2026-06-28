@@ -45,9 +45,9 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-10 gap-4 mb-5">
+      <div className="grid grid-cols-1 md:grid-cols-10 gap-5 mb-5">
         {/* Left Big Featured Article */}
-        <div className="md:col-span-7 w-full">
+        <div className="md:col-span-6 w-full">
           {mainArticle && (
             <Link href={getArticleHref(mainArticle)} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
               <img
@@ -65,13 +65,13 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
         </div>
 
         {/* Right Stacked Featured Articles */}
-        <div className="md:col-span-3 flex flex-col gap-4 w-full justify-between">
+        <div className="md:col-span-4 flex flex-col gap-4 w-full justify-between">
           {rightArticles.map((art) => {
             const cleanTitle = art.title ? art.title.replace(/<[^>]*>/g, '').trim() : '';
             const cleanDesc = art.description ? art.description.replace(/<[^>]*>/g, '').trim() : '';
             return (
-              <div key={art.id} className="flex gap-3 items-start group bg-white hover:bg-slate-50/50 p-2 rounded-xl border border-transparent hover:border-slate-100 transition-all">
-                <Link href={getArticleHref(art)} className="w-[100px] h-[70px] flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 relative block shadow-3xs">
+              <div key={art.id} className="flex gap-4 items-start group bg-white hover:bg-slate-50/50 p-2.5 rounded-xl border border-transparent hover:border-slate-100 transition-all">
+                <Link href={getArticleHref(art)} className="w-[110px] h-[76px] flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 relative block shadow-3xs">
                   <img
                     src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
                     alt={cleanTitle}
@@ -80,12 +80,12 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
                 </Link>
                 <div className="flex-1 text-left min-w-0">
                   <Link href={getArticleHref(art)}>
-                    <h4 className="text-sm font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-3" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    <h4 className="text-sm md:text-[15px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       {cleanTitle}
                     </h4>
                   </Link>
                   {cleanDesc && (
-                    <p className="text-[10px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    <p className="text-[11px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       {cleanDesc}
                     </p>
                   )}
