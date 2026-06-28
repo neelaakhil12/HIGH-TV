@@ -29,10 +29,6 @@ function getArticleHref(art: any) {
 function EditorialSection({ title, articles, categorySlug }: { title: string; articles: Article[]; categorySlug: string }) {
   const mainArticle = articles[0];
   const rightArticles = articles.slice(1, 3);
-  const bottomLeftArticles = articles.slice(3, 6);
-  const textOnlyArticles = articles.slice(6, 14);
-  const col1 = textOnlyArticles.slice(0, 4);
-  const col2 = textOnlyArticles.slice(4, 8);
 
   return (
     <div className="mb-12 text-left">
@@ -49,59 +45,38 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mb-5">
-        {/* Left Big Featured Article (Horizontal Card - Image on side) */}
-        <div className="lg:col-span-6 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-10 gap-4 mb-5">
+        {/* Left Big Featured Article */}
+        <div className="md:col-span-7 w-full">
           {mainArticle && (
-            <Link href={getArticleHref(mainArticle)} className="flex flex-col sm:flex-row gap-4 bg-white rounded-xl p-3 border border-gray-150 shadow-3xs hover:border-[#02599c]/35 transition-colors group h-full">
-              <div className="sm:w-[45%] aspect-[4/3] rounded-lg overflow-hidden relative shrink-0 bg-slate-50 border border-slate-100">
-                <img
-                  src={mainArticle.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                  alt={mainArticle.title}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
-                />
-              </div>
-              <div className="flex-1 flex flex-col justify-between py-1 text-left min-w-0">
-                <div>
-                  <h3 className="text-lg md:text-xl font-black text-slate-800 group-hover:text-[#02599c] transition-colors leading-snug telugu-text line-clamp-3" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                    {mainArticle.title}
-                  </h3>
-                  {mainArticle.description && (
-                    <p className="text-xs text-slate-550 line-clamp-4 mt-2.5 telugu-text leading-relaxed" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                      {mainArticle.description.replace(/<[^>]*>/g, '')}
-                    </p>
-                  )}
-                </div>
-                {mainArticle.publishedAt && (
-                  <span className="text-[10px] text-slate-400 font-mono mt-3 block">
-                    {new Date(mainArticle.publishedAt).toLocaleDateString('te-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </span>
-                )}
+            <Link href={getArticleHref(mainArticle)} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
+              <img
+                src={mainArticle.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
+                alt={mainArticle.title}
+                className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5 pointer-events-none">
+                <h3 className="text-xl md:text-2xl lg:text-3xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  {mainArticle.title}
+                </h3>
               </div>
             </Link>
           )}
         </div>
 
-        {/* Right Stacked Featured Articles (Horizontal Cards - Image on side) */}
-        <div className="lg:col-span-4 flex flex-col gap-4 w-full">
+        {/* Right Stacked Featured Articles */}
+        <div className="md:col-span-3 flex flex-col gap-4 w-full justify-between">
           {rightArticles.map((art) => (
-            <Link key={art.id} href={getArticleHref(art)} className="flex gap-4 bg-white rounded-xl p-3 border border-gray-150 shadow-3xs hover:border-[#02599c]/35 transition-colors group flex-1 items-center min-h-[110px]">
-              <div className="w-[110px] h-[82px] rounded-lg overflow-hidden relative shrink-0 bg-slate-50 border border-slate-100">
-                <img
-                  src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                  alt={art.title}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
-                />
-              </div>
-              <div className="flex-1 min-w-0 text-left">
-                <h4 className="text-sm font-black text-slate-800 group-hover:text-[#02599c] transition-colors leading-snug telugu-text line-clamp-3" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+            <Link key={art.id} href={getArticleHref(art)} className="relative flex-1 aspect-[16/9] md:aspect-auto rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5 min-h-[125px]">
+              <img
+                src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
+                alt={art.title}
+                className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-3 pointer-events-none">
+                <h4 className="text-base md:text-lg lg:text-[19px] font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text line-clamp-2 pl-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   {art.title}
                 </h4>
-                {art.publishedAt && (
-                  <span className="text-[9px] text-slate-400 font-mono mt-2 block">
-                    {new Date(art.publishedAt).toLocaleDateString('te-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </span>
-                )}
               </div>
             </Link>
           ))}
@@ -109,60 +84,38 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
       </div>
 
       {/* Bottom Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 pt-3 border-t border-gray-100">
-        {/* Bottom Left Column - Thumbnail Lists */}
-        <div className="lg:col-span-4 flex flex-col gap-4">
-          {bottomLeftArticles.map((art) => (
-            <div key={art.id} className="flex gap-3 items-start group">
-              <Link href={getArticleHref(art)} className="w-[100px] h-[70px] flex-shrink-0 rounded overflow-hidden bg-slate-50 border border-gray-150 relative block shadow-3xs">
-                <img
-                  src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                  alt={art.title}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                />
-              </Link>
-              <div className="flex-1 text-left">
-                <Link href={getArticleHref(art)}>
-                  <h4 className="text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2 pl-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                    {art.title}
-                  </h4>
+      {articles.length > 3 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-5 border-t border-gray-100 mt-5">
+          {articles.slice(3, 14).map((art) => {
+            const cleanTitle = art.title ? art.title.replace(/<[^>]*>/g, '').trim() : '';
+            const cleanDesc = art.description ? art.description.replace(/<[^>]*>/g, '').trim() : '';
+            
+            return (
+              <div key={art.id} className="flex gap-4 items-start group bg-white hover:bg-slate-50/50 p-2.5 rounded-xl border border-transparent hover:border-slate-100 transition-all">
+                <Link href={getArticleHref(art)} className="w-[120px] h-[80px] sm:w-[130px] sm:h-[86px] flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 relative block shadow-3xs">
+                  <img
+                    src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
+                    alt={cleanTitle}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  />
                 </Link>
+                <div className="flex-1 text-left min-w-0">
+                  <Link href={getArticleHref(art)}>
+                    <h4 className="text-[15px] sm:text-[16px] md:text-[17px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      {cleanTitle}
+                    </h4>
+                  </Link>
+                  {cleanDesc && (
+                    <p className="text-[11px] sm:text-xs text-gray-500 font-medium line-clamp-2 mt-1.5 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      {cleanDesc}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-
-        {/* Bottom Right Columns - Bullet Lists */}
-        <div className="lg:col-span-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Column 1 */}
-          <div className="flex flex-col border-r-0 md:border-r border-gray-100 pr-0 md:pr-4 gap-2">
-            {col1.map((art) => (
-              <div key={art.id} className="flex items-start gap-1.5 py-2.5 border-b border-dashed border-gray-200 last:border-b-0">
-                <span className="text-[#a90000] text-[10px] mt-2 shrink-0">▶</span>
-                <Link href={getArticleHref(art)}>
-                  <h5 className="text-[16px] md:text-[18px] font-black text-gray-800 hover:text-red-650 hover:underline leading-relaxed telugu-text line-clamp-2 pl-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                    {art.title}
-                  </h5>
-                </Link>
-              </div>
-            ))}
-          </div>
-
-          {/* Column 2 */}
-          <div className="flex flex-col gap-2">
-            {col2.map((art) => (
-              <div key={art.id} className="flex items-start gap-1.5 py-2.5 border-b border-dashed border-gray-200 last:border-b-0">
-                <span className="text-[#a90000] text-[10px] mt-2 shrink-0">▶</span>
-                <Link href={getArticleHref(art)}>
-                  <h5 className="text-[16px] md:text-[18px] font-black text-gray-800 hover:text-red-650 hover:underline leading-relaxed telugu-text line-clamp-2 pl-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                    {art.title}
-                  </h5>
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
