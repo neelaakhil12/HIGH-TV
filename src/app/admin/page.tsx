@@ -1971,7 +1971,9 @@ export default function AdminPage() {
 
   // Compile full article listings from the live database list
   const allArticles = useMemo(() => {
-    return [...customNewsList].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+    return [...customNewsList]
+      .filter((art) => art.categorySlug !== 'polls')
+      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
   }, [customNewsList]);
 
 
@@ -3573,7 +3575,7 @@ export default function AdminPage() {
                             <td className="p-4">
                               <div className="flex items-center gap-3.5 min-w-[320px]">
                                 <img
-                                  src={art.image}
+                                  src={art.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&fit=crop'}
                                   alt={art.title}
                                   className="w-14 h-9 object-cover rounded-lg border border-slate-200 shrink-0"
                                 />
