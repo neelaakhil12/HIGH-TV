@@ -46,11 +46,11 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
 
   const usedNormalIds = new Set<string>();
   const usedTitles = new Set<string>();
-  const rows: { imgArt: Article; linkedArt: Article | null; rightArt: Article | null }[] = [];
+  const bannerArticles: { imgArt: Article; linkedArt: Article | null }[] = [];
 
   if (imageLinkArticles.length > 0) {
     imageLinkArticles.forEach(imgArt => {
-      // Find the linked article (displays on left)
+      // Find the linked article
       let linkedArt = getLinkedArticle(imgArt, normalArticles);
       if (linkedArt) {
         usedNormalIds.add(linkedArt.id);
@@ -63,39 +63,20 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
           usedTitles.add(getCleanTitle(linkedArt.title));
         }
       }
-
-      // Find the next unused normal article (displays on right next to the big image)
-      const rightArt = normalArticles.find(a => !usedNormalIds.has(a.id) && !usedTitles.has(getCleanTitle(a.title))) || null;
-      if (rightArt) {
-        usedNormalIds.add(rightArt.id);
-        usedTitles.add(getCleanTitle(rightArt.title));
-      }
-
-      rows.push({ imgArt, linkedArt, rightArt });
+      bannerArticles.push({ imgArt, linkedArt });
     });
   }
 
-  const fallbackRows: { imgArt: Article | null; linkedArts: Article[] } = { imgArt: null, linkedArts: [] };
+  // Fallback banner if no Image Link articles exist
+  let fallbackBanner: Article | null = null;
   if (imageLinkArticles.length === 0 && normalArticles.length > 0) {
-    const mainArt = normalArticles[0];
-    usedNormalIds.add(mainArt.id);
-    usedTitles.add(getCleanTitle(mainArt.title));
-
-    const rightArts: Article[] = [];
-    for (const art of normalArticles) {
-      if (rightArts.length >= 2) break;
-      if (!usedNormalIds.has(art.id) && !usedTitles.has(getCleanTitle(art.title))) {
-        rightArts.push(art);
-        usedNormalIds.add(art.id);
-        usedTitles.add(getCleanTitle(art.title));
-      }
-    }
-    
-    fallbackRows.imgArt = mainArt;
-    fallbackRows.linkedArts = rightArts;
+    fallbackBanner = normalArticles[0];
+    usedNormalIds.add(fallbackBanner.id);
+    usedTitles.add(getCleanTitle(fallbackBanner.title));
   }
 
-  const remainingArticles = normalArticles.filter(a => !usedNormalIds.has(a.id) && !usedTitles.has(getCleanTitle(a.title)));
+  // All other normal articles are listed one-by-one vertically
+  const listArticles = normalArticles.filter(a => !usedNormalIds.has(a.id) && !usedTitles.has(getCleanTitle(a.title)));
 
   return (
     <div className="mb-12 text-left">
@@ -111,128 +92,54 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
         </Link>
       </div>
 
-      {/* 1. Custom Image-Link Rows */}
-      {rows.map(({ imgArt, linkedArt, rightArt }) => (
-        <div key={imgArt.id} className="grid grid-cols-1 md:grid-cols-10 gap-5 mb-6 items-start">
-          {/* Left Big Image */}
-          <div className="md:col-span-6 w-full">
-            <Link href={linkedArt ? getArticleHref(linkedArt) : '#'} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
-              <img
-                src={imgArt.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                alt={linkedArt ? linkedArt.title.replace(/<[^>]*>/g, '').trim() : ''}
-                className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
-              />
-              {linkedArt && (
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5 pointer-events-none">
-                  <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                    {linkedArt.title ? linkedArt.title.replace(/<[^>]*>/g, '').trim() : ''}
-                  </h3>
-                </div>
-              )}
-            </Link>
-          </div>
-
-          {/* Right Stacked Article Card */}
-          <div className="md:col-span-4 w-full">
-            {rightArt ? (
-              (() => {
-                const cleanTitle = rightArt.title ? rightArt.title.replace(/<[^>]*>/g, '').trim() : '';
-                const cleanDesc = rightArt.description ? rightArt.description.replace(/<[^>]*>/g, '').trim() : '';
-                return (
-                  <div className="flex gap-4 items-start group bg-white hover:bg-slate-50/50 p-2.5 rounded-xl border border-transparent hover:border-slate-100 transition-all">
-                    <Link href={getArticleHref(rightArt)} className="w-20 h-14 sm:w-24 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 block shadow-3xs relative">
-                      <img
-                        src={rightArt.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                        alt={cleanTitle}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      />
-                    </Link>
-                    <div className="flex-1 text-left min-w-0">
-                      <Link href={getArticleHref(rightArt)}>
-                        <h4 className="text-[15px] sm:text-[16px] md:text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2 pl-1 pt-0.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                          {cleanTitle}
-                        </h4>
-                      </Link>
-                      {cleanDesc && (
-                        <p className="text-xs sm:text-[13px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text pl-1" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                          {cleanDesc}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })()
-            ) : (
-              <div className="p-4 text-center text-slate-400 text-xs font-bold border border-dashed border-slate-200 rounded-xl">
-                No additional articles.
+      {/* 1. Custom Image-Link Banners */}
+      {bannerArticles.map(({ imgArt, linkedArt }) => (
+        <div key={imgArt.id} className="mb-6 w-full">
+          <Link href={linkedArt ? getArticleHref(linkedArt) : '#'} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
+            <img
+              src={imgArt.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
+              alt={linkedArt ? linkedArt.title.replace(/<[^>]*>/g, '').trim() : ''}
+              className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
+            />
+            {linkedArt && (
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5 pointer-events-none">
+                <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  {linkedArt.title ? linkedArt.title.replace(/<[^>]*>/g, '').trim() : ''}
+                </h3>
               </div>
             )}
-          </div>
+          </Link>
         </div>
       ))}
 
-      {/* 2. Fallback Grid (when no custom Image Link articles exist) */}
-      {fallbackRows.imgArt && (
-        <div className="grid grid-cols-1 md:grid-cols-10 gap-5 mb-5">
-          {/* Left Big Featured Article */}
-          <div className="md:col-span-6 w-full">
-            <Link href={getArticleHref(fallbackRows.imgArt)} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
-              <img
-                src={fallbackRows.imgArt.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                alt={fallbackRows.imgArt.title ? fallbackRows.imgArt.title.replace(/<[^>]*>/g, '').trim() : ''}
-                className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5 pointer-events-none">
-                <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  {fallbackRows.imgArt.title ? fallbackRows.imgArt.title.replace(/<[^>]*>/g, '').trim() : ''}
-                </h3>
-              </div>
-            </Link>
-          </div>
-
-          {/* Right Stacked Featured Articles */}
-          <div className="md:col-span-4 flex flex-col gap-4 w-full">
-            {fallbackRows.linkedArts.map((art) => {
-              const cleanTitle = art.title ? art.title.replace(/<[^>]*>/g, '').trim() : '';
-              const cleanDesc = art.description ? art.description.replace(/<[^>]*>/g, '').trim() : '';
-              return (
-                <div key={art.id} className="flex gap-4 items-start group bg-white hover:bg-slate-50/50 p-2.5 rounded-xl border border-transparent hover:border-slate-100 transition-all">
-                  <Link href={getArticleHref(art)} className="w-20 h-14 sm:w-24 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 block shadow-3xs relative">
-                    <img
-                      src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                      alt={cleanTitle}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                    />
-                  </Link>
-                  <div className="flex-1 text-left min-w-0">
-                    <Link href={getArticleHref(art)}>
-                      <h4 className="text-[15px] sm:text-[16px] md:text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2 pl-1 pt-0.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                        {cleanTitle}
-                      </h4>
-                    </Link>
-                    {cleanDesc && (
-                      <p className="text-xs sm:text-[13px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text pl-1" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                        {cleanDesc}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+      {/* 2. Fallback Banner (when no custom Image Link articles exist) */}
+      {fallbackBanner && (
+        <div className="mb-6 w-full">
+          <Link href={getArticleHref(fallbackBanner)} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
+            <img
+              src={fallbackBanner.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
+              alt={fallbackBanner.title ? fallbackBanner.title.replace(/<[^>]*>/g, '').trim() : ''}
+              className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5 pointer-events-none">
+              <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                {fallbackBanner.title ? fallbackBanner.title.replace(/<[^>]*>/g, '').trim() : ''}
+              </h3>
+            </div>
+          </Link>
         </div>
       )}
 
-      {/* 3. Bottom list for remaining unused articles */}
-      {remainingArticles.length > 0 && (
+      {/* 3. Bottom List for remaining unused articles */}
+      {listArticles.length > 0 && (
         <div className="flex flex-col gap-5 pt-5 border-t border-gray-100 mt-5">
-          {remainingArticles.map((art) => {
+          {listArticles.map((art) => {
             const cleanTitle = art.title ? art.title.replace(/<[^>]*>/g, '').trim() : '';
             const cleanDesc = art.description ? art.description.replace(/<[^>]*>/g, '').trim() : '';
             
             return (
               <div key={art.id} className="flex gap-4 items-start group bg-white hover:bg-slate-50/50 p-2.5 rounded-xl border border-transparent hover:border-slate-100 transition-all">
-                <Link href={getArticleHref(art)} className="w-32 h-20 sm:w-36 sm:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 block shadow-3xs relative">
+                <Link href={getArticleHref(art)} className="w-24 h-16 sm:w-32 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 block shadow-3xs relative">
                   <img
                     src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
                     alt={cleanTitle}
