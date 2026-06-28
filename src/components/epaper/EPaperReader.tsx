@@ -297,6 +297,81 @@ export default function EPaperReader() {
     return d.toISOString().split('T')[0];
   };
   const [selectedDate, setSelectedDate] = useState(getTodayString());
+  const [dbEpapers, setDbEpapers] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/epapers?date=${selectedDate}&t=` + Date.now())
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setDbEpapers(data);
+        }
+      })
+      .catch(err => console.error('Error fetching dynamic epapers:', err));
+  }, [selectedDate]);
+
+  const getEditionsForSection = (sectionKey: string, staticList: any[]) => {
+    const dbPapers = dbEpapers.filter(p => p.section === sectionKey);
+    const merged = staticList.map(item => {
+      const dbMatch = dbPapers.find(
+        p => p.title.toLowerCase() === item.value.toLowerCase() ||
+             p.title === item.value ||
+             p.title === item.name
+      );
+      return {
+        name: item.nameTe || item.name,
+        nameTe: item.nameTe || item.name,
+        value: item.value,
+        pdfUrl: dbMatch ? dbMatch.pdfUrl : null,
+        isDb: !!dbMatch
+      };
+    });
+
+    dbPapers.forEach(paper => {
+      const alreadyMerged = merged.some(
+        m => m.value.toLowerCase() === paper.title.toLowerCase() || m.value === paper.title
+      );
+      if (!alreadyMerged) {
+        merged.push({
+          name: paper.title,
+          nameTe: paper.title,
+          value: paper.title,
+          pdfUrl: paper.pdfUrl,
+          isDb: true
+        });
+      }
+    });
+
+    if (!searchQuery) return merged;
+    return merged.filter(ed => 
+      ed.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      ed.nameTe.includes(searchQuery)
+    );
+  };
+
+  const getCustomSectionPapers = (sectionKey: string) => {
+    const list = dbEpapers
+      .filter(p => p.section === sectionKey)
+      .map(paper => ({
+        name: paper.title,
+        nameTe: paper.title,
+        value: paper.title,
+        pdfUrl: paper.pdfUrl,
+        isDb: true
+      }));
+
+    if (!searchQuery) return list;
+    return list.filter(ed => 
+      ed.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      ed.nameTe.includes(searchQuery)
+    );
+  };
+
+  const customSections = Array.from(new Set(
+    dbEpapers
+      .map(p => p.section)
+      .filter(s => s && s !== 'main' && s !== 'telangana' && s !== 'ap' && s !== 'metro')
+  ));
   
   const [activePageIdx, setActivePageIdx] = useState(0);
   const [zoom, setZoom] = useState(75);
@@ -498,7 +573,16 @@ export default function EPaperReader() {
           const loadingTask = pdfjs.getDocument({ data: customData });
           pdf = await loadingTask.promise;
         } else {
-          const loadingTask = pdfjs.getDocument({ url: '/BalagamTV_Main_Edition__13_Jun_2026.pdf' });
+          // Check if there is any uploaded PDF for this date and selectedEdition
+          const matchingDbPaper = dbEpapers.find(
+            p => p.title.toLowerCase() === selectedEdition.toLowerCase() ||
+                 p.title === selectedEdition
+          );
+          // Fallback: any DB paper for this date
+          const fallbackDbPaper = matchingDbPaper || dbEpapers[0];
+          
+          const targetUrl = fallbackDbPaper ? fallbackDbPaper.pdfUrl : '/BalagamTV_Main_Edition__13_Jun_2026.pdf';
+          const loadingTask = pdfjs.getDocument({ url: targetUrl });
           pdf = await loadingTask.promise;
         }
 
@@ -517,7 +601,7 @@ export default function EPaperReader() {
       }
     };
     loadDefaultPdf();
-  }, [pdfjs, selectedDate, selectedEdition]);
+  }, [pdfjs, selectedDate, selectedEdition, dbEpapers]);
 
   const isArticleView = urlParams?.get('view') === 'article';
   const targetDate = isArticleView ? activeArticleDate : selectedDate;
@@ -564,21 +648,31 @@ export default function EPaperReader() {
           const blob = new Blob([customData], { type: 'application/pdf' });
           setLoadedPdfUrl(URL.createObjectURL(blob));
         } else {
-          const url = getPdfUrlForDate(targetDate);
-          let pdfExists = false;
-          try {
-            const checkRes = await fetch(url, { method: 'HEAD' });
-            if (checkRes.ok) {
-              pdfExists = true;
-            } else if (checkRes.status === 405) {
-              const checkResGet = await fetch(url);
-              pdfExists = checkResGet.ok;
+          const matchingDbPaper = dbEpapers.find(
+            p => p.title.toLowerCase() === selectedEdition.toLowerCase() ||
+                 p.title === selectedEdition
+          );
+
+          let targetUrl = '';
+          if (matchingDbPaper) {
+            targetUrl = matchingDbPaper.pdfUrl;
+          } else {
+            const url = getPdfUrlForDate(targetDate);
+            let pdfExists = false;
+            try {
+              const checkRes = await fetch(url, { method: 'HEAD' });
+              if (checkRes.ok) {
+                pdfExists = true;
+              } else if (checkRes.status === 405) {
+                const checkResGet = await fetch(url);
+                pdfExists = checkResGet.ok;
+              }
+            } catch {
+              pdfExists = false;
             }
-          } catch {
-            pdfExists = false;
+            targetUrl = pdfExists ? url : '/BalagamTV_Main_Edition__13_Jun_2026.pdf';
           }
 
-          const targetUrl = pdfExists ? url : '/BalagamTV_Main_Edition__13_Jun_2026.pdf';
           const loadingTask = pdfjs.getDocument({ url: targetUrl });
           const pdf = await loadingTask.promise;
           setPdfDoc(pdf);
@@ -591,7 +685,7 @@ export default function EPaperReader() {
       }
     };
     loadReaderPdf();
-  }, [pdfjs, targetDate, selectedEdition]);
+  }, [pdfjs, targetDate, selectedEdition, dbEpapers]);
 
   // Adjust aspect ratio based on page dimensions
   useEffect(() => {
@@ -1537,7 +1631,7 @@ export default function EPaperReader() {
           {/* Dashboard Blue Category Nav Bar */}
           <div className="bg-[#0c4a80] text-white px-3 md:px-6 py-2 md:py-2.5 flex flex-row flex-wrap items-center justify-between gap-2 select-none shadow-md w-full">
             {/* Nav Menus */}
-            <div className="flex items-center gap-4 text-[11px] md:text-[12px] font-black uppercase tracking-wider flex-shrink-0">
+            <div className="flex items-center gap-4 text-[11px] md:text-[12px] font-black uppercase tracking-wider flex-shrink-0 flex-wrap">
               <button 
                 onClick={() => {
                   const el = document.getElementById('main-editions-section');
@@ -1556,6 +1650,36 @@ export default function EPaperReader() {
               >
                 Telangana
               </button>
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('ap-editions-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="hover:text-yellow-300 transition-colors cursor-pointer"
+              >
+                Andhra Pradesh
+              </button>
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('metro-editions-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="hover:text-yellow-300 transition-colors cursor-pointer"
+              >
+                Metro
+              </button>
+              {customSections.map((secName: string) => (
+                <button 
+                  key={secName}
+                  onClick={() => {
+                    const el = document.getElementById(`${secName}-editions-section`);
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="hover:text-yellow-300 transition-colors cursor-pointer capitalize"
+                >
+                  {secName.replace(/-/g, ' ')}
+                </button>
+              ))}
             </div>
 
             {/* Search & Date Controls */}
@@ -1619,13 +1743,14 @@ export default function EPaperReader() {
 
             {/* Central Content Container */}
             <div className="flex-1 max-w-[1200px] flex flex-col gap-10 w-full min-w-0">
+              
               {/* Section: MAIN EDITIONS */}
               <div id="main-editions-section" className="flex flex-col text-left">
                 <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
                   Main Editions
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                  {filterEditions(MAIN_EDITIONS).map((item, idx) => (
+                  {getEditionsForSection('main', MAIN_EDITIONS).map((item, idx) => (
                     <div
                       key={idx}
                       onClick={() => handleSelectEditionCard(item.value)}
@@ -1652,7 +1777,7 @@ export default function EPaperReader() {
                       </div>
                     </div>
                   ))}
-                  {filterEditions(MAIN_EDITIONS).length === 0 && (
+                  {getEditionsForSection('main', MAIN_EDITIONS).length === 0 && (
                     <div className="text-gray-400 text-sm py-4 col-span-full">No main editions match your search.</div>
                   )}
                 </div>
@@ -1664,16 +1789,53 @@ export default function EPaperReader() {
                 </div>
               )}
 
-              {/* Section: TELANGANA */}
+              {/* Section: TELANGANA DISTRICTS */}
               <div id="tg-editions-section" className="flex flex-col text-left">
                 <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
                   Telangana Districts
                 </h2>
-                {renderCarousel('tg-carousel', filterEditions(TG_EDITIONS))}
-                {filterEditions(TG_EDITIONS).length === 0 && (
+                {renderCarousel('tg-carousel', getEditionsForSection('telangana', TG_EDITIONS))}
+                {getEditionsForSection('telangana', TG_EDITIONS).length === 0 && (
                   <div className="text-gray-400 text-sm py-4">No Telangana editions match your search.</div>
                 )}
               </div>
+
+              {/* Section: ANDHRA PRADESH DISTRICTS */}
+              <div id="ap-editions-section" className="flex flex-col text-left">
+                <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
+                  Andhra Pradesh Districts
+                </h2>
+                {renderCarousel('ap-carousel', getEditionsForSection('ap', AP_EDITIONS))}
+                {getEditionsForSection('ap', AP_EDITIONS).length === 0 && (
+                  <div className="text-gray-400 text-sm py-4">No Andhra Pradesh editions match your search.</div>
+                )}
+              </div>
+
+              {/* Section: METRO EDITIONS */}
+              <div id="metro-editions-section" className="flex flex-col text-left">
+                <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
+                  Metro Editions
+                </h2>
+                {renderCarousel('metro-carousel', getEditionsForSection('metro', METRO_EDITIONS))}
+                {getEditionsForSection('metro', METRO_EDITIONS).length === 0 && (
+                  <div className="text-gray-400 text-sm py-4">No Metro editions match your search.</div>
+                )}
+              </div>
+
+              {/* DYNAMIC FUTURE CUSTOM SECTIONS */}
+              {customSections.map((secName: string) => {
+                const papers = getCustomSectionPapers(secName);
+                if (papers.length === 0) return null;
+                return (
+                  <div key={secName} id={`${secName}-editions-section`} className="flex flex-col text-left">
+                    <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
+                      {secName.replace(/-/g, ' ')}
+                    </h2>
+                    {renderCarousel(`${secName}-carousel`, papers)}
+                  </div>
+                );
+              })}
+
             </div>
 
             {/* Right Skyscraper Ad */}

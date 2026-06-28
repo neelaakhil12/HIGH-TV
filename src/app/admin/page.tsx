@@ -1113,10 +1113,30 @@ export default function AdminPage() {
 
 
   // E-Paper PDF Config
-  const [epapersList, setEpapersList] = useState<{ id: string; title: string; date: string; pdfUrl: string }[]>([]);
+  const [epapersList, setEpapersList] = useState<{ id: string; title: string; date: string; pdfUrl: string; section: string }[]>([]);
   const [epaperTitle, setEpaperTitle] = useState('');
   const [epaperDate, setEpaperDate] = useState('');
   const [epaperPdf, setEpaperPdf] = useState('');
+  const [epaperSection, setEpaperSection] = useState('main');
+  const [customEpaperSection, setCustomEpaperSection] = useState('');
+  const [isSavingEpaper, setIsSavingEpaper] = useState(false);
+
+  const fetchEpapersData = () => {
+    fetch('/api/epapers?t=' + Date.now())
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setEpapersList(data);
+        }
+      })
+      .catch(err => console.error('Error fetching epapers:', err));
+  };
+
+  useEffect(() => {
+    if (activeTab === 'epaper') {
+      fetchEpapersData();
+    }
+  }, [activeTab]);
 
   // Authorization Check
   useEffect(() => {
@@ -1356,11 +1376,7 @@ export default function AdminPage() {
     setInlinePromosEnabled(savedInlinePromos === null ? true : savedInlinePromos === 'true');
 
     // E-paper list
-    try {
-      setEpapersList(JSON.parse(localStorage.getItem('custom_epapers') || '[]'));
-    } catch {
-      setEpapersList([]);
-    }
+    fetchEpapersData();
 
     // Load Homepage slides
     try {
@@ -3091,32 +3107,61 @@ export default function AdminPage() {
   };
 
   // E-Paper publishing
-  const handleAddEpaper = (e: React.FormEvent) => {
+  const handleAddEpaper = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!epaperTitle.trim() || !epaperDate || !epaperPdf) {
       alert('Please fill out all E-Paper fields!');
       return;
     }
-    const newPaper = {
-      id: `epaper-${Date.now()}`,
-      title: epaperTitle.trim(),
-      date: epaperDate,
-      pdfUrl: epaperPdf
-    };
-    const updated = [newPaper, ...epapersList];
-    setEpapersList(updated);
-    localStorage.setItem('custom_epapers', JSON.stringify(updated));
-    setEpaperTitle('');
-    setEpaperDate('');
-    setEpaperPdf('');
-    alert('E-Paper edition added successfully!');
+    const finalSection = epaperSection === 'custom' ? customEpaperSection.trim().toLowerCase() : epaperSection;
+    if (!finalSection) {
+      alert('Please enter a section name!');
+      return;
+    }
+    setIsSavingEpaper(true);
+    try {
+      const res = await fetch('/api/epapers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: epaperTitle.trim(),
+          date: epaperDate,
+          pdfUrl: epaperPdf,
+          section: finalSection,
+        })
+      });
+      if (res.ok) {
+        setEpaperTitle('');
+        setEpaperDate('');
+        setEpaperPdf('');
+        setEpaperSection('main');
+        setCustomEpaperSection('');
+        fetchEpapersData();
+        alert('E-Paper edition added successfully!');
+      } else {
+        alert('Failed to publish E-Paper!');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error occurred while publishing E-Paper.');
+    } finally {
+      setIsSavingEpaper(false);
+    }
   };
 
-  const handleDeleteEpaper = (id: string) => {
+  const handleDeleteEpaper = async (id: string) => {
     if (!confirm('Are you sure you want to delete this E-Paper?')) return;
-    const updated = epapersList.filter(p => p.id !== id);
-    setEpapersList(updated);
-    localStorage.setItem('custom_epapers', JSON.stringify(updated));
+    try {
+      const res = await fetch(`/api/epapers?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        fetchEpapersData();
+        alert('E-Paper deleted successfully!');
+      } else {
+        alert('Failed to delete E-Paper!');
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleLogout = () => {
@@ -5662,7 +5707,7 @@ export default function AdminPage() {
                 <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5">
                   Publish New E-Paper
                 </h3>
-                <form onSubmit={handleAddEpaper} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <form onSubmit={handleAddEpaper} className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="flex flex-col gap-1">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">E-Paper Edition Title (Telugu/English)</label>
                     <input
@@ -5686,6 +5731,20 @@ export default function AdminPage() {
                     />
                   </div>
                   <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Section / Category</label>
+                    <select
+                      value={epaperSection}
+                      onChange={(e) => setEpaperSection(e.target.value)}
+                      className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none font-bold text-slate-800 cursor-pointer"
+                    >
+                      <option value="main">Main Editions (ప్రధాన సంచికలు)</option>
+                      <option value="telangana">Telangana Districts (తెలంగాణ జిల్లాలు)</option>
+                      <option value="ap">Andhra Pradesh Districts (ఆంధ్రప్రదేశ్ జిల్లాలు)</option>
+                      <option value="metro">Metro Editions (మెట్రో సంచికలు)</option>
+                      <option value="custom">Other / Custom Section (ఇతర విభాగాలు)</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-1">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">PDF Attachment File URL</label>
                     <input
                       type="text"
@@ -5696,13 +5755,29 @@ export default function AdminPage() {
                       className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3.5 py-2.5 text-xs font-mono outline-none text-slate-800"
                     />
                   </div>
-                  <div className="md:col-span-3 flex justify-end">
+
+                  {epaperSection === 'custom' && (
+                    <div className="md:col-span-4 flex flex-col gap-1 animate-fade-in">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Custom Section Name / Key <strong className="text-rose-500">*</strong></label>
+                      <input
+                        type="text"
+                        required
+                        value={customEpaperSection}
+                        onChange={(e) => setCustomEpaperSection(e.target.value)}
+                        placeholder="e.g. editorial, special-editions, etc."
+                        className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3.5 py-2.5 text-xs outline-none font-bold text-slate-800"
+                      />
+                    </div>
+                  )}
+
+                  <div className="md:col-span-4 flex justify-end">
                     <button
                       type="submit"
-                      className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-1 hover:scale-[1.01]"
+                      disabled={isSavingEpaper}
+                      className="bg-rose-600 hover:bg-rose-700 disabled:bg-slate-350 text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-1 hover:scale-[1.01]"
                     >
                       <Plus className="w-4 h-4" />
-                      <span>Publish E-Paper</span>
+                      <span>{isSavingEpaper ? 'Publishing...' : 'Publish E-Paper'}</span>
                     </button>
                   </div>
                 </form>
@@ -5720,6 +5795,7 @@ export default function AdminPage() {
                       <tr className="bg-slate-50 border-b border-slate-200 text-slate-400 font-black">
                         <th className="p-3 text-[10px] uppercase tracking-wider">Date</th>
                         <th className="p-3 text-[10px] uppercase tracking-wider">Edition Title</th>
+                        <th className="p-3 text-[10px] uppercase tracking-wider">Section</th>
                         <th className="p-3 text-[10px] uppercase tracking-wider">File Path</th>
                         <th className="p-3 text-[10px] uppercase tracking-wider text-center">Action</th>
                       </tr>
@@ -5727,7 +5803,7 @@ export default function AdminPage() {
                     <tbody className="divide-y divide-slate-100">
                       {epapersList.length === 0 ? (
                         <tr>
-                          <td colSpan={4} className="p-8 text-center text-slate-450 font-bold">
+                          <td colSpan={5} className="p-8 text-center text-slate-450 font-bold">
                             No custom epapers uploaded. Add one above!
                           </td>
                         </tr>
@@ -5737,6 +5813,11 @@ export default function AdminPage() {
                             <td className="p-3 font-mono font-bold text-slate-650">{paper.date}</td>
                             <td className="p-3 font-bold text-slate-800 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                               {paper.title}
+                            </td>
+                            <td className="p-3">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-rose-50 text-rose-700 border border-rose-100">
+                                {paper.section || 'main'}
+                              </span>
                             </td>
                             <td className="p-3 font-mono text-[10px] text-slate-400 truncate max-w-[200px]">{paper.pdfUrl}</td>
                             <td className="p-3 text-center">

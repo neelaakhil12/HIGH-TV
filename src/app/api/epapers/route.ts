@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// GET — list all epapers
-export async function GET() {
+// GET — list all epapers (supports ?date=YYYY-MM-DD)
+export async function GET(req: NextRequest) {
   try {
-    const epapers = await prisma.epaper.findMany({ orderBy: { createdAt: 'desc' } });
+    const { searchParams } = new URL(req.url);
+    const date = searchParams.get('date');
+    const where = date ? { date } : {};
+    const epapers = await prisma.epaper.findMany({
+      where,
+      orderBy: { createdAt: 'desc' }
+    });
     return NextResponse.json(epapers);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch epapers' }, { status: 500 });
