@@ -67,7 +67,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
                 className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-3">
-                <h4 className="text-base md:text-lg lg:text-[19px] font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <h4 className="text-base md:text-lg lg:text-[19px] font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text line-clamp-2 pl-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   {art.title}
                 </h4>
               </div>
@@ -91,7 +91,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
               </Link>
               <div className="flex-1 text-left">
                 <Link href={`/news/${art.slug}`}>
-                  <h4 className="text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  <h4 className="text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2 pl-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                     {art.title}
                   </h4>
                 </Link>
@@ -108,7 +108,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
               <div key={art.id} className="flex items-start gap-1.5 py-2.5 border-b border-dashed border-gray-200 last:border-b-0">
                 <span className="text-[#a90000] text-[10px] mt-2 shrink-0">▶</span>
                 <Link href={`/news/${art.slug}`}>
-                  <h5 className="text-[16px] md:text-[18px] font-black text-gray-800 hover:text-red-650 hover:underline leading-relaxed telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  <h5 className="text-[16px] md:text-[18px] font-black text-gray-800 hover:text-red-650 hover:underline leading-relaxed telugu-text line-clamp-2 pl-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                     {art.title}
                   </h5>
                 </Link>
@@ -122,7 +122,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
               <div key={art.id} className="flex items-start gap-1.5 py-2.5 border-b border-dashed border-gray-200 last:border-b-0">
                 <span className="text-[#a90000] text-[10px] mt-2 shrink-0">▶</span>
                 <Link href={`/news/${art.slug}`}>
-                  <h5 className="text-[16px] md:text-[18px] font-black text-gray-800 hover:text-red-650 hover:underline leading-relaxed telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  <h5 className="text-[16px] md:text-[18px] font-black text-gray-800 hover:text-red-650 hover:underline leading-relaxed telugu-text line-clamp-2 pl-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                     {art.title}
                   </h5>
                 </Link>
