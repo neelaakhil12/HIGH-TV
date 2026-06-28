@@ -4293,50 +4293,6 @@ export default function AdminPage() {
                     </div>
                   )}
 
-                  {/* Target Placements (Promotion Flags) */}
-                  <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
-                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Target Placements</label>
-                    <div className="space-y-3">
-                      <label className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/75 rounded-xl border border-slate-100 cursor-pointer transition-colors select-none">
-                        <input
-                          type="checkbox"
-                          checked={isBreakingChecked}
-                          onChange={(e) => setIsBreakingChecked(e.target.checked)}
-                          className="w-4 h-4 text-rose-600 focus:ring-rose-500 border-slate-300 rounded cursor-pointer"
-                        />
-                        <div className="flex flex-col">
-                          <span className="text-xs font-black text-slate-700 telugu-text">బ్రేకింగ్ న్యూస్ (Breaking News)</span>
-                          <span className="text-[10px] text-slate-400 font-normal">Shows in home breaking feed and ticker.</span>
-                        </div>
-                      </label>
-                      
-                      <label className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/75 rounded-xl border border-slate-100 cursor-pointer transition-colors select-none">
-                        <input
-                          type="checkbox"
-                          checked={isTrendingChecked}
-                          onChange={(e) => setIsTrendingChecked(e.target.checked)}
-                          className="w-4 h-4 text-amber-600 focus:ring-amber-500 border-slate-300 rounded cursor-pointer"
-                        />
-                        <div className="flex flex-col">
-                          <span className="text-xs font-black text-slate-700 telugu-text">ట్రెండింగ్ న్యూస్ (Trending News)</span>
-                          <span className="text-[10px] text-slate-400 font-normal">Shows in the home trending grid.</span>
-                        </div>
-                      </label>
-
-                      <label className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/75 rounded-xl border border-slate-100 cursor-pointer transition-colors select-none">
-                        <input
-                          type="checkbox"
-                          checked={isFeaturedChecked}
-                          onChange={(e) => setIsFeaturedChecked(e.target.checked)}
-                          className="w-4 h-4 text-[#02599c] focus:ring-[#02599c] border-slate-300 rounded cursor-pointer"
-                        />
-                        <div className="flex flex-col">
-                          <span className="text-xs font-black text-slate-700 telugu-text">ముఖ్య వార్తలు (Featured News)</span>
-                          <span className="text-[10px] text-slate-400 font-normal">Shows in the top home slider/highlights.</span>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
 
                   {/* Classification Tree Checklist (Select Categories) */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
