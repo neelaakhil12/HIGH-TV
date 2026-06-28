@@ -86,7 +86,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
 
       {/* 1. Custom Image-Link Rows */}
       {rows.map(({ imgArt, linkedArt }) => (
-        <div key={imgArt.id} className="grid grid-cols-1 md:grid-cols-10 gap-5 mb-6 items-center">
+        <div key={imgArt.id} className="grid grid-cols-1 md:grid-cols-10 gap-5 mb-6 items-start">
           {/* Left Big Image */}
           <div className="md:col-span-6 w-full">
             <Link href={linkedArt ? getArticleHref(linkedArt) : '#'} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
