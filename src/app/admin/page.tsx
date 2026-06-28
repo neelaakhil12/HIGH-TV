@@ -686,7 +686,7 @@ export default function AdminPage() {
 
   // Sidebar Ads Manager states
   const [adFormMode, setAdFormMode] = useState<'list' | 'add' | 'edit'>('list');
-  const [adActiveSubTab, setAdActiveSubTab] = useState<'category' | 'article-left' | 'article-right'>('category');
+  const [adActiveSubTab, setAdActiveSubTab] = useState<'category' | 'article-left' | 'article-right' | 'header-ad'>('category');
   const [sidebarAds, setSidebarAds] = useState<any[]>([]);
   const [editingAd, setEditingAd] = useState<any | null>(null);
 
@@ -695,7 +695,7 @@ export default function AdminPage() {
   const [sidebarAdLink, setSidebarAdLink] = useState('');
   const [sidebarAdImage, setSidebarAdImage] = useState('');
   const [sidebarAdStatus, setSidebarAdStatus] = useState<'active' | 'inactive'>('active');
-  const [sidebarAdLocation, setSidebarAdLocation] = useState<'category' | 'article-left' | 'article-right' | 'both'>('category');
+  const [sidebarAdLocation, setSidebarAdLocation] = useState<'category' | 'article-left' | 'article-right' | 'both' | 'header-ad'>('category');
   const [isSavingSidebarAd, setIsSavingSidebarAd] = useState(false);
 
   const fetchAdsData = () => {
@@ -703,11 +703,12 @@ export default function AdminPage() {
       fetch('/api/articles?category=sidebar-ad-category&limit=50&t=' + Date.now()).then(r => r.json()),
       fetch('/api/articles?category=sidebar-ad-article-left&limit=50&t=' + Date.now()).then(r => r.json()),
       fetch('/api/articles?category=sidebar-ad-article-right&limit=50&t=' + Date.now()).then(r => r.json()),
-      fetch('/api/articles?category=sidebar-ad-both&limit=50&t=' + Date.now()).then(r => r.json())
+      fetch('/api/articles?category=sidebar-ad-both&limit=50&t=' + Date.now()).then(r => r.json()),
+      fetch('/api/articles?category=header-ad&limit=10&t=' + Date.now()).then(r => r.json())
     ])
-      .then(([catAds, leftAds, rightAds, bothAds]) => {
-        if (Array.isArray(catAds) && Array.isArray(leftAds) && Array.isArray(rightAds) && Array.isArray(bothAds)) {
-          setSidebarAds([...catAds, ...leftAds, ...rightAds, ...bothAds]);
+      .then(([catAds, leftAds, rightAds, bothAds, headerAds]) => {
+        if (Array.isArray(catAds) && Array.isArray(leftAds) && Array.isArray(rightAds) && Array.isArray(bothAds) && Array.isArray(headerAds)) {
+          setSidebarAds([...catAds, ...leftAds, ...rightAds, ...bothAds, ...headerAds]);
         }
       })
       .catch(err => console.error('Error loading ads data:', err));
@@ -737,7 +738,9 @@ export default function AdminPage() {
         ? 'sidebar-ad-article-left' 
         : sidebarAdLocation === 'article-right'
           ? 'sidebar-ad-article-right'
-          : 'sidebar-ad-both';
+          : sidebarAdLocation === 'header-ad'
+            ? 'header-ad'
+            : 'sidebar-ad-both';
     const cleanSlug = adFormMode === 'edit' && editingAd ? editingAd.slug : `ad-${catSlug.slice(-3)}-${Date.now().toString().slice(-6)}`;
     
     const adData = {
@@ -8927,9 +8930,13 @@ export default function AdminPage() {
                       ? 'sidebar-ad-category' 
                       : adActiveSubTab === 'article-left'
                         ? 'sidebar-ad-article-left'
-                        : 'sidebar-ad-article-right';
+                        : adActiveSubTab === 'article-right'
+                          ? 'sidebar-ad-article-right'
+                          : 'header-ad';
                     const activeAds = sidebarAds.filter(
-                      ad => ad.categorySlug === targetCategorySlug || ad.categorySlug === 'sidebar-ad-both'
+                      ad => adActiveSubTab === 'header-ad'
+                        ? ad.categorySlug === 'header-ad'
+                        : (ad.categorySlug === targetCategorySlug || ad.categorySlug === 'sidebar-ad-both')
                     );
 
                     if (activeAds.length === 0) {
@@ -8970,7 +8977,9 @@ export default function AdminPage() {
                                         ? 'Article Left Only' 
                                         : ad.categorySlug === 'sidebar-ad-article-right'
                                           ? 'Article Right Only'
-                                          : 'All Sidebars'}
+                                          : ad.categorySlug === 'header-ad'
+                                            ? '🏠 Header Banner'
+                                            : 'All Sidebars'}
                                   </span>
                                 </div>
                               </div>
@@ -9005,7 +9014,9 @@ export default function AdminPage() {
                                         ? 'article-left' 
                                         : ad.categorySlug === 'sidebar-ad-article-right'
                                           ? 'article-right'
-                                          : 'both';
+                                          : ad.categorySlug === 'header-ad'
+                                            ? 'header-ad'
+                                            : 'both';
                                     setSidebarAdLocation(loc);
                                     setAdFormMode('edit');
                                   }}
@@ -9075,12 +9086,13 @@ export default function AdminPage() {
                       <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">యాడ్ ప్రదర్శన స్థలం (Display Location) <strong className="text-rose-500">*</strong></label>
                       <select
                         value={sidebarAdLocation}
-                        onChange={(e) => setSidebarAdLocation(e.target.value as 'category' | 'article-left' | 'article-right' | 'both')}
+                        onChange={(e) => setSidebarAdLocation(e.target.value as 'category' | 'article-left' | 'article-right' | 'both' | 'header-ad')}
                         className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
                       >
                         <option value="category">కేటగిరీ సైడ్‌బార్ మాత్రమే (Category Pages Sidebar Only)</option>
                         <option value="article-left">వార్తల ఎడమ సైడ్‌బార్ మాత్రమే (Article Page Left Sidebar Only)</option>
                         <option value="article-right">వార్తల కుడి సైడ్‌బార్ మాత్రమే (Article Page Right Sidebar Only)</option>
+                        <option value="header-ad">🏠 హెడర్ బ్యానర్ (Header Banner — Top of Page)</option>
                         <option value="both">అన్ని సైడ్‌బార్లలోనూ (All Sidebars / Combined)</option>
                       </select>
                     </div>
