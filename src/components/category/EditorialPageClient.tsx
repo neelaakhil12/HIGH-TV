@@ -146,26 +146,11 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
 }
 
 export default function EditorialPageClient({ allArticles }: { allArticles: Article[] }) {
-  // Helper to filter articles by category and fall back to politics/latest if not enough articles are present
+  // Helper to filter articles by category (only explicitly added articles show here)
   const getSectionArticles = (categorySlug: string) => {
-    let sectionList = allArticles.filter(art => art.categorySlug === categorySlug);
-    
-    // Fallbacks to politics, featured and entertainment to make sure we always have enough content
-    if (sectionList.length < 14) {
-      const extraList = allArticles.filter(art => 
-        art.categorySlug !== categorySlug && 
-        art.categorySlug !== 'sampadakiyam' && 
-        art.categorySlug !== 'adyathmikam' && 
-        art.categorySlug !== 'antharmadanam' &&
-        art.categorySlug !== 'polls' &&
-        art.categorySlug !== 'shorts' &&
-        art.categorySlug !== 'photos'
-      );
-      sectionList = [...sectionList, ...extraList].slice(0, 14);
-    } else {
-      sectionList = sectionList.slice(0, 14);
-    }
-    return sectionList;
+    return allArticles
+      .filter(art => art.categorySlug === categorySlug)
+      .slice(0, 14);
   };
 
   const sampadakiyamArticles = getSectionArticles('sampadakiyam');
