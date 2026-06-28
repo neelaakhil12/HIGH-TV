@@ -71,7 +71,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
             const cleanDesc = art.description ? art.description.replace(/<[^>]*>/g, '').trim() : '';
             return (
               <div key={art.id} className="flex gap-4 items-start group bg-white hover:bg-slate-50/50 p-2.5 rounded-xl border border-transparent hover:border-slate-100 transition-all">
-                <Link href={getArticleHref(art)} className="w-28 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 block shadow-3xs relative">
+                <Link href={getArticleHref(art)} className="w-20 h-14 sm:w-24 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 block shadow-3xs relative">
                   <img
                     src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
                     alt={cleanTitle}
@@ -80,12 +80,12 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
                 </Link>
                 <div className="flex-1 text-left min-w-0">
                   <Link href={getArticleHref(art)}>
-                    <h4 className="text-sm md:text-[15px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    <h4 className="text-[15px] sm:text-[16px] md:text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       {cleanTitle}
                     </h4>
                   </Link>
                   {cleanDesc && (
-                    <p className="text-[11px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    <p className="text-xs sm:text-[13px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       {cleanDesc}
                     </p>
                   )}
