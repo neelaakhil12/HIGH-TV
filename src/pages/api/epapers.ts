@@ -29,12 +29,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (method === 'POST') {
     try {
-      const data = req.body;
+      let data = req.body;
+      if (typeof data === 'string') {
+        try {
+          data = JSON.parse(data);
+        } catch (e) {}
+      }
       const epaper = await prisma.epaper.create({ data });
       return res.status(201).json(epaper);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating epaper in Pages API:', error);
-      return res.status(500).json({ error: 'Failed to create epaper' });
+      return res.status(500).json({
+        error: 'Failed to create epaper',
+        message: error?.message || String(error),
+        code: error?.code
+      });
     }
   }
 

@@ -3158,7 +3158,8 @@ export default function AdminPage() {
         fetchEpapersData();
         alert('E-Paper edition added successfully!');
       } else {
-        alert('Failed to publish E-Paper!');
+        const errText = await res.text();
+        alert('Failed to publish E-Paper! Server details: ' + errText);
       }
     } catch (err) {
       console.error(err);
