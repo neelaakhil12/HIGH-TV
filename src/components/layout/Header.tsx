@@ -210,8 +210,8 @@ export default function Header() {
             )}
           </div>
           
-          {/* Header Ad Banner (Center — desktop only) — loaded from DB */}
-          {headerAd ? (
+          {/* Header Ad Banner (Center — desktop only) — managed via Admin Panel */}
+          {headerAd && (
             <a
               href={headerAd.body || '#'}
               target={headerAd.body ? '_blank' : '_self'}
@@ -225,49 +225,6 @@ export default function Header() {
                 className="w-full h-full object-contain rounded"
               />
             </a>
-          ) : (
-            <div className="hidden md:flex flex-1 justify-between max-w-[550px] h-[90px] bg-[#111113] border border-neutral-800 rounded overflow-hidden relative group mx-4 select-none px-4 items-center">
-              {/* Adchoices icon */}
-              <div className="absolute top-0.5 right-0.5 opacity-20 hover:opacity-100 transition-opacity z-10">
-                <svg className="w-2.5 h-2.5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-                </svg>
-              </div>
-
-              {/* Left part: Building Image + "55 Floors" */}
-              <div className="flex items-center gap-3 h-full flex-shrink-0">
-                <div className="w-[70px] h-[70px] relative overflow-hidden rounded border border-neutral-800">
-                  <img
-                    src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=100&h=100&fit=crop"
-                    alt="MSN Neopolis Tower"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex flex-col text-left justify-center leading-none">
-                  <span className="text-white font-extrabold text-[18px] font-sans">55</span>
-                  <span className="text-neutral-500 font-bold text-[8px] tracking-widest font-sans uppercase">FLOORS</span>
-                </div>
-              </div>
-
-              {/* Center part: "ONE OF A KIND" branding */}
-              <div className="flex-1 flex flex-col justify-center text-center px-2.5 leading-tight">
-                <span className="text-amber-400 font-black text-[13px] font-sans tracking-widest uppercase">ONE OF A KIND</span>
-                <span className="text-white font-bold text-[10px] font-sans tracking-wide uppercase mt-0.5">EXPANSIVE 4 BHK RESIDENCES</span>
-                <span className="text-neutral-400 font-medium text-[8px] font-sans uppercase mt-0.5">📍 NEOPOLIS, HYDERABAD</span>
-              </div>
-
-              {/* Right part: MSN Logo / Phone / SFT */}
-              <div className="flex items-center gap-3 flex-shrink-0 border-l border-neutral-800/60 pl-3 h-[60px] text-right">
-                <div className="flex flex-col justify-center leading-tight">
-                  <span className="text-[10px] text-neutral-300 font-bold font-sans">5,250 - 7,460 SFT</span>
-                  <span className="text-[9.5px] text-amber-400 font-bold font-sans mt-0.5">📞 91426 45645</span>
-                </div>
-                <div className="flex flex-col justify-center leading-none text-left border-l border-neutral-800/60 pl-2.5">
-                  <span className="text-[11px] text-amber-500 font-extrabold font-sans">MSN</span>
-                  <span className="text-[7.5px] text-neutral-400 font-bold font-sans tracking-wider mt-0.5">REALTY</span>
-                </div>
-              </div>
-            </div>
           )}
 
           {/* Actions Dashboard (Right — desktop only) */}
