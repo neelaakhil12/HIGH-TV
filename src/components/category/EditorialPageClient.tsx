@@ -235,7 +235,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
 
 export default function EditorialPageClient({ allArticles }: { allArticles: Article[] }) {
   const [sections, setSections] = React.useState<{ id: string; title: string; slug: string }[]>([
-    { id: 'sec-editorial', title: 'సంపాదకీయం', slug: 'sampadakiyam' },
+    { id: 'sec-editorial', title: 'ఎడిటోరియల్', slug: 'sampadakiyam' },
     { id: 'sec-gitanjali', title: 'గీతాంజలి', slug: 'adyathmikam' },
     { id: 'sec-kothapaluku', title: 'కొత్త పలుకు', slug: 'antharmadanam' },
   ]);
@@ -244,7 +244,15 @@ export default function EditorialPageClient({ allArticles }: { allArticles: Arti
     try {
       const saved = localStorage.getItem('editorial_sections_config');
       if (saved) {
-        setSections(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        const migrated = parsed.map((s: any) => {
+          if (s.slug === 'sampadakiyam' && s.title === 'సంపాదకీయం') {
+            return { ...s, title: 'ఎడిటోరియల్' };
+          }
+          return s;
+        });
+        setSections(migrated);
+        localStorage.setItem('editorial_sections_config', JSON.stringify(migrated));
       }
     } catch (e) {
       console.error('Error loading dynamic editorial sections config:', e);
