@@ -92,13 +92,13 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
             <Link href={linkedArt ? getArticleHref(linkedArt) : '#'} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
               <img
                 src={imgArt.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                alt={linkedArt ? linkedArt.title : ''}
+                alt={linkedArt ? linkedArt.title.replace(/<[^>]*>/g, '').trim() : ''}
                 className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
               />
               {linkedArt && (
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5 pointer-events-none">
                   <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                    {linkedArt.title}
+                    {linkedArt.title ? linkedArt.title.replace(/<[^>]*>/g, '').trim() : ''}
                   </h3>
                 </div>
               )}
@@ -152,12 +152,12 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
             <Link href={getArticleHref(fallbackRows.imgArt)} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
               <img
                 src={fallbackRows.imgArt.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-                alt={fallbackRows.imgArt.title}
+                alt={fallbackRows.imgArt.title ? fallbackRows.imgArt.title.replace(/<[^>]*>/g, '').trim() : ''}
                 className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5 pointer-events-none">
                 <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  {fallbackRows.imgArt.title}
+                  {fallbackRows.imgArt.title ? fallbackRows.imgArt.title.replace(/<[^>]*>/g, '').trim() : ''}
                 </h3>
               </div>
             </Link>
@@ -266,9 +266,9 @@ export default function EditorialPageClient({ allArticles }: { allArticles: Arti
       {/* Main Grid Content */}
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-5">
         <div className="w-full lg:col-span-7">
-          {/* Section 1: ఎడిటోరియల్ */}
+          {/* Section 1: సంపాదకీయం */}
           <EditorialSection 
-            title="ఎడిటోరియల్" 
+            title="సంపాదకీయం" 
             articles={sampadakiyamArticles} 
             categorySlug="sampadakiyam" 
           />

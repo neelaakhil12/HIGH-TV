@@ -459,7 +459,7 @@ const getCmsPollStatusLabel = (desc: string) => {
 
 // Default editorial sections
 const DEFAULT_EDITORIAL_SECTIONS = [
-  { id: 'sec-editorial', title: 'ఎడిటోరియల్', slug: 'sampadakiyam' },
+  { id: 'sec-editorial', title: 'సంపాదకీయం', slug: 'sampadakiyam' },
   { id: 'sec-gitanjali', title: 'గీతాంజలి', slug: 'adyathmikam' },
   { id: 'sec-kothapaluku', title: 'కొత్త పలుకు', slug: 'antharmadanam' },
 ];
@@ -3062,7 +3062,17 @@ export default function AdminPage() {
               // Load sections from localStorage if available
               try {
                 const saved = localStorage.getItem('editorial_sections_config');
-                if (saved) setEditorialSections(JSON.parse(saved));
+                if (saved) {
+                  const parsed = JSON.parse(saved);
+                  const migrated = parsed.map((s: any) => {
+                    if (s.slug === 'sampadakiyam' && s.title === 'ఎడిటోరియల్') {
+                      return { ...s, title: 'సంపాదకీయం' };
+                    }
+                    return s;
+                  });
+                  setEditorialSections(migrated);
+                  localStorage.setItem('editorial_sections_config', JSON.stringify(migrated));
+                }
               } catch {}
             }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
