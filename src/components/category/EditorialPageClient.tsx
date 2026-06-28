@@ -122,12 +122,12 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
                     </Link>
                     <div className="flex-1 text-left min-w-0">
                       <Link href={getArticleHref(linkedArt)}>
-                        <h4 className="text-[15px] sm:text-[16px] md:text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                        <h4 className="text-[15px] sm:text-[16px] md:text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2 pl-1 pt-0.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                           {cleanTitle}
                         </h4>
                       </Link>
                       {cleanDesc && (
-                        <p className="text-xs sm:text-[13px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                        <p className="text-xs sm:text-[13px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text pl-1" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                           {cleanDesc}
                         </p>
                       )}
@@ -179,12 +179,12 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
                   </Link>
                   <div className="flex-1 text-left min-w-0">
                     <Link href={getArticleHref(art)}>
-                      <h4 className="text-[15px] sm:text-[16px] md:text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      <h4 className="text-[15px] sm:text-[16px] md:text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2 pl-1 pt-0.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                         {cleanTitle}
                       </h4>
                     </Link>
                     {cleanDesc && (
-                      <p className="text-xs sm:text-[13px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                      <p className="text-xs sm:text-[13px] text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed telugu-text pl-1" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                         {cleanDesc}
                       </p>
                     )}
@@ -214,12 +214,12 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
                 </Link>
                 <div className="flex-1 text-left min-w-0">
                   <Link href={getArticleHref(art)}>
-                    <h4 className="text-[15px] sm:text-[16px] md:text-[17px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    <h4 className="text-[15px] sm:text-[16px] md:text-[17px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2 pl-1 pt-0.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       {cleanTitle}
                     </h4>
                   </Link>
                   {cleanDesc && (
-                    <p className="text-[11px] sm:text-xs text-gray-500 font-medium line-clamp-2 mt-1.5 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    <p className="text-[11px] sm:text-xs text-gray-500 font-medium line-clamp-2 mt-1.5 leading-relaxed telugu-text pl-1" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                       {cleanDesc}
                     </p>
                   )}
