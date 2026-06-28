@@ -1120,6 +1120,10 @@ export default function AdminPage() {
   const [epaperSection, setEpaperSection] = useState('main');
   const [customEpaperSection, setCustomEpaperSection] = useState('');
   const [isSavingEpaper, setIsSavingEpaper] = useState(false);
+  const [epaperSections, setEpaperSections] = useState<{ id: string; name: string; key: string }[]>([]);
+  const [newSectionName, setNewSectionName] = useState('');
+  const [newSectionKey, setNewSectionKey] = useState('');
+  const [isSavingSection, setIsSavingSection] = useState(false);
 
   const fetchEpapersData = () => {
     fetch('/api/epapers?t=' + Date.now())
@@ -1132,9 +1136,24 @@ export default function AdminPage() {
       .catch(err => console.error('Error fetching epapers:', err));
   };
 
+  const fetchEpaperSections = () => {
+    fetch('/api/epapers/sections?t=' + Date.now())
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setEpaperSections(data);
+          if (data.length > 0) {
+            setEpaperSection(data[0].key);
+          }
+        }
+      })
+      .catch(err => console.error('Error fetching epaper sections:', err));
+  };
+
   useEffect(() => {
     if (activeTab === 'epaper') {
       fetchEpapersData();
+      fetchEpaperSections();
     }
   }, [activeTab]);
 
@@ -3158,6 +3177,54 @@ export default function AdminPage() {
         alert('E-Paper deleted successfully!');
       } else {
         alert('Failed to delete E-Paper!');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleAddEpaperSection = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSectionName.trim() || !newSectionKey.trim()) {
+      alert('Please fill out all Section fields!');
+      return;
+    }
+    setIsSavingSection(true);
+    try {
+      const res = await fetch('/api/epapers/sections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newSectionName.trim(),
+          key: newSectionKey.trim()
+        })
+      });
+      if (res.ok) {
+        setNewSectionName('');
+        setNewSectionKey('');
+        fetchEpaperSections();
+        alert('Section added successfully!');
+      } else {
+        const errorData = await res.json();
+        alert(errorData.error || 'Failed to add Section!');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error occurred while adding Section.');
+    } finally {
+      setIsSavingSection(false);
+    }
+  };
+
+  const handleDeleteEpaperSection = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this Section? E-papers published under this section key will remain in database but will not be grouped.')) return;
+    try {
+      const res = await fetch(`/api/epapers/sections?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        fetchEpaperSections();
+        alert('Section deleted successfully!');
+      } else {
+        alert('Failed to delete Section!');
       }
     } catch (err) {
       console.error(err);
@@ -5738,9 +5805,11 @@ export default function AdminPage() {
                       onChange={(e) => setEpaperSection(e.target.value)}
                       className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none font-bold text-slate-800 cursor-pointer"
                     >
-                      <option value="main">Main Editions (ప్రధాన సంచికలు)</option>
-                      <option value="telangana">Telangana Districts (తెలంగాణ జిల్లాలు)</option>
-                      <option value="ap">Andhra Pradesh Districts (ఆంధ్రప్రదేశ్ జిల్లాలు)</option>
+                      {epaperSections.map((sec) => (
+                        <option key={sec.id} value={sec.key}>
+                          {sec.name}
+                        </option>
+                      ))}
                       <option value="custom">Other / Custom Section (ఇతర విభాగాలు)</option>
                     </select>
                   </div>
@@ -5814,6 +5883,92 @@ export default function AdminPage() {
                     </button>
                   </div>
                 </form>
+              </div>
+
+              {/* Dynamic Section Category Manager */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-1">
+                
+                {/* Add New Section Form */}
+                <div className="md:col-span-1 bg-white border border-slate-200/60 rounded-2xl p-5 shadow-sm flex flex-col gap-3.5">
+                  <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5 flex items-center gap-1.5">
+                    <Plus className="w-4 h-4 text-rose-500" />
+                    Add E-Paper Section
+                  </h3>
+                  <form onSubmit={handleAddEpaperSection} className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Section Display Name <strong className="text-rose-500">*</strong></label>
+                      <input
+                        type="text"
+                        required
+                        value={newSectionName}
+                        onChange={(e) => setNewSectionName(e.target.value)}
+                        placeholder="e.g. Hyderabad Metro"
+                        className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2 text-xs outline-none font-bold text-slate-800"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Section Key / Slug <strong className="text-rose-500">*</strong></label>
+                      <input
+                        type="text"
+                        required
+                        value={newSectionKey}
+                        onChange={(e) => setNewSectionKey(e.target.value)}
+                        placeholder="e.g. hyd-metro (lowercase)"
+                        className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2 text-xs font-mono outline-none text-slate-800"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isSavingSection}
+                      className="bg-slate-900 hover:bg-slate-800 disabled:bg-slate-350 text-white font-black text-xs py-2 px-4 rounded-xl transition-all cursor-pointer shadow-sm text-center mt-1"
+                    >
+                      {isSavingSection ? 'Adding...' : 'Add Section'}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Current Dynamic Sections List */}
+                <div className="md:col-span-2 bg-white border border-slate-200/60 rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+                  <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5">
+                    Manage Sections / Sub-sections ({epaperSections.length})
+                  </h3>
+                  <div className="border border-slate-150 rounded-xl overflow-hidden max-h-[220px] overflow-y-auto">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-200 text-slate-400 font-black">
+                          <th className="p-2.5 text-[9px] uppercase tracking-wider">Display Name</th>
+                          <th className="p-2.5 text-[9px] uppercase tracking-wider">Section Key</th>
+                          <th className="p-2.5 text-[9px] uppercase tracking-wider text-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {epaperSections.map((sec) => (
+                          <tr key={sec.id} className="hover:bg-slate-50/50">
+                            <td className="p-2.5 font-bold text-slate-700">{sec.name}</td>
+                            <td className="p-2.5 font-mono text-[11px] text-slate-500">{sec.key}</td>
+                            <td className="p-2.5 text-center">
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteEpaperSection(sec.id)}
+                                className="text-red-500 hover:text-red-700 font-bold hover:underline cursor-pointer"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                        {epaperSections.length === 0 && (
+                          <tr>
+                            <td colSpan={3} className="p-4 text-center text-slate-400 font-bold">
+                              No categories configured yet. Default ones will load automatically.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
               </div>
 
               {/* Stored E-Papers Grid */}

@@ -326,6 +326,18 @@ export default function EPaperReader() {
   };
   const [selectedDate, setSelectedDate] = useState(getTodayString());
   const [dbEpapers, setDbEpapers] = useState<any[]>([]);
+  const [sectionsList, setSectionsList] = useState<{ id: string; name: string; key: string }[]>([]);
+
+  useEffect(() => {
+    fetch('/api/epapers/sections?t=' + Date.now())
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setSectionsList(data);
+        }
+      })
+      .catch(err => console.error('Error fetching sections:', err));
+  }, []);
 
   useEffect(() => {
     fetch(`/api/epapers?date=${selectedDate}&t=` + Date.now())
@@ -1650,52 +1662,16 @@ export default function EPaperReader() {
           <div className="bg-[#0c4a80] text-white px-3 md:px-6 py-2 md:py-2.5 flex flex-row flex-wrap items-center justify-between gap-2 select-none shadow-md w-full">
             {/* Nav Menus */}
             <div className="flex items-center gap-4 text-[11px] md:text-[12px] font-black uppercase tracking-wider flex-shrink-0 flex-wrap">
-              <button 
-                onClick={() => {
-                  const el = document.getElementById('main-editions-section');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="hover:text-yellow-300 transition-colors cursor-pointer"
-              >
-                Main Editions
-              </button>
-              <button 
-                onClick={() => {
-                  const el = document.getElementById('tg-editions-section');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="hover:text-yellow-300 transition-colors cursor-pointer"
-              >
-                Telangana
-              </button>
-              <button 
-                onClick={() => {
-                  const el = document.getElementById('ap-editions-section');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="hover:text-yellow-300 transition-colors cursor-pointer"
-              >
-                Andhra Pradesh
-              </button>
-              <button 
-                onClick={() => {
-                  const el = document.getElementById('metro-editions-section');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="hover:text-yellow-300 transition-colors cursor-pointer"
-              >
-                Metro
-              </button>
-              {customSections.map((secName: string) => (
+              {sectionsList.map((sec) => (
                 <button 
-                  key={secName}
+                  key={sec.id}
                   onClick={() => {
-                    const el = document.getElementById(`${secName}-editions-section`);
+                    const el = document.getElementById(`${sec.key}-editions-section`);
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="hover:text-yellow-300 transition-colors cursor-pointer capitalize"
+                  className="hover:text-yellow-300 transition-colors cursor-pointer"
                 >
-                  {secName.replace(/-/g, ' ')}
+                  {sec.name.split(' (')[0]}
                 </button>
               ))}
             </div>
@@ -1762,99 +1738,73 @@ export default function EPaperReader() {
             {/* Central Content Container */}
             <div className="flex-1 max-w-[1200px] flex flex-col gap-10 w-full min-w-0">
               
-              {/* Section: MAIN EDITIONS */}
-              <div id="main-editions-section" className="flex flex-col text-left">
-                <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
-                  Main Editions
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                  {getEditionsForSection('main', MAIN_EDITIONS).map((item, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => handleSelectEditionCard(item.value)}
-                      className="group cursor-pointer flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
-                    >
-                      <div 
-                        className="relative overflow-hidden bg-white border border-gray-250 shadow-md rounded-t-lg group-hover:border-red-500 transition-all duration-200"
-                        style={{ aspectRatio: `1 / ${defaultPageAspectRatio}` }}
-                      >
-                        {item.pdfUrl ? (
-                          <DynamicCardThumbnail
-                            pdfjs={pdfjs}
-                            pdfUrl={item.pdfUrl}
-                          />
-                        ) : defaultPdfDoc ? (
-                          <EditionCardThumbnail
-                            pdfDoc={pdfDoc || defaultPdfDoc}
-                            cardIdx={idx}
-                            totalPages={pdfDoc ? pdfDoc.numPages : defaultTotalPages}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-semibold animate-pulse">
-                            Loading preview...
+              {sectionsList.map((sec, secIdx) => {
+                const papers = getEditionsForSection(sec.key, sec.key === 'main' ? MAIN_EDITIONS : sec.key === 'telangana' ? TG_EDITIONS : sec.key === 'ap' ? AP_EDITIONS : []);
+                
+                // If it is the main section, render it as a grid of cards
+                if (sec.key === 'main') {
+                  return (
+                    <div key={sec.id} id={`${sec.key}-editions-section`} className="flex flex-col text-left">
+                      <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
+                        {sec.name}
+                      </h2>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                        {papers.map((item, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => handleSelectEditionCard(item.value)}
+                            className="group cursor-pointer flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+                          >
+                            <div 
+                              className="relative overflow-hidden bg-white border border-gray-250 shadow-md rounded-t-lg group-hover:border-red-500 transition-all duration-200"
+                              style={{ aspectRatio: `1 / ${defaultPageAspectRatio}` }}
+                            >
+                              {item.pdfUrl ? (
+                                <DynamicCardThumbnail
+                                  pdfjs={pdfjs}
+                                  pdfUrl={item.pdfUrl}
+                                />
+                              ) : defaultPdfDoc ? (
+                                <EditionCardThumbnail
+                                  pdfDoc={pdfDoc || defaultPdfDoc}
+                                  cardIdx={idx}
+                                  totalPages={pdfDoc ? pdfDoc.numPages : defaultTotalPages}
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-semibold animate-pulse">
+                                  Loading preview...
+                                </div>
+                              )}
+                            </div>
+                            <div className="w-full bg-[#e60000] py-2 px-3 text-center text-xs font-black text-white truncate uppercase border-t border-red-700 rounded-b-lg">
+                              {item.name}
+                            </div>
                           </div>
+                        ))}
+                        {papers.length === 0 && (
+                          <div className="text-gray-400 text-sm py-4 col-span-full">No editions match your search.</div>
                         )}
                       </div>
-                      <div className="w-full bg-[#e60000] py-2 px-3 text-center text-xs font-black text-white truncate uppercase border-t border-red-700 rounded-b-lg">
-                        {item.name}
-                      </div>
+                      
+                      {secIdx === 0 && isMobile && (
+                        <div className="w-full flex justify-center mt-6">
+                          <AdBanner position="rectangle" />
+                        </div>
+                      )}
                     </div>
-                  ))}
-                  {getEditionsForSection('main', MAIN_EDITIONS).length === 0 && (
-                    <div className="text-gray-400 text-sm py-4 col-span-full">No main editions match your search.</div>
-                  )}
-                </div>
-              </div>
+                  );
+                }
 
-              {isMobile && (
-                <div className="w-full flex justify-center">
-                  <AdBanner position="rectangle" />
-                </div>
-              )}
-
-              {/* Section: TELANGANA DISTRICTS */}
-              <div id="tg-editions-section" className="flex flex-col text-left">
-                <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
-                  Telangana Districts
-                </h2>
-                {renderCarousel('tg-carousel', getEditionsForSection('telangana', TG_EDITIONS))}
-                {getEditionsForSection('telangana', TG_EDITIONS).length === 0 && (
-                  <div className="text-gray-400 text-sm py-4">No Telangana editions match your search.</div>
-                )}
-              </div>
-
-              {/* Section: ANDHRA PRADESH DISTRICTS */}
-              <div id="ap-editions-section" className="flex flex-col text-left">
-                <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
-                  Andhra Pradesh Districts
-                </h2>
-                {renderCarousel('ap-carousel', getEditionsForSection('ap', AP_EDITIONS))}
-                {getEditionsForSection('ap', AP_EDITIONS).length === 0 && (
-                  <div className="text-gray-400 text-sm py-4">No Andhra Pradesh editions match your search.</div>
-                )}
-              </div>
-
-              {/* Section: METRO EDITIONS */}
-              <div id="metro-editions-section" className="flex flex-col text-left">
-                <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
-                  Metro Editions
-                </h2>
-                {renderCarousel('metro-carousel', getEditionsForSection('metro', METRO_EDITIONS))}
-                {getEditionsForSection('metro', METRO_EDITIONS).length === 0 && (
-                  <div className="text-gray-400 text-sm py-4">No Metro editions match your search.</div>
-                )}
-              </div>
-
-              {/* DYNAMIC FUTURE CUSTOM SECTIONS */}
-              {customSections.map((secName: string) => {
-                const papers = getCustomSectionPapers(secName);
-                if (papers.length === 0) return null;
+                // Render other sections as sliders
                 return (
-                  <div key={secName} id={`${secName}-editions-section`} className="flex flex-col text-left">
+                  <div key={sec.id} id={`${sec.key}-editions-section`} className="flex flex-col text-left">
                     <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
-                      {secName.replace(/-/g, ' ')}
+                      {sec.name}
                     </h2>
-                    {renderCarousel(`${secName}-carousel`, papers)}
+                    {renderCarousel(`${sec.key}-carousel`, papers)}
+                    {papers.length === 0 && (
+                      <div className="text-gray-400 text-sm py-4">No editions match your search.</div>
+                    )}
                   </div>
                 );
               })}

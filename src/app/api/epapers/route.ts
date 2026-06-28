@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
     const epaper = await prisma.epaper.create({ data });
     return NextResponse.json(epaper, { status: 201 });
   } catch (error) {
+    console.error('API EPAPER POST ERROR:', error);
     return NextResponse.json({ error: 'Failed to create epaper' }, { status: 500 });
   }
 }
