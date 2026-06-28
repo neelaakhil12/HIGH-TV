@@ -173,8 +173,8 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
                   alt="Advertisement"
                   className={`h-auto object-contain mx-auto select-none hover:opacity-95 transition-opacity block ${
                     adOrientation === 'horizontal'
-                      ? 'w-full max-w-[95vw] md:w-[800px] md:max-w-[800px] lg:w-[950px] lg:max-w-[950px] max-h-[88vh]'
-                      : 'w-full max-w-[95vw] md:w-[650px] md:max-w-[650px] lg:w-[750px] lg:max-w-[750px] max-h-[88vh]'
+                      ? 'w-full max-w-[95vw] md:w-[800px] md:max-w-[800px] lg:w-[900px] lg:max-w-[900px] md:max-h-none max-h-[85vh]'
+                      : 'w-full max-w-[95vw] md:w-[600px] md:max-w-[600px] lg:w-[700px] lg:max-w-[700px] md:max-h-none max-h-[85vh]'
                   }`}
                 />
               </a>
