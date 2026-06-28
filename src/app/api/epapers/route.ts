@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '50mb'
+    }
+  }
+};
+
+// Trigger Turbopack rebuild: 2026-06-28
 // GET — list all epapers (supports ?date=YYYY-MM-DD)
 export async function GET(req: NextRequest) {
   try {
@@ -20,7 +29,8 @@ export async function GET(req: NextRequest) {
 // POST — publish a new epaper
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
+    const bodyText = await req.text();
+    const data = JSON.parse(bodyText);
     const epaper = await prisma.epaper.create({ data });
     return NextResponse.json(epaper, { status: 201 });
   } catch (error) {
