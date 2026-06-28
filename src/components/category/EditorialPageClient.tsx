@@ -65,17 +65,17 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
         </div>
 
         {/* Right Stacked Featured Articles */}
-        <div className="md:col-span-4 flex flex-col gap-4 w-full justify-between">
+        <div className="md:col-span-4 flex flex-col gap-4 w-full">
           {rightArticles.map((art) => {
             const cleanTitle = art.title ? art.title.replace(/<[^>]*>/g, '').trim() : '';
             const cleanDesc = art.description ? art.description.replace(/<[^>]*>/g, '').trim() : '';
             return (
               <div key={art.id} className="flex gap-4 items-start group bg-white hover:bg-slate-50/50 p-2.5 rounded-xl border border-transparent hover:border-slate-100 transition-all">
-                <Link href={getArticleHref(art)} className="w-[110px] h-[76px] flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 relative block shadow-3xs">
+                <Link href={getArticleHref(art)} className="w-28 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 block shadow-3xs relative">
                   <img
                     src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
                     alt={cleanTitle}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                   />
                 </Link>
                 <div className="flex-1 text-left min-w-0">
@@ -105,7 +105,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
             
             return (
               <div key={art.id} className="flex gap-4 items-start group bg-white hover:bg-slate-50/50 p-2.5 rounded-xl border border-transparent hover:border-slate-100 transition-all">
-                <Link href={getArticleHref(art)} className="w-[120px] h-[80px] sm:w-[130px] sm:h-[86px] flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 relative block shadow-3xs">
+                <Link href={getArticleHref(art)} className="w-32 h-20 sm:w-36 sm:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 block shadow-3xs relative">
                   <img
                     src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
                     alt={cleanTitle}
