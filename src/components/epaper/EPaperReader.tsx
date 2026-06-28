@@ -370,7 +370,7 @@ export default function EPaperReader() {
   const customSections = Array.from(new Set(
     dbEpapers
       .map(p => p.section)
-      .filter(s => s && s !== 'main' && s !== 'telangana' && s !== 'ap' && s !== 'metro')
+      .filter(s => s && s !== 'main' && s !== 'telangana' && s !== 'ap')
   ));
   
   const [activePageIdx, setActivePageIdx] = useState(0);
@@ -953,7 +953,7 @@ export default function EPaperReader() {
           const clipLink = `${currentHost}/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
           
           const getEditionDisplayName = (editionVal: string) => {
-            const allEditions = [...MAIN_EDITIONS, ...AP_EDITIONS, ...TG_EDITIONS, ...METRO_EDITIONS];
+            const allEditions = [...MAIN_EDITIONS, ...AP_EDITIONS, ...TG_EDITIONS];
             const found = allEditions.find(ed => ed.value === editionVal);
             return found ? `${found.nameTe} (${found.name})` : editionVal;
           };
@@ -1097,7 +1097,7 @@ export default function EPaperReader() {
           const clipLink = `${currentHost}/category/epaper?view=article&date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}&articleId=${activeArticle.id}`;
           
           const getEditionDisplayName = (editionVal: string) => {
-            const allEditions = [...MAIN_EDITIONS, ...AP_EDITIONS, ...TG_EDITIONS, ...METRO_EDITIONS];
+            const allEditions = [...MAIN_EDITIONS, ...AP_EDITIONS, ...TG_EDITIONS];
             const found = allEditions.find(ed => ed.value === editionVal);
             return found ? `${found.nameTe} (${found.name})` : editionVal;
           };

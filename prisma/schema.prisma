@@ -69,7 +69,7 @@ model Epaper {
   id        String   @id @default(cuid())
   title     String   @db.VarChar(500)
   date      String   @db.VarChar(20)
-  pdfUrl    String   @db.VarChar(1000)
+  pdfUrl    String   @db.LongText
   section   String   @default("main") @db.VarChar(100)
   createdAt DateTime @default(now())
 }

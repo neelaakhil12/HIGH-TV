@@ -5730,6 +5730,7 @@ export default function AdminPage() {
                       className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3.5 py-2.5 text-xs outline-none text-slate-800"
                     />
                   </div>
+
                   <div className="flex flex-col gap-1">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Section / Category</label>
                     <select
@@ -5740,23 +5741,55 @@ export default function AdminPage() {
                       <option value="main">Main Editions (ప్రధాన సంచికలు)</option>
                       <option value="telangana">Telangana Districts (తెలంగాణ జిల్లాలు)</option>
                       <option value="ap">Andhra Pradesh Districts (ఆంధ్రప్రదేశ్ జిల్లాలు)</option>
-                      <option value="metro">Metro Editions (మెట్రో సంచికలు)</option>
                       <option value="custom">Other / Custom Section (ఇతర విభాగాలు)</option>
                     </select>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">PDF Attachment File URL</label>
-                    <input
-                      type="text"
-                      required
-                      value={epaperPdf}
-                      onChange={(e) => setEpaperPdf(e.target.value)}
-                      placeholder="e.g. /epapers/edition_today.pdf"
-                      className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3.5 py-2.5 text-xs font-mono outline-none text-slate-800"
-                    />
-                  </div>
 
-                  {epaperSection === 'custom' && (
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">PDF E-Paper File <strong className="text-rose-500">*</strong></label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        id="epaper-pdf-input"
+                        className="hidden"
+                        accept="application/pdf"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            if (file.size > 50 * 1024 * 1024) {
+                              alert('PDF file is too large! Please select a file smaller than 50MB.');
+                              return;
+                            }
+                            const reader = new FileReader();
+                            reader.readAsDataURL(file);
+                            reader.onload = () => {
+                              setEpaperPdf(reader.result as string);
+                            };
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => document.getElementById('epaper-pdf-input')?.click()}
+                        className="bg-slate-900 hover:bg-slate-800 text-white font-black text-xs py-2.5 px-4 rounded-xl transition-colors cursor-pointer shadow-sm flex items-center gap-1.5"
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>PDF ఫైల్ ఎంచుకోండి (Choose PDF)</span>
+                      </button>
+                      {epaperPdf && (
+                        <div className="flex items-center gap-1 text-[11.5px] text-emerald-600 font-bold">
+                          <span>✓ PDF Loaded</span>
+                          <button
+                            type="button"
+                            onClick={() => setEpaperPdf('')}
+                            className="text-rose-500 hover:text-rose-700 ml-1 underline cursor-pointer"
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>                  {epaperSection === 'custom' && (
                     <div className="md:col-span-4 flex flex-col gap-1 animate-fade-in">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Custom Section Name / Key <strong className="text-rose-500">*</strong></label>
                       <input
