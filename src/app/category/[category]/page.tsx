@@ -143,7 +143,7 @@ export default async function CategoryPage({
   // 1. Fetch latest articles from the database
   let dbArticles: any[] = [];
   let deletedArticles: any[] = [];
-    const shouldSelectBody = category === 'shorts';
+    const shouldSelectBody = category === 'shorts' || category === 'sampadakiyam';
 
     try {
       [dbArticles, deletedArticles] = await Promise.all([
