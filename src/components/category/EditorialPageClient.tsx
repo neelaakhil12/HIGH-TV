@@ -293,10 +293,12 @@ export default function EditorialPageClient({ allArticles }: { allArticles: Arti
               // If there are no articles in this section, and it's not the only section, we can skip it
               return null;
             }
+            // Ensure the main editorial page section is always displayed in Telugu as 'ఎడిటోరియల్'
+            const displayTitle = sec.slug === 'sampadakiyam' ? 'ఎడిటోరియల్' : sec.title;
             return (
               <EditorialSection 
                 key={sec.id}
-                title={sec.title} 
+                title={displayTitle} 
                 articles={secArticles} 
                 categorySlug={sec.slug} 
               />
