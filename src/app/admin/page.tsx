@@ -680,7 +680,7 @@ export default function AdminPage() {
   const editorialEditorRef = useRef<HTMLDivElement>(null);
   const editorialImageInputRef = useRef<HTMLInputElement>(null);
   const [isSavingEditorialArticle, setIsSavingEditorialArticle] = useState(false);
-  const [pendingAddCategory, setPendingAddCategory] = useState<string | null>(null);
+  const pendingAddCategoryRef = useRef<string | null>(null);
 
   // Editorial Image Link states
   const [editorialImageCaption, setEditorialImageCaption] = useState('');
@@ -1112,9 +1112,9 @@ export default function AdminPage() {
       setIsFeaturedChecked(filterCategory === 'featured');
 
       // Auto-check filterCategory in classification tree
-      if (pendingAddCategory) {
-        setSelectedCategories([pendingAddCategory]);
-        setPendingAddCategory(null);
+      if (pendingAddCategoryRef.current) {
+        setSelectedCategories([pendingAddCategoryRef.current]);
+        pendingAddCategoryRef.current = null;
       } else if (
         filterCategory !== 'all' && 
         filterCategory !== 'latest' && 
@@ -1133,7 +1133,7 @@ export default function AdminPage() {
         if (weatherDescriptionRef.current) weatherDescriptionRef.current.innerHTML = '';
       }, 50);
     }
-  }, [newsViewMode, filterCategory, pendingAddCategory]);
+  }, [newsViewMode, filterCategory]);
 
   // Auto slug generation — produces English-only slug (strips Telugu/non-ASCII chars)
   useEffect(() => {
@@ -9006,7 +9006,7 @@ export default function AdminPage() {
                               <Plus className="w-3.5 h-3.5" />
                               <span>Add Image</span>
                             </button>
-                            <button onClick={() => { setPendingAddCategory(editorialActiveSection); setSelectedCategories([editorialActiveSection]); setIsBreakingChecked(false); setIsTrendingChecked(false); setIsFeaturedChecked(false); setNewsViewMode('add'); setActiveTab('news'); }} className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2 px-4 rounded-xl cursor-pointer flex items-center gap-1.5 shadow-sm hover:scale-[1.01] transition-all"><Plus className="w-3.5 h-3.5" />Add Article</button>
+                            <button onClick={() => { pendingAddCategoryRef.current = editorialActiveSection; setSelectedCategories([editorialActiveSection]); setIsBreakingChecked(false); setIsTrendingChecked(false); setIsFeaturedChecked(false); setNewsViewMode('add'); setActiveTab('news'); }} className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2 px-4 rounded-xl cursor-pointer flex items-center gap-1.5 shadow-sm hover:scale-[1.01] transition-all"><Plus className="w-3.5 h-3.5" />Add Article</button>
                           </div>
                         </div>
                         {arts.length === 0 ? (
