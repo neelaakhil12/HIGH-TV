@@ -99,10 +99,10 @@ const MAIN_CATEGORIES_LIST = [
   { slug: 'lifestyle', name: 'లైఫ్ స్టైల్ (Lifestyle)' },
   { slug: 'rasipalalu', name: 'శుభఫలాలు (Astrology)' },
   { slug: 'webstories', name: 'వెబ్ స్టోరీస్ (Web Stories)' },
-  { slug: 'sampadakiyam', name: 'ఎడిటోరియల్ (Editorial)' },
+  { slug: 'sampadakiyam', name: 'ఎడిటోరియల్ (సంపాదకీయం)' },
   { slug: 'women', name: 'ఆమె (Women)' },
-  { slug: 'antharmadanam', name: 'వ్యక్తిత్వ వికాసం (Opinion)' },
-  { slug: 'adyathmikam', name: 'దైవం (Devotional)' },
+  { slug: 'antharmadanam', name: 'కొత్త పలుకు (Opinion Column)' },
+  { slug: 'adyathmikam', name: 'గీతాంజలి (Devotional/Gitanjali)' },
   { slug: 'citizen-reporter', name: 'సిటిజన్ రిపోర్టర్' },
   { slug: 'team', name: 'మా టీమ్' },
   { slug: 'weather', name: 'వెదర్' },
@@ -2829,6 +2829,18 @@ export default function AdminPage() {
           </button>
 
           <button
+            onClick={() => { setActiveTab('editorial-page'); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'editorial-page' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span className="telugu-text font-bold">ఎడిటోరియల్ పేజీ (Editorial)</span>
+            </div>
+          </button>
+
+          <button
             onClick={() => { setActiveTab('breaking'); }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
               activeTab === 'breaking' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
@@ -3602,6 +3614,154 @@ export default function AdminPage() {
 
             </div>
           )}
+
+          {/* ══════════════ VIEW: EDITORIAL PAGE SECTIONS MANAGER ══════════════ */}
+          {activeTab === 'editorial-page' && (() => {
+            // Filter articles for the three sections
+            const sampadakiyamList = allArticles.filter(art => art.categorySlug === 'sampadakiyam');
+            const adyathmikamList = allArticles.filter(art => art.categorySlug === 'adyathmikam');
+            const antharmadanamList = allArticles.filter(art => art.categorySlug === 'antharmadanam');
+
+            const sections = [
+              {
+                title: 'సంపాదకీయం / ఎడిటోరియల్ (Section 1)',
+                slug: 'sampadakiyam',
+                color: 'border-rose-500 bg-rose-50/20',
+                btnColor: 'bg-rose-600 hover:bg-rose-700 text-white',
+                badgeColor: 'bg-rose-100 text-rose-800',
+                list: sampadakiyamList
+              },
+              {
+                title: 'గీతాంజలి (Section 2)',
+                slug: 'adyathmikam',
+                color: 'border-amber-500 bg-amber-50/20',
+                btnColor: 'bg-amber-600 hover:bg-amber-700 text-white',
+                badgeColor: 'bg-amber-100 text-amber-800',
+                list: adyathmikamList
+              },
+              {
+                title: 'కొత్త పలుకు (Section 3)',
+                slug: 'antharmadanam',
+                color: 'border-purple-500 bg-purple-50/20',
+                btnColor: 'bg-purple-600 hover:bg-purple-700 text-white',
+                badgeColor: 'bg-purple-100 text-purple-800',
+                list: antharmadanamList
+              }
+            ];
+
+            const handleAddNewArticleForSection = (categorySlug: string) => {
+              setEditingArticle(null);
+              setNewsTitle('');
+              setNewsSlug('');
+              setNewsDescription('');
+              setNewsAuthor('హై టీవీ డెస్క్');
+              setNewsPublishedDate(new Date().toISOString().slice(0, 16));
+              setNewsImage('');
+              setNewsVideo('');
+              setSelectedCategories([categorySlug]);
+              setIsBreakingChecked(false);
+              setIsTrendingChecked(false);
+              setIsFeaturedChecked(false);
+              
+              if (newsTitleRef.current) newsTitleRef.current.innerHTML = '';
+              if (newsDescriptionRef.current) newsDescriptionRef.current.innerHTML = '';
+              if (editorRef.current) editorRef.current.innerHTML = '';
+
+              setActiveTab('news');
+              setNewsViewMode('add');
+            };
+
+            return (
+              <div className="flex flex-col gap-6 animate-fade-in text-left">
+                {/* Header */}
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800">ఎడిటోరియల్ పేజీ మేనేజర్ (Editorial Page Manager)</h2>
+                    <p className="text-slate-500 text-xs mt-1">
+                      ABN తరహా లేఅవుట్‌తో కూడిన ఎడిటోరియల్ పేజీలోని 3 విభాగాలను ఇక్కడ సులభంగా నిర్వహించవచ్చు.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Sections Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {sections.map((sect) => (
+                    <div key={sect.slug} className={`border rounded-2xl p-5 shadow-sm bg-white border-slate-200 flex flex-col min-h-[500px]`}>
+                      {/* Section Title */}
+                      <div className="flex justify-between items-start gap-2 mb-4 pb-3 border-b border-slate-100">
+                        <div>
+                          <h3 className="text-sm font-black text-slate-800 telugu-text leading-relaxed">{sect.title}</h3>
+                          <span className="text-[10px] font-mono text-slate-400">Category Slug: {sect.slug}</span>
+                        </div>
+                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full shrink-0 ${sect.badgeColor}`}>
+                          {sect.list.length} Articles
+                        </span>
+                      </div>
+
+                      {/* Add Button */}
+                      <button
+                        type="button"
+                        onClick={() => handleAddNewArticleForSection(sect.slug)}
+                        className={`w-full py-2.5 px-4 rounded-xl text-xs font-black transition-all mb-4 flex items-center justify-center gap-1.5 shadow-3xs hover:scale-[1.01] cursor-pointer ${sect.btnColor}`}
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>కొత్త వార్త జోడించండి</span>
+                      </button>
+
+                      {/* Articles list */}
+                      <div className="flex-1 overflow-y-auto max-h-[400px] divide-y divide-slate-150/60 pr-1 admin-scrollbar">
+                        {sect.list.length === 0 ? (
+                          <div className="py-12 text-center text-slate-400">
+                            <span className="text-2xl block mb-1">📝</span>
+                            <span className="text-xs font-bold">ఈ విభాగంలో వార్తలు లేవు</span>
+                          </div>
+                        ) : (
+                          sect.list.map((art) => (
+                            <div key={art.id} className="py-3 flex items-start gap-2.5">
+                              <img
+                                src={art.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100&fit=crop'}
+                                alt={art.title}
+                                className="w-12 h-8 object-cover rounded border border-slate-200 shrink-0"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-[11.5px] font-black text-slate-700 telugu-text leading-relaxed line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                  {art.title}
+                                </h4>
+                                <span className="text-[9px] text-slate-400 block font-mono mt-0.5">
+                                  {new Date(art.publishedAt).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1 shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    startEditing(art);
+                                    setActiveTab('news');
+                                  }}
+                                  className="text-slate-500 hover:text-rose-600 p-1 hover:bg-slate-100 rounded transition-colors cursor-pointer"
+                                  title="Edit"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteArticle(art.id)}
+                                  className="text-slate-400 hover:text-red-650 p-1 hover:bg-slate-100 rounded transition-colors cursor-pointer"
+                                  title="Delete"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* ══════════════ VIEW: ADD / EDIT NEWS ARTICLE (2-Column Workspace) ══════════════ */}
           {activeTab === 'news' && (newsViewMode === 'add' || newsViewMode === 'edit') && (
