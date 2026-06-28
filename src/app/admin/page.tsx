@@ -1119,6 +1119,7 @@ export default function AdminPage() {
   const [epaperPdf, setEpaperPdf] = useState('');
   const [epaperSection, setEpaperSection] = useState('main');
   const [customEpaperSection, setCustomEpaperSection] = useState('');
+  const [epaperDistrict, setEpaperDistrict] = useState('');
   const [isSavingEpaper, setIsSavingEpaper] = useState(false);
   const [epaperSections, setEpaperSections] = useState<{ id: string; name: string; key: string }[]>([]);
   const [newSectionName, setNewSectionName] = useState('');
@@ -3132,7 +3133,14 @@ export default function AdminPage() {
       alert('Please fill out all E-Paper fields!');
       return;
     }
-    const finalSection = epaperSection === 'custom' ? customEpaperSection.trim().toLowerCase() : epaperSection;
+    let finalSection = epaperSection === 'custom' ? customEpaperSection.trim().toLowerCase() : epaperSection;
+    if (epaperDistrict) {
+      if (epaperSection === 'main') {
+        finalSection = epaperDistrict;
+      } else if (epaperSection === 'telangana' || epaperSection === 'ap') {
+        finalSection = `${epaperSection}-${epaperDistrict}`;
+      }
+    }
     if (!finalSection) {
       alert('Please enter a section name!');
       return;
@@ -3155,6 +3163,7 @@ export default function AdminPage() {
         setEpaperPdf('');
         setEpaperSection('main');
         setCustomEpaperSection('');
+        setEpaperDistrict('');
         fetchEpapersData();
         alert('E-Paper edition added successfully!');
       } else {
@@ -5814,6 +5823,66 @@ export default function AdminPage() {
                       <option value="custom">Other / Custom Section (ఇతర విభాగాలు)</option>
                     </select>
                   </div>
+
+                  {/* Sub-edition selector for Main Editions */}
+                  {epaperSection === 'main' && (
+                    <div className="flex flex-col gap-1 animate-fade-in">
+                      <label className="text-[10px] font-black text-rose-600 uppercase tracking-widest flex items-center gap-1">
+                        <span>Select Main Edition Type</span>
+                        <span className="text-slate-400 font-normal">(ప్రధాన సంచిక విభాగం)</span>
+                      </label>
+                      <select
+                        value={epaperDistrict}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setEpaperDistrict(val);
+                          if (val === 'telangana-main') setEpaperTitle('తెలంగాణ ప్రధాన సంచిక');
+                          else if (val === 'ap-main') setEpaperTitle('ఆంధ్రప్రదేశ్ ప్రధాన సంచిక');
+                          else if (val === 'hyderabad-main') setEpaperTitle('హైదరాబాద్ ప్రధాన సంచిక');
+                          else if (val === 'general-main') setEpaperTitle('నేటి ప్రధాన సంచిక');
+                        }}
+                        className="bg-rose-50/50 border border-rose-200 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none font-bold text-slate-800 cursor-pointer telugu-text"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      >
+                        <option value="">జనరల్ ప్రధాన సంచిక (General Main Edition)</option>
+                        <option value="telangana-main">తెలంగాణ ప్రధాన సంచిక (Telangana Main)</option>
+                        <option value="ap-main">ఆంధ్రప్రదేశ్ ప్రధాన సంచిక (Andhra Pradesh Main)</option>
+                        <option value="hyderabad-main">హైదరాబాద్ ప్రధాన సంచిక (Hyderabad Main)</option>
+                      </select>
+                    </div>
+                  )}
+
+                  {/* District selector for Telangana and AP */}
+                  {(epaperSection === 'telangana' || epaperSection === 'ap') && (
+                    <div className="flex flex-col gap-1 animate-fade-in">
+                      <label className="text-[10px] font-black text-rose-600 uppercase tracking-widest flex items-center gap-1">
+                        <span>Select Specific District</span>
+                        <span className="text-slate-400 font-normal">(జిల్లాను ఎంచుకోండి)</span>
+                      </label>
+                      <select
+                        value={epaperDistrict}
+                        onChange={(e) => {
+                          const distSlug = e.target.value;
+                          setEpaperDistrict(distSlug);
+                          if (distSlug) {
+                            const distObj = (epaperSection === 'telangana' ? tgDistricts : apDistricts).find(d => d.slug === distSlug);
+                            if (distObj && (!epaperTitle || epaperTitle === 'నేటి ఈ-పేపర్ ఎడిషన్')) {
+                              setEpaperTitle(`${distObj.name} జిల్లా ఎడిషన్`);
+                            }
+                          }
+                        }}
+                        className="bg-rose-50/50 border border-rose-200 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none font-bold text-slate-800 cursor-pointer telugu-text"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      >
+                        <option value="">మొత్తం రాష్ట్రీయ ఎడిషన్ (Statewide Main)</option>
+                        {(epaperSection === 'telangana' ? tgDistricts : apDistricts).map((d) => (
+                          <option key={d.slug} value={d.slug}>
+                            {d.name} ({d.slug})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
 
                   <div className="flex flex-col gap-1">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">PDF E-Paper File <strong className="text-rose-500">*</strong></label>

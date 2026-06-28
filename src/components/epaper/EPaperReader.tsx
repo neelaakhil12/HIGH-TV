@@ -23,6 +23,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import AdBanner from '@/components/home/AdBanner';
+import { tgDistricts, apDistricts } from '@/lib/mockData';
 
 interface EpaperPageData {
   pageNum: number;
@@ -351,7 +352,15 @@ export default function EPaperReader() {
   }, [selectedDate]);
 
   const getEditionsForSection = (sectionKey: string, staticList: any[]) => {
-    const dbPapers = dbEpapers.filter(p => p.section === sectionKey);
+    let dbPapers = dbEpapers.filter(p => p.section === sectionKey);
+    if (sectionKey === 'main') {
+      dbPapers = dbEpapers.filter(p => p.section === 'main' || p.section === 'general-main' || p.section.endsWith('-main'));
+    } else if (sectionKey === 'telangana') {
+      dbPapers = dbEpapers.filter(p => p.section === 'telangana' || (p.section.startsWith('telangana-') && p.section !== 'telangana-main') || tgDistricts.some(d => d.slug === p.section));
+    } else if (sectionKey === 'ap') {
+      dbPapers = dbEpapers.filter(p => p.section === 'ap' || (p.section.startsWith('ap-') && p.section !== 'ap-main') || apDistricts.some(d => d.slug === p.section));
+    }
+
     const list = dbPapers.map(paper => {
       const staticMatch = staticList.find(
         item => item.value.toLowerCase() === paper.title.toLowerCase() ||
