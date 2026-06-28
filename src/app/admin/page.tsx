@@ -2250,7 +2250,7 @@ export default function AdminPage() {
         cleanBodyHTML = `<video src="${newsVideo}" controls class="w-full h-auto rounded-xl my-4 block"></video>` + cleanBodyHTML;
       }
     }
-    const excerptText = descriptionPlainText ? descriptionHtml.trim() : (editorRef.current ? editorRef.current.innerText.slice(0, 140).trim().replace(/<[^>]*>/g, '') + '...' : '');
+    const excerptText = descriptionPlainText || (editorRef.current ? editorRef.current.innerText.slice(0, 140).trim().replace(/<[^>]*>/g, '') + '...' : '');
 
     const slugToUse = newsSlug.trim() || (() => {
       const base = titlePlainText.toLowerCase()
@@ -2263,7 +2263,7 @@ export default function AdminPage() {
     })();
 
     const articleData = {
-      title: titleHtml.trim(),
+      title: titlePlainText,
       slug: slugToUse,
       categorySlug,
       category: resolvedCat,
@@ -3600,12 +3600,12 @@ export default function AdminPage() {
                               <div className="flex items-center gap-3.5 min-w-[320px]">
                                 <img
                                   src={art.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&fit=crop'}
-                                  alt={art.title}
+                                  alt={art.title ? art.title.replace(/<[^>]*>/g, '').trim() : ''}
                                   className="w-14 h-9 object-cover rounded-lg border border-slate-200 shrink-0"
                                 />
                                 <div className="flex flex-col min-w-0 gap-0.5">
                                   <span className="text-xs font-black text-slate-800 telugu-text truncate" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                                    {art.title}
+                                    {art.title ? art.title.replace(/<[^>]*>/g, '').trim() : ''}
                                   </span>
                                   <span className="text-[10px] text-slate-400 font-mono">
                                     {new Date(art.publishedAt).toLocaleDateString()} at {new Date(art.publishedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -4495,7 +4495,7 @@ export default function AdminPage() {
                                 <div className="w-16 h-11 flex-shrink-0 rounded overflow-hidden bg-slate-100 border border-slate-200">
                                   <img
                                     src={art.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&h=120&fit=crop'}
-                                    alt={art.title}
+                                    alt={art.title ? art.title.replace(/<[^>]*>/g, '').trim() : ''}
                                     className="w-full h-full object-cover"
                                   />
                                 </div>
@@ -4505,7 +4505,7 @@ export default function AdminPage() {
                                     className="text-xs font-bold text-slate-800 group-hover:text-[#02599c] telugu-text line-clamp-2 leading-relaxed transition-colors"
                                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                                   >
-                                    {art.title}
+                                    {art.title ? art.title.replace(/<[^>]*>/g, '').trim() : ''}
                                   </p>
                                   <div className="flex items-center gap-2 mt-1">
                                     <span className="text-[10px] text-slate-400 font-bold">{getArticleCategoryName(art)}</span>
@@ -4724,7 +4724,7 @@ export default function AdminPage() {
                                 <div className="w-16 h-11 flex-shrink-0 rounded overflow-hidden bg-slate-100 border border-slate-200">
                                   <img
                                     src={art.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&h=120&fit=crop'}
-                                    alt={art.title}
+                                    alt={art.title ? art.title.replace(/<[^>]*>/g, '').trim() : ''}
                                     className="w-full h-full object-cover"
                                   />
                                 </div>
@@ -4733,7 +4733,7 @@ export default function AdminPage() {
                                     className="text-xs font-bold text-slate-800 group-hover:text-amber-700 telugu-text line-clamp-2 leading-relaxed transition-colors"
                                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                                   >
-                                    {art.title}
+                                    {art.title ? art.title.replace(/<[^>]*>/g, '').trim() : ''}
                                   </p>
                                   <div className="flex items-center gap-2 mt-1">
                                     <span className="text-[10px] text-slate-400 font-bold">{getArticleCategoryName(art)}</span>
@@ -9022,7 +9022,7 @@ export default function AdminPage() {
                                   title="Add/Edit Article Image"
                                 >
                                   {art.image ? (
-                                    <img src={art.image} alt={art.title} className="w-full h-full object-cover" />
+                                    <img src={art.image} alt={art.title ? art.title.replace(/<[^>]*>/g, '').trim() : ''} className="w-full h-full object-cover" />
                                   ) : (
                                     <div className="w-full h-full flex items-center justify-center">
                                       <Plus className="w-4 h-4 text-slate-400" />
@@ -9037,7 +9037,7 @@ export default function AdminPage() {
                                   >
                                     <div className="flex items-center gap-2">
                                       <p className="text-sm font-black text-slate-800 line-clamp-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                                        {art.title}
+                                        {art.title ? art.title.replace(/<[^>]*>/g, '').trim() : ''}
                                       </p>
                                       {art.slug?.startsWith('editorial-img-') && (
                                         <span className="bg-emerald-100 text-emerald-800 text-[8px] font-black px-1.5 py-0.5 rounded border border-emerald-200 uppercase tracking-wide shrink-0">
@@ -9254,11 +9254,11 @@ export default function AdminPage() {
                   <div key={art.id} className="p-3 flex items-center justify-between gap-4 hover:bg-slate-50 rounded-xl transition-colors">
                     <div className="min-w-0 flex-1 flex items-center gap-3">
                       <div className="w-12 h-8 rounded overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0">
-                        {art.image && <img src={art.image} alt={art.title} className="w-full h-full object-cover" />}
+                        {art.image && <img src={art.image} alt={art.title ? art.title.replace(/<[^>]*>/g, '').trim() : ''} className="w-full h-full object-cover" />}
                       </div>
                       <div className="min-w-0 flex-1">
                         <span className="text-xs font-extrabold text-slate-800 line-clamp-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                          {art.title}
+                          {art.title ? art.title.replace(/<[^>]*>/g, '').trim() : ''}
                         </span>
                         <span className="text-[10px] text-slate-400 font-mono block mt-0.5 truncate">
                           {art.slug}
