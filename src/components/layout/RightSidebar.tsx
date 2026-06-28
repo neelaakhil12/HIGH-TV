@@ -28,7 +28,7 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
 
   const currentDistrictSlug = selectedDistrict || (categorySlug?.startsWith('district-') ? categorySlug.replace('district-', '') : '');
   const activeCat = currentDistrictSlug ? `district-${currentDistrictSlug}` : (categorySlug || 'home');
-  const filterByCategory = activeCat !== 'home' && activeCat !== 'latest';
+  const filterByCategory = activeCat !== 'home' && activeCat !== 'latest' && activeCat !== 'photos' && activeCat !== 'webstories' && activeCat !== 'shorts';
 
   // For district-specific slugs (district-adilabad, district-hyderabad, etc.) derive the real API category
   const isDistrictSlug = activeCat.startsWith('district-');
@@ -45,8 +45,9 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
 
     const fetchCategoryNews = async () => {
       try {
+        const isHomeInherited = apiCat === 'home' || apiCat === 'latest' || apiCat === 'photos' || apiCat === 'webstories' || apiCat === 'shorts';
         let trendUrl = `/api/articles?category=${apiCat}&limit=12`;
-        if (apiCat === 'home' || apiCat === 'latest') {
+        if (isHomeInherited) {
           trendUrl = `/api/articles?category=trending&limit=15`;
         }
 
@@ -76,8 +77,11 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
             const parsed = JSON.parse(savedPins);
             // Read from activeCat (e.g. telangana-districts) and also base slug (e.g. telangana)
             const isDistrict = activeCat.startsWith('district-') || activeCat.endsWith('-districts');
-            const catPins = parsed[activeCat] || { trending: [], breaking: [] };
-            const basePins = (activeCat !== apiCat && !isDistrict) ? (parsed[apiCat] || { trending: [], breaking: [] }) : { trending: [], breaking: [] };
+            const isHomeInherited = activeCat === 'photos' || activeCat === 'webstories' || activeCat === 'shorts';
+            const lookupCat = isHomeInherited ? 'home' : activeCat;
+            const lookupApiCat = isHomeInherited ? 'home' : apiCat;
+            const catPins = parsed[lookupCat] || { trending: [], breaking: [] };
+            const basePins = (lookupCat !== lookupApiCat && !isDistrict) ? (parsed[lookupApiCat] || { trending: [], breaking: [] }) : { trending: [], breaking: [] };
             // Merge and deduplicate
             pinnedTrendingIds = [
               ...(catPins.trending || []).map(String),
@@ -174,7 +178,8 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
           finalBreaking = finalBreaking.filter((a: any) => !a.districtSlug);
         }
 
-        if (apiCat !== 'home' && apiCat !== 'latest' && !isDistrictView) {
+        const skipCategoryFiltering = apiCat === 'home' || apiCat === 'latest' || apiCat === 'photos' || apiCat === 'webstories' || apiCat === 'shorts';
+        if (!skipCategoryFiltering && !isDistrictView) {
           finalTrending = finalTrending.filter((a: any) => a.categorySlug === apiCat);
           finalBreaking = finalBreaking.filter((a: any) => a.categorySlug === apiCat);
         }
