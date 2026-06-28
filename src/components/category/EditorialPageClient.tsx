@@ -48,7 +48,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
                 alt={mainArticle.title}
                 className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5 pointer-events-none">
                 <h3 className="text-xl md:text-2xl lg:text-3xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   {mainArticle.title}
                 </h3>
@@ -66,7 +66,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
                 alt={art.title}
                 className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-3">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-3 pointer-events-none">
                 <h4 className="text-base md:text-lg lg:text-[19px] font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text line-clamp-2 pl-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   {art.title}
                 </h4>
@@ -142,7 +142,15 @@ export default function EditorialPageClient({ allArticles }: { allArticles: Arti
     
     // Fallbacks to politics, featured and entertainment to make sure we always have enough content
     if (sectionList.length < 14) {
-      const extraList = allArticles.filter(art => art.categorySlug !== categorySlug && art.categorySlug !== 'sampadakiyam' && art.categorySlug !== 'adyathmikam' && art.categorySlug !== 'antharmadanam');
+      const extraList = allArticles.filter(art => 
+        art.categorySlug !== categorySlug && 
+        art.categorySlug !== 'sampadakiyam' && 
+        art.categorySlug !== 'adyathmikam' && 
+        art.categorySlug !== 'antharmadanam' &&
+        art.categorySlug !== 'polls' &&
+        art.categorySlug !== 'shorts' &&
+        art.categorySlug !== 'photos'
+      );
       sectionList = [...sectionList, ...extraList].slice(0, 14);
     } else {
       sectionList = sectionList.slice(0, 14);

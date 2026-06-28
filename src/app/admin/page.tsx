@@ -8793,8 +8793,32 @@ export default function AdminPage() {
                           <div className="divide-y divide-slate-100">
                             {arts.map((art: any) => (
                               <div key={art.id} className="flex items-center gap-4 px-5 py-3 hover:bg-slate-50 transition-colors group">
-                                <div className="w-16 h-11 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0 border border-slate-200">{art.image ? <img src={art.image} alt={art.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><ImageIcon className="w-4 h-4 text-slate-400" /></div>}</div>
-                                <div className="flex-1 min-w-0"><p className="text-sm font-black text-slate-800 line-clamp-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>{art.title}</p><p className="text-[11px] text-slate-400 mt-0.5 font-mono truncate">{art.slug}</p></div>
+                                <button
+                                  type="button"
+                                  onClick={() => { startEditing(art); setActiveTab('news'); }}
+                                  className="w-16 h-11 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0 border border-slate-200 cursor-pointer hover:border-[#02599c] hover:bg-blue-50/50 transition-all flex items-center justify-center"
+                                  title="Add/Edit Article Image"
+                                >
+                                  {art.image ? (
+                                    <img src={art.image} alt={art.title} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                      <Plus className="w-4 h-4 text-slate-400" />
+                                    </div>
+                                  )}
+                                </button>
+                                <div className="flex-1 min-w-0">
+                                  <button
+                                    type="button"
+                                    onClick={() => { startEditing(art); setActiveTab('news'); }}
+                                    className="text-left hover:text-[#02599c] cursor-pointer block"
+                                  >
+                                    <p className="text-sm font-black text-slate-800 line-clamp-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                      {art.title}
+                                    </p>
+                                  </button>
+                                  <p className="text-[11px] text-slate-400 mt-0.5 font-mono truncate">{art.slug}</p>
+                                </div>
                                 <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                                   <Link href={`/news/${art.slug}`} target="_blank" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-[#02599c]" title="Preview"><Eye className="w-4 h-4" /></Link>
                                   <button onClick={() => { startEditing(art); setActiveTab('news'); }} className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600" title="Edit"><Pencil className="w-4 h-4" /></button>
