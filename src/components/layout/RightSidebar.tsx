@@ -295,32 +295,35 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
           </div>
         ) : (
           <div className="space-y-3.5">
-            {activeTrending.map((article, idx) => (
-              <Link
-                key={`${article.id}-${idx}`}
-                href={`/news/${article.slug}`}
-                className="flex items-start gap-3 pb-3 last:pb-0 last:border-b-0 border-b border-gray-55 group cursor-pointer"
-              >
-                {/* Image thumbnail */}
-                <div className="w-20 h-14 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
-                  <img
-                    src={article.image}
-                    alt={article.title}
-                    className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
-                  />
-                </div>
-                {/* Text */}
-                <div className="min-w-0 flex-1 py-0.5">
-                  <h4
-                    className="text-[14.5px] md:text-[15.5px] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-relaxed telugu-text line-clamp-2 pl-1.5 pb-0.5"
-                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                  >
-                    {article.title}
-                  </h4>
-                  <span className="text-[12px] text-gray-400 mt-0.5 block"></span>
-                </div>
-              </Link>
-            ))}
+            {activeTrending.map((article, idx) => {
+              const cleanTitle = article.title ? article.title.replace(/<[^>]*>/g, '').trim() : '';
+              return (
+                <Link
+                  key={`${article.id}-${idx}`}
+                  href={`/news/${article.slug}`}
+                  className="flex items-start gap-3 pb-3 last:pb-0 last:border-b-0 border-b border-gray-55 group cursor-pointer"
+                >
+                  {/* Image thumbnail */}
+                  <div className="w-20 h-14 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
+                    <img
+                      src={article.image}
+                      alt={cleanTitle}
+                      className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
+                    />
+                  </div>
+                  {/* Text */}
+                  <div className="min-w-0 flex-1 py-0.5">
+                    <h4
+                      className="text-[14.5px] md:text-[15.5px] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-relaxed telugu-text line-clamp-2 pl-1.5 pb-0.5"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    >
+                      {cleanTitle}
+                    </h4>
+                    <span className="text-[12px] text-gray-400 mt-0.5 block"></span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
