@@ -3230,29 +3230,6 @@ export default function AdminPage() {
             </div>
           </button>
 
-          <button
-            onClick={() => { setActiveTab('categories'); }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'categories' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Settings className="w-4 h-4" />
-              <span>Categories & Banners</span>
-            </div>
-          </button>
-
-          <button
-            onClick={() => { setActiveTab('overlays'); }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'overlays' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <ImageIcon className="w-4 h-4" />
-              <span>Overlay Overrides</span>
-            </div>
-          </button>
 
           <button
             onClick={() => { setActiveTab('epaper'); }}
