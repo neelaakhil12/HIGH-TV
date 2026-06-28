@@ -56,7 +56,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
                 className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-200"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 md:p-5 pointer-events-none">
-                <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-black text-white hover:text-red-400 transition-colors leading-snug telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   {mainArticle.title}
                 </h3>
               </div>
