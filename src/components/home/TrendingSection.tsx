@@ -56,7 +56,7 @@ export default function TrendingSection({ dbArticles }: { dbArticles?: any[] }) 
             <div className="img-zoom-container absolute inset-0">
               <Image
                 src={activeTrending[0].image}
-                alt={activeTrending[0].title}
+                alt={activeTrending[0].title?.replace(/<[^>]*>/g, '')}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -75,9 +75,8 @@ export default function TrendingSection({ dbArticles }: { dbArticles?: any[] }) 
                 <h3
                   className="secondary-headline text-white hover:text-orange-200 transition-colors telugu-text pl-2.5 pb-1 font-black"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                >
-                  {activeTrending[0].title}
-                </h3>
+                  dangerouslySetInnerHTML={{ __html: activeTrending[0].title }}
+                />
               </Link>
  
             </div>
@@ -95,13 +94,13 @@ export default function TrendingSection({ dbArticles }: { dbArticles?: any[] }) 
               <div className="absolute right-2 top-0 trending-number">
                 {index + 2}
               </div>
-              <div className="img-zoom-container flex-shrink-0 rounded-lg overflow-hidden w-24 h-16 bg-slate-50 border border-gray-150">
+              <div className="img-zoom-container flex-shrink-0 rounded-lg overflow-hidden w-24 h-16 bg-slate-50 border border-gray-150 relative">
                 <Image
                   src={article.image}
-                  alt={article.title}
+                  alt={article.title?.replace(/<[^>]*>/g, '')}
                   width={96}
                   height={64}
-                  className="w-full h-full object-contain"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
               <div className="flex-1 min-w-0 relative z-10">
@@ -110,9 +109,8 @@ export default function TrendingSection({ dbArticles }: { dbArticles?: any[] }) 
                   <p
                     className="secondary-headline font-bold text-gray-800 hover:text-brand-blue transition-colors line-clamp-2 telugu-text pl-2.5 pb-1"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                  >
-                    {article.title}
-                  </p>
+                    dangerouslySetInnerHTML={{ __html: article.title }}
+                  />
                 </Link>
  
               </div>

@@ -43,7 +43,7 @@ export default function BottomNavBar() {
     { label: 'శుభఫలాలు', href: '/category/rasipalalu' },
     { label: 'వైరల్', href: '/category/viral' },
     { label: 'ఆల్బమ్‌లు', href: '/category/photos' },
-    { label: 'వీడియోలు', href: '/category/videos' },
+    { label: 'షార్ట్స్', href: '/category/shorts' },
     { label: 'ఆమె', href: '/category/women' },
     { label: 'లైఫ్ స్టైల్', href: '/category/lifestyle' },
     { label: 'వెబ్ స్టోరీస్', href: '/category/webstories' },

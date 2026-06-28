@@ -1,16 +1,31 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Images, X, ZoomIn } from 'lucide-react';
 import { galleryImages } from '@/lib/mockData';
 
-export default function PhotoGallery() {
+interface PhotoItem {
+  id: string;
+  title: string;
+  image?: string | null;
+}
+
+export default function PhotoGallery({ photos = [] }: { photos?: PhotoItem[] }) {
   const [lightbox, setLightbox] = useState<number | null>(null);
 
+  const items = (photos || []).map(p => ({
+    id: p.id,
+    src: p.image || '/hightv_breaking.png',
+    alt: p.title
+  }));
+
+  if (items.length === 0) return null;
+
+  const displayItems = items.slice(0, 4);
+
   return (
-    <section className="mb-10">
+    <section className="mb-10 select-none">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
@@ -30,20 +45,17 @@ export default function PhotoGallery() {
         </Link>
       </div>
 
-      {/* Uniform Grid / Horizontal Scroll */}
       <div className="flex md:grid md:grid-cols-4 overflow-x-auto md:overflow-x-visible gap-4 pb-2.5 md:pb-0 snap-x snap-mandatory scroll-smooth hide-scrollbar">
-        {galleryImages.slice(0, 4).map((img, index) => (
+        {displayItems.map((img, index) => (
           <div
             key={img.id}
-            className="flex-shrink-0 w-[140px] aspect-[9/16] md:w-auto md:aspect-auto md:h-48 rounded-xl overflow-hidden group cursor-pointer img-zoom-container shadow-sm border border-gray-100 snap-start relative"
+            className="flex-shrink-0 w-[140px] aspect-[9/16] md:w-auto md:aspect-auto md:h-48 rounded-none overflow-hidden group cursor-pointer img-zoom-container shadow-sm border border-gray-100 snap-start relative"
             onClick={() => setLightbox(index)}
           >
-            <Image
+            <img
               src={img.src}
               alt={img.alt}
-              fill
-              className="object-cover group-hover:scale-[1.04] transition-transform duration-300"
-              sizes="(max-width: 640px) 50vw, 25vw"
+              className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
               <ZoomIn size={28} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -62,21 +74,19 @@ export default function PhotoGallery() {
           onClick={() => setLightbox(null)}
         >
           <button
-            className="absolute top-4 right-4 text-white bg-white/20 w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors"
+            className="absolute top-4 right-4 text-white bg-white/25 hover:bg-white/35 w-10 h-10 rounded-full flex items-center justify-center transition-colors cursor-pointer"
             onClick={() => setLightbox(null)}
           >
             <X size={20} />
           </button>
-          <div className="max-w-4xl max-h-full" onClick={(e) => e.stopPropagation()}>
-            <Image
-              src={galleryImages[lightbox].src.replace('w=600', 'w=1200')}
-              alt={galleryImages[lightbox].alt}
-              width={1200}
-              height={800}
-              className="rounded-xl max-h-[85vh] w-auto object-contain"
+          <div className="max-w-4xl max-h-full flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={items[lightbox].src}
+              alt={items[lightbox].alt}
+              className="rounded-xl max-h-[85vh] max-w-full object-contain"
             />
             <p className="text-white text-center mt-3 telugu-text font-medium" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-              {galleryImages[lightbox].alt}
+              {items[lightbox].alt}
             </p>
           </div>
         </div>

@@ -24,7 +24,7 @@ export const categories = [
   { name: 'బ్రేకింగ్ న్యూస్', slug: 'latest', color: '#02599c' },
   { name: 'లైవ్ అప్‌డేట్స్', slug: 'live-updates', color: '#dc2626' },
   { name: 'ఈ-పేపర్', slug: 'epaper', color: '#0f766e' },
-  { name: 'రాజకీయాలు', slug: 'politics', color: '#1a6b3a' },
+  { name: 'పాలిటిక్స్', slug: 'politics', color: '#1a6b3a' },
   { name: 'ఆంధ్రప్రదేశ్', slug: 'andhra-pradesh', color: '#d97706' },
   { name: 'తెలంగాణ', slug: 'telangana', color: '#7c3aed' },
   { name: 'నేషనల్', slug: 'national', color: '#0369a1' },
@@ -39,7 +39,6 @@ export const categories = [
   { name: 'లైఫ్ స్టైల్', slug: 'lifestyle', color: '#9333ea' },
   { name: 'శుభఫలాలు', slug: 'rasipalalu', color: '#b45309' },
   { name: 'ఆల్బమ్‌లు', slug: 'photos', color: '#64748b' },
-  { name: 'వీడియోలు', slug: 'videos', color: '#dc2626' },
   { name: 'వెబ్ స్టోరీస్', slug: 'webstories', color: '#ec4899' },
   { name: 'ఎడిటోరియల్', slug: 'sampadakiyam', color: '#be123c' },
   { name: 'ఎడిటోరియల్', slug: 'editorial', color: '#be123c' },
@@ -318,9 +317,35 @@ export const authorToReporterSlugMap: Record<string, string> = {
   'సిద్ధాంతి సుబ్రహ్మణ్య శర్మ': 'subrahmanyam',
 };
 
+export function formatAuthorName(author: string): string {
+  if (!author) return 'హై టీవీ డెస్క్';
+  
+  const trimmed = author.trim();
+  if (trimmed === 'హై టీవీ డెస్క్') return 'హై టీవీ డెస్క్';
+  
+  if (trimmed.startsWith('హై టీవీ డెస్క్')) {
+    const suffix = trimmed.substring('హై టీవీ డెస్క్'.length).replace(/^[\s\-_:]+/, '').trim();
+    return suffix ? `హై టీవీ డెస్క్ - ${suffix}` : 'హై టీవీ డెస్క్';
+  }
+  
+  if (trimmed.startsWith('హై టీవీ')) {
+    const suffix = trimmed.substring('హై టీవీ'.length).replace(/^[\s\-_:]+/, '').trim();
+    return suffix ? `హై టీవీ డెస్క్ - ${suffix}` : 'హై టీవీ డెస్క్';
+  }
+
+  return `హై టీవీ డెస్క్ - ${trimmed}`;
+}
+
 export function getReporterByAuthor(authorName: string): ReporterProfile {
   const slug = authorToReporterSlugMap[authorName] || 'suresh';
-  return reporterProfiles[slug] || reporterProfiles['default'];
+  const profile = { ...(reporterProfiles[slug] || reporterProfiles['default']) };
+  const formatted = formatAuthorName(authorName);
+  
+  if (authorName === 'హై టీవీ డెస్క్' || authorName.includes('హై టీవీ డెస్క్') || slug === 'suresh' || slug === 'ramesh') {
+    profile.name = formatted;
+  }
+  
+  return profile;
 }
 
 export function formatTimeAgo(dateStr: string): string {

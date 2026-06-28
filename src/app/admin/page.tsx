@@ -10,6 +10,7 @@ import {
   Megaphone, 
   FileText, 
   Image as ImageIcon, 
+  BarChart3, 
   LogOut, 
   Settings, 
   Tv, 
@@ -38,7 +39,18 @@ import {
   Globe,
   Sliders,
   FileCheck,
-  TrendingUp
+  TrendingUp,
+  CloudSun,
+  Sparkles,
+  Layers,
+  ArrowUp,
+  ArrowDown,
+  MapPin,
+  MonitorSmartphone,
+  ToggleLeft,
+  ToggleRight,
+  Link2,
+  ImagePlay
 } from 'lucide-react';
 
 import { 
@@ -69,12 +81,14 @@ import {
   videoNews
 } from '@/lib/mockData';
 
+import { ZodiacIcon } from '@/components/astrology/HoroscopePageClient';
+
 // Main 22 Pages/Categories List (excluding subpages)
 const MAIN_CATEGORIES_LIST = [
   { slug: 'latest', name: 'బ్రేకింగ్ న్యూస్ (Breaking)' },
   { slug: 'trending', name: 'ట్రెండింగ్ వార్తలు (Trending)' },
   { slug: 'featured', name: 'ముఖ్య వార్తలు (Featured)' },
-  { slug: 'politics', name: 'రాజకీయాలు (Politics)' },
+  { slug: 'politics', name: 'పాలిటిక్స్ (Politics)' },
   { slug: 'national', name: 'నేషనల్ (National)' },
   { slug: 'international', name: 'వరల్డ్ (World)' },
   { slug: 'business', name: 'బిజినెస్ (Business)' },
@@ -84,8 +98,6 @@ const MAIN_CATEGORIES_LIST = [
   { slug: 'viral', name: 'వైరల్ (Viral)' },
   { slug: 'lifestyle', name: 'లైఫ్ స్టైల్ (Lifestyle)' },
   { slug: 'rasipalalu', name: 'శుభఫలాలు (Astrology)' },
-  { slug: 'photos', name: 'ఆల్బమ్‌లు (Photos)' },
-  { slug: 'videos', name: 'వీడియోలు (Videos)' },
   { slug: 'webstories', name: 'వెబ్ స్టోరీస్ (Web Stories)' },
   { slug: 'sampadakiyam', name: 'ఎడిటోరియల్ (Editorial)' },
   { slug: 'women', name: 'ఆమె (Women)' },
@@ -97,6 +109,297 @@ const MAIN_CATEGORIES_LIST = [
   { slug: 'epaper', name: 'ఈ-పేపర్' },
 ];
 
+function MiniWysiwygToolbar({ editorRef }: { editorRef: React.RefObject<HTMLDivElement | null> }) {
+  const savedRangeRef = useRef<Range | null>(null);
+
+  useEffect(() => {
+    const handleSelectionChange = () => {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        if (editorRef.current && editorRef.current.contains(range.commonAncestorContainer)) {
+          savedRangeRef.current = range.cloneRange();
+        }
+      }
+    };
+
+    document.addEventListener('selectionchange', handleSelectionChange);
+    return () => {
+      document.removeEventListener('selectionchange', handleSelectionChange);
+    };
+  }, [editorRef]);
+
+  const restoreSelection = () => {
+    if (!savedRangeRef.current) return;
+    const selection = window.getSelection();
+    if (selection) {
+      selection.removeAllRanges();
+      selection.addRange(savedRangeRef.current);
+    }
+  };
+
+  const handleFormatCmd = (command: string, value: string = '') => {
+    restoreSelection();
+    document.execCommand(command, false, value);
+    // Maintain selection tracking after text change
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      savedRangeRef.current = selection.getRangeAt(0).cloneRange();
+    }
+    editorRef.current?.focus();
+  };
+
+  const handleFontSizeCmd = (size: string) => {
+    if (!size) return;
+    restoreSelection();
+    document.execCommand('fontSize', false, '7');
+    const fontElements = editorRef.current?.getElementsByTagName('font');
+    if (fontElements) {
+      for (let i = fontElements.length - 1; i >= 0; i--) {
+        const el = fontElements[i];
+        if (el.getAttribute('size') === '7') {
+          el.removeAttribute('size');
+          el.style.fontSize = size;
+        }
+      }
+    }
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      savedRangeRef.current = selection.getRangeAt(0).cloneRange();
+    }
+    editorRef.current?.focus();
+  };
+
+  return (
+    <div className="flex items-center gap-1 bg-slate-50 border border-slate-200/60 border-b-0 rounded-t-xl px-2.5 py-1.5 flex-wrap select-none">
+      {/* Format block select */}
+      <select
+        onChange={(e) => {
+          handleFormatCmd('formatBlock', e.target.value);
+          e.target.value = '';
+        }}
+        className="bg-white border border-slate-200 rounded px-1.5 py-0.5 text-[10px] font-bold text-slate-650 outline-none cursor-pointer"
+      >
+        <option value="">Format</option>
+        <option value="p">Normal</option>
+        <option value="h1">Heading 1</option>
+        <option value="h2">Heading 2</option>
+        <option value="h3">Heading 3</option>
+      </select>
+
+      {/* Font Size select */}
+      <select
+        onChange={(e) => {
+          handleFontSizeCmd(e.target.value);
+          e.target.value = '';
+        }}
+        className="bg-white border border-slate-200 rounded px-1.5 py-0.5 text-[10px] font-bold text-slate-650 outline-none cursor-pointer"
+      >
+        <option value="">Size</option>
+        <option value="12px">12 px</option>
+        <option value="14px">14 px</option>
+        <option value="16px">16 px</option>
+        <option value="18px">18 px</option>
+        <option value="20px">20 px</option>
+        <option value="24px">24 px</option>
+      </select>
+
+      <div className="w-px h-4 bg-slate-200 mx-0.5" />
+
+      {/* Formatting buttons */}
+      <button type="button" onClick={() => handleFormatCmd('bold')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-slate-600" title="Bold"><Bold className="w-3 h-3" /></button>
+      <button type="button" onClick={() => handleFormatCmd('italic')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-slate-600" title="Italic"><Italic className="w-3 h-3" /></button>
+      <button type="button" onClick={() => handleFormatCmd('underline')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-slate-600" title="Underline"><Underline className="w-3 h-3" /></button>
+      <button type="button" onClick={() => handleFormatCmd('strikeThrough')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-slate-600" title="Strikethrough"><Strikethrough className="w-3 h-3" /></button>
+
+      <div className="w-px h-4 bg-slate-200 mx-0.5" />
+
+      {/* Lists */}
+      <button type="button" onClick={() => handleFormatCmd('insertUnorderedList')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-slate-600" title="Bullet List"><List className="w-3 h-3" /></button>
+      <button type="button" onClick={() => handleFormatCmd('insertOrderedList')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-slate-600" title="Number List"><ListOrdered className="w-3 h-3" /></button>
+
+      <div className="w-px h-4 bg-slate-200 mx-0.5" />
+
+      {/* Text Colors */}
+      <button type="button" onClick={() => handleFormatCmd('foreColor', '#000000')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-black font-black text-[11.5px]" title="Text Color Black">A</button>
+      <button type="button" onClick={() => handleFormatCmd('foreColor', '#e11d48')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-rose-600 font-black text-[11.5px]" title="Text Color Red">A</button>
+      <button type="button" onClick={() => handleFormatCmd('foreColor', '#02599c')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-blue-600 font-black text-[11.5px]" title="Text Color Blue">A</button>
+      <button type="button" onClick={() => handleFormatCmd('foreColor', '#16a34a')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-green-600 font-black text-[11.5px]" title="Text Color Green">A</button>
+      <button type="button" onClick={() => handleFormatCmd('foreColor', '#9333ea')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-purple-600 font-black text-[11.5px]" title="Text Color Purple">A</button>
+      <button type="button" onClick={() => handleFormatCmd('foreColor', '#ea580c')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-orange-600 font-black text-[11.5px]" title="Text Color Orange">A</button>
+      
+      {/* Custom Color Input */}
+      <div className="relative flex items-center hover:bg-slate-200 rounded p-1 cursor-pointer" title="Custom Color Picker">
+        <span className="font-black text-[11.5px] mr-1 text-slate-700">A</span>
+        <input 
+          type="color" 
+          defaultValue="#000000"
+          onChange={(e) => handleFormatCmd('foreColor', e.target.value)} 
+          className="w-3.5 h-3.5 p-0 border-0 cursor-pointer rounded-full overflow-hidden" 
+          style={{ appearance: 'none', WebkitAppearance: 'none' }}
+        />
+      </div>
+
+      <div className="w-px h-4 bg-slate-200 mx-0.5" />
+
+      {/* Clear format */}
+      <button type="button" onClick={() => handleFormatCmd('removeFormat')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-slate-500" title="Clear Formatting"><Eraser className="w-3 h-3" /></button>
+    </div>
+  );
+}
+
+const DEFAULT_WEATHER_DATA = [
+  {
+    city: 'హైదరాబాద్',
+    temp: 32,
+    condition: 'పాక్షికంగా మేఘావృతం',
+    humidity: 60,
+    wind: 12,
+    high: 34,
+    low: 24,
+    forecast: [
+      { day: 'శుక్రవారం', temp: 33, cond: 'మేఘావృతం' },
+      { day: 'శనివారం', temp: 31, cond: 'ఉరుములతో కూడిన వర్షం' },
+      { day: 'ఆదివారం', temp: 30, cond: 'భారీ వర్షం' },
+      { day: 'సోమవారం', temp: 32, cond: 'పాక్షికంగా మేఘావృతం' }
+    ]
+  },
+  {
+    city: 'రంగారెడ్డి',
+    temp: 31,
+    condition: 'ఉరుములతో కూడిన వర్షం',
+    humidity: 68,
+    wind: 14,
+    high: 33,
+    low: 22,
+    forecast: [
+      { day: 'శుక్రవారం', temp: 32, cond: 'తేలికపాటి వర్షం' },
+      { day: 'శనివారం', temp: 31, cond: 'ఉరుములతో కూడిన వర్షం' },
+      { day: 'ఆదివారం', temp: 29, cond: 'భారీ వర్షం' },
+      { day: 'సోమవారం', temp: 32, cond: 'పాక్షికంగా మేఘావృతం' }
+    ]
+  },
+  {
+    city: 'వరంగల్',
+    temp: 33,
+    condition: 'మేఘావృతం',
+    humidity: 62,
+    wind: 11,
+    high: 35,
+    low: 23,
+    forecast: [
+      { day: 'శుక్రవారం', temp: 32, cond: 'తేలికపాటి వర్షం' },
+      { day: 'శనివారం', temp: 30, cond: 'భారీ వర్షం' },
+      { day: 'ఆదివారం', temp: 31, cond: 'మేఘావృతం' },
+      { day: 'సోమవారం', temp: 33, cond: 'పాక్షికంగా మేఘావృతం' }
+    ]
+  },
+  {
+    city: 'ఖమ్మం',
+    temp: 35,
+    condition: 'ఎండగా ఉంటుంది',
+    humidity: 52,
+    wind: 9,
+    high: 37,
+    low: 25,
+    forecast: [
+      { day: 'శుక్రవారం', temp: 36, cond: 'ఎండగా ఉంటుంది' },
+      { day: 'శనివారం', temp: 35, cond: 'ఎండగా ఉంటుంది' },
+      { day: 'ఆదివారం', temp: 34, cond: 'పాక్షికంగా మేఘావృతం' },
+      { day: 'సోమవారం', temp: 34, cond: 'మేఘావృతం' }
+    ]
+  },
+  {
+    city: 'విశాఖపట్నం',
+    temp: 34,
+    condition: 'ఎండగా మరియు ఉక్కపోత',
+    humidity: 75,
+    wind: 18,
+    high: 35,
+    low: 27,
+    forecast: [
+      { day: 'శుక్రవారం', temp: 34, cond: 'ఎండగా ఉంటుంది' },
+      { day: 'శనివారం', temp: 33, cond: 'పాక్షికంగా మేఘావృతం' },
+      { day: 'ఆదివారం', temp: 32, cond: 'తేలికపాటి వర్షం' },
+      { day: 'సోమవారం', temp: 33, cond: 'మేఘావృతం' }
+    ]
+  },
+  {
+    city: 'విజయవాడ',
+    temp: 37,
+    condition: 'తీవ్రమైన ఎండ',
+    humidity: 50,
+    wind: 10,
+    high: 39,
+    low: 26,
+    forecast: [
+      { day: 'శుక్రవారం', temp: 38, cond: 'తీవ్రమైన ఎండ' },
+      { day: 'శనివారం', temp: 37, cond: 'ఎండగా ఉంటుంది' },
+      { day: 'ఆదివారం', temp: 35, cond: 'పాక్షికంగా మేఘావృతం' },
+      { day: 'సోమవారం', temp: 36, cond: 'ఎండగా ఉంటుంది' }
+    ]
+  },
+  {
+    city: 'తిరుపతి',
+    temp: 35,
+    condition: 'ఎండగా ఉంటుంది',
+    humidity: 55,
+    wind: 9,
+    high: 37,
+    low: 25,
+    forecast: [
+      { day: 'శుక్రవారం', temp: 36, cond: 'ఎండగా ఉంటుంది' },
+      { day: 'శనివారం', temp: 35, cond: 'ఎండగా ఉంటుంది' },
+      { day: 'ఆదివారం', temp: 34, cond: 'పాక్షికంగా మేఘావృతం' },
+      { day: 'సోమవారం', temp: 34, cond: 'మేఘావృతం' }
+    ]
+  }
+];
+
+function splitPanchangam(html: string): string[] {
+  if (!html) return [];
+  const items: string[] = [];
+  let current = '';
+  let inTag = false;
+  for (let i = 0; i < html.length; i++) {
+    const char = html[i];
+    if (char === '<') {
+      inTag = true;
+    } else if (char === '>') {
+      inTag = false;
+    }
+
+    if (char === ';' && !inTag) {
+      items.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  if (current.trim()) {
+    items.push(current.trim());
+  }
+  return items.filter(Boolean);
+}
+
+const DEFAULT_HOROSCOPE_PANCHANGAM = "శ్రీ పరాభవ నామ సంవత్సరం; ఉత్తరాయణం; గ్రీష్మరుతువు, నిజ జ్యేష్ఠ మాసం, శుక్ల పక్షం ఏకాదశి: రా. 9-15 తదుపరి ద్వాదశి; స్వాతి: సా. 6-18 తదుపరి విశాఖ వర్జ్యం: రా. 12-23 నుంచి 2-07 వరకు; అమృత ఘడియలు: ఉ. 8-54 నుంచి 10-36 వరకు; దుర్ముహూర్తం: ఉ. 9-52 నుంచి 10-44 వరకు; తిరిగి మ. 3-05 నుంచి 3-57 వరకు; రాహుకాలం: మ. 1-30 నుంచి 3-00 వరకు; సూర్యోదయం: ఉ.5.31; సూర్యాస్తమయం: సా.6.34 నిర్జల ఏకాదశి";
+
+const DEFAULT_HOROSCOPE_PREDICTIONS = [
+  { id: "aries", name: "మేషం", englishName: "Aries", dateRange: "మార్చి 21 - ఏప్రిల్ 19", prediction: "చేపట్టిన పనులలో ఆటంకాలు ఎదురైనా పట్టుదలతో పూర్తి చేస్తారు. వృత్తి ఉద్యోగాలలో మీ ప్రతిభకు గుర్తింపు లభిస్తుంది. ధనలాభం కలిగే అవకాశం ఉంది. ప్రయాణాల విరామం మంచిది." },
+  { id: "taurus", name: "వృషభం", englishName: "Taurus", dateRange: "ఏప్రిల్ 20 - మే 20", prediction: "కుటుంబ సభ్యులతో ఆనందంగా గడుపుతారు. నూతన వస్తు ఆభరణాలు కొనుగోలు చేస్తారు. వ్యాపార లావాదేవీలు లాభసాటిగా సాగుతాయి. ఆరోగ్యం పట్ల శ్రద్ధ వహించండి." },
+  { id: "gemini", name: "మిథునం", englishName: "Gemini", dateRange: "మే 21 - జూన్ 20", prediction: "ఆर्थिक పరిస్థితి మెరుగ్గా ఉంటుంది. మిత్రుల సహాయంతో ముఖ్యమైన సమస్యలు పరిష్కరించుకుంటారు. సమాజంలో గౌరవ मర్యాదలు పెరుగుతాయి. అనుకోని ప్రయాణాలు చేయాల్సి రావచ్చు." },
+  { id: "cancer", name: "కర్కాటకం", englishName: "Cancer", dateRange: "జూన్ 21 - జూలై 22", prediction: "పనులలో నిర్లక్ష్యం తగదు. సహోద్యోగులతో వివాదాలకు దూరంగా ఉండండి. ఖర్చులు పెరిగే అవకాశం ఉంది. క్రమశిక్షణతో వ్యవహరిస్తే అనుకూల ఫలితాలు సాధించవచ్చు." },
+  { id: "leo", name: "సింహం", englishName: "Leo", dateRange: "జూలై 23 - ఆగస్టు 22", prediction: "నూతన కార్యకలాపాలకు శ్రీకారం చుడతారు. సమాజంలో ఉన్నత వ్యక్తుల పరిచయాలు ఏర్పడతాయి. ఆదాయ మార్గాలు పెరుగుతాయి. శుభవార్తలు వింటారు." },
+  { id: "virgo", name: "కన్య", englishName: "Virgo", dateRange: "ఆగస్టు 23 - సెప్టెంబర్ 22", prediction: "కష్టానికి తగిన ప్రతిఫలం దక్కుతుంది. వృత్తి రంగంలో ఒత్తిడి అధిగమిస్తారు. కుటుంబంలో ప్రశాంతత నెలకొంటుంది. ఆధ్యాత్మిక సేవా కార్యక్రమాల్లో పాల్గొంటారు." },
+  { id: "libra", name: "తుల", englishName: "Libra", dateRange: "సెప్టెంబర్ 23 - అక్టోబర్ 22", prediction: "కళా, సాంకేతిక రంగాల వారికి అనుకూల సమయం. వ్యాపార విస్తరణ ప్రయత్నాలు ఫలించవు. ఆర్థిక విషయాల్లో ఆచితూచి అడుగులు వేయడం అవసరం. దైవ దర్శనం చేసుకుంటారు." },
+  { id: "scorpio", name: "వృశ్చికం", englishName: "Scorpio", dateRange: "అక్టోబర్ 23 - నవంబర్ 21", prediction: "ఆకస్మిక ధనలాభం సూచిస్తోంది. కోర్టు వ్యవహారాలు మీకు అనుకూలంగా పరిష్కారమవుతాయి. సంతోషకరమైన వార్తలు వింటారు. విందు వినోదాలలో పాల్గొంటారు." },
+  { id: "sagittarius", name: "ధనుస్సు", englishName: "Sagittarius", dateRange: "నవంబర్ 22 - డిసెంబర్ 21", prediction: "చేపట్టిన పనులు సకాలంలో పూర్తవుతాయి. ఉన్నతాధికారుల మద్దతు లభిస్తుంది. బంధువులతో ఏర్పడిన విభేదాలు తొలగిపోతాయి. మానసిక ఉల్లాసం కలుగుతుంది." },
+  { id: "makar", name: "మకరం", englishName: "Makar", dateRange: "డిసెంబర్ 22 - జనవరి 19", prediction: "ధనవ్యయం అధికంగా ఉంటుంది. శారీరక శ్రమ, అలసట ఎక్కువగా ఉండవచ్చు. వ్యాపారంలో నష్టాలు రాకుండా జాగ్రత్త పడండి. ఎవరికీ హామీలు ఇవ్వవద్దు." },
+  { id: "aquarius", name: "కుంభం", englishName: "Aquarius", dateRange: "జనవరి 20 - ఫిబ్రవరి 18", prediction: "సమాజంలో పలుకుబడి పెరుగుతుంది. స్థిరాస్తి వివాదాలు పరిష్కారమవుతాయి. సంతానానికి సంబంధించి శుభవార్తలు వింటారు. రుణ సమస్యలు కొంతవరకు తొలగుతాయి." },
+  { id: "meen", name: "మీనం", englishName: "Pisces", dateRange: "ఫిబ్రవరి 19 - మార్చి 20", prediction: "నూతన ఉద్యోగ అవకాశాలు లభిస్తాయి. గతంలో నిలిచిపోయిన పనులు సాఫీగా సాగుతాయి. ఆర్థిక విజయం మీ సొంతమవుతుంది. ఆత్మీయుల నుండి బహుమతులు పొందుతారు." }
+];
+
+
 const SIDEBAR_CATEGORIES = [
   { slug: 'home', name: 'హోమ్ పేజీ (Home Page)' },
   { slug: 'latest', name: 'బ్రేకింగ్ న్యూస్ (Breaking)' },
@@ -104,7 +407,7 @@ const SIDEBAR_CATEGORIES = [
   { slug: 'telangana-districts', name: 'తెలంగాణ జిల్లా వార్తలు' },
   { slug: 'andhra-pradesh', name: 'ఆంధ్రప్రదేశ్ (Andhra Pradesh)' },
   { slug: 'andhra-pradesh-districts', name: 'ఆంధ్రప్రదేశ్ జిల్లా వార్తలు' },
-  { slug: 'politics', name: 'రాజకీయాలు (Politics)' },
+  { slug: 'politics', name: 'పాలిటిక్స్ (Politics)' },
   { slug: 'national', name: 'నేషనల్ (National)' },
   { slug: 'international', name: 'వరల్డ్ (World)' },
   { slug: 'business', name: 'బిజినెస్ (Business)' },
@@ -121,6 +424,7 @@ const SIDEBAR_CATEGORIES = [
   { slug: 'rasipalalu', name: 'శుభఫలాలు (Astrology)' },
   { slug: 'sampadakiyam', name: 'ఎడిటోరియల్ (Editorial)' },
   { slug: 'antharmadanam', name: 'వ్యక్తిత్వ వికాసం (Opinion)' },
+  { slug: 'weather', name: 'వెదర్ (Weather)' },
 ];
 
 const getArticleCategoryName = (art: any) => {
@@ -134,6 +438,26 @@ const getArticleCategoryName = (art: any) => {
     return dist ? `${engName} (${dist.name})` : engName;
   }
   return art.category || art.categorySlug || 'News';
+};
+
+const formatTeluguDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  const day = d.getDate().toString().padStart(2, '0');
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+const getCmsPollStatusLabel = (desc: string) => {
+  try {
+    const parsed = JSON.parse(desc);
+    if (parsed && parsed.startDate && parsed.endDate) {
+      return `${formatTeluguDate(parsed.startDate)} నుండి ${formatTeluguDate(parsed.endDate)} వరకు`;
+    }
+  } catch (e) {}
+  return desc || 'రేపటి వరకు';
 };
 
 export default function AdminPage() {
@@ -177,6 +501,11 @@ export default function AdminPage() {
     career: false,
   });
 
+  // Header dropdown state
+  const [activeHeaderDropdown, setActiveHeaderDropdown] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+
   // Expandable sections for add/edit classification
   const [expandedClassification, setExpandedClassification] = useState<Record<string, boolean>>({
     ap: false,
@@ -194,6 +523,7 @@ export default function AdminPage() {
   const [newsAuthor, setNewsAuthor] = useState('హై టీవీ డెస్క్');
   const [newsPublishedDate, setNewsPublishedDate] = useState('');
   const [newsImage, setNewsImage] = useState('');
+  const [newsVideo, setNewsVideo] = useState('');
 
   // Story placement flag checkboxes
   const [isBreakingChecked, setIsBreakingChecked] = useState(false);
@@ -212,11 +542,145 @@ export default function AdminPage() {
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
+  // Shorts videos states
+  const [shortsFormMode, setShortsFormMode] = useState<'list' | 'add' | 'edit'>('list');
+  const [editingShort, setEditingShort] = useState<any | null>(null);
+  const [shortTitle, setShortTitle] = useState('');
+  const [shortDescription, setShortDescription] = useState('');
+  const [shortCoverImage, setShortCoverImage] = useState('');
+  const [shortVideo, setShortVideo] = useState('');
+  const shortVideoInputRef = useRef<HTMLInputElement>(null);
+  const shortCoverInputRef = useRef<HTMLInputElement>(null);
+
+  // Photo gallery states
+  const [photosFormMode, setPhotosFormMode] = useState<'list' | 'add' | 'edit'>('list');
+  const [editingPhotoAlbum, setEditingPhotoAlbum] = useState<any | null>(null);
+  const [photoTitle, setPhotoTitle] = useState('');
+  const [photoDescription, setPhotoDescription] = useState('');
+  const [photoImage, setPhotoImage] = useState('');
+  const photoCoverInputRef = useRef<HTMLInputElement>(null);
+
+  // Polls manager states
+  const [pollsFormMode, setPollsFormMode] = useState<'list' | 'add' | 'edit'>('list');
+  const [editingPoll, setEditingPoll] = useState<any | null>(null);
+  const [cmsPollQuestion, setCmsPollQuestion] = useState('');
+  const [pollStartDate, setPollStartDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [pollEndDate, setPollEndDate] = useState(() => new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+  const [pollScope, setPollScope] = useState<'general' | 'article'>('general');
+  const [pollOptions, setPollOptions] = useState([
+    { id: 'a', label: '', votes: 0 },
+    { id: 'b', label: '', votes: 0 },
+  ]);
+
+  // Popup Manager states (persisted to localStorage)
+  type PopupId = 'home' | 'article';
+  const loadPopupConfig = (id: PopupId) => {
+    const savedOptions = localStorage.getItem(`promo_poll_${id}_options`);
+    let pollOpts: string[] = ['అవును', 'కాదు'];
+    if (savedOptions) {
+      try {
+        pollOpts = JSON.parse(savedOptions);
+      } catch (e) {}
+    } else {
+      const yes = localStorage.getItem(`promo_poll_${id}_option_yes`);
+      const no = localStorage.getItem(`promo_poll_${id}_option_no`);
+      const unsure = localStorage.getItem(`promo_poll_${id}_option_unsure`);
+      if (yes || no || unsure) {
+        pollOpts = [];
+        if (yes) pollOpts.push(yes);
+        if (no) pollOpts.push(no);
+        if (unsure) pollOpts.push(unsure);
+      }
+    }
+    return {
+      enabled: localStorage.getItem(`promo_popup_${id}_enabled`) !== 'false',
+      type: (localStorage.getItem(`promo_popup_${id}_type`) || 'ad') as 'ad' | 'poll',
+      adImage: localStorage.getItem(`promo_ad_${id}_image`) || '',
+      adLink: localStorage.getItem(`promo_ad_${id}_link`) || '',
+      adOrientation: (localStorage.getItem(`promo_ad_${id}_orientation`) || 'horizontal') as 'horizontal' | 'vertical',
+      pollQuestion: localStorage.getItem(`promo_poll_${id}_question`) || '',
+      pollOpts,
+    };
+  };
+  const [homePopup, setHomePopup] = useState({ enabled: true, type: 'ad' as 'ad'|'poll', adImage: '', adLink: '', adOrientation: 'horizontal' as 'horizontal'|'vertical', pollQuestion: '', pollOpts: ['అవును','కాదు'] });
+  const [articlePopup, setArticlePopup] = useState({ enabled: true, type: 'ad' as 'ad'|'poll', adImage: '', adLink: '', adOrientation: 'horizontal' as 'horizontal'|'vertical', pollQuestion: '', pollOpts: ['అవును','కాదు'] });
+  const [popupSaved, setPopupSaved] = useState<'home'|'article'|null>(null);
+
+  // Load popup configs from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setHomePopup(loadPopupConfig('home') as any);
+      setArticlePopup(loadPopupConfig('article') as any);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const savePopupConfig = (id: PopupId, config: typeof homePopup) => {
+    localStorage.setItem(`promo_popup_${id}_enabled`, String(config.enabled));
+    localStorage.setItem(`promo_popup_${id}_type`, config.type);
+    localStorage.setItem(`promo_ad_${id}_image`, config.adImage);
+    localStorage.setItem(`promo_ad_${id}_link`, config.adLink);
+    localStorage.setItem(`promo_ad_${id}_orientation`, config.adOrientation);
+    localStorage.setItem(`promo_poll_${id}_question`, config.pollQuestion);
+    localStorage.setItem(`promo_poll_${id}_options`, JSON.stringify(config.pollOpts));
+    
+    // Legacy support
+    localStorage.setItem(`promo_poll_${id}_option_yes`, config.pollOpts[0] || '');
+    localStorage.setItem(`promo_poll_${id}_option_no`, config.pollOpts[1] || '');
+    localStorage.setItem(`promo_poll_${id}_option_unsure`, config.pollOpts[2] || '');
+    
+    setPopupSaved(id);
+    setTimeout(() => setPopupSaved(null), 2500);
+  };
+
+  // Weather page states
+  const [weatherReports, setWeatherReports] = useState<any[]>([]);
+  const [selectedWeatherCityIndex, setSelectedWeatherCityIndex] = useState<number>(0);
+  const [weatherArticleFormMode, setWeatherArticleFormMode] = useState<'list' | 'add' | 'edit'>('list');
+
+  // Horoscope page states
+  const [horoscopeDate, setHoroscopeDate] = useState('');
+  const [horoscopeWeeklyRange, setHoroscopeWeeklyRange] = useState('');
+  const [horoscopePanchangamTitle, setHoroscopePanchangamTitle] = useState('');
+  const [horoscopePanchangam, setHoroscopePanchangam] = useState('');
+  const [horoscopePredictions, setHoroscopePredictions] = useState<any[]>([]);
+  const [selectedHoroscopeIndex, setSelectedHoroscopeIndex] = useState<number>(0);
+  const [horoscopeFormMode, setHoroscopeFormMode] = useState<'list' | 'add' | 'edit'>('list');
+  const [horoscopeEditIdx, setHoroscopeEditIdx] = useState<number | null>(null);
+  const [horoscopeFormRashiId, setHoroscopeFormRashiId] = useState('aries');
+  const [horoscopeFormDaily, setHoroscopeFormDaily] = useState('');
+  const [horoscopeFormWeekly, setHoroscopeFormWeekly] = useState('');
+  const [horoscopeBoxRows, setHoroscopeBoxRows] = useState<number>(4);
+
+  // Web stories states
+  const [webStoriesList, setWebStoriesList] = useState<any[]>([]);
+  const [webStoryFormMode, setWebStoryFormMode] = useState<'list' | 'add' | 'edit'>('list');
+  const [editingWebStory, setEditingWebStory] = useState<any | null>(null);
+  const [webStoryTitle, setWebStoryTitle] = useState('');
+  const [webStoryCoverImage, setWebStoryCoverImage] = useState('');
+  const [webStoryCoverTitle, setWebStoryCoverTitle] = useState('');
+  const [webStoryCoverStyle, setWebStoryCoverStyle] = useState<'red-white' | 'white-black'>('red-white');
+  const [webStorySlides, setWebStorySlides] = useState<any[]>([{ image: '', text: '', textStyle: 'red-white' }]);
+
+  // Pinned District News states
+  const [pinnedApNews, setPinnedApNews] = useState<any[]>([]);
+  const [pinnedTgNews, setPinnedTgNews] = useState<any[]>([]);
+  const [districtSearchQuery, setDistrictSearchQuery] = useState('');
+  const [districtActiveSubTab, setDistrictActiveSubTab] = useState<'tg' | 'ap'>('tg');
+
   // WYSIWYG Editor references
   const editorRef = useRef<HTMLDivElement>(null);
+  const newsTitleRef = useRef<HTMLDivElement>(null);
+  const newsDescriptionRef = useRef<HTMLDivElement>(null);
+  const weatherTitleRef = useRef<HTMLDivElement>(null);
+  const weatherDescriptionRef = useRef<HTMLDivElement>(null);
+  const horoscopePanchangamRef = useRef<HTMLDivElement>(null);
+  const horoscopeDailyRef = useRef<HTMLDivElement>(null);
+  const horoscopeWeeklyRef = useRef<HTMLDivElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const featuredImageInputRef = useRef<HTMLInputElement>(null);
+  const newsVideoInputRef = useRef<HTMLInputElement>(null);
 
   // Image Resizer overlay state
   const [selectedImage, setSelectedImage] = useState<HTMLImageElement | null>(null);
@@ -234,6 +698,7 @@ export default function AdminPage() {
 
   // Flash News (Marquee) config
   const [flashNewsList, setFlashNewsList] = useState<{ text: string; link: string }[]>([]);
+  const [flashNewsLabel, setFlashNewsLabel] = useState('Flash News');
   const [newNewsText, setNewNewsText] = useState('');
   const [newNewsLink, setNewNewsLink] = useState('');
   const [editingFlashIndex, setEditingFlashIndex] = useState<number | null>(null);
@@ -278,6 +743,38 @@ export default function AdminPage() {
   const savedSelectionRangeRef = useRef<Range | null>(null);
   const [selectedPromoBox, setSelectedPromoBox] = useState<HTMLDivElement | null>(null);
   const [promoBoxStyle, setPromoBoxStyle] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
+
+  // Track cursor selection inside news article editor
+  useEffect(() => {
+    const handleSelectionChange = () => {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        if (editorRef.current && editorRef.current.contains(range.commonAncestorContainer)) {
+          savedSelectionRangeRef.current = range.cloneRange();
+        }
+      }
+    };
+
+    document.addEventListener('selectionchange', handleSelectionChange);
+    return () => {
+      document.removeEventListener('selectionchange', handleSelectionChange);
+    };
+  }, []);
+
+  // Close header dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setActiveHeaderDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
 
   // E-Paper PDF Config
   const [epapersList, setEpapersList] = useState<{ id: string; title: string; date: string; pdfUrl: string }[]>([]);
@@ -354,6 +851,10 @@ export default function AdminPage() {
         ];
         setFlashNewsList(defaults);
       }
+      const savedLabel = localStorage.getItem('flash_news_label');
+      if (savedLabel) {
+        setFlashNewsLabel(savedLabel);
+      }
     } catch {
       setFlashNewsList([]);
     }
@@ -380,11 +881,81 @@ export default function AdminPage() {
       setTrendingNewsList([]);
     }
 
+    // Load Web Stories list
+    try {
+      const savedStories = localStorage.getItem('custom_web_stories');
+      if (savedStories) {
+        setWebStoriesList(JSON.parse(savedStories));
+      } else {
+        setWebStoriesList([]);
+      }
+    } catch {
+      setWebStoriesList([]);
+    }
+
+    // Load Pinned District News
+    try {
+      setPinnedApNews(JSON.parse(localStorage.getItem('pinned_ap_district_news') || '[]'));
+      setPinnedTgNews(JSON.parse(localStorage.getItem('pinned_tg_district_news') || '[]'));
+    } catch {
+      setPinnedApNews([]);
+      setPinnedTgNews([]);
+    }
+
     // Load Videos list
     try {
       setVideosList(JSON.parse(localStorage.getItem('latest_videos') || '[]'));
     } catch {
       setVideosList([]);
+    }
+
+    // Load Weather Reports data
+    try {
+      const savedWeather = localStorage.getItem('weather_page_reports_data');
+      if (savedWeather) {
+        setWeatherReports(JSON.parse(savedWeather));
+      } else {
+        setWeatherReports(DEFAULT_WEATHER_DATA);
+      }
+    } catch {
+      setWeatherReports(DEFAULT_WEATHER_DATA);
+    }
+
+    // Load Horoscope data
+    try {
+      const savedHoroscope = localStorage.getItem('horoscope_daily_data');
+      if (savedHoroscope) {
+        const parsed = JSON.parse(savedHoroscope);
+        setHoroscopeDate(parsed.date || '');
+        setHoroscopeWeeklyRange(parsed.weeklyRange || '');
+        
+        const rawPanchangam = parsed.panchangam || '';
+        const parts = splitPanchangam(rawPanchangam);
+        setHoroscopePanchangamTitle(parts[0] || '');
+        setHoroscopePanchangam(parts.slice(1).join('; '));
+        
+        setHoroscopePredictions(parsed.predictions || DEFAULT_HOROSCOPE_PREDICTIONS);
+      } else {
+        const days = ['ఆదివారం', 'సోమవారం', 'మంగళవారం', 'బుధవారం', 'గురువారం', 'శుక్రవారం', 'శనివారం'];
+        const now = new Date();
+        const formattedDate = `తేది: ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}, ${days[now.getDay()]}`;
+        
+        setHoroscopeDate(formattedDate);
+        setHoroscopeWeeklyRange('');
+        
+        const parts = splitPanchangam(DEFAULT_HOROSCOPE_PANCHANGAM);
+        setHoroscopePanchangamTitle(parts[0] || '');
+        setHoroscopePanchangam(parts.slice(1).join('; '));
+        
+        setHoroscopePredictions(DEFAULT_HOROSCOPE_PREDICTIONS);
+      }
+    } catch {
+      setHoroscopeDate('');
+      setHoroscopeWeeklyRange('');
+      const parts = splitPanchangam(DEFAULT_HOROSCOPE_PANCHANGAM);
+      setHoroscopePanchangamTitle(parts[0] || '');
+      setHoroscopePanchangam(parts.slice(1).join('; '));
+      setHoroscopePredictions(DEFAULT_HOROSCOPE_PREDICTIONS);
     }
 
     // Load Custom Ads
@@ -467,6 +1038,15 @@ export default function AdminPage() {
     }
   }, [isAuthenticated, popupScope, activeAdSpot, refreshCounter]);
 
+  // Initialize Horoscope Panchangam editor content when tab becomes active
+  useEffect(() => {
+    if (activeTab === 'horoscope') {
+      if (horoscopePanchangamRef.current) {
+        horoscopePanchangamRef.current.innerHTML = horoscopePanchangam;
+      }
+    }
+  }, [activeTab]);
+
   // Clear published date when switching to add mode — it will be set automatically at publish time
   useEffect(() => {
     if (newsViewMode === 'add') {
@@ -475,6 +1055,7 @@ export default function AdminPage() {
       setNewsSlug('');
       setNewsDescription('');
       setNewsImage('');
+      setNewsVideo('');
       setEditingArticle(null);
       
       // Auto-check Target Placement based on current sidebar filterCategory
@@ -495,6 +1076,10 @@ export default function AdminPage() {
       }
       setTimeout(() => {
         if (editorRef.current) editorRef.current.innerHTML = '';
+        if (newsTitleRef.current) newsTitleRef.current.innerHTML = '';
+        if (newsDescriptionRef.current) newsDescriptionRef.current.innerHTML = '';
+        if (weatherTitleRef.current) weatherTitleRef.current.innerHTML = '';
+        if (weatherDescriptionRef.current) weatherDescriptionRef.current.innerHTML = '';
       }, 50);
     }
   }, [newsViewMode, filterCategory]);
@@ -553,14 +1138,413 @@ export default function AdminPage() {
     }
   };
 
+  // ── Handle short video upload
+  const handleNewsVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 100 * 1024 * 1024) {
+        alert('Video file is too large! Please select a file smaller than 100MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        setNewsVideo(reader.result as string);
+      };
+    }
+  };
+
+  // ── Shorts Tab Handlers
+  const handleShortVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 100 * 1024 * 1024) {
+        alert('Video file is too large! Please select a file smaller than 100MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        setShortVideo(reader.result as string);
+      };
+    }
+  };
+
+  const handleShortCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleCompressAndSetImage(file, (base64) => {
+        setShortCoverImage(base64);
+      });
+    }
+  };
+
+  // ── Photo Gallery Tab Handlers
+  const handlePhotoCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleCompressAndSetImage(file, (base64) => {
+        setPhotoImage(base64);
+      });
+    }
+  };
+
+  const handleStartEditPhoto = (art: any) => {
+    setEditingPhotoAlbum(art);
+    setPhotoTitle(art.title || '');
+    setPhotoDescription(art.description || '');
+    setPhotoImage(art.image || '');
+    setPhotosFormMode('edit');
+  };
+
+  const handleSavePhotoAlbum = async () => {
+    if (!photoTitle.trim() || !photoImage) {
+      alert('Title/Caption and Photo Image file are required!');
+      return;
+    }
+    
+    setIsSavingArticle(true);
+    
+    const articleData = {
+      title: photoTitle.trim(),
+      slug: (photosFormMode === 'edit' && editingPhotoAlbum) ? editingPhotoAlbum.slug : `photo-${Date.now().toString().slice(-6)}`,
+      categorySlug: 'photos',
+      category: 'ఆల్బమ్‌లు',
+      districtSlug: '',
+      author: 'హై టీవీ డెస్క్',
+      publishedAt: new Date().toISOString(),
+      description: photoDescription.trim() || photoTitle.trim(),
+      body: photoDescription.trim() || photoTitle.trim(),
+      image: photoImage,
+      isBreaking: false,
+      isTrending: false,
+      isFeatured: false
+    };
+
+    try {
+      if (photosFormMode === 'add') {
+        const response = await fetch('/api/articles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(articleData)
+        });
+        if (response.ok) {
+          const added = await response.json();
+          setCustomNewsList(prev => [added, ...prev]);
+          alert('Photo uploaded to gallery successfully!');
+        } else {
+          const errData = await response.json().catch(() => ({}));
+          alert('Failed to save photo: ' + (errData.error || response.statusText || 'Unknown error'));
+        }
+      } else if (photosFormMode === 'edit' && editingPhotoAlbum) {
+        try {
+          const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
+          const idx = custom.findIndex((art: any) => art.id === editingPhotoAlbum.id);
+          if (idx !== -1) {
+            custom[idx] = { ...custom[idx], ...articleData, id: editingPhotoAlbum.id };
+            localStorage.setItem('custom_news_articles', JSON.stringify(custom));
+          }
+          const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
+          modified[editingPhotoAlbum.id] = { ...modified[editingPhotoAlbum.id], ...articleData };
+          localStorage.setItem('modified_news_articles', JSON.stringify(modified));
+        } catch (e) {
+          console.error(e);
+        }
+
+        const response = await fetch(`/api/articles/${editingPhotoAlbum.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(articleData)
+        });
+
+        if (response.ok) {
+          const updated = await response.json();
+          setCustomNewsList(prev => prev.map(a => a.id === editingPhotoAlbum.id ? updated : a));
+          alert('Photo Album updated successfully!');
+        } else {
+          alert('Failed to update photo.');
+        }
+      }
+      setPhotosFormMode('list');
+      setEditingPhotoAlbum(null);
+      setPhotoTitle('');
+      setPhotoDescription('');
+      setPhotoImage('');
+    } catch (err: any) {
+      console.error(err);
+      alert('Error saving photo: ' + (err.message || String(err)));
+    } finally {
+      setIsSavingArticle(false);
+    }
+  };
+
+  // ── Polls Tab Handlers
+  const handleStartEditPoll = (art: any) => {
+    setEditingPoll(art);
+    setCmsPollQuestion(art.title || '');
+    try {
+      const parsedDesc = JSON.parse(art.description || '{}');
+      if (parsedDesc.startDate && parsedDesc.endDate) {
+        setPollStartDate(parsedDesc.startDate);
+        setPollEndDate(parsedDesc.endDate);
+      } else {
+        setPollStartDate(new Date(art.publishedAt || Date.now()).toISOString().split('T')[0]);
+        setPollEndDate(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+      }
+    } catch (e) {
+      setPollStartDate(new Date(art.publishedAt || Date.now()).toISOString().split('T')[0]);
+      setPollEndDate(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+    }
+    setPollScope(art.districtSlug === 'article' ? 'article' : 'general');
+    try {
+      const parsedOptions = JSON.parse(art.body || '[]');
+      // Load all existing options dynamically
+      const filledOptions = parsedOptions.length >= 2
+        ? parsedOptions.map((o: any, i: number) => ({
+            id: o.id || String.fromCharCode(97 + i),
+            label: o.label || '',
+            votes: o.votes || 0,
+          }))
+        : [
+            { id: 'a', label: '', votes: 0 },
+            { id: 'b', label: '', votes: 0 },
+          ];
+      setPollOptions(filledOptions);
+    } catch (e) {
+      setPollOptions([
+        { id: 'a', label: '', votes: 0 },
+        { id: 'b', label: '', votes: 0 },
+      ]);
+    }
+    setPollsFormMode('edit');
+  };
+
+  const handleSavePoll = async () => {
+    if (!cmsPollQuestion.trim()) {
+      alert('Poll Question is required!');
+      return;
+    }
+    
+    // Filter options that are not empty
+    const activeOpts = pollOptions.filter(opt => opt.label.trim() !== '');
+    if (activeOpts.length < 2) {
+      alert('At least two Options are required!');
+      return;
+    }
+
+    setIsSavingArticle(true);
+    
+    const formattedOptions = activeOpts.map((opt, idx) => ({
+      id: opt.id || String.fromCharCode(97 + idx), // a, b, c, d
+      label: opt.label.trim(),
+      votes: opt.votes || 0
+    }));
+
+    const articleData = {
+      title: cmsPollQuestion.trim(),
+      slug: (pollsFormMode === 'edit' && editingPoll) ? editingPoll.slug : `poll-${Date.now().toString().slice(-6)}`,
+      categorySlug: 'polls',
+      category: 'పోల్స్',
+      districtSlug: pollScope,
+      author: 'హై టీవీ డెస్క్',
+      publishedAt: new Date().toISOString(),
+      description: JSON.stringify({ startDate: pollStartDate, endDate: pollEndDate }),
+      body: JSON.stringify(formattedOptions),
+      image: '',
+      isBreaking: false,
+      isTrending: false,
+      isFeatured: false
+    };
+
+    try {
+      if (pollsFormMode === 'add') {
+        const response = await fetch('/api/articles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(articleData)
+        });
+        if (response.ok) {
+          const added = await response.json();
+          setCustomNewsList(prev => [added, ...prev]);
+          alert('Poll created successfully!');
+        } else {
+          const errData = await response.json().catch(() => ({}));
+          alert('Failed to save poll: ' + (errData.error || response.statusText || 'Unknown error'));
+        }
+      } else if (pollsFormMode === 'edit' && editingPoll) {
+        try {
+          const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
+          const idx = custom.findIndex((art: any) => art.id === editingPoll.id);
+          if (idx !== -1) {
+            custom[idx] = { ...custom[idx], ...articleData, id: editingPoll.id };
+            localStorage.setItem('custom_news_articles', JSON.stringify(custom));
+          }
+          const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
+          modified[editingPoll.id] = { ...modified[editingPoll.id], ...articleData };
+          localStorage.setItem('modified_news_articles', JSON.stringify(modified));
+        } catch (e) {
+          console.error(e);
+        }
+
+        const response = await fetch(`/api/articles/${editingPoll.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(articleData)
+        });
+
+        if (response.ok) {
+          const updated = await response.json();
+          setCustomNewsList(prev => prev.map(a => a.id === editingPoll.id ? updated : a));
+          alert('Poll updated successfully!');
+        } else {
+          alert('Failed to update poll.');
+        }
+      }
+      setPollsFormMode('list');
+      setEditingPoll(null);
+      setCmsPollQuestion('');
+      setPollStartDate(new Date().toISOString().split('T')[0]);
+      setPollEndDate(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+      setPollScope('general');
+      setPollOptions([
+        { id: 'a', label: '', votes: 0 },
+        { id: 'b', label: '', votes: 0 },
+      ]);
+    } catch (err: any) {
+      console.error(err);
+      alert('Error saving poll: ' + (err.message || String(err)));
+    } finally {
+      setIsSavingArticle(false);
+    }
+  };
+
+  const handleStartEditShort = (art: any) => {
+    setEditingShort(art);
+    setShortTitle(art.title || '');
+    setShortDescription(art.description || '');
+    setShortCoverImage(art.image || '');
+    
+    if (art.body) {
+      const videoMatch = art.body.match(/<video[^>]+src=["']([^"']+)["']/i);
+      if (videoMatch) {
+        setShortVideo(videoMatch[1]);
+      } else {
+        setShortVideo('');
+      }
+    } else {
+      setShortVideo('');
+    }
+    
+    setShortsFormMode('edit');
+  };
+
+  const handleSaveShort = async () => {
+    if (!shortTitle.trim() || !shortVideo) {
+      alert('Title and Video File are required!');
+      return;
+    }
+    
+    setIsSavingArticle(true);
+    
+    const cleanBodyHTML = `<video src="${shortVideo}" controls class="w-full h-auto rounded-xl my-4 block"></video>`;
+    
+    const articleData = {
+      title: shortTitle.trim(),
+      slug: (shortsFormMode === 'edit' && editingShort) ? editingShort.slug : `short-${Date.now().toString().slice(-6)}`,
+      categorySlug: 'shorts',
+      category: 'షార్ట్స్',
+      districtSlug: '',
+      author: 'హై టీవీ డెస్క్',
+      publishedAt: new Date().toISOString(),
+      description: shortDescription.trim() || shortTitle.trim(),
+      body: cleanBodyHTML,
+      image: shortCoverImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop',
+      isBreaking: false,
+      isTrending: false,
+      isFeatured: false
+    };
+
+    try {
+      if (shortsFormMode === 'add') {
+        const response = await fetch('/api/articles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(articleData)
+        });
+        if (response.ok) {
+          const added = await response.json();
+          setCustomNewsList(prev => [added, ...prev]);
+          alert('Short Video uploaded successfully!');
+        } else {
+          const errData = await response.json().catch(() => ({}));
+          alert('Failed to save short: ' + (errData.error || response.statusText || 'Unknown error'));
+        }
+      } else if (shortsFormMode === 'edit' && editingShort) {
+        try {
+          const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
+          const idx = custom.findIndex((art: any) => art.id === editingShort.id);
+          if (idx !== -1) {
+            custom[idx] = { ...custom[idx], ...articleData, id: editingShort.id };
+            localStorage.setItem('custom_news_articles', JSON.stringify(custom));
+          }
+          const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
+          modified[editingShort.id] = { ...modified[editingShort.id], ...articleData };
+          localStorage.setItem('modified_news_articles', JSON.stringify(modified));
+        } catch (e) {
+          console.error(e);
+        }
+
+        const response = await fetch(`/api/articles/${editingShort.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(articleData)
+        });
+
+        if (response.ok) {
+          const updated = await response.json();
+          setCustomNewsList(prev => prev.map(a => a.id === editingShort.id ? updated : a));
+          alert('Short Video updated successfully!');
+        } else {
+          alert('Failed to update short.');
+        }
+      }
+      setShortsFormMode('list');
+      setEditingShort(null);
+      setShortTitle('');
+      setShortDescription('');
+      setShortCoverImage('');
+      setShortVideo('');
+    } catch (err: any) {
+      console.error(err);
+      alert('Error saving short: ' + (err.message || String(err)));
+    } finally {
+      setIsSavingArticle(false);
+    }
+  };
+
   // ── WYSIWYG execCommand formatting helpers
+  const restoreNewsSelection = () => {
+    if (!savedSelectionRangeRef.current) return;
+    const selection = window.getSelection();
+    if (selection) {
+      selection.removeAllRanges();
+      selection.addRange(savedSelectionRangeRef.current);
+    }
+  };
+
   const handleFormat = (command: string, value: string = '') => {
+    restoreNewsSelection();
     document.execCommand(command, false, value);
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      savedSelectionRangeRef.current = selection.getRangeAt(0).cloneRange();
+    }
     editorRef.current?.focus();
   };
 
   const handleFontSize = (size: string) => {
     if (!size) return;
+    restoreNewsSelection();
     document.execCommand('fontSize', false, '7');
     const fontElements = editorRef.current?.getElementsByTagName('font');
     if (fontElements) {
@@ -572,7 +1556,32 @@ export default function AdminPage() {
         }
       }
     }
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      savedSelectionRangeRef.current = selection.getRangeAt(0).cloneRange();
+    }
     editorRef.current?.focus();
+  };
+
+  const handleEditorFormat = (ref: React.RefObject<HTMLDivElement | null>, command: string, value: string = '') => {
+    document.execCommand(command, false, value);
+    ref.current?.focus();
+  };
+
+  const handleEditorFontSize = (ref: React.RefObject<HTMLDivElement | null>, size: string) => {
+    if (!size) return;
+    document.execCommand('fontSize', false, '7');
+    const fontElements = ref.current?.getElementsByTagName('font');
+    if (fontElements) {
+      for (let i = fontElements.length - 1; i >= 0; i--) {
+        const el = fontElements[i];
+        if (el.getAttribute('size') === '7') {
+          el.removeAttribute('size');
+          el.style.fontSize = size;
+        }
+      }
+    }
+    ref.current?.focus();
   };
 
   // ── Inline Media Upload & Reference Insertion
@@ -1125,7 +2134,16 @@ export default function AdminPage() {
   const handleSaveArticle = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSavingArticle) return;
-    if (!newsTitle.trim() || !editorRef.current?.innerHTML.trim()) {
+
+    const isWeather = (weatherArticleFormMode !== 'list');
+    const titleHtml = (isWeather ? weatherTitleRef.current?.innerHTML : newsTitleRef.current?.innerHTML) || '';
+    const descriptionHtml = (isWeather ? weatherDescriptionRef.current?.innerHTML : newsDescriptionRef.current?.innerHTML) || '';
+
+    // Plain text conversions for checks and slug generation
+    const titlePlainText = titleHtml.replace(/<[^>]*>/g, '').trim();
+    const descriptionPlainText = descriptionHtml.replace(/<[^>]*>/g, '').trim();
+
+    if (!titlePlainText || !editorRef.current?.innerHTML.trim()) {
       alert('Title and Article Body Content are required!');
       return;
     }
@@ -1169,11 +2187,21 @@ export default function AdminPage() {
 
     // Save the raw HTML directly — base64 images are stored as-is in the DB
     // (No placeholder conversion: images display reliably without localStorage dependency)
-    const cleanBodyHTML = editorRef.current.innerHTML;
-    const excerptText = newsDescription.trim() || (editorRef.current ? editorRef.current.innerText.slice(0, 140).trim().replace(/<[^>]*>/g, '') + '...' : '');
+    let cleanBodyHTML = editorRef.current.innerHTML;
+    
+    if (selectedCategories.includes('shorts')) {
+      // Strip any existing video tags to avoid duplication
+      cleanBodyHTML = cleanBodyHTML.replace(/<video[^>]*>([\s\S]*?)<\/video>/gi, '');
+      cleanBodyHTML = cleanBodyHTML.replace(/<video[^>]*>/gi, '');
+      
+      if (newsVideo) {
+        cleanBodyHTML = `<video src="${newsVideo}" controls class="w-full h-auto rounded-xl my-4 block"></video>` + cleanBodyHTML;
+      }
+    }
+    const excerptText = descriptionPlainText ? descriptionHtml.trim() : (editorRef.current ? editorRef.current.innerText.slice(0, 140).trim().replace(/<[^>]*>/g, '') + '...' : '');
 
     const slugToUse = newsSlug.trim() || (() => {
-      const base = newsTitle.trim().toLowerCase()
+      const base = titlePlainText.toLowerCase()
         .replace(/[\u0C00-\u0C7F\u0900-\u097F\u0600-\u06FF]/g, '') // Strip Telugu/Hindi/Arabic
         .replace(/[^a-z0-9\s-]/g, '')
         .replace(/\s+/g, '-')
@@ -1183,7 +2211,7 @@ export default function AdminPage() {
     })();
 
     const articleData = {
-      title: newsTitle.trim(),
+      title: titleHtml.trim(),
       slug: slugToUse,
       categorySlug,
       category: resolvedCat,
@@ -1302,6 +2330,18 @@ export default function AdminPage() {
     setNewsAuthor(art.author || '');
     setNewsPublishedDate(art.publishedAt ? new Date(art.publishedAt).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16));
     setNewsImage(art.image || '');
+    
+    // Resolve short video
+    if (art.categorySlug === 'shorts' && art.body) {
+      const videoMatch = art.body.match(/<video[^>]+src=["']([^"']+)["']/i);
+      if (videoMatch) {
+        setNewsVideo(videoMatch[1]);
+      } else {
+        setNewsVideo('');
+      }
+    } else {
+      setNewsVideo('');
+    }
 
     // Resolve checkbox array values
     const activeCheckboxes = [art.categorySlug];
@@ -1331,6 +2371,11 @@ export default function AdminPage() {
 
     setNewsViewMode('edit');
     setTimeout(() => {
+      if (newsTitleRef.current) newsTitleRef.current.innerHTML = art.title || '';
+      if (newsDescriptionRef.current) newsDescriptionRef.current.innerHTML = art.description || '';
+      if (weatherTitleRef.current) weatherTitleRef.current.innerHTML = art.title || '';
+      if (weatherDescriptionRef.current) weatherDescriptionRef.current.innerHTML = art.description || '';
+
       if (editorRef.current) {
         // Resolve any old-style placeholder paths back to base64 for articles that were
         // saved before this fix, then display the body as-is for newer articles
@@ -1402,6 +2447,78 @@ export default function AdminPage() {
     }
   };
 
+  const resetWebStoryForm = () => {
+    setWebStoryTitle('');
+    setWebStoryCoverImage('');
+    setWebStoryCoverTitle('');
+    setWebStoryCoverStyle('red-white');
+    setWebStorySlides([{ image: '', text: '', textStyle: 'red-white' }]);
+    setEditingWebStory(null);
+  };
+
+  const handleSaveWebStory = () => {
+    if (!webStoryTitle.trim() || !webStoryCoverTitle.trim() || !webStoryCoverImage) {
+      alert('Title, Cover Title, and Cover Image are required!');
+      return;
+    }
+    // Check if slides are populated
+    const validSlides = webStorySlides.filter(s => s.image && s.text.trim());
+    if (validSlides.length === 0) {
+      alert('At least one valid slide with an image and text description is required!');
+      return;
+    }
+
+    let updatedList = [...webStoriesList];
+    if (webStoryFormMode === 'edit' && editingWebStory) {
+      const idx = updatedList.findIndex(story => story.id === editingWebStory.id);
+      if (idx !== -1) {
+        updatedList[idx] = {
+          ...editingWebStory,
+          title: webStoryTitle.trim(),
+          coverImage: webStoryCoverImage,
+          coverTitle: webStoryCoverTitle.trim(),
+          coverStyle: webStoryCoverStyle,
+          slides: validSlides
+        };
+      }
+      alert('Web Story updated successfully!');
+    } else {
+      const newStory = {
+        id: `story-custom-${Date.now()}`,
+        title: webStoryTitle.trim(),
+        coverImage: webStoryCoverImage,
+        coverTitle: webStoryCoverTitle.trim(),
+        coverStyle: webStoryCoverStyle,
+        slides: validSlides
+      };
+      updatedList = [newStory, ...updatedList];
+      alert('Web Story created successfully!');
+    }
+
+    setWebStoriesList(updatedList);
+    localStorage.setItem('custom_web_stories', JSON.stringify(updatedList));
+    setWebStoryFormMode('list');
+    resetWebStoryForm();
+  };
+
+  const handleDeleteWebStory = (id: string) => {
+    if (!confirm('Are you sure you want to delete this Web Story?')) return;
+    const updatedList = webStoriesList.filter(story => story.id !== id);
+    setWebStoriesList(updatedList);
+    localStorage.setItem('custom_web_stories', JSON.stringify(updatedList));
+    alert('Web Story deleted successfully!');
+  };
+
+  const handleStartEditWebStory = (story: any) => {
+    setEditingWebStory(story);
+    setWebStoryTitle(story.title || '');
+    setWebStoryCoverImage(story.coverImage || '');
+    setWebStoryCoverTitle(story.coverTitle || '');
+    setWebStoryCoverStyle(story.coverStyle || 'red-white');
+    setWebStorySlides(story.slides && story.slides.length > 0 ? story.slides : [{ image: '', text: '', textStyle: 'red-white' }]);
+    setWebStoryFormMode('edit');
+  };
+
 
 
 
@@ -1428,10 +2545,12 @@ export default function AdminPage() {
 
       // Save Inline promos
       localStorage.setItem('inline_article_promos_enabled', String(inlinePromosEnabled));
-    } else if (activeTab === 'categories') {
-      // Save youtube videos and sliders
+    } else if (activeTab === 'weather') {
+      // Save weather reports
+      localStorage.setItem('weather_page_reports_data', JSON.stringify(weatherReports));
+    } else if (activeTab === 'high-tv-videos') {
       localStorage.setItem('latest_videos', JSON.stringify(videosList));
-
+    } else if (activeTab === 'categories') {
       // Save General banners
       const updatedAds = {
         ...customAds,
@@ -1538,8 +2657,11 @@ export default function AdminPage() {
       updated[idx] = { id: '', title: '', thumbnail: '' };
     }
     updated[idx] = { ...updated[idx], [field]: val };
-    if (field === 'id' && !updated[idx].thumbnail) {
-      updated[idx].thumbnail = `https://img.youtube.com/vi/${val}/hqdefault.jpg`;
+    if (field === 'id') {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = val.match(regExp);
+      const ytId = (match && match[2].length === 11) ? match[2] : val.trim();
+      updated[idx].thumbnail = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
     }
     setVideosList(updated);
   };
@@ -1769,222 +2891,129 @@ export default function AdminPage() {
             </div>
           </button>
 
-          {/* Collapsible Categories Tree for Sidebar Filter */}
-          <div className="mt-4 border-t border-slate-900 pt-3">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-2 mb-2 block">Website Pages ({22})</span>
-            
-            {/* 1. Main Categories Folder */}
-            <div className="mb-0.5">
-              <button
-                onClick={() => toggleSidebarGroup('main')}
-                className="w-full flex items-center justify-between px-2.5 py-2 text-slate-200 hover:text-white text-xs md:text-[13px] font-black cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expandedSidebar.main ? '' : '-rotate-90'}`} />
-                  <span>Main Categories</span>
-                </div>
-              </button>
-              {expandedSidebar.main && (
-                <div className="pl-6 flex flex-col gap-0.5 border-l border-slate-900 ml-4 max-h-[220px] overflow-y-auto admin-scrollbar">
-                  {MAIN_CATEGORIES_LIST.map((cat) => (
-                    <button
-                      key={cat.slug}
-                      onClick={() => {
-                        setActiveTab('news');
-                        setFilterCategory(cat.slug);
-                        setNewsViewMode('list');
-                      }}
-                      className={`w-full text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all telugu-text truncate shrink-0 ${
-                        activeTab === 'news' && filterCategory === cat.slug ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600' : 'text-slate-300 hover:text-white'
-                      }`}
-                    >
-                      {cat.name}
-                    </button>
-                  ))}
-                </div>
-              )}
+          <button
+            onClick={() => { setActiveTab('weather'); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'weather' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <CloudSun className="w-4 h-4" />
+              <span>Weather Page Details</span>
             </div>
+          </button>
 
-            {/* 2. Andhra Pradesh collapsible */}
-            <div className="mb-0.5">
-              <button
-                onClick={() => toggleSidebarGroup('ap')}
-                className="w-full flex items-center justify-between px-2.5 py-2 text-slate-200 hover:text-white text-xs md:text-[13px] font-black cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expandedSidebar.ap ? '' : '-rotate-90'}`} />
-                  <span>ఆంధ్రప్రదేశ్ (AP News)</span>
-                </div>
-              </button>
-              {expandedSidebar.ap && (
-                <div className="pl-6 flex flex-col gap-0.5 border-l border-slate-900 ml-4 max-h-[200px] overflow-y-auto admin-scrollbar">
-                  <button
-                    onClick={() => { setActiveTab('news'); setFilterCategory('andhra-pradesh'); setNewsViewMode('list'); }}
-                    className={`w-full text-left py-2 px-2.5 rounded-lg text-[13px] font-extrabold transition-all shrink-0 ${
-                      activeTab === 'news' && filterCategory === 'andhra-pradesh' ? 'bg-rose-950/50 text-white border-l-2 border-rose-600' : 'text-amber-400 hover:text-white'
-                    }`}
-                  >
-                    🌅 ఏపీ హోమ్ (AP State)
-                  </button>
-                  {apDistricts.map((dist) => (
-                    <button
-                      key={dist.slug}
-                      onClick={() => { setActiveTab('news'); setFilterCategory(dist.slug); setNewsViewMode('list'); }}
-                      className={`w-full text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all telugu-text truncate shrink-0 ${
-                        activeTab === 'news' && filterCategory === dist.slug ? 'bg-rose-950/50 text-white' : 'text-slate-300 hover:text-white'
-                      }`}
-                    >
-                      {dist.name}
-                    </button>
-                  ))}
-                </div>
-              )}
+          <button
+            onClick={() => { setActiveTab('horoscope'); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'horoscope' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Sparkles className="w-4 h-4" />
+              <span>శుభఫలాలు (Horoscope)</span>
             </div>
+          </button>
 
-            {/* 3. Telangana collapsible */}
-            <div className="mb-0.5">
-              <button
-                onClick={() => toggleSidebarGroup('telangana')}
-                className="w-full flex items-center justify-between px-2.5 py-2 text-slate-200 hover:text-white text-xs md:text-[13px] font-black cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expandedSidebar.telangana ? '' : '-rotate-90'}`} />
-                  <span>తెలంగాణ (Telangana News)</span>
-                </div>
-              </button>
-              {expandedSidebar.telangana && (
-                <div className="pl-6 flex flex-col gap-0.5 border-l border-slate-900 ml-4 max-h-[200px] overflow-y-auto admin-scrollbar">
-                  <button
-                    onClick={() => { setActiveTab('news'); setFilterCategory('telangana'); setNewsViewMode('list'); }}
-                    className={`w-full text-left py-2 px-2.5 rounded-lg text-[13px] font-extrabold transition-all shrink-0 ${
-                      activeTab === 'news' && filterCategory === 'telangana' ? 'bg-rose-950/50 text-white border-l-2 border-rose-600' : 'text-amber-400 hover:text-white'
-                    }`}
-                  >
-                    🍇 తెలంగాణ హోమ్ (TG State)
-                  </button>
-                  {tgDistricts.map((dist) => (
-                    <button
-                      key={dist.slug}
-                      onClick={() => { setActiveTab('news'); setFilterCategory(dist.slug); setNewsViewMode('list'); }}
-                      className={`w-full text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all telugu-text truncate shrink-0 ${
-                        activeTab === 'news' && filterCategory === dist.slug ? 'bg-rose-950/50 text-white' : 'text-slate-300 hover:text-white'
-                      }`}
-                    >
-                      {dist.name}
-                    </button>
-                  ))}
-                </div>
-              )}
+          <button
+            onClick={() => {
+              setActiveTab('webstories');
+              setWebStoryFormMode('list');
+            }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'webstories' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Layers className="w-4 h-4" />
+              <span>వెబ్ స్టోరీస్ (Web Stories)</span>
             </div>
+          </button>
 
-            {/* 4. Health collapsible */}
-            <div className="mb-0.5">
-              <button
-                onClick={() => toggleSidebarGroup('health')}
-                className="w-full flex items-center justify-between px-2.5 py-2 text-slate-200 hover:text-white text-xs md:text-[13px] font-black cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expandedSidebar.health ? '' : '-rotate-90'}`} />
-                  <span>హెల్త్ (Health)</span>
-                </div>
-              </button>
-              {expandedSidebar.health && (
-                <div className="pl-6 flex flex-col gap-0.5 border-l border-slate-900 ml-4">
-                  <button
-                    onClick={() => { setActiveTab('news'); setFilterCategory('health'); setNewsViewMode('list'); }}
-                    className={`w-full text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all shrink-0 ${
-                      activeTab === 'news' && filterCategory === 'health' ? 'bg-rose-950/50 text-white' : 'text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    🩺 హెల్త్ హోమ్
-                  </button>
-                  <button
-                    onClick={() => { setActiveTab('news'); setFilterCategory('doctors-corner'); setNewsViewMode('list'); }}
-                    className={`w-full text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all shrink-0 ${
-                      activeTab === 'news' && filterCategory === 'doctors-corner' ? 'bg-rose-950/50 text-white' : 'text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    🥼 డాక్టర్స్ కార్నర్
-                  </button>
-                </div>
-              )}
+          <button
+            onClick={() => {
+              setActiveTab('shorts-videos');
+              setShortsFormMode('list');
+            }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'shorts-videos' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Video className="w-4 h-4" />
+              <span>షార్ట్స్ వీడియోలు (Upload Videos)</span>
             </div>
+          </button>
 
-            {/* 5. Education collapsible */}
-            <div className="mb-0.5">
-              <button
-                onClick={() => toggleSidebarGroup('education')}
-                className="w-full flex items-center justify-between px-2.5 py-2 text-slate-200 hover:text-white text-xs md:text-[13px] font-black cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expandedSidebar.education ? '' : '-rotate-90'}`} />
-                  <span>విద్య (Education)</span>
-                </div>
-              </button>
-              {expandedSidebar.education && (
-                <div className="pl-6 flex flex-col gap-0.5 border-l border-slate-900 ml-4">
-                  <button
-                    onClick={() => { setActiveTab('news'); setFilterCategory('vidya'); setNewsViewMode('list'); }}
-                    className={`w-full text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all shrink-0 ${
-                      activeTab === 'news' && filterCategory === 'vidya' ? 'bg-rose-950/50 text-white' : 'text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    🎓 విద్య హోమ్
-                  </button>
-                  <button
-                    onClick={() => { setActiveTab('news'); setFilterCategory('admissions'); setNewsViewMode('list'); }}
-                    className={`w-full text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all shrink-0 ${
-                      activeTab === 'news' && filterCategory === 'admissions' ? 'bg-rose-950/50 text-white' : 'text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    🏫 అడ్మిషన్స్
-                  </button>
-                  <button
-                    onClick={() => { setActiveTab('news'); setFilterCategory('current-affairs'); setNewsViewMode('list'); }}
-                    className={`w-full text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all shrink-0 ${
-                      activeTab === 'news' && filterCategory === 'current-affairs' ? 'bg-rose-950/50 text-white' : 'text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    📖 కరెంట్ అఫైర్స్
-                  </button>
-                </div>
-              )}
+          <button
+            onClick={() => {
+              setActiveTab('high-tv-videos');
+            }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'high-tv-videos' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Tv className="w-4 h-4" />
+              <span>హై టీవీ వీడియోస్ (High TV Videos)</span>
             </div>
+          </button>
 
-            {/* 6. Career collapsible */}
-            <div className="mb-0.5">
-              <button
-                onClick={() => toggleSidebarGroup('career')}
-                className="w-full flex items-center justify-between px-2.5 py-2 text-slate-200 hover:text-white text-xs md:text-[13px] font-black cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expandedSidebar.career ? '' : '-rotate-90'}`} />
-                  <span>ఉపాధి (Career)</span>
-                </div>
-              </button>
-              {expandedSidebar.career && (
-                <div className="pl-6 flex flex-col gap-0.5 border-l border-slate-900 ml-4">
-                  <button
-                    onClick={() => { setActiveTab('news'); setFilterCategory('upadi'); setNewsViewMode('list'); }}
-                    className={`w-full text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all shrink-0 ${
-                      activeTab === 'news' && filterCategory === 'upadi' ? 'bg-rose-950/50 text-white' : 'text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    👔 ఉపాధి హోమ్
-                  </button>
-                  <button
-                    onClick={() => { setActiveTab('news'); setFilterCategory('notification'); setNewsViewMode('list'); }}
-                    className={`w-full text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all shrink-0 ${
-                      activeTab === 'news' && filterCategory === 'notification' ? 'bg-rose-950/50 text-white' : 'text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    📢 నోటిఫికేషన్స్
-                  </button>
-                </div>
-              )}
+          <button
+            onClick={() => {
+              setActiveTab('photos-gallery');
+              setPhotosFormMode('list');
+            }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'photos-gallery' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <ImageIcon className="w-4 h-4" />
+              <span>ఫోటో గ్యాలరీ (Upload Photos)</span>
             </div>
+          </button>
 
-          </div>
+          <button
+            onClick={() => {
+              setActiveTab('polls-manager');
+              setPollsFormMode('list');
+            }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'polls-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <BarChart3 className="w-4 h-4" />
+              <span>పోల్స్ మేనేజర్ (Manage Polls)</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('popup-manager'); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'popup-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <MonitorSmartphone className="w-4 h-4" />
+              <span>పాప్‌అప్ మేనేజర్ (Popup Manager)</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('jilla-sidebar'); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'jilla-sidebar' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <MapPin className="w-4 h-4" />
+              <span>జిల్లా వార్తలు సైడ్‌బార్ (District Sidebar)</span>
+            </div>
+          </button>
+
+
 
         </nav>
 
@@ -2013,26 +3042,339 @@ export default function AdminPage() {
       {/* ── MAIN WORKSPACE AREA ────────────────────────────────────────── */}
       <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden min-w-0 bg-[#f8fafc] text-slate-700">
         
-        {/* Workspace Top Header */}
-        <header className="h-16 bg-white border-b border-slate-200/80 px-6 md:px-8 flex items-center justify-between select-none">
-          <div className="flex items-center gap-2 text-xs md:text-sm">
-            <span className="font-extrabold text-slate-400 uppercase tracking-widest text-[10px]">Super Admin Portal</span>
-            <span className="text-slate-300">/</span>
-            <span className="font-black text-[#02599c] capitalize">
-              {activeTab === 'news' ? `News Management (${filterCategory.replace('-', ' ')})` : activeTab.replace('-', ' ')}
-            </span>
+        {/* Workspace Top Header (Navy Blue Category Navigation Bar) */}
+        <div className="flex bg-[#0b1329] border-b border-slate-900 select-none z-30 relative items-center justify-between py-3 px-6 md:px-8 flex-wrap gap-4" ref={dropdownRef}>
+          
+          {/* Left: Website Pages Navigation */}
+          <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2">Website Pages:</span>
+            
+            {/* 1. Main Categories Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'main' ? null : 'main')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
+                  activeTab === 'news' && MAIN_CATEGORIES_LIST.some(c => c.slug === filterCategory && c.slug !== 'rasipalalu' && c.slug !== 'weather' && c.slug !== 'webstories')
+                    ? 'bg-rose-600 border-rose-500 text-white font-black'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
+                }`}
+              >
+                <span>Main Categories</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'main' ? 'rotate-180' : ''}`} />
+              </button>
+              {activeHeaderDropdown === 'main' && (
+                <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-2xl shadow-2xl p-4 w-[480px]">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-[300px] overflow-y-auto admin-scrollbar">
+                    {MAIN_CATEGORIES_LIST
+                      .filter((cat) => cat.slug !== 'rasipalalu' && cat.slug !== 'weather' && cat.slug !== 'webstories')
+                      .map((cat) => (
+                        <button
+                          key={cat.slug}
+                          onClick={() => {
+                            setActiveTab('news');
+                            setFilterCategory(cat.slug);
+                            setNewsViewMode('list');
+                            setActiveHeaderDropdown(null);
+                          }}
+                          className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all telugu-text truncate ${
+                            activeTab === 'news' && filterCategory === cat.slug
+                              ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                              : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                          }`}
+                        >
+                          {cat.name}
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 2. Andhra Pradesh Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'ap' ? null : 'ap')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
+                  activeTab === 'news' && (filterCategory === 'andhra-pradesh' || apDistricts.some(d => d.slug === filterCategory))
+                    ? 'bg-rose-600 border-rose-500 text-white font-black'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
+                }`}
+              >
+                <span>ఆంధ్రప్రదేశ్ (AP News)</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'ap' ? 'rotate-180' : ''}`} />
+              </button>
+              {activeHeaderDropdown === 'ap' && (
+                <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-2xl shadow-2xl p-4 w-[320px]">
+                  <div className="grid grid-cols-2 gap-1.5 max-h-[300px] overflow-y-auto admin-scrollbar">
+                    <button
+                      onClick={() => {
+                        setActiveTab('news');
+                        setFilterCategory('andhra-pradesh');
+                        setNewsViewMode('list');
+                        setActiveHeaderDropdown(null);
+                      }}
+                      className={`col-span-2 text-left py-2 px-2.5 rounded-lg text-[13px] font-extrabold transition-all border-b border-slate-800/60 pb-1.5 ${
+                        activeTab === 'news' && filterCategory === 'andhra-pradesh'
+                          ? 'bg-rose-950/50 text-white border-l-2 border-rose-600'
+                          : 'text-amber-400 hover:text-white hover:bg-slate-900/50'
+                      }`}
+                    >
+                      🌅 ఏపీ హోమ్ (AP State)
+                    </button>
+                    {apDistricts.map((dist) => (
+                      <button
+                        key={dist.slug}
+                        onClick={() => {
+                          setActiveTab('news');
+                          setFilterCategory(dist.slug);
+                          setNewsViewMode('list');
+                          setActiveHeaderDropdown(null);
+                        }}
+                        className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all telugu-text truncate ${
+                          activeTab === 'news' && filterCategory === dist.slug
+                            ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                        }`}
+                      >
+                        {dist.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 3. Telangana Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'telangana' ? null : 'telangana')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
+                  activeTab === 'news' && (filterCategory === 'telangana' || tgDistricts.some(d => d.slug === filterCategory))
+                    ? 'bg-rose-600 border-rose-500 text-white font-black'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
+                }`}
+              >
+                <span>తెలంగాణ (Telangana News)</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'telangana' ? 'rotate-180' : ''}`} />
+              </button>
+              {activeHeaderDropdown === 'telangana' && (
+                <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-2xl shadow-2xl p-4 w-[320px]">
+                  <div className="grid grid-cols-2 gap-1.5 max-h-[300px] overflow-y-auto admin-scrollbar">
+                    <button
+                      onClick={() => {
+                        setActiveTab('news');
+                        setFilterCategory('telangana');
+                        setNewsViewMode('list');
+                        setActiveHeaderDropdown(null);
+                      }}
+                      className={`col-span-2 text-left py-2 px-2.5 rounded-lg text-[13px] font-extrabold transition-all border-b border-slate-800/60 pb-1.5 ${
+                        activeTab === 'news' && filterCategory === 'telangana'
+                          ? 'bg-rose-950/50 text-white border-l-2 border-rose-600'
+                          : 'text-amber-400 hover:text-white hover:bg-slate-900/50'
+                      }`}
+                    >
+                      🍇 తెలంగాణ హోమ్ (TG State)
+                    </button>
+                    {tgDistricts.map((dist) => (
+                      <button
+                        key={dist.slug}
+                        onClick={() => {
+                          setActiveTab('news');
+                          setFilterCategory(dist.slug);
+                          setNewsViewMode('list');
+                          setActiveHeaderDropdown(null);
+                        }}
+                        className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all telugu-text truncate ${
+                          activeTab === 'news' && filterCategory === dist.slug
+                            ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                        }`}
+                      >
+                        {dist.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 4. Health Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'health' ? null : 'health')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
+                  activeTab === 'news' && (filterCategory === 'health' || filterCategory === 'doctors-corner')
+                    ? 'bg-rose-600 border-rose-500 text-white font-black'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
+                }`}
+              >
+                <span>హెల్త్ (Health)</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'health' ? 'rotate-180' : ''}`} />
+              </button>
+              {activeHeaderDropdown === 'health' && (
+                <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
+                  <button
+                    onClick={() => {
+                      setActiveTab('news');
+                      setFilterCategory('health');
+                      setNewsViewMode('list');
+                      setActiveHeaderDropdown(null);
+                    }}
+                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                      activeTab === 'news' && filterCategory === 'health'
+                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                    }`}
+                  >
+                    🩺 ஹெల్త్ హోమ్
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab('news');
+                      setFilterCategory('doctors-corner');
+                      setNewsViewMode('list');
+                      setActiveHeaderDropdown(null);
+                    }}
+                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                      activeTab === 'news' && filterCategory === 'doctors-corner'
+                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                    }`}
+                  >
+                    🥼 డాక్టర్స్ కార్నర్
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* 5. Education Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'education' ? null : 'education')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
+                  activeTab === 'news' && (filterCategory === 'vidya' || filterCategory === 'admissions' || filterCategory === 'current-affairs')
+                    ? 'bg-rose-600 border-rose-500 text-white font-black'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
+                }`}
+              >
+                <span>విద్య (Education)</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'education' ? 'rotate-180' : ''}`} />
+              </button>
+              {activeHeaderDropdown === 'education' && (
+                <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
+                  <button
+                    onClick={() => {
+                      setActiveTab('news');
+                      setFilterCategory('vidya');
+                      setNewsViewMode('list');
+                      setActiveHeaderDropdown(null);
+                    }}
+                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                      activeTab === 'news' && filterCategory === 'vidya'
+                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                    }`}
+                  >
+                    🎓 విద్య హోమ్
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab('news');
+                      setFilterCategory('admissions');
+                      setNewsViewMode('list');
+                      setActiveHeaderDropdown(null);
+                    }}
+                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                      activeTab === 'news' && filterCategory === 'admissions'
+                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                    }`}
+                  >
+                    🏫 అడ్మిషన్స్
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab('news');
+                      setFilterCategory('current-affairs');
+                      setNewsViewMode('list');
+                      setActiveHeaderDropdown(null);
+                    }}
+                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                      activeTab === 'news' && filterCategory === 'current-affairs'
+                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                    }`}
+                  >
+                    📖 కరెంట్ అఫైర్స్
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* 6. Career Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'career' ? null : 'career')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
+                  activeTab === 'news' && (filterCategory === 'upadi' || filterCategory === 'notification')
+                    ? 'bg-rose-600 border-rose-500 text-white font-black'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
+                }`}
+              >
+                <span>ఉపాధి (Career)</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'career' ? 'rotate-180' : ''}`} />
+              </button>
+              {activeHeaderDropdown === 'career' && (
+                <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
+                  <button
+                    onClick={() => {
+                      setActiveTab('news');
+                      setFilterCategory('upadi');
+                      setNewsViewMode('list');
+                      setActiveHeaderDropdown(null);
+                    }}
+                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                      activeTab === 'news' && filterCategory === 'upadi'
+                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                    }`}
+                  >
+                    👔 ఉపాధి హోమ్
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab('news');
+                      setFilterCategory('notification');
+                      setNewsViewMode('list');
+                      setActiveHeaderDropdown(null);
+                    }}
+                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                      activeTab === 'news' && filterCategory === 'notification'
+                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                    }`}
+                  >
+                    📢 నోటిఫికేషన్స్
+                  </button>
+                </div>
+              )}
+            </div>
+
           </div>
-          <div>
+
+          {/* Right: Visit Live Website link */}
+          <div className="flex items-center shrink-0">
             <Link 
               href="/"
               target="_blank"
-              className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3.5 rounded-xl transition-all border border-slate-200/60 flex items-center gap-1.5"
+              className="text-xs bg-slate-900/60 hover:bg-slate-800 text-slate-300 hover:text-white font-bold py-2 px-3.5 rounded-xl transition-all border border-slate-800 flex items-center gap-1.5"
             >
               <span>Visit Live Website</span>
               <Globe className="w-3.5 h-3.5" />
             </Link>
           </div>
-        </header>
+          
+        </div>
 
         {/* Scrollable Workspace Container */}
         <div className="flex-1 p-6 md:p-8 max-w-[1440px] w-full min-w-0 mx-auto">
@@ -2106,7 +3448,16 @@ export default function AdminPage() {
               {/* Heading */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <h2 className="text-2xl font-black text-slate-800">News Management</h2>
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-2xl font-black text-slate-800">News Management</h2>
+                    <span className="bg-rose-50 text-rose-700 text-xs font-black px-3 py-1 rounded-full border border-rose-100 shadow-sm flex items-center gap-1">
+                      <span>{filteredArticles.length}</span>
+                      {filteredArticles.length !== allArticles.length && (
+                        <span className="text-rose-450 font-medium">/ {allArticles.length}</span>
+                      )}
+                      <span className="text-[10px] text-rose-450 uppercase tracking-wider ml-0.5">Articles</span>
+                    </span>
+                  </div>
                   <p className="text-slate-500 text-xs">Review and manage all news articles.</p>
                 </div>
                 <button
@@ -2276,15 +3627,18 @@ export default function AdminPage() {
                   {/* Headline Block */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
                     <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Headline (Telugu/English)</label>
-                    <input
-                      type="text"
-                      required
-                      value={newsTitle}
-                      onChange={(e) => setNewsTitle(e.target.value)}
-                      placeholder="Enter a catchy headline..."
-                      className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-3.5 text-base font-bold outline-none transition-colors telugu-text text-slate-800"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif', textIndent: '10px' }}
-                    />
+                    <div className="flex flex-col border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                      <MiniWysiwygToolbar editorRef={newsTitleRef} />
+                      <div
+                        contentEditable
+                        ref={newsTitleRef}
+                        suppressContentEditableWarning
+                        onInput={(e) => setNewsTitle(e.currentTarget.innerText)}
+                        data-placeholder="Enter a catchy headline..."
+                        className="wysiwyg-editor-mini w-full bg-slate-50 border-t border-slate-200/60 focus:bg-white px-4 py-3.5 text-base font-bold outline-none transition-colors telugu-text text-slate-800"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      />
+                    </div>
                   </div>
 
                   {/* Slug Block */}
@@ -2304,14 +3658,18 @@ export default function AdminPage() {
                   {/* Short Excerpt Block */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
                     <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Short Excerpt (Optional)</label>
-                    <textarea
-                      rows={3}
-                      value={newsDescription}
-                      onChange={(e) => setNewsDescription(e.target.value)}
-                      placeholder="Brief summary of the article..."
-                      className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-3 text-xs outline-none transition-colors resize-none telugu-text text-slate-800"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif', textIndent: '10px' }}
-                    />
+                    <div className="flex flex-col border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                      <MiniWysiwygToolbar editorRef={newsDescriptionRef} />
+                      <div
+                        contentEditable
+                        ref={newsDescriptionRef}
+                        suppressContentEditableWarning
+                        onInput={(e) => setNewsDescription(e.currentTarget.innerText)}
+                        data-placeholder="Brief summary of the article..."
+                        className="wysiwyg-editor-mini w-full bg-slate-50 border-t border-slate-200/60 focus:bg-white px-4 py-3 text-xs outline-none transition-colors telugu-text text-slate-800 min-h-[70px]"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      />
+                    </div>
                   </div>
 
                   {/* Article Content WYSIWYG Editor Block */}
@@ -2369,9 +3727,23 @@ export default function AdminPage() {
                       <div className="w-px h-5 bg-slate-200 my-1 mx-0.5" />
 
                       {/* Color Picker helper */}
-                      <button type="button" onClick={() => handleFormat('foreColor', '#e11d48')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-rose-600 font-bold text-xs" title="Text Color Red">A</button>
-                      <button type="button" onClick={() => handleFormat('foreColor', '#02599c')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-blue-600 font-bold text-xs" title="Text Color Blue">A</button>
-                      <button type="button" onClick={() => handleFormat('foreColor', '#000000')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-black font-bold text-xs" title="Text Color Black">A</button>
+                      <button type="button" onClick={() => handleFormat('foreColor', '#000000')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-black font-black text-xs" title="Text Color Black">A</button>
+                      <button type="button" onClick={() => handleFormat('foreColor', '#e11d48')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-rose-600 font-black text-xs" title="Text Color Red">A</button>
+                      <button type="button" onClick={() => handleFormat('foreColor', '#02599c')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-blue-600 font-black text-xs" title="Text Color Blue">A</button>
+                      <button type="button" onClick={() => handleFormat('foreColor', '#16a34a')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-green-600 font-black text-xs" title="Text Color Green">A</button>
+                      <button type="button" onClick={() => handleFormat('foreColor', '#9333ea')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-purple-600 font-black text-xs" title="Text Color Purple">A</button>
+                      <button type="button" onClick={() => handleFormat('foreColor', '#ea580c')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-orange-600 font-black text-xs" title="Text Color Orange">A</button>
+                      
+                      <div className="relative flex items-center hover:bg-slate-200 rounded p-1 cursor-pointer" title="Custom Color Picker">
+                        <span className="font-black text-xs mr-1 text-slate-700">A</span>
+                        <input 
+                          type="color" 
+                          defaultValue="#000000"
+                          onChange={(e) => handleFormat('foreColor', e.target.value)} 
+                          className="w-3.5 h-3.5 p-0 border-0 cursor-pointer rounded-full overflow-hidden" 
+                          style={{ appearance: 'none', WebkitAppearance: 'none' }}
+                        />
+                      </div>
 
                       <div className="w-px h-5 bg-slate-200 my-1 mx-0.5" />
 
@@ -2819,6 +4191,48 @@ export default function AdminPage() {
                     </div>
                   </div>
 
+                  {/* Short Video File Box (Only for Shorts category) */}
+                  {selectedCategories.includes('shorts') && (
+                    <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
+                      <label className="text-[11px] font-black text-[#f43f5e] uppercase tracking-widest">Short Video File</label>
+                      <div className="border-2 border-dashed border-slate-200 hover:border-[#f43f5e] rounded-2xl p-4 bg-slate-50 text-center relative cursor-pointer min-h-[160px] flex items-center justify-center transition-colors">
+                        <input
+                          type="file"
+                          ref={newsVideoInputRef}
+                          accept="video/*"
+                          onChange={handleNewsVideoChange}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        />
+                        {!newsVideo ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <Upload className="w-6 h-6 text-slate-400" />
+                            <span className="text-xs font-bold text-slate-500">Click to upload short video file</span>
+                            <span className="text-[9px] text-slate-400 uppercase tracking-wider">Max 100MB file size</span>
+                          </div>
+                        ) : (
+                          <div className="relative w-full overflow-hidden rounded-xl bg-slate-900 border border-slate-200 p-2">
+                            <video 
+                              src={newsVideo} 
+                              controls 
+                              className="w-full h-auto max-h-[160px] block rounded-lg object-contain bg-black" 
+                            />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setNewsVideo('');
+                              }}
+                              className="absolute top-4 right-4 bg-black/70 hover:bg-black/90 text-white rounded-full w-6 h-6 flex items-center justify-center transition-colors cursor-pointer shadow-md"
+                              title="Delete Video"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Target Placements (Promotion Flags) */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
                     <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Target Placements</label>
@@ -3087,6 +4501,33 @@ export default function AdminPage() {
 
               <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 flex flex-col gap-4 shadow-sm">
                 
+                {/* Flash News Label Editor */}
+                <div className="bg-slate-50 p-4 border border-slate-200/60 rounded-2xl flex flex-col gap-4">
+                  <span className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
+                    Flash News Label Text
+                  </span>
+                  <div className="flex gap-3 items-center">
+                    <input
+                      type="text"
+                      value={flashNewsLabel}
+                      onChange={(e) => setFlashNewsLabel(e.target.value)}
+                      placeholder="e.g. Flash News, Breaking, Live..."
+                      className="flex-1 bg-white border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        localStorage.setItem('flash_news_label', flashNewsLabel.trim() || 'Flash News');
+                        alert('Label saved!');
+                      }}
+                      className="bg-[#02599c] hover:bg-[#024a82] text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-sm shrink-0"
+                    >
+                      Save Label
+                    </button>
+                  </div>
+                  <span className="text-[10px] text-slate-400">This changes the red label shown in the ticker bar on the website header.</span>
+                </div>
+
                 {/* Form to append Headline */}
                 <div className="bg-slate-50 p-4 border border-slate-200/60 rounded-2xl flex flex-col gap-4">
                   <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
@@ -3546,69 +4987,6 @@ export default function AdminPage() {
                 <p className="text-slate-500 text-xs">Configure landing video embeds and category specific banner ads overrides.</p>
               </div>
 
-              {/* 1. YouTube embeds block */}
-              <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 flex flex-col gap-4 shadow-sm">
-                <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5">
-                  🎥 Homepage YouTube Video Embeds
-                </h3>
-                <div className="space-y-4">
-                  {Array.from({ length: 3 }).map((_, idx) => {
-                    const video = videosList[idx] || { id: '', title: '', thumbnail: '' };
-                    return (
-                      <div key={idx} className="bg-slate-50 p-4 border border-slate-200/60 rounded-xl flex flex-col md:flex-row gap-4">
-                        <div className="w-7 h-7 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-600 font-mono font-bold text-xs shrink-0 shadow-inner">
-                          {idx + 1}
-                        </div>
-                        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">YouTube Video ID</label>
-                            <input
-                              type="text"
-                              value={video.id}
-                              onChange={(e) => handleVideoFieldChange(idx, 'id', e.target.value)}
-                              placeholder="e.g. p_kI2pXWkAc"
-                              className="bg-white border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2 text-xs outline-none transition-colors font-mono text-slate-800"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Video Title (Telugu/English)</label>
-                            <input
-                              type="text"
-                              value={video.title}
-                              onChange={(e) => handleVideoFieldChange(idx, 'title', e.target.value)}
-                              placeholder="e.g. దేవర పార్ట్-1 అఫీషియల్ ట్రైలర్..."
-                              className="bg-white border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text"
-                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                            />
-                          </div>
-                          <div className="col-span-1 md:col-span-2 flex flex-col gap-1">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Thumbnail URL Override (Optional)</label>
-                            <input
-                              type="text"
-                              value={video.thumbnail}
-                              onChange={(e) => handleVideoFieldChange(idx, 'thumbnail', e.target.value)}
-                              placeholder="e.g. /hightv_breaking.png"
-                              className="bg-white border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2 text-xs outline-none transition-colors text-slate-800"
-                            />
-                          </div>
-                        </div>
-                        <div className="w-full md:w-[130px] aspect-video border border-slate-200/80 rounded-xl overflow-hidden bg-black flex items-center justify-center shrink-0">
-                          {video.id ? (
-                            <img
-                              src={video.thumbnail || `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
-                              alt="Video Preview"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-[9px] font-bold text-slate-400 uppercase">No video</span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* 2. Global Ads layout banners */}
               <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 flex flex-col gap-4 shadow-sm mt-2">
                 <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5">
@@ -3769,6 +5147,132 @@ export default function AdminPage() {
             </div>
           )}
 
+          {/* ══════════════ VIEW: HIGH TV VIDEOS ══════════════ */}
+          {activeTab === 'high-tv-videos' && (
+            <div className="flex flex-col gap-6 animate-fade-in text-left">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800">హై టీవీ వీడియోలు (High TV Videos)</h2>
+                <p className="text-slate-500 text-xs">వెబ్‌సైట్ సైడ్‌బార్‌లో కనిపించే యూట్యూబ్ వీడియోల లింక్‌లు మరియు వివరాలను ఇక్కడ జోడించండి.</p>
+              </div>
+
+              <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 flex flex-col gap-4 shadow-sm">
+                <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5 flex items-center gap-2">
+                  <Tv className="w-4 h-4 text-rose-500" /> సైడ్‌బార్ వీడియోల మేనేజర్ (Sidebar Videos Manager)
+                </h3>
+                <div className="space-y-4">
+                  {Array.from({ length: 3 }).map((_, idx) => {
+                    const video = videosList[idx] || { id: '', title: '', thumbnail: '' };
+                    return (
+                      <div key={idx} className="bg-slate-50 p-4 border border-slate-200/60 rounded-xl flex flex-col md:flex-row gap-4">
+                        <div className="w-7 h-7 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-slate-600 font-mono font-bold text-xs shrink-0 shadow-inner">
+                          {idx + 1}
+                        </div>
+                        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">యూట్యూబ్ లింక్ లేదా ఐడీ (YouTube Link / ID)</label>
+                            <input
+                              type="text"
+                              value={video.id}
+                              onChange={(e) => handleVideoFieldChange(idx, 'id', e.target.value)}
+                              placeholder="e.g. https://www.youtube.com/watch?v=q6h3C_s8sSw"
+                              className="bg-white border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-mono font-bold"
+                              style={{ lineHeight: 'normal' }}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-455 uppercase tracking-wide">వీడియో శీర్షిక (Video Title)</label>
+                            <input
+                              type="text"
+                              value={video.title}
+                              onChange={(e) => handleVideoFieldChange(idx, 'title', e.target.value)}
+                              placeholder="e.g. దేవర పార్ట్-1 అఫీషియల్ ట్రైలర్..."
+                              className="bg-white border border-slate-200/60 focus:border-rose-500 rounded-xl pl-5 pr-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-semibold telugu-text"
+                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: 'normal' }}
+                            />
+                          </div>
+                          <div className="col-span-1 md:col-span-2 flex flex-col gap-2">
+                            <label className="text-[10px] font-black text-slate-455 uppercase tracking-wide">థంబ్‌నెయిల్ చిత్రం అప్‌లోడ్ (Upload Thumbnail)</label>
+                            <div className="flex flex-wrap items-center gap-3">
+                              <label className="bg-slate-900 hover:bg-slate-850 text-white font-black text-[11px] py-2.5 px-4 rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5 w-fit">
+                                <Upload className="w-3.5 h-3.5" />
+                                <span>చిత్రాన్ని ఎంచుకోండి (Choose Image)</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      handleCompressAndSetImage(file, (base64) => {
+                                        handleVideoFieldChange(idx, 'thumbnail', base64);
+                                      });
+                                    }
+                                  }}
+                                />
+                              </label>
+
+                              {video.thumbnail && !video.thumbnail.startsWith('https://img.youtube.com/vi/') && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                                    const match = video.id.match(regExp);
+                                    const ytId = (match && match[2].length === 11) ? match[2] : video.id.trim();
+                                    const defaultThumb = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '';
+                                    handleVideoFieldChange(idx, 'thumbnail', defaultThumb);
+                                  }}
+                                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold text-[11px] py-2.5 px-4 rounded-xl transition-all cursor-pointer flex items-center gap-1"
+                                >
+                                  యూట్యూబ్ డిఫాల్ట్ ఉపయోగించండి (Use YouTube Default)
+                                </button>
+                              )}
+                            </div>
+                            <p className="text-[10px] text-slate-400 font-bold leading-normal">
+                              * ఏదైనా కస్టమ్ చిత్రం అప్‌లోడ్ చేయవచ్చు. లేదంటే ఆటోమేటిక్‌గా యూట్యూబ్ డిఫాల్ట్ థంబ్‌నెయిల్ ఉపయోగించబడుతుంది.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="w-full md:w-[130px] aspect-video border border-slate-200/80 rounded-xl overflow-hidden bg-black flex items-center justify-center shrink-0">
+                          {video.id ? (
+                            <img
+                              src={video.thumbnail || `https://img.youtube.com/vi/${(() => {
+                                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                                const match = video.id.match(regExp);
+                                return (match && match[2].length === 11) ? match[2] : video.id.trim();
+                              })()}/hqdefault.jpg`}
+                              alt="Video Preview"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-[9px] font-bold text-slate-400 uppercase">No video</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Actions submit button */}
+              <div className="flex justify-end pt-2 border-t border-slate-200">
+                <button
+                  onClick={handleSaveConfigs}
+                  disabled={saveStatus === 'saving'}
+                  className={`w-full md:w-auto font-black text-xs py-3 px-8 rounded-xl transition-all cursor-pointer shadow-md text-center flex items-center justify-center min-w-[150px] ${
+                    saveStatus === 'saved'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-rose-600 hover:bg-rose-700 text-white'
+                  }`}
+                >
+                  {saveStatus === 'saving' && 'Saving configurations...'}
+                  {saveStatus === 'saved' && '✓ Configuration Saved!'}
+                  {saveStatus === 'idle' && 'Save Configurations'}
+                </button>
+              </div>
+
+            </div>
+          )}
+
           {/* ══════════════ VIEW: OVERLAYS CONFIGS ══════════════ */}
           {activeTab === 'overlays' && (
             <div className="flex flex-col gap-6 animate-fade-in text-left">
@@ -3820,32 +5324,19 @@ export default function AdminPage() {
 
                   {popupEnabled && (
                     <div className="space-y-4 animate-fade-in">
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Popup Action Style</label>
-                        <div className="grid grid-cols-2 gap-3 max-w-sm">
-                          <button
-                            type="button"
-                            onClick={() => setPopupType('ad')}
-                            className={`py-2 px-3 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs ${
-                              popupType === 'ad'
-                                ? 'border-[#02599c] bg-[#02599c]/10 text-[#02599c] shadow-sm'
-                                : 'border-slate-200 bg-white text-slate-450 hover:text-slate-700'
-                            }`}
-                          >
-                            📢 Sponsor Ad
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setPopupType('poll')}
-                            className={`py-2 px-3 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs ${
-                              popupType === 'poll'
-                                ? 'border-[#02599c] bg-[#02599c]/10 text-[#02599c] shadow-sm'
-                                : 'border-slate-200 bg-white text-slate-450 hover:text-slate-700'
-                            }`}
-                          >
-                            📊 Voting Poll Card
-                          </button>
-                        </div>
+                      <div className="flex items-center justify-between bg-slate-100/50 p-3 rounded-xl border border-slate-200/40">
+                        <span className="text-xs font-black text-slate-700">
+                          {popupType === 'poll' ? '📊 Show Poll inside Popup (పోల్‌ను పాప్‌అప్‌గా చూపించు - Active)' : '📢 Show Ad inside Popup (యాడ్‌ను పాప్‌అప్‌గా చూపించు - Active)'}
+                        </span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={popupType === 'poll'}
+                            onChange={(e) => setPopupType(e.target.checked ? 'poll' : 'ad')}
+                            className="sr-only peer"
+                          />
+                          <div className="w-10 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#02599c]"></div>
+                        </label>
                       </div>
 
                       <div className="h-px bg-slate-200 my-1" />
@@ -4149,6 +5640,585 @@ export default function AdminPage() {
             </div>
           )}
 
+          {/* ══════════════ VIEW: WEATHER PAGE CONFIG ══════════════ */}
+          {activeTab === 'weather' && (
+            <div className="flex flex-col gap-6 animate-fade-in text-left">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800">Weather Page Manager</h2>
+                <p className="text-slate-500 text-xs">Configure daily weather reports for cities and manage weather articles.</p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column: City reports editor */}
+                <div className="lg:col-span-2 bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-4">
+                  <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
+                    <h3 className="text-sm font-black text-slate-800 flex items-center gap-2">
+                      🌤️ Edit City Weather Data
+                    </h3>
+                    {weatherReports.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentCityName = weatherReports[selectedWeatherCityIndex]?.city;
+                          if (confirm(`Are you sure you want to delete ${currentCityName}?`)) {
+                            setWeatherReports(prev => prev.filter((_, idx) => idx !== selectedWeatherCityIndex));
+                            setSelectedWeatherCityIndex(0);
+                          }
+                        }}
+                        className="text-red-500 hover:text-red-700 font-bold text-xs flex items-center gap-1.5 cursor-pointer hover:bg-red-50 px-2 py-1 rounded-lg border border-red-200 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete City</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* City selector tabs */}
+                  <div className="flex flex-wrap bg-slate-100 p-1.5 rounded-xl gap-1 items-center">
+                    {weatherReports.map((report, idx) => (
+                      <button
+                        key={report.city}
+                        type="button"
+                        onClick={() => setSelectedWeatherCityIndex(idx)}
+                        className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all cursor-pointer telugu-text ${
+                          selectedWeatherCityIndex === idx ? 'bg-[#02599c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                        }`}
+                      >
+                        {report.city}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cityName = prompt('Enter new city name (Telugu or English):');
+                        if (!cityName || !cityName.trim()) return;
+                        if (weatherReports.some(r => r.city.toLowerCase() === cityName.trim().toLowerCase())) {
+                          alert('City already exists!');
+                          return;
+                        }
+                        const newCity = {
+                          city: cityName.trim(),
+                          temp: 30,
+                          condition: 'పాక్షికంగా మేఘావృతం',
+                          humidity: 60,
+                          wind: 10,
+                          high: 33,
+                          low: 22,
+                          forecast: [
+                            { day: 'శుక్రవారం', temp: 31, cond: 'మేఘావృతం' },
+                            { day: 'శనివారం', temp: 30, cond: 'తేలికపాటి వర్షం' },
+                            { day: 'ఆదివారం', temp: 29, cond: 'భారీ వర్షం' },
+                            { day: 'సోమవారం', temp: 31, cond: 'పాక్షికంగా మేఘావృతం' }
+                          ]
+                        };
+                        setWeatherReports(prev => [...prev, newCity]);
+                        setSelectedWeatherCityIndex(weatherReports.length);
+                      }}
+                      className="px-3 py-1.5 text-xs font-black rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-all cursor-pointer flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add City</span>
+                    </button>
+                  </div>
+
+                  {/* Selected City Details Form */}
+                  {weatherReports[selectedWeatherCityIndex] && (() => {
+                    const report = weatherReports[selectedWeatherCityIndex];
+                    return (
+                      <div className="space-y-4 animate-fade-in pt-2">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Temperature (°C)</label>
+                            <input
+                              type="number"
+                              value={report.temp}
+                              onChange={(e) => {
+                                setWeatherReports(prev => {
+                                  const updated = [...prev];
+                                  updated[selectedWeatherCityIndex] = {
+                                    ...updated[selectedWeatherCityIndex],
+                                    temp: Number(e.target.value)
+                                  };
+                                  return updated;
+                                });
+                              }}
+                              className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2 text-xs outline-none text-slate-800 font-bold"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Condition (Telugu/English)</label>
+                            <input
+                              type="text"
+                              value={report.condition}
+                              onChange={(e) => {
+                                setWeatherReports(prev => {
+                                  const updated = [...prev];
+                                  updated[selectedWeatherCityIndex] = {
+                                    ...updated[selectedWeatherCityIndex],
+                                    condition: e.target.value
+                                  };
+                                  return updated;
+                                });
+                              }}
+                              className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2 text-xs outline-none text-slate-800 font-bold telugu-text"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Humidity (%)</label>
+                            <input
+                              type="number"
+                              value={report.humidity}
+                              onChange={(e) => {
+                                setWeatherReports(prev => {
+                                  const updated = [...prev];
+                                  updated[selectedWeatherCityIndex] = {
+                                    ...updated[selectedWeatherCityIndex],
+                                    humidity: Number(e.target.value)
+                                  };
+                                  return updated;
+                                });
+                              }}
+                              className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2 text-xs outline-none text-slate-800 font-bold"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Wind Speed (km/h)</label>
+                            <input
+                              type="number"
+                              value={report.wind}
+                              onChange={(e) => {
+                                setWeatherReports(prev => {
+                                  const updated = [...prev];
+                                  updated[selectedWeatherCityIndex] = {
+                                    ...updated[selectedWeatherCityIndex],
+                                    wind: Number(e.target.value)
+                                  };
+                                  return updated;
+                                });
+                              }}
+                              className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2 text-xs outline-none text-slate-800 font-bold"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">High Temperature (°C)</label>
+                            <input
+                              type="number"
+                              value={report.high}
+                              onChange={(e) => {
+                                setWeatherReports(prev => {
+                                  const updated = [...prev];
+                                  updated[selectedWeatherCityIndex] = {
+                                    ...updated[selectedWeatherCityIndex],
+                                    high: Number(e.target.value)
+                                  };
+                                  return updated;
+                                });
+                              }}
+                              className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2 text-xs outline-none text-slate-800 font-bold"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Low Temperature (°C)</label>
+                            <input
+                              type="number"
+                              value={report.low}
+                              onChange={(e) => {
+                                setWeatherReports(prev => {
+                                  const updated = [...prev];
+                                  updated[selectedWeatherCityIndex] = {
+                                    ...updated[selectedWeatherCityIndex],
+                                    low: Number(e.target.value)
+                                  };
+                                  return updated;
+                                });
+                              }}
+                              className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2 text-xs outline-none text-slate-800 font-bold"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Forecast Section */}
+                        <div className="border-t border-slate-100 pt-4 mt-2">
+                          <h4 className="text-xs font-black text-slate-700 uppercase tracking-wider mb-3">
+                            🔮 4-Day Forecast
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {report.forecast.map((forecastItem: any, forecastIdx: number) => (
+                              <div key={forecastIdx} className="bg-slate-50/50 border border-slate-200/50 rounded-xl p-3 flex flex-col gap-2">
+                                <span className="text-[10px] font-black text-slate-450 uppercase tracking-wider">Day {forecastIdx + 1}</span>
+                                <div className="grid grid-cols-3 gap-2">
+                                  <div className="flex flex-col gap-1 col-span-1">
+                                    <label className="text-[9px] font-bold text-slate-400">Day Name</label>
+                                    <input
+                                      type="text"
+                                      value={forecastItem.day}
+                                      onChange={(e) => {
+                                        setWeatherReports(prev => {
+                                          const updated = [...prev];
+                                          const updatedForecast = [...updated[selectedWeatherCityIndex].forecast];
+                                          updatedForecast[forecastIdx] = {
+                                            ...updatedForecast[forecastIdx],
+                                            day: e.target.value
+                                          };
+                                          updated[selectedWeatherCityIndex] = {
+                                            ...updated[selectedWeatherCityIndex],
+                                            forecast: updatedForecast
+                                          };
+                                          return updated;
+                                        });
+                                      }}
+                                      className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] outline-none text-slate-800 font-bold telugu-text"
+                                    />
+                                  </div>
+                                  <div className="flex flex-col gap-1 col-span-1">
+                                    <label className="text-[9px] font-bold text-slate-400">Temp (°C)</label>
+                                    <input
+                                      type="number"
+                                      value={forecastItem.temp}
+                                      onChange={(e) => {
+                                        setWeatherReports(prev => {
+                                          const updated = [...prev];
+                                          const updatedForecast = [...updated[selectedWeatherCityIndex].forecast];
+                                          updatedForecast[forecastIdx] = {
+                                            ...updatedForecast[forecastIdx],
+                                            temp: Number(e.target.value)
+                                          };
+                                          updated[selectedWeatherCityIndex] = {
+                                            ...updated[selectedWeatherCityIndex],
+                                            forecast: updatedForecast
+                                          };
+                                          return updated;
+                                        });
+                                      }}
+                                      className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] outline-none text-slate-800 font-bold"
+                                    />
+                                  </div>
+                                  <div className="flex flex-col gap-1 col-span-1">
+                                    <label className="text-[9px] font-bold text-slate-400">Condition</label>
+                                    <input
+                                      type="text"
+                                      value={forecastItem.cond}
+                                      onChange={(e) => {
+                                        setWeatherReports(prev => {
+                                          const updated = [...prev];
+                                          const updatedForecast = [...updated[selectedWeatherCityIndex].forecast];
+                                          updatedForecast[forecastIdx] = {
+                                            ...updatedForecast[forecastIdx],
+                                            cond: e.target.value
+                                          };
+                                          updated[selectedWeatherCityIndex] = {
+                                            ...updated[selectedWeatherCityIndex],
+                                            forecast: updatedForecast
+                                          };
+                                          return updated;
+                                        });
+                                      }}
+                                      className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-[11px] outline-none text-slate-800 font-bold telugu-text"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Save button for weather report */}
+                  <div className="flex justify-end pt-4 border-t border-slate-100">
+                    <button
+                      onClick={handleSaveConfigs}
+                      disabled={saveStatus === 'saving'}
+                      className={`w-full md:w-auto font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md text-center ${
+                        saveStatus === 'saved'
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-rose-600 hover:bg-rose-700 text-white'
+                      }`}
+                    >
+                      {saveStatus === 'saving' && 'Saving Weather Reports...'}
+                      {saveStatus === 'saved' && '✓ Weather Saved!'}
+                      {saveStatus === 'idle' && 'Save Weather Reports'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Right Column: Weather Articles Manager */}
+                <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-4">
+                  <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
+                    <h3 className="text-sm font-black text-slate-800 flex items-center gap-2">
+                      📰 {weatherArticleFormMode !== 'list' ? (weatherArticleFormMode === 'add' ? 'Add Weather Article' : 'Edit Weather Article') : 'Weather Articles'}
+                    </h3>
+                    {weatherArticleFormMode === 'list' ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFilterCategory('weather');
+                          setSelectedCategories(['weather']);
+                          setNewsViewMode('add');
+                          setNewsTitle('');
+                          setNewsSlug('');
+                          setNewsDescription('');
+                          setNewsImage('');
+                          setNewsAuthor('హై టీవీ డెస్క్');
+                          setIsBreakingChecked(false);
+                          setIsTrendingChecked(false);
+                          setIsFeaturedChecked(false);
+                          setEditingArticle(null);
+                          setTimeout(() => { if (editorRef.current) editorRef.current.innerHTML = ''; }, 50);
+                          setWeatherArticleFormMode('add');
+                        }}
+                        className="bg-[#02599c] hover:bg-[#013f70] text-white font-black text-[10px] py-1.5 px-3 rounded-lg flex items-center gap-1 transition-all cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add Article</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setWeatherArticleFormMode('list')}
+                        className="text-slate-400 hover:text-slate-800 font-bold text-[10px] py-1.5 px-3 rounded-lg flex items-center gap-1 transition-all cursor-pointer bg-slate-100 hover:bg-slate-200"
+                      >
+                        <ArrowLeft className="w-3.5 h-3.5" />
+                        <span>Back to list</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {weatherArticleFormMode === 'list' ? (
+                    /* List of articles belonging to the "weather" category */
+                    (() => {
+                      const weatherArticles = allArticles.filter(art => art.categorySlug === 'weather' || art.category === 'weather');
+                      return (
+                        <div className="flex-1 overflow-y-auto max-h-[480px] divide-y divide-slate-50 pr-1 admin-scrollbar">
+                          {weatherArticles.length === 0 ? (
+                            <div className="p-8 text-center text-slate-400 text-xs">
+                              <p className="font-bold">No weather articles found.</p>
+                              <p className="text-[10px] text-slate-350 mt-1">Publish weather news using the button above.</p>
+                            </div>
+                          ) : (
+                            weatherArticles.map((art) => (
+                              <div key={art.id} className="flex items-center gap-3 py-2.5 text-left">
+                                <img
+                                  src={art.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100&fit=crop'}
+                                  alt=""
+                                  className="w-10 h-7 object-cover rounded bg-slate-100 border border-slate-200 shrink-0"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <h4
+                                    className="text-[11px] font-bold text-slate-800 line-clamp-1 telugu-text"
+                                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                                  >
+                                    {art.title}
+                                  </h4>
+                                  <span className="text-[9px] font-mono text-slate-400 truncate block">{art.slug}</span>
+                                </div>
+                                <div className="flex gap-1.5 shrink-0">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      startEditing(art);
+                                      setSelectedCategories(['weather']);
+                                      setFilterCategory('weather');
+                                      setNewsViewMode('edit');
+                                      setWeatherArticleFormMode('edit');
+                                    }}
+                                    className="text-slate-500 hover:text-slate-850 p-1 hover:bg-slate-100 rounded transition-all cursor-pointer"
+                                    title="Edit"
+                                  >
+                                    <Pencil className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteArticle(art.id)}
+                                    className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-all cursor-pointer"
+                                    title="Delete"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    /* Inline Weather Article Form */
+                    <div className="flex flex-col gap-4 overflow-y-auto max-h-[600px] pr-1 admin-scrollbar">
+                      {/* Title */}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Headline (Telugu/English)</label>
+                        <div className="flex flex-col border border-slate-200 rounded-xl overflow-hidden shadow-2xs bg-white">
+                          <MiniWysiwygToolbar editorRef={weatherTitleRef} />
+                          <div
+                            contentEditable
+                            ref={weatherTitleRef}
+                            suppressContentEditableWarning
+                            onInput={(e) => setNewsTitle(e.currentTarget.innerText)}
+                            data-placeholder="Enter headline..."
+                            className="wysiwyg-editor-mini w-full bg-slate-50 border-t border-slate-200/60 focus:bg-white px-4 py-2.5 text-sm font-bold outline-none transition-colors telugu-text text-slate-800"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Slug */}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">URL Slug (English)</label>
+                        <input
+                          type="text"
+                          value={newsSlug}
+                          onChange={(e) => setNewsSlug(e.target.value)}
+                          placeholder="e.g. weather-update-hyderabad-2024"
+                          className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2 text-xs font-mono outline-none transition-colors text-slate-800"
+                        />
+                      </div>
+
+                      {/* Short Excerpt */}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Short Excerpt</label>
+                        <div className="flex flex-col border border-slate-200 rounded-xl overflow-hidden shadow-2xs bg-white">
+                          <MiniWysiwygToolbar editorRef={weatherDescriptionRef} />
+                          <div
+                            contentEditable
+                            ref={weatherDescriptionRef}
+                            suppressContentEditableWarning
+                            onInput={(e) => setNewsDescription(e.currentTarget.innerText)}
+                            data-placeholder="Brief summary..."
+                            className="wysiwyg-editor-mini w-full bg-slate-50 border-t border-slate-200/60 focus:bg-white px-4 py-2 text-xs outline-none transition-colors telugu-text text-slate-800 min-h-[60px]"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Featured Image */}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Featured Image</label>
+                        <div className="border-2 border-dashed border-slate-200 hover:border-rose-500 rounded-xl p-3 bg-slate-50 text-center relative cursor-pointer min-h-[100px] flex items-center justify-center transition-colors">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFeaturedImageChange}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          />
+                          {!newsImage ? (
+                            <div className="flex flex-col items-center gap-1.5">
+                              <Upload className="w-5 h-5 text-slate-400" />
+                              <span className="text-xs font-bold text-slate-500">Click to upload image</span>
+                            </div>
+                          ) : (
+                            <div className="relative w-full overflow-hidden rounded-lg bg-slate-900 border border-slate-200">
+                              <img src={newsImage} alt="Featured cover" className="w-full h-auto object-cover max-h-[100px] block" />
+                              <button
+                                type="button"
+                                onClick={(e) => { e.preventDefault(); setNewsImage(''); }}
+                                className="absolute top-1.5 right-1.5 bg-black/60 hover:bg-black/90 text-white rounded-full w-4 h-4 flex items-center justify-center transition-colors text-[10px]"
+                              >✕</button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Article Body */}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Article Content</label>
+                        <div className="bg-slate-100 border border-slate-200 rounded-xl p-1.5 flex flex-wrap gap-1 items-center select-none text-slate-600 text-xs">
+                          <button type="button" onClick={() => handleFormat('bold')} className="p-1 hover:bg-slate-200 rounded cursor-pointer font-bold" title="Bold">B</button>
+                          <button type="button" onClick={() => handleFormat('italic')} className="p-1 hover:bg-slate-200 rounded cursor-pointer italic" title="Italic">I</button>
+                          <button type="button" onClick={() => handleFormat('underline')} className="p-1 hover:bg-slate-200 rounded cursor-pointer underline" title="Underline">U</button>
+                          <button type="button" onClick={() => handleFormat('insertUnorderedList')} className="p-1 hover:bg-slate-200 rounded cursor-pointer" title="List"><List className="w-3.5 h-3.5" /></button>
+                          <button type="button" onClick={() => { const url = prompt('Enter URL:'); if (url) handleFormat('createLink', url); }} className="p-1 hover:bg-slate-200 rounded cursor-pointer" title="Link"><LinkIcon className="w-3.5 h-3.5" /></button>
+                          <button type="button" onClick={() => imageInputRef.current?.click()} className="p-1 hover:bg-slate-200 rounded cursor-pointer" title="Image"><ImageIcon className="w-3.5 h-3.5" /></button>
+                          
+                          <div className="w-px h-4 bg-slate-300 mx-0.5" />
+                          <button type="button" onClick={() => handleFormat('foreColor', '#000000')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-black font-black text-xs" title="Text Color Black">A</button>
+                          <button type="button" onClick={() => handleFormat('foreColor', '#e11d48')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-rose-600 font-black text-xs" title="Text Color Red">A</button>
+                          <button type="button" onClick={() => handleFormat('foreColor', '#02599c')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-blue-600 font-black text-xs" title="Text Color Blue">A</button>
+                          <button type="button" onClick={() => handleFormat('foreColor', '#16a34a')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-green-600 font-black text-xs" title="Text Color Green">A</button>
+                          <button type="button" onClick={() => handleFormat('foreColor', '#9333ea')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-purple-600 font-black text-xs" title="Text Color Purple">A</button>
+                          <button type="button" onClick={() => handleFormat('foreColor', '#ea580c')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-orange-600 font-black text-xs" title="Text Color Orange">A</button>
+                          
+                          <div className="relative flex items-center hover:bg-slate-200 rounded p-1 cursor-pointer" title="Custom Color Picker">
+                            <span className="font-black text-xs mr-1 text-slate-700">A</span>
+                            <input 
+                              type="color" 
+                              defaultValue="#000000"
+                              onChange={(e) => handleFormat('foreColor', e.target.value)} 
+                              className="w-3.5 h-3.5 p-0 border-0 cursor-pointer rounded-full overflow-hidden" 
+                              style={{ appearance: 'none', WebkitAppearance: 'none' }}
+                            />
+                          </div>
+                        </div>
+                        <div
+                          ref={editorRef}
+                          contentEditable
+                          suppressContentEditableWarning
+                          className="min-h-[160px] bg-white border border-slate-200/60 rounded-xl p-4 text-sm outline-none focus:border-rose-500 transition-colors text-slate-800 telugu-text"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.8' }}
+                        />
+                      </div>
+
+                      {/* Author */}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Reporter / Author</label>
+                        <input
+                          type="text"
+                          value={newsAuthor}
+                          onChange={(e) => setNewsAuthor(e.target.value)}
+                          placeholder="Reporter name"
+                          className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                        />
+                      </div>
+
+                      {/* Target Placements */}
+                      <div className="flex flex-col gap-2">
+                        <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Target Placements</label>
+                        <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
+                          <input type="checkbox" checked={isBreakingChecked} onChange={(e) => setIsBreakingChecked(e.target.checked)} className="w-3.5 h-3.5" />
+                          Breaking News
+                        </label>
+                        <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
+                          <input type="checkbox" checked={isTrendingChecked} onChange={(e) => setIsTrendingChecked(e.target.checked)} className="w-3.5 h-3.5" />
+                          Trending News
+                        </label>
+                        <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
+                          <input type="checkbox" checked={isFeaturedChecked} onChange={(e) => setIsFeaturedChecked(e.target.checked)} className="w-3.5 h-3.5" />
+                          Featured News
+                        </label>
+                      </div>
+
+                      {/* Save Button */}
+                      <button
+                        type="button"
+                        disabled={isSavingArticle}
+                        onClick={async () => {
+                          // Auto-fill body from description if editor is empty
+                          if (editorRef.current && !editorRef.current.innerHTML.trim() && newsDescription.trim()) {
+                            editorRef.current.innerHTML = `<p>${newsDescription.trim()}</p>`;
+                          }
+                          await handleSaveArticle(new Event('submit') as any);
+                          setWeatherArticleFormMode('list');
+                        }}
+                        className={`w-full font-black text-xs py-3 px-6 rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 ${
+                          isSavingArticle ? 'bg-rose-400 cursor-not-allowed text-white' : 'bg-rose-600 hover:bg-rose-700 text-white cursor-pointer hover:scale-[1.01]'
+                        }`}
+                      >
+                        <FileCheck className="w-4 h-4" />
+                        <span>{isSavingArticle ? (weatherArticleFormMode === 'add' ? 'Publishing...' : 'Updating...') : (weatherArticleFormMode === 'add' ? 'Publish Article' : 'Update Article')}</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ══════════════ VIEW: HOMEPAGE SLIDES ══════════════ */}
           {activeTab === 'slider' && (() => {
             const sliderArticles = allArticles; // all articles from DB + local
@@ -4407,7 +6477,7 @@ export default function AdminPage() {
                                 : 'hover:bg-slate-50 text-slate-700 font-semibold'
                             }`}
                           >
-                            <span className="text-xs telugu-text font-sans truncate pr-1">
+                            <span className="text-xs telugu-text font-sans pl-1 pr-1 leading-relaxed">
                               {cat.name.split(' ')[0]}
                             </span>
                             {(tCount > 0 || bCount > 0) && (
@@ -4580,7 +6650,2309 @@ export default function AdminPage() {
             );
           })()}
 
+          {/* ══════════════ VIEW: HOROSCOPE MANAGER ══════════════ */}
+          {activeTab === 'horoscope' && (
+            <div className="flex flex-col gap-6 animate-fade-in text-left">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800">Horoscope / Shubhaphalalu Page Details</h2>
+                <p className="text-slate-500 text-xs">Configure the daily date, Panchangam text, and predictions for the 12 Zodiac signs.</p>
+              </div>
 
+              {/* Date & Panchangam Editor */}
+              <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 flex flex-col gap-4 shadow-sm">
+                <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5">
+                  📅 Daily Date & Panchangam Details
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex flex-col gap-1.5 md:col-span-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Daily Date String (తేదీ)</label>
+                    <input
+                      type="text"
+                      value={horoscopeDate}
+                      onChange={(e) => setHoroscopeDate(e.target.value)}
+                      placeholder="e.g. తేదీ: 25-06-2026, గురువారం"
+                      className="bg-slate-50 border border-slate-200/60 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5 md:col-span-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Weekly Date Range (ఈవారం పరిధి)</label>
+                    <input
+                      type="text"
+                      value={horoscopeWeeklyRange}
+                      onChange={(e) => setHoroscopeWeeklyRange(e.target.value)}
+                      placeholder="e.g. 22-06-2026 - 28-06-2026"
+                      className="bg-slate-50 border border-slate-200/60 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5 md:col-span-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Panchangam Header / Year Title (పంచాంగం శీర్షిక)</label>
+                    <input
+                      type="text"
+                      value={horoscopePanchangamTitle}
+                      onChange={(e) => setHoroscopePanchangamTitle(e.target.value)}
+                      placeholder="e.g. శ్రీ పరాభవ నామ సంవత్సరం"
+                      className="bg-slate-50 border border-slate-200/60 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5 md:col-span-3 max-w-4xl">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Panchangam Details Text (ఇతర వివరాలు - Semicolon-separated)</label>
+                      <span className="text-[9px] text-[#02599c] font-black">ఉదాహరణ: ఉత్తరాయణం; గ్రీష్మరుతువు, నిజ జ్యేష్ఠ మాసం; ...</span>
+                    </div>
+                    <div className="flex flex-col border border-slate-200/60 rounded-xl overflow-hidden shadow-sm">
+                      <MiniWysiwygToolbar editorRef={horoscopePanchangamRef} />
+                      <div
+                        ref={horoscopePanchangamRef}
+                        contentEditable
+                        suppressContentEditableWarning
+                        data-placeholder="ఉత్తరాయణం; గ్రీష్మరుతువు, నిజ జ్యేష్ఠ మాసం, శుక్ల పక్షం..."
+                        className="w-full bg-slate-50 border-t border-slate-200/60 focus:bg-white p-4 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text leading-relaxed min-h-[140px] overflow-y-auto"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Rashi Predictions Editor */}
+              <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 flex flex-col gap-4 shadow-sm">
+                <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-2.5 gap-4">
+                  <div>
+                    <h3 className="text-sm font-black text-slate-800">
+                      🔮 Zodiac Signs Predictions (12 రాశులు)
+                    </h3>
+                    <p className="text-[11px] text-slate-400 font-semibold mt-0.5">
+                      Manage predictions individually. Remember to click "Save Horoscope" at the bottom to apply changes to the live site.
+                    </p>
+                  </div>
+                  {horoscopeFormMode === 'list' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHoroscopeFormRashiId('aries');
+                        setHoroscopeFormDaily('');
+                        setHoroscopeFormWeekly('');
+                        if (horoscopeDailyRef.current) horoscopeDailyRef.current.innerHTML = '';
+                        if (horoscopeWeeklyRef.current) horoscopeWeeklyRef.current.innerHTML = '';
+                        setHoroscopeFormMode('add');
+                      }}
+                      className="bg-[#02599c] hover:bg-[#024a82] text-white font-black text-xs py-2 px-4 rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5 self-start md:self-auto"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add New Prediction</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* VIEW MODE: LIST */}
+                {horoscopeFormMode === 'list' && (
+                  <div className="flex flex-col gap-4">
+                    {horoscopePredictions.length === 0 ? (
+                      <div className="text-center py-12 text-slate-400">
+                        <div className="text-3xl mb-2">🔮</div>
+                        <p className="text-xs font-bold">No zodiac predictions published yet.</p>
+                        <p className="text-[10px] text-slate-355 mt-1">Click "Add New Prediction" or restore defaults to begin.</p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setHoroscopePredictions(DEFAULT_HOROSCOPE_PREDICTIONS);
+                          }}
+                          className="mt-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2 px-4 rounded-lg border border-slate-200"
+                        >
+                          Restore Default 12 Rashis
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="border border-slate-150 rounded-2xl overflow-hidden bg-white shadow-sm overflow-x-auto">
+                        <table className="w-full text-xs text-left border-collapse min-w-[700px]">
+                          <thead>
+                            <tr className="bg-slate-50 border-b border-slate-150 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                              <th className="px-4 py-3 w-12 text-center">#</th>
+                              <th className="px-4 py-3 w-48">Zodiac Sign (రాశి)</th>
+                              <th className="px-4 py-3">Daily Prediction (ఈరోజు ఫలాలు)</th>
+                              <th className="px-4 py-3">Weekly Prediction (ఈవారం ఫలాలు)</th>
+                              <th className="px-4 py-3 w-28 text-center">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
+                            {horoscopePredictions.map((rashi, idx) => (
+                              <tr key={rashi.id || idx} className="hover:bg-slate-50/50 transition-colors">
+                                <td className="px-4 py-3.5 text-center font-bold text-slate-400">
+                                  {idx + 1}
+                                </td>
+                                <td className="px-4 py-3.5">
+                                  <div className="flex items-center gap-2.5">
+                                    <div className="w-7 h-7 rounded-full bg-[#02599c]/10 text-[#02599c] flex items-center justify-center shrink-0">
+                                      <ZodiacIcon id={rashi.id} className="w-3.5 h-3.5 stroke-[2.5]" />
+                                    </div>
+                                    <div>
+                                      <span className="font-extrabold text-slate-800 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                        {rashi.name}
+                                      </span>
+                                      <span className="block text-[9px] text-slate-400 font-bold font-mono">
+                                        {rashi.englishName} ({rashi.dateRange})
+                                      </span>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3.5">
+                                  <div 
+                                    className="line-clamp-2 text-slate-650 telugu-text max-w-xs leading-relaxed" 
+                                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                                    dangerouslySetInnerHTML={{ __html: rashi.prediction || '<em class="text-slate-350 font-normal">No daily prediction</em>' }}
+                                  />
+                                </td>
+                                <td className="px-4 py-3.5">
+                                  <div 
+                                    className="line-clamp-2 text-slate-650 telugu-text max-w-xs leading-relaxed" 
+                                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                                    dangerouslySetInnerHTML={{ __html: rashi.weeklyPrediction || '<em class="text-slate-350 font-normal">No weekly prediction</em>' }}
+                                  />
+                                </td>
+                                <td className="px-4 py-3.5">
+                                  <div className="flex items-center justify-center gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setHoroscopeFormRashiId(rashi.id);
+                                        setHoroscopeFormDaily(rashi.prediction || '');
+                                        setHoroscopeFormWeekly(rashi.weeklyPrediction || '');
+                                        setHoroscopeEditIdx(idx);
+                                        setHoroscopeFormMode('edit');
+                                        setTimeout(() => {
+                                          if (horoscopeDailyRef.current) horoscopeDailyRef.current.innerHTML = rashi.prediction || '';
+                                          if (horoscopeWeeklyRef.current) horoscopeWeeklyRef.current.innerHTML = rashi.weeklyPrediction || '';
+                                        }, 10);
+                                      }}
+                                      className="p-2 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-blue-600 rounded-lg shadow-sm transition-all cursor-pointer"
+                                      title="Edit Prediction"
+                                    >
+                                      <Pencil className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (confirm(`Are you sure you want to delete predictions for ${rashi.name}?`)) {
+                                          const updated = horoscopePredictions.filter((_, i) => i !== idx);
+                                          setHoroscopePredictions(updated);
+                                        }
+                                      }}
+                                      className="p-2 bg-white hover:bg-red-50 border border-slate-200 hover:border-red-300 text-red-600 rounded-lg shadow-sm transition-all cursor-pointer"
+                                      title="Delete Prediction"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                    {horoscopePredictions.length > 0 && (
+                      <div className="flex justify-start">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm('This will replace all current predictions with default sample content. Proceed?')) {
+                              setHoroscopePredictions(DEFAULT_HOROSCOPE_PREDICTIONS);
+                            }
+                          }}
+                          className="text-[11px] text-red-600 hover:text-red-700 font-bold border border-red-200 bg-red-50/30 hover:bg-red-50 py-2 px-4 rounded-xl transition-all cursor-pointer"
+                        >
+                          Reset to Defaults
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* VIEW MODE: ADD or EDIT FORM */}
+                {(horoscopeFormMode === 'add' || horoscopeFormMode === 'edit') && (
+                  <div className="bg-slate-50 p-4 border border-slate-200/60 rounded-2xl flex flex-col gap-4">
+                    <div className="pb-2.5 border-b border-slate-200/60">
+                      <h4 className="text-sm font-extrabold text-slate-800">
+                        {horoscopeFormMode === 'add' ? '✨ Add New Zodiac Prediction' : `✍️ Edit Prediction Details`}
+                      </h4>
+                      <p className="text-[10px] text-slate-400 font-bold mt-0.5">
+                        Fill out the daily and weekly astrological predictions for this zodiac sign.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Rashi Select Dropdown */}
+                      <div className="flex flex-col gap-1.5 md:col-span-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Select Zodiac Sign (రాశి)</label>
+                        <select
+                          value={horoscopeFormRashiId}
+                          onChange={(e) => setHoroscopeFormRashiId(e.target.value)}
+                          disabled={horoscopeFormMode === 'edit'}
+                          className="bg-white border border-slate-200 focus:border-[#02599c] rounded-xl px-3 py-2.5 text-xs outline-none text-slate-800 font-bold cursor-pointer disabled:bg-slate-100 disabled:cursor-not-allowed w-full"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        >
+                          {DEFAULT_HOROSCOPE_PREDICTIONS.map((def) => (
+                            <option key={def.id} value={def.id}>
+                              {def.name} ({def.englishName})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Daily Date Input inside Form */}
+                      <div className="flex flex-col gap-1.5 md:col-span-1">
+                        <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Daily Date String (తేదీ)</label>
+                        <input
+                          type="text"
+                          value={horoscopeDate}
+                          onChange={(e) => setHoroscopeDate(e.target.value)}
+                          placeholder="e.g. తేదీ: 25-06-2026, గురువారం"
+                          className="bg-white border border-slate-200/60 focus:border-[#02599c] rounded-xl px-3 py-2.5 text-xs outline-none text-slate-850 font-bold w-full"
+                        />
+                      </div>
+
+                      {/* Weekly Date Range Input inside Form */}
+                      <div className="flex flex-col gap-1.5 md:col-span-1">
+                        <label className="text-[10px] font-black text-amber-600 uppercase tracking-widest">Weekly Date Range (ఈవారం పరిధి)</label>
+                        <input
+                          type="text"
+                          value={horoscopeWeeklyRange}
+                          onChange={(e) => setHoroscopeWeeklyRange(e.target.value)}
+                          placeholder="e.g. 22-06-2026 - 28-06-2026"
+                          className="bg-white border border-slate-200/60 focus:border-amber-500 rounded-xl px-3 py-2.5 text-xs outline-none text-slate-850 font-bold w-full"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Daily Prediction Textarea */}
+                    <div className="flex flex-col gap-1.5 max-w-4xl">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">ఈరోజు ఫలాలు - Daily Prediction (Telugu)</label>
+                      <div className="flex flex-col border border-slate-200/60 rounded-xl overflow-hidden shadow-sm">
+                        <MiniWysiwygToolbar editorRef={horoscopeDailyRef} />
+                        <div
+                          ref={horoscopeDailyRef}
+                          contentEditable
+                          suppressContentEditableWarning
+                          data-placeholder="నేటి రాశి ఫలితాలు రాయండి..."
+                          className="w-full bg-white border-t border-slate-200/60 focus:bg-white p-4 text-xs outline-none transition-colors text-slate-800 font-semibold telugu-text leading-relaxed min-h-[140px] overflow-y-auto"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Weekly Prediction Textarea */}
+                    <div className="flex flex-col gap-1.5 max-w-4xl">
+                      <label className="text-[10px] font-black text-amber-600 uppercase tracking-widest">ఈవారం ఫలాలు - Weekly Prediction (Telugu)</label>
+                      <div className="flex flex-col border border-amber-200 rounded-xl overflow-hidden shadow-sm">
+                        <MiniWysiwygToolbar editorRef={horoscopeWeeklyRef} />
+                        <div
+                          ref={horoscopeWeeklyRef}
+                          contentEditable
+                          suppressContentEditableWarning
+                          data-placeholder="వారం రాశి ఫలితాలు రాయండి..."
+                          className="w-full bg-white border-t border-amber-200 focus:bg-white p-4 text-xs outline-none transition-colors text-slate-800 font-semibold telugu-text leading-relaxed min-h-[140px] overflow-y-auto"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Form Controls */}
+                    <div className="flex justify-end gap-2.5 pt-2 border-t border-slate-200/60 mt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHoroscopeFormMode('list');
+                          setHoroscopeEditIdx(null);
+                        }}
+                        className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs py-2 px-5 rounded-xl transition-all cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const dailyText = horoscopeDailyRef.current?.innerHTML || '';
+                          const weeklyText = horoscopeWeeklyRef.current?.innerHTML || '';
+
+                          if (horoscopeFormMode === 'add') {
+                            const exists = horoscopePredictions.some(p => p.id === horoscopeFormRashiId);
+                            if (exists && !confirm(`A prediction entry for ${horoscopeFormRashiId} already exists in the list. Do you want to add another?`)) {
+                              return;
+                            }
+
+                            const selectedDef = DEFAULT_HOROSCOPE_PREDICTIONS.find(d => d.id === horoscopeFormRashiId) || {
+                              id: horoscopeFormRashiId,
+                              name: horoscopeFormRashiId,
+                              englishName: horoscopeFormRashiId,
+                              dateRange: '',
+                              color: '#dbeafe',
+                              bgClass: 'bg-blue-50 border-blue-200 text-blue-800',
+                              pillBgClass: 'bg-[#dbeafe] hover:bg-[#bfdbfe]'
+                            };
+
+                            const newPred = {
+                              ...selectedDef,
+                              prediction: dailyText,
+                              weeklyPrediction: weeklyText
+                            };
+
+                            setHoroscopePredictions([...horoscopePredictions, newPred]);
+                          } else {
+                            const updated = [...horoscopePredictions];
+                            if (horoscopeEditIdx !== null) {
+                              updated[horoscopeEditIdx] = {
+                                ...updated[horoscopeEditIdx],
+                                prediction: dailyText,
+                                weeklyPrediction: weeklyText
+                              };
+                              setHoroscopePredictions(updated);
+                            }
+                          }
+                          setHoroscopeFormMode('list');
+                          setHoroscopeEditIdx(null);
+                        }}
+                        className="bg-[#02599c] hover:bg-[#024a82] text-white font-black text-xs py-2 px-6 rounded-xl transition-all cursor-pointer shadow-sm"
+                      >
+                        {horoscopeFormMode === 'add' ? 'Add Entry' : 'Update Entry'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const saved = localStorage.getItem('horoscope_daily_data');
+                    if (saved) {
+                      const parsed = JSON.parse(saved);
+                      setHoroscopeDate(parsed.date || '');
+                      setHoroscopeWeeklyRange(parsed.weeklyRange || '');
+                      const rawPanchangam = parsed.panchangam || '';
+                      const parts = splitPanchangam(rawPanchangam);
+                      const pTitle = parts[0] || '';
+                      const pDetails = parts.slice(1).join('; ');
+                      setHoroscopePanchangamTitle(pTitle);
+                      setHoroscopePanchangam(pDetails);
+                      if (horoscopePanchangamRef.current) {
+                        horoscopePanchangamRef.current.innerHTML = pDetails;
+                      }
+                      setHoroscopePredictions(parsed.predictions || DEFAULT_HOROSCOPE_PREDICTIONS);
+                    } else {
+                      setHoroscopeWeeklyRange('');
+                      const parts = splitPanchangam(DEFAULT_HOROSCOPE_PANCHANGAM);
+                      const pTitle = parts[0] || '';
+                      const pDetails = parts.slice(1).join('; ');
+                      setHoroscopePanchangamTitle(pTitle);
+                      setHoroscopePanchangam(pDetails);
+                      if (horoscopePanchangamRef.current) {
+                        horoscopePanchangamRef.current.innerHTML = pDetails;
+                      }
+                      setHoroscopePredictions(DEFAULT_HOROSCOPE_PREDICTIONS);
+                    }
+                    alert('Changes reverted to saved database!');
+                  }}
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-3 px-6 rounded-xl transition-all cursor-pointer border border-slate-200"
+                >
+                  Discard Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentPanchangam = horoscopePanchangamRef.current?.innerHTML || '';
+                    const combinedPanchangam = [horoscopePanchangamTitle.trim(), currentPanchangam.trim()]
+                      .filter(Boolean)
+                      .join('; ');
+
+                    const payload = {
+                      date: horoscopeDate.trim(),
+                      weeklyRange: horoscopeWeeklyRange.trim(),
+                      panchangam: combinedPanchangam,
+                      predictions: horoscopePredictions
+                    };
+                    localStorage.setItem('horoscope_daily_data', JSON.stringify(payload));
+                    setHoroscopePanchangam(currentPanchangam);
+                    alert('Horoscope configurations successfully saved to localStorage!');
+                  }}
+                  className="bg-[#02599c] hover:bg-[#024a82] text-white font-black text-xs py-3 px-8 rounded-xl transition-all cursor-pointer shadow-md"
+                >
+                  Save Horoscope
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════ VIEW: WEB STORIES MANAGER ══════════════ */}
+          {activeTab === 'webstories' && (
+            <div className="flex flex-col gap-6 animate-fade-in text-left">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800">వెబ్ స్టోరీస్ మేనేజర్ (Web Stories Manager)</h2>
+                <p className="text-slate-500 text-xs">వెబ్ స్టోరీస్ క్రియేట్ చేయండి లేదా ఎడిట్ చేయండి. ప్రతి స్టోరీలో కవర్ పేజీ మరియు పలు స్లైడ్‌లు (ఇమేజ్ మరియు క్యాప్షన్) ఉంటాయి.</p>
+              </div>
+
+              {webStoryFormMode === 'list' ? (
+                <div className="flex flex-col gap-6">
+                  {/* List Header Actions */}
+                  <div className="flex justify-between items-center bg-white border border-slate-200/60 rounded-2xl p-4 shadow-sm">
+                    <span className="text-xs font-bold text-slate-500">
+                      మొత్తం కస్టమ్ వెబ్ స్టోరీస్: <strong className="text-slate-800">{webStoriesList.length}</strong>
+                    </span>
+                    <button
+                      onClick={() => {
+                        resetWebStoryForm();
+                        setWebStoryFormMode('add');
+                      }}
+                      className="bg-[#02599c] hover:bg-[#024a82] text-white font-black text-xs py-2.5 px-5 rounded-xl transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>కొత్త వెబ్ స్టోరీ సృష్టించండి</span>
+                    </button>
+                  </div>
+
+                  {/* Web Stories Grid */}
+                  {webStoriesList.length === 0 ? (
+                    <div className="bg-white border border-slate-200/60 rounded-3xl p-12 text-center shadow-sm flex flex-col items-center justify-center gap-4">
+                      <Layers className="w-12 h-12 text-slate-350" />
+                      <div className="flex flex-col gap-1">
+                        <h3 className="font-black text-slate-700 text-sm">కస్టమ్ వెబ్ స్టోరీస్ ఏవీ లేవు</h3>
+                        <p className="text-xs text-slate-400 max-w-sm">మీరు ఇంకా ఏ వెబ్ స్టోరీలను సృష్టించలేదు. కొత్త వెబ్ స్టోరీని సృష్టించడానికి పైన ఉన్న బటన్‌ను క్లిక్ చేయండి.</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          resetWebStoryForm();
+                          setWebStoryFormMode('add');
+                        }}
+                        className="bg-[#02599c] hover:bg-[#024a82] text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md"
+                      >
+                        + కొత్త వెబ్ స్టోరీ సృష్టించండి
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                      {webStoriesList.map((story) => (
+                        <div key={story.id} className="bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm flex flex-col group relative text-left">
+                          <div className="relative aspect-[9/16] bg-slate-900 overflow-hidden">
+                            {story.coverImage ? (
+                              <img src={story.coverImage} alt={story.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">No Cover Image</div>
+                            )}
+                            {/* Cover text overlay */}
+                            <div className="absolute top-[15%] left-0 right-0 px-4 text-center">
+                              <span
+                                className="text-[17px] font-black leading-relaxed block break-words"
+                                style={{
+                                  color: story.coverStyle === 'red-white' ? '#e60000' : '#ffffff',
+                                  textShadow: story.coverStyle === 'red-white'
+                                    ? '2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 0px 2px 0 #fff, 0px -2px 0 #fff, 2px 0px 0 #fff, -2px 0px 0 #fff'
+                                    : '2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 0px 2px 0 #000, 0px -2px 0 #000, 2px 0px 0 #000, -2px 0px 0 #000',
+                                  fontFamily: 'Noto Sans Telugu, sans-serif'
+                                }}
+                              >
+                                {story.coverTitle}
+                              </span>
+                            </div>
+                            <div className="absolute bottom-3 left-3 bg-black/55 text-white text-[10px] font-bold px-2 py-1 rounded backdrop-blur-xs flex items-center gap-1">
+                              <Layers className="w-3 h-3" />
+                              <span>{story.slides?.length || 0} స్లైడ్‌లు</span>
+                            </div>
+                          </div>
+                          {/* Story Info and Actions */}
+                          <div className="p-4 flex flex-col gap-3 flex-grow justify-between">
+                            <div>
+                              <h3 className="font-black text-slate-800 text-xs line-clamp-2 telugu-text mb-1" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                {story.title}
+                              </h3>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 mt-auto">
+                              <button
+                                onClick={() => handleStartEditWebStory(story)}
+                                className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2 rounded-xl transition-all cursor-pointer border border-slate-200/50 text-center"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteWebStory(story.id)}
+                                className="bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs py-2 rounded-xl transition-all cursor-pointer border border-rose-200/40 text-center"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-white border border-slate-200/60 rounded-3xl p-5 md:p-6 flex flex-col gap-6 shadow-sm">
+                  {/* Form Header */}
+                  <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                    <h3 className="text-sm font-black text-slate-800 flex items-center gap-2">
+                      <Layers className="w-4 h-4 text-[#02599c]" />
+                      <span>
+                        {webStoryFormMode === 'edit' ? 'వెబ్ స్టోరీని సవరించండి (Edit Web Story)' : 'కొత్త వెబ్ స్టోరీని సృష్టించండి (Create Web Story)'}
+                      </span>
+                    </h3>
+                    <button
+                      onClick={() => {
+                        setWebStoryFormMode('list');
+                        resetWebStoryForm();
+                      }}
+                      className="text-slate-400 hover:text-slate-650 text-xs font-bold transition-all cursor-pointer"
+                    >
+                      మొత్తం లిస్ట్ చూడండి
+                    </button>
+                  </div>
+
+                  {/* Form Body - Two Columns */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left 2 Columns: Cover configuration and Slides */}
+                    <div className="lg:col-span-2 flex flex-col gap-6 text-left">
+                      {/* Section A: Cover details */}
+                      <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 md:p-5 flex flex-col gap-4">
+                        <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-200/50 pb-2">
+                          1. కవర్ పేజీ వివరాలు (Cover Details)
+                        </h4>
+                        
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-black text-slate-450 uppercase tracking-widest">Web Story Title (Admin Internal Reference)</label>
+                          <input
+                            type="text"
+                            value={webStoryTitle}
+                            onChange={(e) => setWebStoryTitle(e.target.value)}
+                            placeholder="e.g. ఫ్రిజ్‌లో ఆహారం.. సరిగానే నిల్వ చేస్తున్నారా?"
+                            className="bg-white border border-slate-200/80 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-450 uppercase tracking-widest">Cover Title text on image (కవర్ శీర్షిక)</label>
+                            <input
+                              type="text"
+                              value={webStoryCoverTitle}
+                              onChange={(e) => setWebStoryCoverTitle(e.target.value)}
+                              placeholder="e.g. ఫ్రిజ్‌లో ఆహారం.."
+                              className="bg-white border border-slate-200/80 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text"
+                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-455 uppercase tracking-widest">Cover Text Style Theme (కవర్ టెక్స్ట్ థీమ్)</label>
+                            <select
+                              value={webStoryCoverStyle}
+                              onChange={(e) => setWebStoryCoverStyle(e.target.value as 'red-white' | 'white-black')}
+                              className="bg-white border border-slate-200/80 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
+                            >
+                              <option value="red-white">ఎరుపు అక్షరాలు + వైట్ అవుట్‌లైన్ (Red text / White shadow)</option>
+                              <option value="white-black">తెలుపు అక్షరాలు + బ్లాక్ అవుట్‌లైన్ (White text / Black shadow)</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Section B: Slides */}
+                      <div className="flex flex-col gap-4">
+                        <div className="flex justify-between items-center border-b border-slate-200/60 pb-2.5">
+                          <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                            2. స్లైడ్‌లు (Story Slides - {webStorySlides.length})
+                          </h4>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setWebStorySlides([...webStorySlides, { image: '', text: '', textStyle: 'red-white' }]);
+                            }}
+                            className="bg-slate-100 hover:bg-slate-200 text-[#02599c] font-black text-xs py-1.5 px-3.5 rounded-lg border border-slate-200 transition-all cursor-pointer flex items-center gap-1"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>స్లైడ్ జోడించండి (Add Slide)</span>
+                          </button>
+                        </div>
+
+                        {/* Slides List */}
+                        <div className="space-y-5">
+                          {webStorySlides.map((slide, sIdx) => (
+                            <div key={sIdx} className="bg-slate-55/50 border border-slate-200 rounded-2xl p-4 flex flex-col gap-4 shadow-2xs relative text-left">
+                              {/* Slide Header with Ordering and Delete Actions */}
+                              <div className="flex justify-between items-center border-b border-slate-200/60 pb-2">
+                                <span className="text-xs font-black text-slate-700 bg-slate-200 px-2 py-0.5 rounded">
+                                  స్లైడ్ {sIdx + 1}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    disabled={sIdx === 0}
+                                    onClick={() => {
+                                      if (sIdx === 0) return;
+                                      const updated = [...webStorySlides];
+                                      const temp = updated[sIdx];
+                                      updated[sIdx] = updated[sIdx - 1];
+                                      updated[sIdx - 1] = temp;
+                                      setWebStorySlides(updated);
+                                    }}
+                                    className={`p-1 rounded cursor-pointer ${sIdx === 0 ? 'text-slate-300' : 'text-slate-500 hover:bg-slate-200'}`}
+                                    title="Move Up"
+                                  >
+                                    <ArrowUp className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={sIdx === webStorySlides.length - 1}
+                                    onClick={() => {
+                                      if (sIdx === webStorySlides.length - 1) return;
+                                      const updated = [...webStorySlides];
+                                      const temp = updated[sIdx];
+                                      updated[sIdx] = updated[sIdx + 1];
+                                      updated[sIdx + 1] = temp;
+                                      setWebStorySlides(updated);
+                                    }}
+                                    className={`p-1 rounded cursor-pointer ${sIdx === webStorySlides.length - 1 ? 'text-slate-300' : 'text-slate-500 hover:bg-slate-200'}`}
+                                    title="Move Down"
+                                  >
+                                    <ArrowDown className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const updated = webStorySlides.filter((_, i) => i !== sIdx);
+                                      setWebStorySlides(updated.length > 0 ? updated : [{ image: '', text: '', textStyle: 'red-white' }]);
+                                    }}
+                                    className="p-1 rounded hover:bg-rose-100 text-rose-500 transition-colors cursor-pointer"
+                                    title="Delete Slide"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Slide Content layout */}
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {/* Left md:col-span-2: Inputs for Caption description and Text style */}
+                                <div className="md:col-span-2 flex flex-col gap-3">
+                                  <div className="flex flex-col gap-1">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Slide description (స్లైడ్ వివరణ - తెలుగు)</label>
+                                    <textarea
+                                      value={slide.text}
+                                      onChange={(e) => {
+                                        const updated = [...webStorySlides];
+                                        updated[sIdx].text = e.target.value;
+                                        setWebStorySlides(updated);
+                                      }}
+                                      placeholder="స్లైడ్‌పై వచ్చే వివరణ టెక్స్ట్ రాయండి..."
+                                      rows={2}
+                                      className="bg-white border border-slate-200/80 focus:border-[#02599c] rounded-xl px-3 py-2 text-xs outline-none text-slate-800 font-bold telugu-text resize-none"
+                                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                                    />
+                                  </div>
+
+                                  <div className="flex flex-col gap-1">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Text Style theme (అక్షరాల శైలి)</label>
+                                    <select
+                                      value={slide.textStyle}
+                                      onChange={(e) => {
+                                        const updated = [...webStorySlides];
+                                        updated[sIdx].textStyle = e.target.value as 'red-white' | 'white-black';
+                                        setWebStorySlides(updated);
+                                      }}
+                                      className="bg-white border border-slate-200/80 focus:border-[#02599c] rounded-xl px-3 py-1.5 text-xs outline-none text-slate-800 font-bold cursor-pointer"
+                                    >
+                                      <option value="red-white">ఎరుపు అక్షరాలు + వైట్ అవుట్‌లైన్</option>
+                                      <option value="white-black">తెలుపు అక్షరాలు + బ్లాక్ అవుట్‌లైన్</option>
+                                    </select>
+                                  </div>
+                                </div>
+
+                                {/* Right: File Image Upload Box */}
+                                <div className="flex flex-col gap-1.5 md:col-span-1">
+                                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Slide Image (స్లైడ్ ఇమేజ్)</label>
+                                  <div className="border border-dashed border-slate-300 hover:border-[#02599c] rounded-xl p-3 bg-white text-center relative cursor-pointer min-h-[110px] flex items-center justify-center transition-colors">
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={(e) => {
+                                        if (e.target.files && e.target.files[0]) {
+                                          handleCompressAndSetImage(e.target.files[0], (base64) => {
+                                            const updated = [...webStorySlides];
+                                            updated[sIdx].image = base64;
+                                            setWebStorySlides(updated);
+                                          });
+                                        }
+                                      }}
+                                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                    />
+                                    {!slide.image ? (
+                                      <div className="flex flex-col items-center gap-1">
+                                        <Upload className="w-5 h-5 text-slate-400" />
+                                        <span className="text-[10px] font-bold text-slate-500">Upload Image</span>
+                                      </div>
+                                    ) : (
+                                      <div className="relative w-full h-full overflow-hidden rounded bg-slate-900 border border-slate-100">
+                                        <img src={slide.image} alt={`Slide ${sIdx + 1}`} className="w-full h-auto object-cover max-h-[90px] block mx-auto" />
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            const updated = [...webStorySlides];
+                                            updated[sIdx].image = '';
+                                            setWebStorySlides(updated);
+                                          }}
+                                          className="absolute top-1 right-1 bg-black/60 hover:bg-black/90 text-white rounded-full w-4 h-4 flex items-center justify-center transition-colors text-[9px]"
+                                        >
+                                          ✕
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column: Live Cover Image Preview */}
+                    <div className="lg:col-span-1">
+                      <div className="sticky top-6 flex flex-col gap-4 text-left">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
+                          Cover Preview (లైవ్ కవర్ ప్రివ్యూ)
+                        </label>
+                        <div className="border border-slate-200 rounded-3xl p-4 bg-slate-50 flex items-center justify-center">
+                          <div className="relative aspect-[9/16] w-full max-w-[240px] bg-slate-900 rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                            {webStoryCoverImage ? (
+                              <img src={webStoryCoverImage} alt="Cover Preview" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-slate-500 text-[10px] font-bold">
+                                <ImageIcon className="w-8 h-8 text-slate-400" />
+                                <span>కవర్ ఫోటో ప్రివ్యూ</span>
+                              </div>
+                            )}
+
+                            {/* Overlaid Cover Title text */}
+                            {webStoryCoverTitle && (
+                              <div className="absolute top-[15%] left-0 right-0 px-4 text-center">
+                                <span
+                                  className="text-[16px] font-black leading-relaxed block break-words"
+                                  style={{
+                                    color: webStoryCoverStyle === 'red-white' ? '#e60000' : '#ffffff',
+                                    textShadow: webStoryCoverStyle === 'red-white'
+                                      ? '2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 0px 2px 0 #fff, 0px -2px 0 #fff, 2px 0px 0 #fff, -2px 0px 0 #fff'
+                                      : '2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 0px 2px 0 #000, 0px -2px 0 #000, 2px 0px 0 #000, -2px 0px 0 #000',
+                                    fontFamily: 'Noto Sans Telugu, sans-serif'
+                                  }}
+                                >
+                                  {webStoryCoverTitle}
+                                </span>
+                              </div>
+                            )}
+
+                            <div className="absolute bottom-3 left-3 bg-black/60 text-white text-[9px] font-bold px-2 py-0.5 rounded">
+                              Cover Page
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Image upload widget for Cover */}
+                        <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-4 shadow-2xs flex flex-col gap-3">
+                          <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest text-left">
+                            Cover Image (కవర్ ఇమేజ్)
+                          </label>
+                          <div className="border-2 border-dashed border-slate-200 hover:border-rose-500 rounded-xl p-4 bg-white text-center relative cursor-pointer min-h-[130px] flex items-center justify-center transition-colors">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  handleCompressAndSetImage(e.target.files[0], (base64) => {
+                                    setWebStoryCoverImage(base64);
+                                  });
+                                }
+                              }}
+                              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                            />
+                            {!webStoryCoverImage ? (
+                              <div className="flex flex-col items-center gap-1.5">
+                                <Upload className="w-5 h-5 text-slate-400" />
+                                <span className="text-xs font-bold text-slate-550">Upload Cover Image</span>
+                                <span className="text-[8px] text-slate-400 uppercase">Max 800px width</span>
+                              </div>
+                            ) : (
+                              <div className="relative w-full overflow-hidden rounded bg-slate-900 border border-slate-100">
+                                <img src={webStoryCoverImage} alt="Cover Preview" className="w-full h-auto object-cover max-h-[100px] block mx-auto" />
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setWebStoryCoverImage('');
+                                  }}
+                                  className="absolute top-1 right-1 bg-black/60 hover:bg-black/90 text-white rounded-full w-4 h-4 flex items-center justify-center transition-colors text-[9px]"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Form Footer Actions */}
+                  <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-4 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setWebStoryFormMode('list');
+                        resetWebStoryForm();
+                      }}
+                      className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-3 px-6 rounded-xl transition-all cursor-pointer border border-slate-200"
+                    >
+                      Discard Changes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveWebStory}
+                      className="bg-[#02599c] hover:bg-[#024a82] text-white font-black text-xs py-3 px-8 rounded-xl transition-all cursor-pointer shadow-md"
+                    >
+                      Save Web Story
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ══════════════ VIEW: SHORTS VIDEOS MANAGER ══════════════ */}
+          {activeTab === 'shorts-videos' && (
+            <div className="flex flex-col gap-6 animate-fade-in text-left">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800">షార్ట్స్ వీడియోల మేనేజర్ (Shorts Videos Manager)</h2>
+                <p className="text-slate-500 text-xs">షార్ట్స్ వీడియోలు అప్‌లోడ్ చేయండి. ఇవి షార్ట్స్ విభాగంలో మొబైల్ స్టేటస్ తరహాలో ప్లే అవుతాయి.</p>
+              </div>
+
+              {shortsFormMode === 'list' ? (
+                <div className="flex flex-col gap-6">
+                  {/* List Header Actions */}
+                  <div className="flex justify-between items-center bg-white border border-slate-200/60 rounded-2xl p-4 shadow-sm">
+                    <span className="text-xs font-bold text-slate-500">
+                      మొత్తం షార్ట్స్ వీడియోలు: <strong className="text-slate-800">{allArticles.filter(art => art.categorySlug === 'shorts').length}</strong>
+                    </span>
+                    <button
+                      onClick={() => {
+                        setEditingShort(null);
+                        setShortTitle('');
+                        setShortDescription('');
+                        setShortCoverImage('');
+                        setShortVideo('');
+                        setShortsFormMode('add');
+                      }}
+                      className="bg-[#f43f5e] hover:bg-[#e11d48] text-white font-black text-xs py-2.5 px-5 rounded-xl transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>కొత్త షార్ట్ జోడించండి</span>
+                    </button>
+                  </div>
+
+                  {/* Shorts Grid */}
+                  {allArticles.filter(art => art.categorySlug === 'shorts').length === 0 ? (
+                    <div className="bg-white border border-slate-200/60 rounded-3xl p-12 text-center shadow-sm flex flex-col items-center justify-center gap-4">
+                      <Video className="w-12 h-12 text-slate-350" />
+                      <div className="flex flex-col gap-1">
+                        <h3 className="font-black text-slate-700 text-sm">షార్ట్స్ వీడియోలు ఏవీ లేవు</h3>
+                        <p className="text-xs text-slate-400 max-w-sm">మీరు ఇంకా ఏ షార్ట్స్ వీడియోలను అప్‌లోడ్ చేయలేదు. కొత్త షార్ట్‌ను జోడించడానికి పైన ఉన్న బటన్‌ను క్లిక్ చేయండి.</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setEditingShort(null);
+                          setShortTitle('');
+                          setShortDescription('');
+                          setShortCoverImage('');
+                          setShortVideo('');
+                          setShortsFormMode('add');
+                        }}
+                        className="bg-[#f43f5e] hover:bg-[#e11d48] text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md"
+                      >
+                        + కొత్త షార్ట్ జోడించండి
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                      {allArticles.filter(art => art.categorySlug === 'shorts').map((art) => (
+                        <div key={art.id} className="bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm flex flex-col group relative text-left">
+                          <div className="relative aspect-[9/16] bg-slate-900 overflow-hidden">
+                            {art.image ? (
+                              <img src={art.image} alt={art.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">No Cover Image</div>
+                            )}
+                            {/* Title overlay */}
+                            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent pt-12 pb-4 px-4">
+                              <span
+                                className="text-[14px] font-black text-white telugu-text line-clamp-3"
+                                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                              >
+                                {art.title}
+                              </span>
+                            </div>
+                            {/* Play icon overlay */}
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                              <div className="w-10 h-10 bg-[#f43f5e] rounded-full flex items-center justify-center text-white shadow-md">
+                                <svg className="w-4.5 h-4.5 fill-white text-white ml-0.5" viewBox="0 0 24 24">
+                                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Actions Panel */}
+                          <div className="p-3 border-t border-slate-100 flex items-center justify-end gap-2 bg-slate-50">
+                            <button
+                              onClick={() => handleStartEditShort(art)}
+                              className="bg-white hover:bg-slate-100 text-slate-650 p-2 rounded-lg border border-slate-200/60 transition-all cursor-pointer inline-flex items-center gap-1 text-[11px] font-bold"
+                              title="Edit Short"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                              <span>సవరించు</span>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteArticle(art.id)}
+                              className="bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-lg border border-rose-200/40 transition-all cursor-pointer inline-flex items-center gap-1 text-[11px] font-bold"
+                              title="Delete Short"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>తొలగించు</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-white border border-slate-200/60 rounded-3xl p-5 md:p-6 flex flex-col gap-6 shadow-sm">
+                  {/* Form Header */}
+                  <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                    <h3 className="text-sm font-black text-slate-800 flex items-center gap-2">
+                      <Video className="w-4 h-4 text-[#f43f5e]" />
+                      <span>
+                        {shortsFormMode === 'edit' ? 'షార్ట్ వీడియోను సవరించండి (Edit Short Video)' : 'కొత్త షార్ట్ వీడియోను అప్‌లోడ్ చేయండి (Upload Short Video)'}
+                      </span>
+                    </h3>
+                    <button
+                      onClick={() => {
+                        setShortsFormMode('list');
+                        setEditingShort(null);
+                      }}
+                      className="text-slate-400 hover:text-slate-650 text-xs font-bold transition-all cursor-pointer"
+                    >
+                      మొత్తం లిస్ట్ చూడండి
+                    </button>
+                  </div>
+
+                  {/* Form Body - Two Columns */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left 2 Columns: Inputs */}
+                    <div className="lg:col-span-2 flex flex-col gap-6 text-left">
+                      {/* Section 1: Title and Description */}
+                      <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 md:p-5 flex flex-col gap-4">
+                        <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-200/50 pb-2">
+                          1. శీర్షిక & వివరణ (Title & Description)
+                        </h4>
+                        
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-black text-slate-450 uppercase tracking-widest">శీర్షిక (Short Video Title)</label>
+                          <input
+                            type="text"
+                            value={shortTitle}
+                            onChange={(e) => setShortTitle(e.target.value)}
+                            placeholder="e.g. సినిమాను తలపించిన పోలీస్ చేజింగ్ వీడియో వైరల్!"
+                            className="bg-white border border-slate-200/80 focus:border-[#f43f5e] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-black text-slate-450 uppercase tracking-widest">వివరణ (Description / Subtitle)</label>
+                          <textarea
+                            value={shortDescription}
+                            onChange={(e) => setShortDescription(e.target.value)}
+                            placeholder="ఈ షార్ట్ వీడియోకి సంబంధించిన చిన్న వివరణ రాయండి..."
+                            rows={3}
+                            className="bg-white border border-slate-200/80 focus:border-[#f43f5e] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text resize-none"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Section 2: Video File */}
+                      <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 md:p-5 flex flex-col gap-4">
+                        <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-200/50 pb-2">
+                          2. వీడియో ఫైల్ (Video File)
+                        </h4>
+
+                        <div className="border border-dashed border-slate-300 hover:border-[#f43f5e] rounded-xl p-6 bg-white text-center relative cursor-pointer min-h-[140px] flex items-center justify-center transition-colors">
+                          <input
+                            type="file"
+                            accept="video/*"
+                            onChange={handleShortVideoChange}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          />
+                          {!shortVideo ? (
+                            <div className="flex flex-col items-center gap-2">
+                              <Upload className="w-6 h-6 text-slate-400" />
+                              <span className="text-xs font-bold text-slate-500">వీడియో ఫైల్ ఎంచుకోండి (Select Video File)</span>
+                              <span className="text-[9px] text-slate-400 uppercase tracking-wider">Max 100MB file size</span>
+                            </div>
+                          ) : (
+                            <div className="relative w-full overflow-hidden rounded-xl bg-slate-900 border border-slate-250 p-2">
+                              <video 
+                                src={shortVideo} 
+                                controls 
+                                className="w-full h-auto max-h-[160px] block rounded-lg object-contain bg-black mx-auto" 
+                              />
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setShortVideo('');
+                                }}
+                                className="absolute top-4 right-4 bg-black/75 hover:bg-black/90 text-white rounded-full w-6 h-6 flex items-center justify-center transition-colors cursor-pointer shadow-md"
+                                title="Delete Video"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column: Cover image upload & Preview */}
+                    <div className="lg:col-span-1 flex flex-col gap-6">
+                      {/* Section 3: Cover Image Upload */}
+                      <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 md:p-5 flex flex-col gap-4 text-left">
+                        <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-200/50 pb-2">
+                          3. కవర్ ఫోటో (Cover Image)
+                        </h4>
+
+                        <div className="border border-dashed border-slate-300 hover:border-[#f43f5e] rounded-xl p-3 bg-white text-center relative cursor-pointer min-h-[110px] flex items-center justify-center transition-colors">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleShortCoverChange}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          />
+                          {!shortCoverImage ? (
+                            <div className="flex flex-col items-center gap-1">
+                              <Upload className="w-5 h-5 text-slate-400" />
+                              <span className="text-[10px] font-bold text-slate-500">కవర్ ఇమేజ్ అప్‌లోడ్</span>
+                            </div>
+                          ) : (
+                            <div className="relative w-full overflow-hidden rounded bg-slate-900 border border-slate-100">
+                              <img src={shortCoverImage} alt="Cover" className="w-full h-auto object-cover max-h-[90px] block mx-auto" />
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setShortCoverImage('');
+                                }}
+                                className="absolute top-1 right-1 bg-black/60 hover:bg-black/90 text-white rounded-full w-4 h-4 flex items-center justify-center transition-colors text-[9px]"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Cover Preview Card */}
+                      <div className="sticky top-6 flex flex-col gap-4 text-left">
+                        <label className="text-[10px] font-black text-slate-405 uppercase tracking-widest">
+                          Cover Preview (లైవ్ కవర్ ప్రివ్యూ)
+                        </label>
+                        <div className="border border-slate-200 rounded-3xl p-4 bg-slate-50 flex items-center justify-center">
+                          <div className="relative aspect-[9/16] w-full max-w-[200px] bg-slate-900 rounded-2xl overflow-hidden shadow-md border border-slate-200">
+                            {shortCoverImage ? (
+                              <img src={shortCoverImage} alt="Cover Preview" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-slate-500 text-[10px] font-bold">
+                                <ImageIcon className="w-8 h-8 text-slate-400" />
+                                <span>కవర్ ఫోటో ప్రివ్యూ</span>
+                              </div>
+                            )}
+
+                            {/* Overlaid Cover Title text */}
+                            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pt-12 pb-3 px-3 text-left">
+                              <span
+                                className="text-[12px] font-black text-white leading-snug line-clamp-3 telugu-text"
+                                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                              >
+                                {shortTitle || 'శీర్షిక ఇక్కడ వస్తుంది...'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Form Footer Actions */}
+                  <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-4 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShortsFormMode('list');
+                        setEditingShort(null);
+                      }}
+                      className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-3 px-6 rounded-xl transition-all cursor-pointer border border-slate-200"
+                    >
+                      Discard Changes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveShort}
+                      disabled={isSavingArticle}
+                      className="bg-[#f43f5e] hover:bg-[#e11d48] text-white font-black text-xs py-3 px-8 rounded-xl transition-all cursor-pointer shadow-md disabled:opacity-50"
+                    >
+                      {isSavingArticle ? 'Saving...' : 'Save Video Short'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ══════════════ VIEW: PHOTO GALLERY MANAGER ══════════════ */}
+          {activeTab === 'photos-gallery' && (
+            <div className="flex flex-col gap-6 animate-fade-in text-left">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800">ఫోటో గ్యాలరీ మేనేజర్ (Photo Gallery Manager)</h2>
+                <p className="text-slate-500 text-xs">ఫోటో గ్యాలరీలోకి చిత్రాలు అప్‌లోడ్ చేయండి. ఇవి వెబ్‌సైట్ ఫోటో గ్యాలరీ విభాగంలో ప్రదర్శించబడతాయి.</p>
+              </div>
+
+              {photosFormMode === 'list' ? (
+                <div className="flex flex-col gap-6">
+                  {/* List Header Actions */}
+                  <div className="flex justify-between items-center bg-white border border-slate-200/60 rounded-2xl p-4 shadow-sm">
+                    <span className="text-xs font-bold text-slate-500">
+                      మొత్తం గ్యాలరీ ఫోటోలు: <strong className="text-slate-800">{allArticles.filter(art => art.categorySlug === 'photos').length}</strong>
+                    </span>
+                    <button
+                      onClick={() => {
+                        setEditingPhotoAlbum(null);
+                        setPhotoTitle('');
+                        setPhotoDescription('');
+                        setPhotoImage('');
+                        setPhotosFormMode('add');
+                      }}
+                      className="bg-sky-600 hover:bg-sky-700 text-white font-black text-xs py-2.5 px-5 rounded-xl transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>కొత్త ఫోటో జోడించండి</span>
+                    </button>
+                  </div>
+
+                  {/* Photos Grid */}
+                  {allArticles.filter(art => art.categorySlug === 'photos').length === 0 ? (
+                    <div className="bg-white border border-slate-200/60 rounded-3xl p-12 text-center shadow-sm flex flex-col items-center justify-center gap-4">
+                      <ImageIcon className="w-12 h-12 text-slate-350" />
+                      <div className="flex flex-col gap-1">
+                        <h3 className="font-black text-slate-700 text-sm">గ్యాలరీ ఫోటోలు ఏవీ లేవు</h3>
+                        <p className="text-xs text-slate-400 max-w-sm">మీరు ఇంకా ఏ ఫోటోలను అప్‌లోడ్ చేయలేదు. కొత్త ఫోటోను జోడించడానికి పైన ఉన్న బటన్‌ను క్లిక్ చేయండి.</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setEditingPhotoAlbum(null);
+                          setPhotoTitle('');
+                          setPhotoDescription('');
+                          setPhotoImage('');
+                          setPhotosFormMode('add');
+                        }}
+                        className="bg-sky-600 hover:bg-sky-700 text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md"
+                      >
+                        + కొత్త ఫోటో జోడించండి
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                      {allArticles.filter(art => art.categorySlug === 'photos').map((art) => (
+                        <div key={art.id} className="bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm flex flex-col group relative text-left">
+                          <div className="relative aspect-square bg-slate-900 overflow-hidden">
+                            {art.image ? (
+                              <img src={art.image} alt={art.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">No Image</div>
+                            )}
+                            {/* Title overlay */}
+                            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent pt-10 pb-3 px-3">
+                              <span
+                                className="text-[12px] font-black text-white telugu-text line-clamp-2"
+                                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                              >
+                                {art.title}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* Actions Panel */}
+                          <div className="p-2 border-t border-slate-100 flex items-center justify-end gap-1.5 bg-slate-50">
+                            <button
+                              onClick={() => handleStartEditPhoto(art)}
+                              className="bg-white hover:bg-slate-100 text-slate-650 p-1.5 rounded-lg border border-slate-200/60 transition-all cursor-pointer inline-flex items-center gap-0.5 text-[10px] font-bold"
+                              title="Edit Photo"
+                            >
+                              <Pencil className="w-3 h-3" />
+                              <span>సవరించు</span>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteArticle(art.id)}
+                              className="bg-rose-50 hover:bg-rose-100 text-rose-600 p-1.5 rounded-lg border border-rose-200/40 transition-all cursor-pointer inline-flex items-center gap-0.5 text-[10px] font-bold"
+                              title="Delete Photo"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              <span>తొలగించు</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-white border border-slate-200/60 rounded-3xl p-5 md:p-6 flex flex-col gap-6 shadow-sm">
+                  {/* Form Header */}
+                  <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                    <h3 className="text-sm font-black text-slate-800 flex items-center gap-2">
+                      <ImageIcon className="w-4 h-4 text-sky-600" />
+                      <span>
+                        {photosFormMode === 'edit' ? 'ఆల్బమ్ ఫోటోను సవరించండి (Edit Album Photo)' : 'కొత్త ఫోటోను అప్‌లోడ్ చేయండి (Upload New Photo)'}
+                      </span>
+                    </h3>
+                    <button
+                      onClick={() => {
+                        setPhotosFormMode('list');
+                        setEditingPhotoAlbum(null);
+                      }}
+                      className="text-slate-400 hover:text-slate-650 text-xs font-bold transition-all cursor-pointer"
+                    >
+                      మొత్తం లిస్ట్ చూడండి
+                    </button>
+                  </div>
+
+                  {/* Form Body */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left Inputs */}
+                    <div className="lg:col-span-2 flex flex-col gap-6 text-left">
+                      <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 md:p-5 flex flex-col gap-4">
+                        <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-200/50 pb-2">
+                          1. శీర్షిక & వివరణ (Title & Caption)
+                        </h4>
+                        
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-black text-slate-450 uppercase tracking-widest">శీర్షిక / క్యాప్షన్ (Photo Caption / Title)</label>
+                          <input
+                            type="text"
+                            value={photoTitle}
+                            onChange={(e) => setPhotoTitle(e.target.value)}
+                            placeholder="e.g. హైదరాబాద్‌లో ఘనంగా అంతర్జాతీయ పతంగుల పండుగ"
+                            className="bg-white border border-slate-200/80 focus:border-sky-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-black text-slate-450 uppercase tracking-widest">వివరణ (Description / Subtitle)</label>
+                          <textarea
+                            value={photoDescription}
+                            onChange={(e) => setPhotoDescription(e.target.value)}
+                            placeholder="ఈ ఫోటోకి సంబంధించిన చిన్న వివరణ లేదా వివరాలను రాయండి..."
+                            rows={4}
+                            className="bg-white border border-slate-200/80 focus:border-sky-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text resize-none"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Image Upload Box */}
+                      <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 md:p-5 flex flex-col gap-4">
+                        <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-200/50 pb-2">
+                          2. చిత్రం ఎంచుకోండి (Image File)
+                        </h4>
+
+                        <div className="border border-dashed border-slate-300 hover:border-sky-500 rounded-xl p-6 bg-white text-center relative cursor-pointer min-h-[160px] flex items-center justify-center transition-colors">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handlePhotoCoverChange}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          />
+                          {!photoImage ? (
+                            <div className="flex flex-col items-center gap-2">
+                              <Upload className="w-6 h-6 text-slate-400" />
+                              <span className="text-xs font-bold text-slate-500">చిత్రం అప్‌లోడ్ చేయండి (Select Image)</span>
+                            </div>
+                          ) : (
+                            <div className="relative w-full overflow-hidden rounded-xl bg-slate-900 border border-slate-200 p-2">
+                              <img 
+                                src={photoImage} 
+                                alt="Preview" 
+                                className="w-full h-auto max-h-[180px] block rounded-lg object-contain bg-black mx-auto" 
+                              />
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setPhotoImage('');
+                                }}
+                                className="absolute top-4 right-4 bg-black/75 hover:bg-black/90 text-white rounded-full w-6 h-6 flex items-center justify-center transition-colors cursor-pointer shadow-md"
+                                title="Delete Image"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Live Card Preview */}
+                    <div className="lg:col-span-1 flex flex-col gap-6">
+                      <div className="sticky top-6 flex flex-col gap-4 text-left">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                          Preview (లైవ్ గ్యాలరీ కార్డ్ ప్రివ్యూ)
+                        </label>
+                        <div className="border border-slate-200 rounded-3xl p-4 bg-slate-50 flex items-center justify-center">
+                          <div className="bg-white border border-gray-150 rounded-xl overflow-hidden shadow-xs w-full max-w-[220px] flex flex-col">
+                            <div className="relative aspect-video w-full overflow-hidden bg-gray-50 border-b border-gray-100">
+                              {photoImage ? (
+                                <img src={photoImage} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">No Image Preview</div>
+                              )}
+                            </div>
+                            <div className="p-3 bg-gray-50/50 text-center">
+                              <p className="text-[12px] font-bold text-gray-800 telugu-text truncate" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                {photoTitle || 'శీర్షిక ఇక్కడ వస్తుంది...'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Form Actions */}
+                  <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-4 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPhotosFormMode('list');
+                        setEditingPhotoAlbum(null);
+                      }}
+                      className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-3 px-6 rounded-xl transition-all cursor-pointer border border-slate-200"
+                    >
+                      Discard Changes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSavePhotoAlbum}
+                      disabled={isSavingArticle}
+                      className="bg-sky-600 hover:bg-sky-700 text-white font-black text-xs py-3 px-8 rounded-xl transition-all cursor-pointer shadow-md disabled:opacity-50"
+                    >
+                      {isSavingArticle ? 'Saving...' : 'Save Photo Album'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ══════════════ VIEW: POLLS MANAGER ══════════════ */}
+          {activeTab === 'polls-manager' && (
+            <div className="flex flex-col gap-6 animate-fade-in text-left">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800">తాజా పోల్స్ మేనేజర్ (Manage Polls)</h2>
+                <p className="text-slate-500 text-xs">ఇక్కడ మీరు కొత్త పోల్స్‌ను సృష్టించవచ్చు, సవరించవచ్చు లేదా తొలగించవచ్చు.</p>
+              </div>
+
+              {pollsFormMode === 'list' ? (
+                <div className="flex flex-col gap-6">
+                  {/* List Header Actions */}
+                  <div className="flex justify-between items-center bg-white border border-slate-200/60 rounded-2xl p-4 shadow-sm">
+                    <span className="text-xs font-bold text-slate-500">
+                      మొత్తం పోల్స్: <strong className="text-slate-800">{allArticles.filter(art => art.categorySlug === 'polls').length}</strong>
+                    </span>
+                    <button
+                      onClick={() => {
+                        setEditingPoll(null);
+                        setCmsPollQuestion('');
+                        setPollStartDate(new Date().toISOString().split('T')[0]);
+                        setPollEndDate(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+                        setPollOptions([
+                          { id: 'a', label: '', votes: 0 },
+                          { id: 'b', label: '', votes: 0 },
+                        ]);
+                        setPollsFormMode('add');
+                      }}
+                      className="bg-sky-600 hover:bg-sky-700 text-white font-black text-xs py-2.5 px-5 rounded-xl transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>కొత్త పోల్ సృష్టించండి</span>
+                    </button>
+                  </div>
+
+                  {/* Polls Listing Grid */}
+                  {allArticles.filter(art => art.categorySlug === 'polls').length === 0 ? (
+                    <div className="bg-white border border-slate-200/60 rounded-3xl p-12 text-center shadow-sm flex flex-col items-center justify-center gap-4">
+                      <BarChart3 className="w-12 h-12 text-slate-350" />
+                      <div className="flex flex-col gap-1">
+                        <h3 className="font-black text-slate-700 text-sm">పోల్స్ ఏవీ లేవు</h3>
+                        <p className="text-xs text-slate-400 max-w-sm">మీరు ఇంకా ఏ పోల్స్ సృష్టించలేదు. కొత్త పోల్ సృష్టించడానికి పైన ఉన్న బటన్‌ను క్లిక్ చేయండి.</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setEditingPoll(null);
+                          setCmsPollQuestion('');
+                          setPollStartDate(new Date().toISOString().split('T')[0]);
+                          setPollEndDate(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+                          setPollOptions([
+                            { id: 'a', label: '', votes: 0 },
+                            { id: 'b', label: '', votes: 0 },
+                          ]);
+                          setPollsFormMode('add');
+                        }}
+                        className="bg-sky-600 hover:bg-sky-700 text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md"
+                      >
+                        + కొత్త పోల్ సృష్టించండి
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {allArticles.filter(art => art.categorySlug === 'polls').map((art) => {
+                        let parsedOptions: any[] = [];
+                        try {
+                          parsedOptions = JSON.parse(art.body || '[]');
+                        } catch (e) {}
+                        const totalV = parsedOptions.reduce((acc, curr) => acc + (curr.votes || 0), 0);
+
+                        return (
+                          <div key={art.id} className="bg-white border border-slate-200/60 rounded-2xl p-5 shadow-sm flex flex-col justify-between text-left">
+                            <div className="flex flex-col gap-3">
+                              <div className="flex items-center justify-between">
+                                <div className="flex gap-1.5 items-center">
+                                  <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-black uppercase tracking-wider">
+                                    {art.description || 'ముగిసింది'}
+                                  </span>
+                                  <span className={`text-[10px] px-2 py-0.5 rounded font-black uppercase tracking-wider ${
+                                    art.districtSlug === 'article' ? 'bg-amber-100 text-amber-750' : 'bg-blue-100 text-blue-750'
+                                  }`}>
+                                    {art.districtSlug === 'article' ? 'వార్తా కథనాలు' : 'సాధారణం'}
+                                  </span>
+                                </div>
+                                <span className="text-[10px] text-slate-400 font-bold">
+                                  ఓట్లు: <strong className="text-slate-700">{totalV}</strong>
+                                </span>
+                              </div>
+                              <h3 className="text-sm font-black text-slate-800 telugu-text leading-relaxed" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                {art.title}
+                              </h3>
+                              
+                              {/* Preview of options */}
+                              <div className="flex flex-col gap-1.5 mt-2">
+                                {parsedOptions.map((opt: any) => {
+                                  const pct = totalV > 0 ? Math.round((opt.votes / totalV) * 100) : 0;
+                                  return (
+                                    <div key={opt.id} className="text-xs flex items-center justify-between text-slate-600 border border-slate-100 rounded px-2.5 py-1 bg-slate-50/50">
+                                      <span className="telugu-text font-medium">{opt.label}</span>
+                                      <span className="font-bold text-slate-500">{opt.votes} ({pct}%)</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            {/* Actions panel */}
+                            <div className="flex items-center justify-end gap-2 border-t border-slate-100 pt-3 mt-4">
+                              <button
+                                onClick={() => handleStartEditPoll(art)}
+                                className="bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs py-2 px-4 rounded-xl border border-slate-200/80 transition-all cursor-pointer inline-flex items-center gap-1.5"
+                              >
+                                <Pencil className="w-3.5 h-3.5" />
+                                <span>సవరించు</span>
+                              </button>
+                              <button
+                                onClick={() => handleDeleteArticle(art.id)}
+                                className="bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs py-2 px-4 rounded-xl border border-rose-200/40 transition-all cursor-pointer inline-flex items-center gap-1.5"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>తొలగించు</span>
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-white border border-slate-200/60 rounded-3xl p-5 md:p-6 flex flex-col gap-6 shadow-sm">
+                  {/* Form Header */}
+                  <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                    <h3 className="text-sm font-black text-slate-800 flex items-center gap-2">
+                      <BarChart3 className="w-4 h-4 text-sky-600" />
+                      <span>
+                        {pollsFormMode === 'edit' ? 'పోల్‌ను సవరించండి (Edit Poll Question)' : 'కొత్త పోల్ సృష్టించండి (Create New Poll)'}
+                      </span>
+                    </h3>
+                    <button
+                      onClick={() => {
+                        setPollsFormMode('list');
+                        setEditingPoll(null);
+                      }}
+                      className="text-slate-400 hover:text-slate-650 text-xs font-bold transition-all cursor-pointer"
+                    >
+                      మొత్తం పోల్స్ లిస్ట్ చూడండి
+                    </button>
+                  </div>
+
+                  {/* Form Body */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left Inputs */}
+                    <div className="lg:col-span-2 flex flex-col gap-6 text-left">
+                      <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 md:p-5 flex flex-col gap-4">
+                        <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest border-b border-slate-200/50 pb-2">
+                          1. పోల్ ప్రశ్న & ముగింపు సమయం (Question & Duration)
+                        </h4>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-black text-slate-455 uppercase tracking-widest">పోల్ ప్రశ్న (Poll Question)</label>
+                          <textarea
+                            value={cmsPollQuestion}
+                            onChange={(e) => setCmsPollQuestion(e.target.value)}
+                            placeholder="e.g. 2024 ఎన్నికల్లో తెలంగాణలో అధికారంలోకి ఎవరు వస్తారని మీరు అనుకుంటున్నారు?"
+                            rows={3}
+                            className="bg-white border border-slate-200/80 focus:border-sky-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text resize-none"
+                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-455 uppercase tracking-widest">ప్రారంభ తేదీ (Start Date)</label>
+                            <input
+                              type="date"
+                              value={pollStartDate}
+                              onChange={(e) => setPollStartDate(e.target.value)}
+                              className="bg-white border border-slate-200/80 focus:border-sky-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-455 uppercase tracking-widest">ముగింపు తేదీ (End Date)</label>
+                            <input
+                              type="date"
+                              value={pollEndDate}
+                              onChange={(e) => setPollEndDate(e.target.value)}
+                              className="bg-white border border-slate-200/80 focus:border-sky-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-black text-slate-455 uppercase tracking-widest">పోల్ ప్రదర్శించే స్థానం (Poll Scope / Placement)</label>
+                          <div className="grid grid-cols-2 gap-3 mt-1">
+                            <button
+                              type="button"
+                              onClick={() => setPollScope('general')}
+                              className={`py-2 px-3 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs ${
+                                pollScope === 'general'
+                                  ? 'border-[#02599c] bg-[#02599c]/10 text-[#02599c] shadow-sm'
+                                  : 'border-slate-200 bg-white text-slate-450 hover:text-slate-700'
+                              }`}
+                            >
+                              🌐 General Poll (సాధారణ పోల్)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setPollScope('article')}
+                              className={`py-2 px-3 rounded-xl border-2 font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs ${
+                                pollScope === 'article'
+                                  ? 'border-[#02599c] bg-[#02599c]/10 text-[#02599c] shadow-sm'
+                                  : 'border-slate-200 bg-white text-slate-455 hover:text-slate-700'
+                              }`}
+                            >
+                              📄 Article Page (వార్తా కథనాలు)
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                          {/* Scope hint */}
+                          <div className={`mt-2 px-3 py-2 rounded-lg text-[10px] font-bold border ${pollScope === 'general' ? 'bg-sky-50 border-sky-200 text-sky-700' : 'bg-amber-50 border-amber-200 text-amber-700'}`}>
+                            {pollScope === 'general' ? '🌐 ఈ పోల్ అన్ని పేజీల సైడ్‌బార్‌లో కనిపిస్తుంది (హోమ్, కేటగరీ పేజీలు)' : '📄 ఈ పోల్ కేవలం వార్తా కథన పేజీలలో మాత్రమే కనిపిస్తుంది'}
+                          </div>
+
+                      {/* Options Input Fields — Dynamic */}
+                       <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 md:p-5 flex flex-col gap-4">
+                         <div className="flex items-center justify-between border-b border-slate-200/50 pb-2">
+                           <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                             2. పోల్ ఆప్షన్స్ (Poll Options)
+                           </h4>
+                           <button
+                             type="button"
+                             onClick={() => {
+                               const nextId = String.fromCharCode(97 + pollOptions.length);
+                               setPollOptions(prev => [...prev, { id: nextId, label: '', votes: 0 }]);
+                             }}
+                             disabled={pollOptions.length >= 8}
+                             className="flex items-center gap-1 bg-sky-600 hover:bg-sky-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+                           >
+                             <Plus className="w-3 h-3" />
+                             ఆప్షన్ జోడించు
+                           </button>
+                         </div>
+
+                         {pollOptions.map((opt, idx) => (
+                           <div key={opt.id} className="flex items-end gap-2">
+                             <div className="flex-1 flex flex-col gap-1">
+                               <label className="text-[10px] font-black text-slate-450 uppercase tracking-wider flex justify-between">
+                                 <span>
+                                   ఆప్షన్ {opt.id.toUpperCase()}
+                                   {idx < 2
+                                     ? <strong className="text-rose-500 ml-1">*</strong>
+                                     : <span className="text-slate-400 ml-1">(Optional)</span>
+                                   }
+                                 </span>
+                                 {pollsFormMode === 'edit' && <span className="text-slate-400">ఓట్లు: {opt.votes}</span>}
+                               </label>
+                               <input
+                                 type="text"
+                                 value={opt.label}
+                                 onChange={(e) => {
+                                   const val = e.target.value;
+                                   setPollOptions(prev => prev.map(o => o.id === opt.id ? { ...o, label: val } : o));
+                                 }}
+                                 placeholder={`ఆప్షన్ ${opt.id.toUpperCase()} నమోదు చేయండి...`}
+                                 className="bg-white border border-slate-200/80 focus:border-sky-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold telugu-text"
+                                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                               />
+                             </div>
+                             {idx >= 2 && (
+                               <button
+                                 type="button"
+                                 onClick={() => setPollOptions(prev => prev.filter((_, i) => i !== idx))}
+                                 className="mb-0.5 p-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-500 transition-all cursor-pointer flex-shrink-0"
+                                 title="ఆప్షన్ తొలగించు"
+                               >
+                                 <Trash2 className="w-3.5 h-3.5" />
+                               </button>
+                             )}
+                           </div>
+                         ))}
+
+                         <p className="text-[10px] text-slate-400 font-bold">
+                           కనీసం 2 ఆప్షన్లు తప్పనిసరి • గరిష్టం 8 ఆప్షన్లు
+                         </p>
+                       </div>
+                     </div>
+
+                     {/* Right Live Preview Card */}
+                    <div className="lg:col-span-1 flex flex-col gap-6">
+                      <div className="sticky top-6 flex flex-col gap-4 text-left">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                          Preview (లైవ్ పోల్ కార్డ్ ప్రివ్యూ)
+                        </label>
+                        
+                        <div className="bg-white border border-slate-200/60 rounded-3xl p-5 shadow-sm flex flex-col gap-4 w-full">
+                          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <span className="text-xs bg-red-650 text-white px-2 py-0.5 rounded font-black uppercase tracking-wider">తాజా పోల్</span>
+                            <span className="text-[10px] text-slate-400 font-bold">
+                              {formatTeluguDate(pollStartDate)} - {formatTeluguDate(pollEndDate)}
+                            </span>
+                          </div>
+                          
+                          <h3 className="text-xs font-black text-slate-800 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                            {cmsPollQuestion || 'మీ ప్రశ్న ఇక్కడ కనిపిస్తుంది?'}
+                          </h3>
+
+                          <div className="flex flex-col gap-2">
+                            {pollOptions.filter(o => o.label.trim() !== '').map((opt) => (
+                              <div key={opt.id} className="border border-slate-200/80 rounded-xl p-3 flex items-center gap-3 bg-slate-50/50">
+                                <div className="w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center" />
+                                <span className="text-xs font-black text-slate-650 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                  {opt.label}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Form Actions */}
+                  <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-4 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPollsFormMode('list');
+                        setEditingPoll(null);
+                      }}
+                      className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-3 px-6 rounded-xl transition-all cursor-pointer border border-slate-200"
+                    >
+                      Discard Changes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSavePoll}
+                      disabled={isSavingArticle}
+                      className="bg-sky-600 hover:bg-sky-700 text-white font-black text-xs py-3 px-8 rounded-xl transition-all cursor-pointer shadow-md disabled:opacity-50"
+                    >
+                      {isSavingArticle ? 'Saving...' : 'Save Poll'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ══════════════ VIEW: POPUP MANAGER ══════════════ */}
+          {activeTab === 'popup-manager' && (
+            <div className="flex flex-col gap-8 animate-fade-in text-left">
+              {/* Header */}
+              <div>
+                <h2 className="text-2xl font-black text-slate-800">పాప్‌అప్ మేనేజర్ (Popup Manager)</h2>
+                <p className="text-slate-500 text-xs mt-1">వెబ్‌సైట్‌లో కనిపించే పాప్‌అప్‌లను ఇక్కడ నుండి నిర్వహించవచ్చు. ప్రతి పాప్‌అప్‌కు విజ్ఞాపనం (Ad) లేదా పోల్ చూపించే విధంగా సెట్ చేయవచ్చు.</p>
+              </div>
+
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                {/* ── HOME POPUP CARD ── */}
+                {([
+                  { id: 'home' as const, label: 'హోమ్ పాప్‌అప్', sublabel: 'Home Page Popup', config: homePopup, setConfig: setHomePopup },
+                  { id: 'article' as const, label: 'ఆర్టికల్ పాప్‌అప్', sublabel: 'Article Page Popup', config: articlePopup, setConfig: setArticlePopup },
+                ]).map(({ id, label, sublabel, config, setConfig }) => (
+                  <div key={id} className="bg-white border border-slate-200/60 rounded-3xl overflow-hidden shadow-sm flex flex-col">
+                    {/* Card Header */}
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-slate-50/70">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2.5 h-2.5 rounded-full ${config.enabled ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                        <div>
+                          <h3 className="text-sm font-black text-slate-800">{label}</h3>
+                          <p className="text-[10px] text-slate-400 font-bold">{sublabel}</p>
+                        </div>
+                      </div>
+                      {/* Enable/Disable Toggle */}
+                      <button
+                        type="button"
+                        onClick={() => setConfig(prev => ({ ...prev, enabled: !prev.enabled }))}
+                        className="flex items-center gap-2 cursor-pointer"
+                        title={config.enabled ? 'పాప్‌అప్ నిలిపివేయుటకు క్లిక్ చేయండి' : 'పాప్‌అప్ ప్రారంభించుటకు క్లిక్ చేయండి'}
+                      >
+                        <span className={`text-[10px] font-black ${config.enabled ? 'text-emerald-600' : 'text-slate-400'}`}>
+                          {config.enabled ? 'ON' : 'OFF'}
+                        </span>
+                        {config.enabled
+                          ? <ToggleRight className="w-8 h-8 text-emerald-500" />
+                          : <ToggleLeft className="w-8 h-8 text-slate-300" />
+                        }
+                      </button>
+                    </div>
+
+                    <div className="p-5 flex flex-col gap-5">
+                      {/* Mode selector: Ad vs Poll */}
+                      <div className="flex flex-col gap-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">పాప్‌అప్ రకం (Popup Mode)</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setConfig(prev => ({ ...prev, type: 'ad' }))}
+                            className={`py-2.5 rounded-xl border-2 font-black text-xs transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                              config.type === 'ad'
+                                ? 'border-violet-500 bg-violet-50 text-violet-700 shadow-sm'
+                                : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
+                            }`}
+                          >
+                            <ImagePlay className="w-3.5 h-3.5" />
+                            విజ్ఞాపనం (Ad)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setConfig(prev => ({ ...prev, type: 'poll' }))}
+                            className={`py-2.5 rounded-xl border-2 font-black text-xs transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                              config.type === 'poll'
+                                ? 'border-sky-500 bg-sky-50 text-sky-700 shadow-sm'
+                                : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
+                            }`}
+                          >
+                            <BarChart3 className="w-3.5 h-3.5" />
+                            పోల్ (Poll)
+                          </button>
+                        </div>
+                        <div className={`px-3 py-2 rounded-lg text-[10px] font-bold border ${
+                          config.type === 'ad' ? 'bg-violet-50 border-violet-200 text-violet-700' : 'bg-sky-50 border-sky-200 text-sky-700'
+                        }`}>
+                          {config.type === 'ad'
+                            ? '🖼️ పాప్‌అప్‌లో ఒక విజ్ఞాపన చిత్రం మరియు లింక్ చూపిస్తుంది'
+                            : '📊 పాప్‌అప్‌లో ఒక పోల్ ప్రశ్న మరియు ఓటింగ్ చూపిస్తుంది'
+                          }
+                        </div>
+                      </div>
+
+                      {/* ── AD Fields ── */}
+                      {config.type === 'ad' && (
+                        <div className="flex flex-col gap-4 bg-slate-50 border border-slate-200/50 rounded-2xl p-4">
+                          <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">విజ్ఞాపన వివరాలు (Ad Details)</h4>
+                          
+                          {/* Image Upload instead of URL */}
+                          <div className="flex flex-col gap-2">
+                            <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide flex items-center justify-between gap-1 w-full">
+                              <span className="flex items-center gap-1">
+                                <ImageIcon className="w-3.5 h-3.5 text-slate-500" /> విజ్ఞాపన చిత్రం (Ad Image)
+                              </span>
+                              <span className="text-sky-600 font-black normal-case text-[10px] bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100">
+                                {config.adOrientation === 'horizontal' ? 'Exact Size: 1050 x 680 px' : 'Exact Size: 600 x 870 px'}
+                              </span>
+                            </label>
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="file"
+                                id={`popup-image-input-${id}`}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    handleCompressAndSetImage(file, (base64) => {
+                                      setConfig(prev => ({ ...prev, adImage: base64 }));
+                                    });
+                                  }
+                                }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => document.getElementById(`popup-image-input-${id}`)?.click()}
+                                className="bg-sky-600 hover:bg-sky-700 text-white font-black text-xs py-2 px-4 rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+                              >
+                                <Upload className="w-3.5 h-3.5" />
+                                చిత్రం అప్‌లోడ్ చేయండి (Upload Image)
+                              </button>
+                              {config.adImage && (
+                                <button
+                                  type="button"
+                                  onClick={() => setConfig(prev => ({ ...prev, adImage: '' }))}
+                                  className="border border-rose-200 hover:bg-rose-50 text-rose-500 font-bold text-xs py-2 px-3 rounded-xl transition-all cursor-pointer"
+                                >
+                                  తొలగించు (Remove)
+                                </button>
+                              )}
+                            </div>
+                            
+                            {config.adImage && (
+                              <div className="mt-2 border border-slate-200 bg-white p-2 rounded-xl flex flex-col items-center justify-center">
+                                <span className="text-[9px] font-bold text-slate-400 mb-1">Image Preview:</span>
+                                <div className={`relative border border-dashed border-slate-200 overflow-hidden ${
+                                  config.adOrientation === 'horizontal' ? 'w-full h-32' : 'w-28 h-40'
+                                }`}>
+                                  <img 
+                                    src={config.adImage} 
+                                    alt="Ad Preview" 
+                                    className="w-full h-full object-cover" 
+                                    onError={e => (e.currentTarget.style.display = 'none')} 
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Ad Orientation Select */}
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">విన్యాసం (Ad Orientation / Size)</label>
+                            <div className="grid grid-cols-2 gap-2 mt-1">
+                              <button
+                                type="button"
+                                onClick={() => setConfig(prev => ({ ...prev, adOrientation: 'horizontal' }))}
+                                className={`py-2 rounded-xl border font-black text-[11px] transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                                  config.adOrientation === 'horizontal'
+                                    ? 'border-sky-500 bg-sky-50 text-sky-700 shadow-sm'
+                                    : 'border-slate-200 bg-white text-slate-500 hover:border-slate-350'
+                                }`}
+                              >
+                                Horizontal (అడ్డంగా - Wide)
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setConfig(prev => ({ ...prev, adOrientation: 'vertical' }))}
+                                className={`py-2 rounded-xl border font-black text-[11px] transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                                  config.adOrientation === 'vertical'
+                                    ? 'border-sky-500 bg-sky-50 text-sky-700 shadow-sm'
+                                    : 'border-slate-200 bg-white text-slate-500 hover:border-slate-350'
+                                }`}
+                              >
+                                Vertical (నిలువుగా - Tall)
+                              </button>
+                            </div>
+                            <p className="text-[9.5px] text-slate-400 font-bold mt-1.5 bg-slate-100 p-2 rounded-xl flex items-center gap-1 border border-slate-200/40">
+                              💡 <span>సలహా ఇవ్వబడిన సైజు (Exact Size):</span>
+                              <span className="text-sky-600 font-black">
+                                {config.adOrientation === 'horizontal' ? '1050 x 680 px' : '600 x 870 px'}
+                              </span>
+                            </p>
+                          </div>
+
+                          {/* Ad Link URL */}
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide flex items-center gap-1">
+                              <Link2 className="w-3 h-3 text-slate-500" /> క్లిక్ లింక్ (Ad Click Link URL)
+                            </label>
+                            <input
+                              type="text"
+                              value={config.adLink}
+                              onChange={e => setConfig(prev => ({ ...prev, adLink: e.target.value }))}
+                              placeholder="https://example.com/offer"
+                              className="bg-white border border-slate-200/80 focus:border-violet-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* ── POLL Fields ── */}
+                      {config.type === 'poll' && (
+                        <div className="flex flex-col gap-3 bg-slate-50 border border-slate-200/50 rounded-2xl p-4">
+                          <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">పోల్ వివరాలు (Poll Details)</h4>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">ప్రశ్న (Question) <strong className="text-rose-500">*</strong></label>
+                            <textarea
+                              value={config.pollQuestion}
+                              onChange={e => setConfig(prev => ({ ...prev, pollQuestion: e.target.value }))}
+                              placeholder="మీ ప్రశ్న ఇక్కడ రాయండి..."
+                              rows={2}
+                              className="bg-white border border-slate-200/80 focus:border-sky-500 rounded-xl pl-5 pr-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-semibold resize-none"
+                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: 'normal' }}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide flex items-center justify-between">
+                              <span>ఎంపికలు (Choices / Options)</span>
+                              <span className="text-[9px] text-slate-400 font-bold">కనీసం 2, గరిష్టం 6 (Min 2, Max 6)</span>
+                            </label>
+                            
+                            <div className="space-y-3">
+                              {config.pollOpts.map((optVal, i) => (
+                                <div key={i} className="flex items-center gap-2">
+                                  <span className="text-xs font-black text-slate-400 w-5 font-sans">#{i + 1}</span>
+                                  <input
+                                    type="text"
+                                    value={optVal}
+                                    onChange={e => {
+                                      const newOpts = [...config.pollOpts];
+                                      newOpts[i] = e.target.value;
+                                      setConfig(prev => ({ ...prev, pollOpts: newOpts }));
+                                    }}
+                                    placeholder={`Option ${i + 1}`}
+                                    className="flex-1 bg-white border border-slate-200/80 focus:border-sky-500 rounded-xl pl-5 pr-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-semibold"
+                                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: 'normal' }}
+                                  />
+                                  {config.pollOpts.length > 2 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const newOpts = config.pollOpts.filter((_, idx) => idx !== i);
+                                        setConfig(prev => ({ ...prev, pollOpts: newOpts }));
+                                      }}
+                                      className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition-all cursor-pointer border border-rose-100 flex items-center justify-center"
+                                      title="Delete option"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+
+                            {config.pollOpts.length < 6 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setConfig(prev => ({ ...prev, pollOpts: [...prev.pollOpts, ''] }));
+                                }}
+                                className="mt-1 bg-sky-50 hover:bg-sky-100 text-sky-600 border border-sky-200/60 font-black text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 w-full shadow-xs"
+                              >
+                                <Plus className="w-3.5 h-3.5" /> ఎంపికను జోడించండి (Add Option)
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Save Button */}
+                      <button
+                        type="button"
+                        onClick={() => savePopupConfig(id, config)}
+                        className="w-full bg-slate-900 hover:bg-slate-800 text-white font-black text-xs py-3 rounded-xl transition-all cursor-pointer shadow-md flex items-center justify-center gap-2"
+                      >
+                        {popupSaved === id
+                          ? <><CheckCircle className="w-4 h-4 text-emerald-400" /> సేవ్ అయింది! (Saved)</>
+                          : <><Settings className="w-4 h-4" /> {label} సెట్టింగ్స్ సేవ్ చేయండి</>
+                        }
+                      </button>
+
+                      {/* Disabled warning */}
+                      {!config.enabled && (
+                        <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5">
+                          <span className="text-amber-600 text-[11px] font-black">⚠️ ఈ పాప్‌అప్ ప్రస్తుతం నిలిపివేయబడింది (Popup is disabled)</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Info Banner */}
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
+                <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs font-black text-blue-800">పాప్‌అప్ ఎప్పుడు కనిపిస్తుంది?</p>
+                  <ul className="text-[11px] text-blue-700 font-bold space-y-0.5 list-disc list-inside">
+                    <li><strong>హోమ్ పాప్‌అప్:</strong> హోమ్‌పేజ్ తెరిచిన 25 సెకన్ల తర్వాత — సెషన్‌కు ఒకసారి</li>
+                    <li><strong>ఆర్టికల్ పాప్‌అప్:</strong> వార్తా కథన పేజీ తెరిచిన 25 సెకన్ల తర్వాత — ప్రతి పేజీకి ఒకసారి</li>
+                    <li>సెట్టింగ్స్ సేవ్ చేసిన తర్వాత వెంటనే వెబ్‌సైట్‌లో వర్తిస్తాయి</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════ VIEW: DISTRICT NEWS SIDEBAR MANAGER ══════════════ */}
+          {activeTab === 'jilla-sidebar' && (
+            <div className="flex flex-col gap-6 animate-fade-in text-left">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800">జిల్లా వార్తలు సైడ్‌బార్ మేనేజర్ (District News Sidebar Manager)</h2>
+                <p className="text-slate-500 text-xs">ఇక్కడ మీరు పిన్ చేసిన తెలంగాణ మరియు ఆంధ్రప్రదేశ్ జిల్లా వార్తలు అన్ని వార్తా కథనాల సైడ్‌బార్‌లో ప్రదర్శించబడతాయి.</p>
+              </div>
+
+              {/* Sub-tab Toggle (TG vs AP) */}
+              <div className="flex bg-white border border-slate-200/60 rounded-2xl p-2 gap-2 shadow-sm max-w-md">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDistrictActiveSubTab('tg');
+                    setDistrictSearchQuery('');
+                  }}
+                  className={`flex-1 py-2 text-xs font-black rounded-xl transition-all cursor-pointer ${
+                    districtActiveSubTab === 'tg'
+                      ? 'bg-[#02599c] text-white shadow-sm'
+                      : 'text-slate-500 hover:text-slate-850 hover:bg-slate-50'
+                  }`}
+                >
+                  తెలంగాణ జిల్లా వార్తలు (Telangana)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDistrictActiveSubTab('ap');
+                    setDistrictSearchQuery('');
+                  }}
+                  className={`flex-1 py-2 text-xs font-black rounded-xl transition-all cursor-pointer ${
+                    districtActiveSubTab === 'ap'
+                      ? 'bg-[#e60000] text-white shadow-sm'
+                      : 'text-slate-500 hover:text-slate-850 hover:bg-slate-50'
+                  }`}
+                >
+                  ఆంధ్రప్రదేశ్ జిల్లా వార్తలు (Andhra Pradesh)
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left Column: Currently Pinned Articles */}
+                <div className="bg-white border border-slate-200/60 rounded-3xl p-5 md:p-6 shadow-sm flex flex-col gap-4">
+                  <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5 flex justify-between items-center">
+                    <span>📌 ప్రస్తుతం పిన్ చేసిన వార్తలు ({districtActiveSubTab === 'tg' ? pinnedTgNews.length : pinnedApNews.length})</span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase">Sidebar Order</span>
+                  </h3>
+
+                  {(() => {
+                    const pinnedList = districtActiveSubTab === 'tg' ? pinnedTgNews : pinnedApNews;
+                    const setPinnedList = districtActiveSubTab === 'tg' ? setPinnedTgNews : setPinnedApNews;
+
+                    if (pinnedList.length === 0) {
+                      return (
+                        <div className="p-8 text-center text-slate-400 text-xs font-bold bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                          పిన్ చేసిన వార్తలు ఏవీ లేవు. కింద ఉన్న లభించే వార్తల లిస్ట్ నుండి పిన్ చేయండి.
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="divide-y divide-slate-100 border border-slate-200/80 rounded-2xl overflow-hidden bg-slate-50/30">
+                        {pinnedList.map((art, idx) => (
+                          <div key={art.id} className="p-3.5 flex items-center justify-between gap-4 hover:bg-slate-50/50 transition-colors">
+                            <div className="min-w-0 flex-1 flex flex-col gap-1">
+                              <span className="text-xs font-bold text-slate-800 line-clamp-2 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                {art.title}
+                              </span>
+                              {art.districtName && (
+                                <span className="text-[9px] text-[#02599c] font-black uppercase tracking-wider bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded w-max">
+                                  {art.districtName}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-shrink-0">
+                              <button
+                                type="button"
+                                disabled={idx === 0}
+                                onClick={() => {
+                                  const updated = [...pinnedList];
+                                  const temp = updated[idx];
+                                  updated[idx] = updated[idx - 1];
+                                  updated[idx - 1] = temp;
+                                  setPinnedList(updated);
+                                  localStorage.setItem(`pinned_${districtActiveSubTab}_district_news`, JSON.stringify(updated));
+                                }}
+                                className={`p-1.5 rounded cursor-pointer transition-colors ${
+                                  idx === 0 ? 'text-slate-250' : 'text-slate-500 hover:bg-slate-200/80'
+                                }`}
+                                title="Move Up"
+                              >
+                                <ArrowUp className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={idx === pinnedList.length - 1}
+                                onClick={() => {
+                                  const updated = [...pinnedList];
+                                  const temp = updated[idx];
+                                  updated[idx] = updated[idx + 1];
+                                  updated[idx + 1] = temp;
+                                  setPinnedList(updated);
+                                  localStorage.setItem(`pinned_${districtActiveSubTab}_district_news`, JSON.stringify(updated));
+                                }}
+                                className={`p-1.5 rounded cursor-pointer transition-colors ${
+                                  idx === pinnedList.length - 1 ? 'text-slate-250' : 'text-slate-500 hover:bg-slate-200/80'
+                                }`}
+                                title="Move Down"
+                              >
+                                <ArrowDown className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updated = pinnedList.filter((_, i) => i !== idx);
+                                  setPinnedList(updated);
+                                  localStorage.setItem(`pinned_${districtActiveSubTab}_district_news`, JSON.stringify(updated));
+                                }}
+                                className="p-1.5 rounded hover:bg-rose-100 text-rose-500 transition-colors cursor-pointer"
+                                title="Unpin Article"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Right Column: Search and Browse Available Articles */}
+                <div className="bg-white border border-slate-200/60 rounded-3xl p-5 md:p-6 shadow-sm flex flex-col gap-4">
+                  <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5">
+                    📂 పిన్ చేయడానికి అందుబాటులో ఉన్న జిల్లా వార్తలు
+                  </h3>
+
+                  {/* Search input */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={districtSearchQuery}
+                      onChange={(e) => setDistrictSearchQuery(e.target.value)}
+                      placeholder="శీర్షిక లేదా జిల్లా పేరుతో శోధించండి..."
+                      className="w-full bg-slate-50 border border-slate-200/80 focus:border-[#02599c] focus:bg-white rounded-xl pl-10 pr-4 py-2.5 text-xs outline-none text-slate-900 font-bold"
+                    />
+                    <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
+                  </div>
+
+                  {/* Available list */}
+                  <div className="border border-slate-200/80 rounded-2xl overflow-hidden max-h-[400px] overflow-y-auto divide-y divide-slate-100 bg-slate-50/20 admin-scrollbar">
+                    {(() => {
+                      const query = districtSearchQuery.trim().toLowerCase();
+                      const pinnedList = districtActiveSubTab === 'tg' ? pinnedTgNews : pinnedApNews;
+                      const setPinnedList = districtActiveSubTab === 'tg' ? setPinnedTgNews : setPinnedApNews;
+
+                      // Filter articles matching active state sub-tab (TG or AP) and districtSlug
+                      const availableList = allArticles.filter((art) => {
+                        const isMatchTab = art.categorySlug === (districtActiveSubTab === 'tg' ? 'telangana' : 'andhra-pradesh') && art.districtSlug;
+                        const isMatchQuery = !query || 
+                          art.title?.toLowerCase().includes(query) || 
+                          art.districtSlug?.toLowerCase().includes(query) ||
+                          art.districtName?.toLowerCase().includes(query);
+                        return isMatchTab && isMatchQuery;
+                      });
+
+                      if (availableList.length === 0) {
+                        return (
+                          <div className="p-8 text-center text-slate-400 text-xs font-bold bg-white">
+                            జిల్లా వార్తలు ఏవీ కనుగొనబడలేదు.
+                          </div>
+                        );
+                      }
+
+                      return availableList.map((art) => {
+                        const isPinned = pinnedList.some((p) => p.id === art.id);
+
+                        return (
+                          <div key={art.id} className="p-3.5 flex items-center justify-between gap-4 hover:bg-slate-50/50 bg-white transition-colors">
+                            <div className="min-w-0 flex-1 flex flex-col gap-1">
+                              <span className="text-xs font-bold text-slate-800 line-clamp-2 leading-relaxed telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                {art.title}
+                              </span>
+                              {art.districtName && (
+                                <span className="text-[9px] text-[#02599c] font-black uppercase tracking-wider bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded w-max">
+                                  {art.districtName}
+                                </span>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                let updated;
+                                if (isPinned) {
+                                  updated = pinnedList.filter((p) => p.id !== art.id);
+                                } else {
+                                  const minimalArt = {
+                                    id: art.id,
+                                    slug: art.slug,
+                                    title: art.title,
+                                    image: art.image || '',
+                                    districtName: art.districtName || ''
+                                  };
+                                  updated = [...pinnedList, minimalArt];
+                                }
+                                setPinnedList(updated);
+                                localStorage.setItem(`pinned_${districtActiveSubTab}_district_news`, JSON.stringify(updated));
+                              }}
+                              className={`flex-shrink-0 text-[10px] font-black px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-2xs border ${
+                                isPinned
+                                  ? 'bg-rose-50 border-rose-200/60 text-rose-600 hover:bg-rose-100/60'
+                                  : 'bg-[#02599c]/5 border-[#02599c]/10 text-[#02599c] hover:bg-[#02599c] hover:text-white'
+                              }`}
+                            >
+                              {isPinned ? 'Unpin' : 'Pin to Sidebar'}
+                            </button>
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          
         </div>
       </main>
 

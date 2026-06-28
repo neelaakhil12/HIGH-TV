@@ -134,13 +134,16 @@ interface NewsCardProps {
 }
 
 export default function NewsCard({ article, variant = 'default', className, imageClassName }: NewsCardProps) {
+  const cleanTitle = article.title ? article.title.replace(/<[^>]*>/g, '').trim() : '';
+  const cleanDesc = article.description ? article.description.replace(/<[^>]*>/g, '').trim() : '';
+
   if (variant === 'horizontal') {
     return (
       <article className={`news-card flex flex-row items-center gap-3.5 bg-white rounded-lg overflow-hidden border border-gray-100 hover:border-blue-100 p-2.5 sm:p-3.5 text-left flex-shrink-0 w-full snap-start sm:w-auto ${className || ''}`}>
         <Link href={`/news/${article.slug}`} className="flex-shrink-0 w-24 h-16 sm:w-28 sm:h-20 img-zoom-container rounded-md overflow-hidden relative border border-gray-100 bg-gray-50">
           <Image
             src={article.image}
-            alt={article.title}
+            alt={cleanTitle}
             fill
             className="object-cover"
             sizes="(max-width: 640px) 96px, 112px"
@@ -151,9 +154,8 @@ export default function NewsCard({ article, variant = 'default', className, imag
             <h3
               className="secondary-headline headline-hover telugu-text line-clamp-2 pl-1.5 pb-0.5"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-            >
-              {article.title}
-            </h3>
+              dangerouslySetInnerHTML={{ __html: article.title }}
+            />
           </Link>
         </div>
       </article>
@@ -163,25 +165,23 @@ export default function NewsCard({ article, variant = 'default', className, imag
   if (variant === 'mini') {
     return (
       <article className={`flex gap-2 py-2.5 border-b border-gray-100 last:border-b-0 group ${className || ''}`}>
-        <Link href={`/news/${article.slug}`} className="flex-shrink-0 img-zoom-container rounded overflow-hidden w-20 h-14 bg-slate-50 border border-gray-150">
+        <Link href={`/news/${article.slug}`} className="flex-shrink-0 img-zoom-container rounded overflow-hidden w-20 h-14 bg-slate-50 border border-gray-150 relative">
           <Image
             src={article.image}
-            alt={article.title}
+            alt={cleanTitle}
             width={80}
             height={56}
-            className="w-full h-full object-contain"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         </Link>
         <div className="flex-1">
           <Link href={`/news/${article.slug}`}>
             <p
-               className="secondary-headline headline-hover telugu-text line-clamp-2 pl-2.5 pr-1 pb-1"
+              className="secondary-headline headline-hover telugu-text line-clamp-2 pl-2.5 pr-1 pb-1"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-            >
-              {article.title}
-            </p>
+              dangerouslySetInnerHTML={{ __html: article.title }}
+            />
           </Link>
-
         </div>
       </article>
     );
@@ -193,7 +193,7 @@ export default function NewsCard({ article, variant = 'default', className, imag
         <Link href={`/news/${article.slug}`} className="block img-zoom-container rounded-md overflow-hidden w-full aspect-video relative">
           <Image
             src={article.image}
-            alt={article.title}
+            alt={cleanTitle}
             fill
             className="object-cover animate-fade-in"
             sizes="(max-width: 768px) 100vw, 800px"
@@ -201,27 +201,23 @@ export default function NewsCard({ article, variant = 'default', className, imag
         </Link>
         <div className="card-padding flex flex-col flex-1 justify-between">
           <div>
-
             <Link href={`/news/${article.slug}`}>
               <h3
                 className="secondary-headline headline-hover telugu-text pl-2.5 pb-1"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-              >
-                {article.title}
-              </h3>
+                dangerouslySetInnerHTML={{ __html: article.title }}
+              />
             </Link>
             <p
               className="news-summary summary-truncate telugu-text pl-2.5 pr-1 gap-headline-summary"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-            >
-              {article.description}
-            </p>
+              dangerouslySetInnerHTML={{ __html: article.description }}
+            />
           </div>
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50">
             <div className="flex items-center gap-3 text-[13px] text-gray-400">
-
             </div>
-            <ShareButton articleTitle={article.title} slug={article.slug} />
+            <ShareButton articleTitle={cleanTitle} slug={article.slug} />
           </div>
         </div>
       </article>
@@ -235,7 +231,7 @@ export default function NewsCard({ article, variant = 'default', className, imag
       <Link href={`/news/${article.slug}`} className={`img-zoom-container block relative ${imageClassName || ''}`} style={imageClassName ? undefined : { paddingTop: '56.25%' }}>
         <Image
           src={article.image}
-          alt={article.title}
+          alt={cleanTitle}
           fill
           className="object-cover"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -249,22 +245,18 @@ export default function NewsCard({ article, variant = 'default', className, imag
 
       {/* Content */}
       <div className="card-padding flex flex-col flex-1">
-
-
         <Link href={`/news/${article.slug}`} className="flex-1">
           <h2
             className="secondary-headline headline-hover telugu-text line-clamp-2 mb-2 pl-2.5 pr-1 pb-1"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-          >
-            {article.title}
-          </h2>
+            dangerouslySetInnerHTML={{ __html: article.title }}
+          />
           {article.categorySlug !== 'rasipalalu' && (
             <p
               className="news-summary summary-truncate telugu-text pl-2.5 pr-1 gap-headline-summary"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-            >
-              {article.description}
-            </p>
+              dangerouslySetInnerHTML={{ __html: article.description }}
+            />
           )}
         </Link>
 
@@ -272,9 +264,8 @@ export default function NewsCard({ article, variant = 'default', className, imag
         {article.categorySlug !== 'rasipalalu' && (
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
             <div className="flex items-center gap-3 text-[13px] text-gray-400">
-
             </div>
-            <ShareButton articleTitle={article.title} slug={article.slug} />
+            <ShareButton articleTitle={cleanTitle} slug={article.slug} />
           </div>
         )}
       </div>

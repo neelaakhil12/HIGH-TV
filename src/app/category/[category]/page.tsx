@@ -11,6 +11,7 @@ import RightSidebar from '@/components/layout/RightSidebar';
 import EPaperReader from '@/components/epaper/EPaperReader';
 import CategoryArticlesFeed from '@/components/category/CategoryArticlesFeed';
 import WebStoriesPage from '@/components/category/WebStoriesPage';
+import ShortsPage from '@/components/category/ShortsPage';
 import PhotosPage from '@/components/category/PhotosPage';
 import CitizenReporterForm from '@/components/category/CitizenReporterForm';
 import LiveUpdatesPage from '@/components/category/LiveUpdatesPage';
@@ -77,7 +78,7 @@ const englishCategories: Record<string, string> = {
   'viral': 'Viral',
   'rasipalalu': 'Astrology',
   'photos': 'Photos',
-  'videos': 'Videos',
+  'shorts': 'Shorts',
   'webstories': 'Web Stories',
   'antharmadanam': 'Opinion',
   'adyathmikam': 'Devotional',
@@ -141,18 +142,37 @@ export default async function CategoryPage({
   // 1. Fetch latest articles from the database
   let dbArticles: any[] = [];
   let deletedArticles: any[] = [];
-  try {
-    [dbArticles, deletedArticles] = await Promise.all([
-      prisma.article.findMany({
-        where: { isDeleted: false },
-        orderBy: { publishedAt: 'desc' },
-        take: 100
-      }),
-      prisma.article.findMany({
-        where: { isDeleted: true },
-        select: { id: true, slug: true }
-      })
-    ]);
+    const shouldSelectBody = category === 'shorts';
+
+    try {
+      [dbArticles, deletedArticles] = await Promise.all([
+        prisma.article.findMany({
+          where: { isDeleted: false },
+          orderBy: { publishedAt: 'desc' },
+          take: 100,
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            categorySlug: true,
+            districtSlug: true,
+            category: true,
+            author: true,
+            publishedAt: true,
+            description: true,
+            image: true,
+            views: true,
+            isBreaking: true,
+            isTrending: true,
+            isFeatured: true,
+            body: shouldSelectBody,
+          }
+        }),
+        prisma.article.findMany({
+          where: { isDeleted: true },
+          select: { id: true, slug: true }
+        })
+      ]);
   } catch (e) {
     console.error('Error fetching articles for category page:', e);
   }
@@ -209,17 +229,7 @@ export default async function CategoryPage({
     }
   }
 
-  // If no articles match this category slug, adapt generic news items so the page displays a fully-populated grid
-  const allArticles = articles.length > 0 
-    ? articles 
-    : (category === 'telangana' || category === 'andhra-pradesh')
-      ? []
-      : allArticlesList.slice(0, 12).map((art, idx) => ({
-          ...art,
-          id: `fallback-${category}-${idx}`,
-          category: cat?.name || category,
-          categorySlug: category,
-        }));
+  const allArticles = articles;
 
   const breadcrumbName = (category === 'andhra-pradesh' || category === 'telangana')
     ? 'రాష్ట్ర వార్తలు'
@@ -301,8 +311,46 @@ export default async function CategoryPage({
             </h1>
           </div>
           
+          {/* 70% Left and 30% Right Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-6">
+            <div className="w-full lg:col-span-7">
+              <WebStoriesPage />
+            </div>
+            {/* Sidebar (30%) */}
+            <div className="w-full lg:col-span-3">
+              <RightSidebar categorySlug={category} />
+            </div>
+          </div>
+        </main>
+      ) : category === 'shorts' ? (
+        <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full text-left">
+          {/* Breadcrumb Row with Back Button on the right */}
+          <div className="flex items-center justify-between gap-4 mb-5 border-b border-gray-100 pb-3 overflow-hidden">
+            <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
+              <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
+                <Home className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" /> Home
+              </Link>
+              <ChevronRight className="w-3 h-3 md:w-3.5 md:h-3.5 text-gray-400 flex-shrink-0" />
+              <span className="text-gray-800 font-bold flex-shrink-0">
+                Shorts
+              </span>
+            </div>
+            <div className="flex-shrink-0 pb-0.5">
+              <BackButton />
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2 mb-6 border-b-2 border-[#f43f5e] pb-3">
+            <h1
+              className="text-3xl md:text-4xl font-black text-[#f43f5e] telugu-text"
+              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+            >
+              షార్ట్స్
+            </h1>
+          </div>
+          
           <div className="mt-6">
-            <WebStoriesPage />
+            <ShortsPage articles={allArticles} />
           </div>
         </main>
       ) : category === 'photos' ? (
@@ -333,7 +381,7 @@ export default async function CategoryPage({
           </div>
           
           <div className="mt-6">
-            <PhotosPage />
+            <PhotosPage articles={allArticles} />
           </div>
         </main>
       ) : category === 'citizen-reporter' ? (
@@ -466,7 +514,7 @@ export default async function CategoryPage({
                             <img
                               src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
                               alt={art.title}
-                              className="w-full h-full object-contain hover:scale-105 transition-transform duration-200"
+                              className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-200"
                             />
                           </Link>
                           <div className="flex-1 flex flex-col text-left justify-between min-h-[68px]">

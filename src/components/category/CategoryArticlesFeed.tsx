@@ -37,6 +37,20 @@ export default function CategoryArticlesFeed({
   const summaryClass = isLatest ? 'category-summary' : 'news-summary';
   const isHealthGrid = categorySlug === 'doctors-corner' || categorySlug === 'health';
 
+  if (articlesList.length === 0) {
+    return (
+      <div className="py-16 text-center text-slate-500 bg-white border border-gray-150 rounded-xl shadow-xs w-full col-span-2">
+        <div className="text-4xl mb-3 text-[#02599c]">📰</div>
+        <p className="font-bold text-lg telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+          వార్తలు అందుబాటులో లేవు
+        </p>
+        <p className="text-sm text-gray-400 mt-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+          త్వరలోనే ఈ విభాగంలో తాజా వార్తలను ప్రచురిస్తాము.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className={isHealthGrid ? "grid grid-cols-1 sm:grid-cols-2 gap-5" : "grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-0"}>
       {articlesList.map((article, index) => {
@@ -47,7 +61,7 @@ export default function CategoryArticlesFeed({
                 <Link href={`/news/${article.slug}`} className="block relative aspect-video rounded-md overflow-hidden bg-black/5 mb-3">
                   <img
                     src={article.image}
-                    alt={article.title}
+                    alt={article.title?.replace(/<[^>]*>/g, '')}
                     className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-200"
                   />
                 </Link>
@@ -56,16 +70,14 @@ export default function CategoryArticlesFeed({
                     <h3
                       className="text-base font-bold text-[#02599c] hover:text-[#013f70] hover:underline leading-relaxed telugu-text pb-1"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                    >
-                      {article.title}
-                    </h3>
+                      dangerouslySetInnerHTML={{ __html: article.title }}
+                    />
                   </Link>
                   <p
                     className="text-sm text-gray-550 mt-1 line-clamp-3 telugu-text leading-relaxed"
                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                  >
-                    {article.description}
-                  </p>
+                    dangerouslySetInnerHTML={{ __html: article.description }}
+                  />
                 </div>
               </div>
               
@@ -89,8 +101,8 @@ export default function CategoryArticlesFeed({
               <div className="w-[120px] h-[80px] flex-shrink-0 rounded overflow-hidden bg-slate-50 border border-gray-150 relative">
                 <img
                   src={article.image}
-                  alt={article.title}
-                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
+                  alt={article.title?.replace(/<[^>]*>/g, '')}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                 />
               </div>
               {/* Text */}
@@ -98,15 +110,13 @@ export default function CategoryArticlesFeed({
                 <h3
                   className={`${headlineClass} font-black text-[#02599c] group-hover:text-[#013f70] line-clamp-2 telugu-text pl-2.5`}
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                >
-                  {article.title}
-                </h3>
+                  dangerouslySetInnerHTML={{ __html: article.title }}
+                />
                 <p
                   className={`${summaryClass} text-gray-500 mt-1 line-clamp-2 telugu-text pl-2.5`}
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                >
-                  {article.description}
-                </p>
+                  dangerouslySetInnerHTML={{ __html: article.description }}
+                />
               </div>
             </Link>
 

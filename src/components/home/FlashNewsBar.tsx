@@ -8,6 +8,7 @@ export default function FlashNewsBar({ isMobileHeader = false }: { isMobileHeade
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fade, setFade] = useState(true);
   const [cycleTime, setCycleTime] = useState(5000);
+  const [tickerLabel, setTickerLabel] = useState('Flash News');
 
   const [flashNewsItems, setFlashNewsItems] = useState<{ text: string; link: string }[]>([
     {
@@ -36,6 +37,10 @@ export default function FlashNewsBar({ isMobileHeader = false }: { isMobileHeade
       } catch (e) {
         console.error("Error parsing flash news items", e);
       }
+    }
+    const savedLabel = localStorage.getItem('flash_news_label');
+    if (savedLabel) {
+      setTickerLabel(savedLabel);
     }
   }, []);
 
@@ -67,7 +72,7 @@ export default function FlashNewsBar({ isMobileHeader = false }: { isMobileHeade
         {/* Row 1: FLASH NEWS label + pulsing dot */}
         <div className="flex items-center gap-1.5 mb-1">
           <span className="font-extrabold text-[#fe0000] text-[12.5px] tracking-wider uppercase font-sans">
-            FLASH NEWS
+            {tickerLabel}
           </span>
           <span className="relative flex h-2 w-2 flex-shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -97,7 +102,7 @@ export default function FlashNewsBar({ isMobileHeader = false }: { isMobileHeade
     <div className={`w-full bg-white border border-gray-200 md:border-x-0 md:border-y py-3 px-4 flex items-center select-none ${isMobileHeader ? 'mb-0' : 'mb-5'}`}>
       {/* Flash News Label */}
       <span className="font-extrabold text-[#fe0000] text-[18px] tracking-wider flex-shrink-0 uppercase font-sans">
-        Flash News
+        {tickerLabel}
       </span>
 
       {/* Vertical divider */}

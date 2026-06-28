@@ -13,19 +13,32 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
   const [popupType, setPopupType] = useState<'ad' | 'poll'>('ad');
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
+  const [pollVotes, setPollVotes] = useState<Record<string, number>>({});
 
   // Dynamic configuration states
   const [adImage, setAdImage] = useState('/popup-ad.png');
   const [adLink, setAdLink] = useState('#');
+  const [adOrientation, setAdOrientation] = useState<'horizontal' | 'vertical'>('horizontal');
   const [pollQuestion, setPollQuestion] = useState('కాంగ్రెస్‌లో టీఎన్ఎస్ పార్టీని విలీనం చేస్తారని మీరు భావిస్తున్నారా?');
   const [pollOptions, setPollOptions] = useState([
-    { id: 'yes', text: 'అవును' },
-    { id: 'no', text: 'కాదు' },
-    { id: 'unsure', text: 'చెప్పలేం' }
+    { id: 'opt_0', text: 'అవును' },
+    { id: 'opt_1', text: 'కాదు' }
   ]);
 
   const handleVoteSubmit = () => {
-    if (selectedOption) {
+    if (selectedOption && pollVotes) {
+      const updatedVotes = {
+        ...pollVotes,
+        [selectedOption]: (pollVotes[selectedOption] || 0) + 1
+      };
+      setPollVotes(updatedVotes);
+      
+      const votesKey = `promo_poll_${id}_votes_data`;
+      localStorage.setItem(votesKey, JSON.stringify({ question: pollQuestion, votes: updatedVotes }));
+      
+      const hasVotedKey = `promo_poll_${id}_voted_for_${pollQuestion}`;
+      localStorage.setItem(hasVotedKey, 'true');
+      
       setHasVoted(true);
     }
   };
@@ -36,6 +49,7 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
     const savedType = localStorage.getItem(`promo_popup_${id}_type`);
     const savedAdImage = localStorage.getItem(`promo_ad_${id}_image`);
     const savedAdLink = localStorage.getItem(`promo_ad_${id}_link`);
+    const savedAdOrientation = localStorage.getItem(`promo_ad_${id}_orientation`);
     const savedPollQuestion = localStorage.getItem(`promo_poll_${id}_question`);
     const savedOptYes = localStorage.getItem(`promo_poll_${id}_option_yes`);
     const savedOptNo = localStorage.getItem(`promo_poll_${id}_option_no`);
@@ -47,36 +61,71 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
     if (savedType !== null) setPopupType(savedType as 'ad' | 'poll');
     if (savedAdImage !== null) setAdImage(savedAdImage);
     if (savedAdLink !== null) setAdLink(savedAdLink);
-    if (savedPollQuestion !== null) setPollQuestion(savedPollQuestion);
+    if (savedAdOrientation !== null) setAdOrientation(savedAdOrientation as 'horizontal' | 'vertical');
+    
+    const activeQuestion = savedPollQuestion || 'కాంగ్రెస్‌లో టీఎన్ఎస్ పార్టీని విలీనం చేస్తారని మీరు భావిస్తున్నారా?';
+    setPollQuestion(activeQuestion);
 
-    if (savedOptYes !== null || savedOptNo !== null || savedOptUnsure !== null) {
-      setPollOptions([
-        { id: 'yes', text: savedOptYes || 'అవును' },
-        { id: 'no', text: savedOptNo || 'కాదు' },
-        { id: 'unsure', text: savedOptUnsure || 'చెప్పలేం' }
-      ]);
+    const savedOptions = localStorage.getItem(`promo_poll_${id}_options`);
+    let optsList: string[] = ['అవును', 'కాదు'];
+    if (savedOptions) {
+      try {
+        optsList = JSON.parse(savedOptions);
+      } catch (e) {}
+    } else {
+      if (savedOptYes || savedOptNo || savedOptUnsure) {
+        optsList = [];
+        if (savedOptYes) optsList.push(savedOptYes);
+        if (savedOptNo) optsList.push(savedOptNo);
+        if (savedOptUnsure) optsList.push(savedOptUnsure);
+      }
+    }
+    const mappedOptions = optsList.map((text, index) => ({
+      id: `opt_${index}`,
+      text
+    }));
+    setPollOptions(mappedOptions);
+
+    // Check if user has voted on this question
+    const hasVotedKey = `promo_poll_${id}_voted_for_${activeQuestion}`;
+    const userHasVoted = localStorage.getItem(hasVotedKey) === 'true';
+    setHasVoted(userHasVoted);
+
+    // Load or initialize vote counts
+    const votesKey = `promo_poll_${id}_votes_data`;
+    const savedVotesData = localStorage.getItem(votesKey);
+    let votes: Record<string, number> = {};
+    
+    let parsedData: any = null;
+    if (savedVotesData) {
+      try {
+        parsedData = JSON.parse(savedVotesData);
+      } catch (e) {}
     }
 
-    // Check session storage to show it once per session (specifically for this ID)
-    const hasSeenPopup = sessionStorage.getItem(`hasSeenPromoPopup_${id}`);
+    if (parsedData && parsedData.question === activeQuestion && userHasVoted) {
+      votes = parsedData.votes;
+    } else {
+      // Initialize with exactly 0 votes if user has not voted yet or question changed
+      votes = {};
+      mappedOptions.forEach((opt) => {
+        votes[opt.id] = 0;
+      });
+      localStorage.setItem(votesKey, JSON.stringify({ question: activeQuestion, votes }));
+    }
+    setPollVotes(votes);
 
     if (isActuallyEnabled) {
-      if (id === 'article') {
-        const timer = setTimeout(() => {
-          setIsOpen(true);
-        }, 25000); // 25 seconds delay on load
-        return () => clearTimeout(timer);
-      } else if (!hasSeenPopup) {
-        const timer = setTimeout(() => {
-          setIsOpen(true);
-          sessionStorage.setItem(`hasSeenPromoPopup_${id}`, 'true');
-        }, 25000); // 25 seconds delay on load
-        return () => clearTimeout(timer);
-      }
+      const timer = setTimeout(() => {
+        setIsOpen(true);
+      }, 25000); // 25 seconds delay on load
+      return () => clearTimeout(timer);
     }
   }, [id]);
 
   if (!isOpen || !isEnabled) return null;
+
+  const totalVotes = Object.values(pollVotes).reduce((sum, val) => sum + val, 0);
 
   return (
     <div 
@@ -85,10 +134,10 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
     >
       {/* Modal Container */}
       <div 
-        className={`bg-white rounded-2xl shadow-2xl border border-gray-150 w-full overflow-hidden relative animate-scale-up flex flex-col transition-all duration-300 ${
+        className={`bg-white rounded-lg shadow-2xl border border-gray-150 overflow-hidden relative animate-scale-up flex flex-col transition-all duration-300 max-h-[95vh] mx-auto ${
           popupType === 'ad' 
-            ? 'max-w-[400px] lg:max-w-[760px] lg:w-[760px] lg:h-[556px]' 
-            : 'max-w-[400px] lg:max-w-[420px] lg:w-[420px] h-auto'
+            ? 'w-fit h-fit'
+            : 'max-w-[480px] lg:max-w-[500px] lg:w-[500px] w-full h-auto'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -102,10 +151,12 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
         </button>
 
         {/* Content body */}
-        <div className="p-0 flex-1 overflow-y-auto lg:overflow-visible">
+        <div className={`p-0 flex-1 overflow-hidden h-auto ${
+          popupType === 'ad' ? 'w-fit mx-auto' : 'w-full'
+        }`}>
           {popupType === 'ad' ? (
             /* ══════════════ ADVERTISEMENT VIEW ══════════════ */
-            <div className="w-full h-[380px] lg:h-full relative flex flex-col">
+            <div className="w-fit h-auto relative flex flex-col mx-auto">
               <a 
                 href={adLink}
                 target={adLink === '#' ? '_self' : '_blank'}
@@ -115,12 +166,16 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
                     e.preventDefault();
                   }
                 }}
-                className="w-full h-full flex-1 block cursor-pointer"
+                className="w-fit h-auto block cursor-pointer mx-auto"
               >
                 <img 
                   src={adImage} 
                   alt="Advertisement"
-                  className="w-full h-full object-cover select-none hover:opacity-95 transition-opacity"
+                  className={`h-auto object-contain mx-auto select-none hover:opacity-95 transition-opacity block ${
+                    adOrientation === 'horizontal'
+                      ? 'w-auto max-w-[95vw] lg:max-w-[1050px] max-h-[90vh]'
+                      : 'w-auto max-w-[95vw] md:max-w-[540px] lg:max-w-[600px] max-h-[90vh]'
+                  }`}
                 />
               </a>
               {/* AD indicator label */}
@@ -198,44 +253,31 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
                   </div>
                 ) : (
                   <div className="space-y-3.5 animate-fade-in pt-1">
-                    {/* Option 1 Results */}
-                    <div>
-                      <div className="flex justify-between text-[14px] font-bold text-gray-700 mb-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                        <span>{pollOptions[0]?.text || 'అవును'}</span>
-                        <span className="font-sans">62%</span>
-                      </div>
-                      <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                        <div className="bg-[#02599c] h-2 rounded-full transition-all duration-500 animate-slide-right" style={{ width: '62%' }}></div>
-                      </div>
-                    </div>
+                    {pollOptions.map((opt, index) => {
+                      const votesForOpt = pollVotes[opt.id] || 0;
+                      const pct = totalVotes > 0 ? Math.round((votesForOpt / totalVotes) * 100) : 0;
+                      
+                      const colors = ['bg-[#02599c]', 'bg-red-500', 'bg-emerald-500', 'bg-amber-500', 'bg-indigo-500', 'bg-gray-450'];
+                      const progressColor = colors[index % colors.length];
 
-                    {/* Option 2 Results */}
-                    <div>
-                      <div className="flex justify-between text-[14px] font-bold text-gray-700 mb-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                        <span>{pollOptions[1]?.text || 'కాదు'}</span>
-                        <span className="font-sans">28%</span>
-                      </div>
-                      <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                        <div className="bg-red-500 h-2 rounded-full transition-all duration-500 animate-slide-right" style={{ width: '28%' }}></div>
-                      </div>
-                    </div>
-
-                    {/* Option 3 Results */}
-                    <div>
-                      <div className="flex justify-between text-[14px] font-bold text-gray-700 mb-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                        <span>{pollOptions[2]?.text || 'చెప్పలేం'}</span>
-                        <span className="font-sans">10%</span>
-                      </div>
-                      <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                        <div className="bg-gray-450 h-2 rounded-full transition-all duration-500 animate-slide-right" style={{ width: '10%' }}></div>
-                      </div>
-                    </div>
+                      return (
+                        <div key={opt.id}>
+                          <div className="flex justify-between text-[14px] font-bold text-gray-700 mb-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                            <span>{opt.text}</span>
+                            <span className="font-sans">{pct}%</span>
+                          </div>
+                          <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                            <div className={`${progressColor} h-2 rounded-full transition-all duration-500 animate-slide-right`} style={{ width: `${pct}%` }}></div>
+                          </div>
+                        </div>
+                      );
+                    })}
 
                     <div 
                       className="text-center text-[12px] text-gray-500 font-bold mt-4 pt-1.5 border-t border-gray-50 telugu-text" 
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                     >
-                      మొత్తం ఓట్లు: 12,482
+                      మొత్తం ఓట్లు: {totalVotes.toLocaleString('te-IN')}
                     </div>
                   </div>
                 )}

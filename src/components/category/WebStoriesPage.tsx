@@ -5,6 +5,7 @@ import { X, Play, Pause, ChevronLeft, ChevronRight, Layers } from 'lucide-react'
 import { storiesData } from '@/lib/webstoriesData';
 
 export default function WebStoriesPage() {
+  const [activeStories, setActiveStories] = useState<any[]>(storiesData);
   const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
@@ -16,13 +17,28 @@ export default function WebStoriesPage() {
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const SLIDE_DURATION = 4000; // 4 seconds per slide
 
+  // Load custom stories on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('custom_web_stories');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setActiveStories([...parsed, ...storiesData]);
+        }
+      }
+    } catch (e) {
+      console.error('Error loading custom web stories:', e);
+    }
+  }, []);
+
   // Typewriter effect triggered on slide index or story changes
   useEffect(() => {
     if (activeStoryIndex === null) {
       setTypedText('');
       return;
     }
-    const fullText = storiesData[activeStoryIndex].slides[currentSlideIndex].text;
+    const fullText = activeStories[activeStoryIndex].slides[currentSlideIndex].text;
     setTypedText('');
     
     let currentIdx = 0;
@@ -40,7 +56,7 @@ export default function WebStoriesPage() {
     return () => {
       clearInterval(charInterval);
     };
-  }, [activeStoryIndex, currentSlideIndex]);
+  }, [activeStoryIndex, currentSlideIndex, activeStories]);
 
   // Responsive layout check for mobile viewport
   useEffect(() => {
@@ -92,7 +108,7 @@ export default function WebStoriesPage() {
       // If first slide, go to previous story
       if (activeStoryIndex > 0) {
         setActiveStoryIndex(activeStoryIndex - 1);
-        setCurrentSlideIndex(storiesData[activeStoryIndex - 1].slides.length - 1);
+        setCurrentSlideIndex(activeStories[activeStoryIndex - 1].slides.length - 1);
         setProgress(0);
       }
     }
@@ -100,13 +116,13 @@ export default function WebStoriesPage() {
 
   const handleNextSlide = () => {
     if (activeStoryIndex === null) return;
-    const currentStory = storiesData[activeStoryIndex];
+    const currentStory = activeStories[activeStoryIndex];
     if (currentSlideIndex < currentStory.slides.length - 1) {
       setCurrentSlideIndex(currentSlideIndex + 1);
       setProgress(0);
     } else {
       // If last slide, go to next story or close if last story
-      if (activeStoryIndex < storiesData.length - 1) {
+      if (activeStoryIndex < activeStories.length - 1) {
         setActiveStoryIndex(activeStoryIndex + 1);
         setCurrentSlideIndex(0);
         setProgress(0);
@@ -142,7 +158,7 @@ export default function WebStoriesPage() {
       if (timerRef.current) clearTimeout(timerRef.current);
       if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     };
-  }, [activeStoryIndex, currentSlideIndex, isPaused]);
+  }, [activeStoryIndex, currentSlideIndex, isPaused, activeStories]);
 
   // Lock body scroll when stories player modal is open
   useEffect(() => {
@@ -156,7 +172,7 @@ export default function WebStoriesPage() {
     };
   }, [activeStoryIndex]);
 
-  const activeStory = activeStoryIndex !== null ? storiesData[activeStoryIndex] : null;
+  const activeStory = activeStoryIndex !== null ? activeStories[activeStoryIndex] : null;
 
   // Dynamic Circle sizing calculations based on slide text length
   const currentText = activeStory?.slides[currentSlideIndex]?.text || '';
@@ -179,7 +195,7 @@ export default function WebStoriesPage() {
     <div className="select-none">
       {/* Grid of Web Stories (2 Columns on Mobile, 4 on Desktop) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {storiesData.map((story, idx) => (
+        {activeStories.map((story, idx) => (
           <div key={story.id} className="flex flex-col group cursor-pointer" onClick={() => handleOpenStory(idx)}>
             {/* Story Card Image */}
             <div className="relative aspect-[9/16] rounded-2xl overflow-hidden shadow-md border border-gray-150 bg-gray-50 flex items-center justify-center">
@@ -263,7 +279,7 @@ export default function WebStoriesPage() {
             <div className="absolute top-0 inset-x-0 z-30 flex flex-col gap-2 p-3">
               {/* Progress Lines */}
               <div className="flex gap-1.5 w-full">
-                {activeStory.slides.map((_, i) => {
+                {activeStory.slides.map((_: any, i: number) => {
                   let barWidth = '0%';
                   if (i < currentSlideIndex) barWidth = '100%';
                   if (i === currentSlideIndex) barWidth = `${progress}%`;

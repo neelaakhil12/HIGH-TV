@@ -174,6 +174,11 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
           finalBreaking = finalBreaking.filter((a: any) => !a.districtSlug);
         }
 
+        if (apiCat !== 'home' && apiCat !== 'latest' && !isDistrictView) {
+          finalTrending = finalTrending.filter((a: any) => a.categorySlug === apiCat);
+          finalBreaking = finalBreaking.filter((a: any) => a.categorySlug === apiCat);
+        }
+
         setTrendingList(finalTrending);
         setBreakingList(finalBreaking);
       } catch (e: any) {
@@ -201,7 +206,7 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
     'national': 'జాతీయ',
     'international': 'అంతర్జాతీయ',
     'business': 'వ్యాపారం',
-    'politics': 'రాజకీయాలు',
+    'politics': 'పాలిటిక్స్',
     'sports': 'స్పోర్ట్స్',
     'entertainment': 'సినిమా',
     'technology': 'టెక్నాలజీ',
@@ -211,6 +216,9 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
     'lifestyle': 'లైఫ్‌స్టైల్',
     'vidya': 'విద్య',
     'upadi': 'ఉపాధి',
+    'telangana-districts': 'తెలంగాణ జిల్లాలు',
+    'andhra-pradesh-districts': 'ఆంధ్రప్రదేశ్ జిల్లాలు',
+    'weather': 'వాతావరణం',
   };
   const currentDistrictObj = tgDistricts.find(d => d.slug === currentDistrictSlug) || apDistricts.find(d => d.slug === currentDistrictSlug);
   const catLabel = currentDistrictObj 
@@ -263,44 +271,6 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
       {/* 2. Top Sponsored Ad */}
       <AdBanner position="rectangle" />
 
-      {/* 3. Category Breaking News — only shown when filtering by category */}
-      {filterByCategory && breakingList.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left">
-          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100">
-            <div className="w-1.5 h-6 bg-[#e60000] rounded-full"></div>
-            <h3 className="font-black text-gray-900 text-[18px] md:text-[20px] pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-              {catLabel} బ్రేకింగ్ న్యూస్
-            </h3>
-          </div>
-          <div className="space-y-3.5">
-            {breakingList.map((article, idx) => (
-              <Link
-                key={`break-${article.id}-${idx}`}
-                href={`/news/${article.slug}`}
-                className="flex items-start gap-3 pb-3 last:pb-0 last:border-b-0 border-b border-gray-55 group cursor-pointer"
-              >
-                {/* Image thumbnail */}
-                <div className="w-20 h-14 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
-                  <img
-                    src={article.image}
-                    alt={article.title}
-                    className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
-                  />
-                </div>
-                {/* Text */}
-                <div className="min-w-0 flex-1 py-0.5">
-                  <h4
-                    className="text-[14.5px] md:text-[15.5px] font-bold text-gray-800 group-hover:text-[#e60000] transition-colors leading-relaxed telugu-text line-clamp-2 pl-1.5 pb-0.5"
-                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                  >
-                    {article.title}
-                  </h4>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* 4. Trending News Widget (ట్రెండింగ్ వార్తలు) */}
       <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left">
@@ -356,7 +326,7 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
       </div>
 
       {/* Poll Widget */}
-      <PollWidget />
+      <PollWidget scope="general" />
 
       {/* Desktop-only ads */}
       <div className="hidden lg:flex lg:flex-col lg:gap-4">
@@ -427,17 +397,6 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
         <AdBanner position="coaching" />
       </div>
 
-      {/* Trending Tags Box */}
-      <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left">
-        <h3 className="font-black text-gray-800 text-[15px] mb-3 pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ట్రెండింగ్ ట్యాగ్స్</h3>
-        <div className="flex flex-wrap gap-2">
-          {['రాజకీయాలు', 'ఆంధ్రప్రదేశ్', 'తెలంగాణ', 'క్రికెట్', 'సినిమా', 'AI', 'బడ్జెట్', 'వరదలు', 'IPL', 'మెట్రో', 'వ్యాపారం', 'ఆరోగ్యం'].map((tag) => (
-            <Link key={tag} href={`/search?q=${tag}`} className="text-sm bg-gray-100 hover:bg-brand-blue hover:text-white text-gray-600 px-3 py-1.5 rounded-full transition-colors font-medium telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-              {tag}
-            </Link>
-          ))}
-        </div>
-      </div>
 
     </aside>
   );

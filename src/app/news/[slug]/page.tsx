@@ -72,7 +72,7 @@ const englishCategories: Record<string, string> = {
   'viral': 'Viral',
   'rasipalalu': 'Shubhafalalu',
   'photos': 'Photos',
-  'videos': 'Videos',
+  'shorts': 'Shorts',
   'webstories': 'Web Stories',
   'antharmadanam': 'Vyakthithva Vikasam',
   'adyathmikam': 'Daivam',
@@ -85,7 +85,8 @@ const englishCategories: Record<string, string> = {
   'current-affairs': 'Current Affairs',
   'upadi': 'Upadi',
   'notification': 'Notification',
-  'citizen-reporter': 'Citizen Reporter'
+  'citizen-reporter': 'Citizen Reporter',
+  'weather': 'Weather'
 };
 
 import { prisma } from '@/lib/prisma';
@@ -170,7 +171,23 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       prisma.article.findMany({
         where: { isDeleted: false },
         orderBy: { publishedAt: 'desc' },
-        take: 100
+        take: 100,
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          categorySlug: true,
+          districtSlug: true,
+          category: true,
+          author: true,
+          publishedAt: true,
+          description: true,
+          image: true,
+          views: true,
+          isBreaking: true,
+          isTrending: true,
+          isFeatured: true
+        }
       }),
       prisma.article.findMany({
         where: { isDeleted: true },
@@ -219,10 +236,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       : allArticles.filter((n) => n.id !== article.id)
   ).slice(0, 8);
 
-  // Other news for bottom grid (excluding current) — always all categories
-  const otherNews = allArticles
-    .filter((n) => n.id !== article.id)
-    .slice(0, 9);
+  // Other news for bottom grid (excluding current) — category-filtered first, fall back to all
+  const otherNews = (
+    categoryArticles.length > 0
+      ? categoryArticles
+      : allArticles.filter((n) => n.id !== article.id)
+  ).slice(0, 9);
 
   // District news
   const apDistrictNews = allArticles.filter((n) => n.categorySlug === 'andhra-pradesh' && n.districtSlug).slice(0, 5);

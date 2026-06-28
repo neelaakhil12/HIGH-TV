@@ -82,7 +82,7 @@ export default function HeroSlider({ dbArticles }: { dbArticles?: any[] }) {
           {/* Full-fill cover image — no black bars */}
           <img
             src={slide.image}
-            alt={slide.title}
+            alt={slide.title?.replace(/<[^>]*>/g, '')}
             className="w-full h-full object-cover"
           />
         </Link>
@@ -117,10 +117,9 @@ export default function HeroSlider({ dbArticles }: { dbArticles?: any[] }) {
             <h2
               className="secondary-headline headline-hover telugu-text pl-1 pb-1"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-              title={slide.title}
-            >
-              {slide.title}
-            </h2>
+              title={slide.title?.replace(/<[^>]*>/g, '')}
+              dangerouslySetInnerHTML={{ __html: slide.title }}
+            />
           </Link>
         </div>
       </div>

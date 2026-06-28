@@ -77,17 +77,15 @@ export default function BreakingNewsSection({ dbArticles }: { dbArticles?: any[]
                     <div className="w-16 h-11 flex-shrink-0 overflow-hidden bg-gray-100 border border-gray-150 relative">
                       <img
                         src={leftArticle.image}
-                        alt={leftArticle.title}
-                        className="w-full h-full object-contain group-hover:scale-[1.05] transition-transform duration-300"
+                        alt={leftArticle.title?.replace(/<[^>]*>/g, '')}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
                       />
                     </div>
                     <div className="min-w-0 flex-1 py-0.5">
                       {leftArticle.isBreaking && (
                         <span className="inline-block bg-brand-red text-white text-[10px] font-black px-1.5 py-0.5 rounded mb-1 breaking-badge">🔴 BREAKING</span>
                       )}
-                      <span className="secondary-headline headline-hover block telugu-text line-clamp-2 pl-1.5 pb-0.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                        {leftArticle.title}
-                      </span>
+                      <span className="secondary-headline headline-hover block telugu-text line-clamp-2 pl-1.5 pb-0.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }} dangerouslySetInnerHTML={{ __html: leftArticle.title }} />
                     </div>
                   </Link>
                 )}
@@ -101,17 +99,15 @@ export default function BreakingNewsSection({ dbArticles }: { dbArticles?: any[]
                     <div className="w-16 h-11 flex-shrink-0 overflow-hidden bg-gray-100 border border-gray-150 relative">
                       <img
                         src={rightArticle.image}
-                        alt={rightArticle.title}
-                        className="w-full h-full object-contain group-hover:scale-[1.05] transition-transform duration-300"
+                        alt={rightArticle.title?.replace(/<[^>]*>/g, '')}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
                       />
                     </div>
                     <div className="min-w-0 flex-1 py-0.5">
                       {rightArticle.isBreaking && (
                         <span className="inline-block bg-brand-red text-white text-[10px] font-black px-1.5 py-0.5 rounded mb-1 breaking-badge">🔴 BREAKING</span>
                       )}
-                      <span className="secondary-headline headline-hover block telugu-text line-clamp-2 pl-1.5 pb-0.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                        {rightArticle.title}
-                      </span>
+                      <span className="secondary-headline headline-hover block telugu-text line-clamp-2 pl-1.5 pb-0.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }} dangerouslySetInnerHTML={{ __html: rightArticle.title }} />
                     </div>
                   </Link>
                 )}

@@ -69,7 +69,7 @@ export default function MultiDistrictFeed({
           <div className="w-[110px] h-[75px] sm:w-[140px] sm:h-[95px] flex-shrink-0 rounded-lg overflow-hidden bg-black/5 relative">
             <img
               src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
-              alt={art.title}
+              alt={art.title?.replace(/<[^>]*>/g, '')}
               className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-355"
             />
             {/* Map pin badge */}
@@ -86,17 +86,15 @@ export default function MultiDistrictFeed({
             <h3
               className="text-[14.5px] sm:text-base font-black text-[#02599c] group-hover:text-[#013f70] group-hover:underline transition-colors leading-snug telugu-text"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-            >
-              {art.title}
-            </h3>
+              dangerouslySetInnerHTML={{ __html: art.title }}
+            />
             
             {art.description && (
               <p
-                className="hidden sm:line-clamp-2 text-[13px] text-gray-500 telugu-text leading-relaxed"
+                className="hidden sm:line-clamp-2 text-[13px] text-gray-550 telugu-text leading-relaxed"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-              >
-                {art.description}
-              </p>
+                dangerouslySetInnerHTML={{ __html: art.description }}
+              />
             )}
           </div>
         </Link>

@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
     const category = searchParams.get('category');
     const search = searchParams.get('search');
     const limit = parseInt(searchParams.get('limit') || '100');
+    const excludeBody = searchParams.get('excludeBody') === 'true';
 
     const where: any = { isDeleted: false };
 
@@ -25,17 +26,32 @@ export async function GET(req: NextRequest) {
       ];
     }
 
+    const selectFields: any = {
+      id: true,
+      title: true,
+      slug: true,
+      categorySlug: true,
+      districtSlug: true,
+      category: true,
+      author: true,
+      publishedAt: true,
+      description: true,
+      image: true,
+      views: true,
+      isBreaking: true,
+      isTrending: true,
+      isFeatured: true,
+    };
+
+    if (!excludeBody) {
+      selectFields.body = true;
+    }
+
     const articles = await prisma.article.findMany({
       where,
       orderBy: { publishedAt: 'desc' },
       take: limit,
-      select: {
-        id: true, title: true, slug: true, categorySlug: true,
-        districtSlug: true, category: true, author: true,
-        publishedAt: true, description: true, image: true,
-        body: true,
-        views: true, isBreaking: true, isTrending: true, isFeatured: true,
-      },
+      select: selectFields,
     });
 
     return new NextResponse(JSON.stringify(articles), {

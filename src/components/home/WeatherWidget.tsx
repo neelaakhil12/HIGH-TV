@@ -1,7 +1,10 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { CloudSun, Sun, CloudRain, ArrowRight, Cloud } from 'lucide-react';
 
-const homeWeatherData = [
+const STATIC_HOME_WEATHER_DATA = [
   {
     city: 'హైదరాబాద్',
     temp: 32,
@@ -32,7 +35,47 @@ const homeWeatherData = [
   }
 ];
 
+const getWeatherIcon = (condition: string, size = 32) => {
+  const cond = (condition || '').toLowerCase();
+  if (cond.includes('వర్షం') || cond.includes('rain') || cond.includes('ఉరుము') || cond.includes('storm')) {
+    return <CloudRain size={size} className="text-blue-500 flex-shrink-0" />;
+  }
+  if (cond.includes('మేఘ') || cond.includes('cloud') || cond.includes('మబ్బు')) {
+    return <Cloud size={size} className="text-gray-400 flex-shrink-0" />;
+  }
+  if (cond.includes('ఎండ') || cond.includes('sun') || cond.includes('తీవ్రమైన') || cond.includes('ఎండగా')) {
+    return <Sun size={size} className="text-amber-500 animate-spin-slow flex-shrink-0" />;
+  }
+  return <CloudSun size={size} className="text-blue-400 flex-shrink-0" />;
+};
+
 export default function WeatherWidget() {
+  const [weatherList, setWeatherList] = useState<any[]>(STATIC_HOME_WEATHER_DATA);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('weather_page_reports_data');
+      if (saved) {
+        const customReports = JSON.parse(saved);
+        const updated = STATIC_HOME_WEATHER_DATA.map((staticCity) => {
+          const matched = customReports.find((c: any) => c.city === staticCity.city);
+          if (matched) {
+            return {
+              ...staticCity,
+              temp: matched.temp,
+              condition: matched.condition,
+              icon: getWeatherIcon(matched.condition, 32)
+            };
+          }
+          return staticCity;
+        });
+        setWeatherList(updated);
+      }
+    } catch (e) {
+      console.error('Error loading homepage weather widget data:', e);
+    }
+  }, []);
+
   return (
     <div className="bg-white border border-gray-150 rounded-xl p-5 md:p-6 mb-3.5 md:mb-8 shadow-3xs select-none">
       {/* Title */}
@@ -57,7 +100,7 @@ export default function WeatherWidget() {
 
       {/* 2 in a Row Grid (2x2 Layout) */}
       <div className="grid grid-cols-2 gap-3.5 md:gap-5">
-        {homeWeatherData.map((data, index) => (
+        {weatherList.map((data, index) => (
           <div 
             key={index} 
             className={`bg-gradient-to-br ${data.bg} border border-gray-100 rounded-lg p-3 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between hover:shadow-xs hover:border-blue-100 transition-all duration-200 min-w-0`}

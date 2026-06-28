@@ -8,8 +8,9 @@ import BackButton from '@/components/layout/BackButton';
 import ShareButton from '@/components/layout/ShareButton';
 import DistrictNewsTabs from '@/components/layout/DistrictNewsTabs';
 import AdBanner from '@/components/home/AdBanner';
+import PollWidget from '@/components/home/PollWidget';
 import { Home, ChevronRight, Clock, Calendar, ThumbsUp, TrendingUp } from 'lucide-react';
-import { tgDistricts, apDistricts } from '@/lib/mockData';
+import { tgDistricts, apDistricts, formatAuthorName } from '@/lib/mockData';
 
 function FallbackImage({ src, alt, className = '', fill, width, height, ...props }: {
   src: string;
@@ -91,6 +92,9 @@ export default function ArticlePageClient({
   const [inlinePromosEnabled, setInlinePromosEnabled] = useState<boolean>(false);
   const [isMounted, setIsMounted] = useState(false);
 
+  const [apNewsList, setApNewsList] = useState<any[]>(apDistrictNews);
+  const [tgNewsList, setTgNewsList] = useState<any[]>(tgDistrictNews);
+
   const [mediaLibrary, setMediaLibrary] = useState<Record<string, string>>({});
   useEffect(() => {
     try {
@@ -98,7 +102,26 @@ export default function ArticlePageClient({
     } catch (e) {
       console.error('Error loading media library:', e);
     }
-  }, []);
+    // Load pinned district news
+    try {
+      const savedAp = localStorage.getItem('pinned_ap_district_news');
+      if (savedAp) {
+        const parsedAp = JSON.parse(savedAp);
+        if (Array.isArray(parsedAp) && parsedAp.length > 0) {
+          setApNewsList(parsedAp);
+        }
+      }
+      const savedTg = localStorage.getItem('pinned_tg_district_news');
+      if (savedTg) {
+        const parsedTg = JSON.parse(savedTg);
+        if (Array.isArray(parsedTg) && parsedTg.length > 0) {
+          setTgNewsList(parsedTg);
+        }
+      }
+    } catch (e) {
+      console.error('Error loading pinned district news in client:', e);
+    }
+  }, [apDistrictNews, tgDistrictNews]);
 
   const resolveMediaPlaceholders = (htmlContent: string) => {
     if (!htmlContent) return '';
@@ -167,7 +190,7 @@ export default function ArticlePageClient({
         const activeCustom = modified[foundCustom.id] ? { ...foundCustom, ...modified[foundCustom.id] } : foundCustom;
         setArticle(activeCustom);
         setReporter({
-          name: activeCustom.reporter || 'హై టీవీ డెస్క్',
+          name: formatAuthorName(activeCustom.author || activeCustom.reporter),
           slug: 'hightv-reporter',
           avatar: '/logo.png',
           bio: 'హై టీవీ డెస్క్'
@@ -202,20 +225,7 @@ export default function ArticlePageClient({
     setIsMounted(true); // Mark as mounted so promo blocks now render with correct state
   }, []);
   
-  const [currentCategorySlug, setCurrentCategorySlug] = useState<string>(
-    article.isBreaking ? 'latest' : article.categorySlug
-  );
-
-  useEffect(() => {
-    setCurrentCategorySlug(article.isBreaking ? 'latest' : article.categorySlug);
-    if (typeof window !== 'undefined' && document.referrer) {
-      const ref = document.referrer;
-      const match = ref.match(/\/category\/([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) {
-        setCurrentCategorySlug(match[1]);
-      }
-    }
-  }, [article]);
+  const currentCategorySlug = article.categorySlug;
 
   const [selectedDistrictSlug, setSelectedDistrictSlug] = useState<string>(
     article.districtSlug || ''
@@ -353,6 +363,11 @@ export default function ArticlePageClient({
           finalB = finalB.filter((a: any) => !a.districtSlug);
         }
 
+        if (currentCategorySlug !== 'home' && currentCategorySlug !== 'latest' && !activeDistrictSlug) {
+          finalT = finalT.filter((a: any) => a.categorySlug === currentCategorySlug);
+          finalB = finalB.filter((a: any) => a.categorySlug === currentCategorySlug);
+        }
+
         setDisplayTrending(finalT);
         setDisplayLatest(finalB);
       } catch (err) {
@@ -452,7 +467,7 @@ export default function ArticlePageClient({
             )}
             <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
             <span className="text-gray-400 truncate max-w-[200px] telugu-text flex-shrink-0" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-              {article.title}
+              {article.title?.replace(/<[^>]*>/g, '')}
             </span>
           </div>
           <div className="flex-shrink-0">
@@ -560,9 +575,8 @@ export default function ArticlePageClient({
               <h1
                 className="main-headline telugu-text text-[#cc0000] mb-3"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-              >
-                {article.title}
-              </h1>
+                dangerouslySetInnerHTML={{ __html: article.title }}
+              />
 
               {/* Meta row */}
               <div className="flex flex-wrap items-center gap-3 text-gray-500 mb-4 pb-3 border-b border-gray-100 font-sans meta-info">
@@ -579,7 +593,7 @@ export default function ArticlePageClient({
                   <span className="font-semibold">Published: {formatDate(article.publishedAt)}</span>
                 </div>
                 <div className="ml-auto">
-                  <ShareButton title={article.title} />
+                  <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
                 </div>
               </div>
 
@@ -587,15 +601,14 @@ export default function ArticlePageClient({
               <p
                 className="block article-summary telugu-text text-gray-700 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r mb-4 text-[14.5px] md:text-base leading-relaxed"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-              >
-                {article.description}
-              </p>
+                dangerouslySetInnerHTML={{ __html: article.description }}
+              />
 
               {/* Hero Image */}
               <div className="overflow-hidden mb-5 w-full">
                 <FallbackImage
                   src={article.image}
-                  alt={article.title}
+                  alt={article.title?.replace(/<[^>]*>/g, '')}
                   fill={false}
                   width={1200}
                   height={675}
@@ -849,6 +862,7 @@ export default function ArticlePageClient({
               </div>
             </div>
 
+
             {/* Latest News */}
             <div className="bg-white border border-gray-200 rounded overflow-hidden">
               <div className="bg-[#e60000] text-white px-3 py-2.5">
@@ -876,6 +890,7 @@ export default function ArticlePageClient({
               </ul>
             </div>
 
+
             {/* Ad 4 — Health Insurance */}
             <div className="bg-white border border-gray-200 rounded overflow-hidden">
               <div className="bg-gray-100 text-[10px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider">Advertisement</div>
@@ -889,7 +904,12 @@ export default function ArticlePageClient({
             </div>
 
             {/* district news */}
-            <DistrictNewsTabs apNews={apDistrictNews} tgNews={tgDistrictNews} />
+            <DistrictNewsTabs apNews={apNewsList} tgNews={tgNewsList} />
+
+            {/* Article Page Poll Widget */}
+            <div className="mt-3">
+              <PollWidget scope="article" />
+            </div>
           </aside>
 
         </div>
@@ -924,7 +944,7 @@ export default function ArticlePageClient({
           )}
           <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
           <span className="text-gray-400 truncate max-w-[200px] telugu-text flex-shrink-0" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-            {article.title}
+            {article.title?.replace(/<[^>]*>/g, '')}
           </span>
         </div>
         <div className="flex-shrink-0">
@@ -940,7 +960,7 @@ export default function ArticlePageClient({
           <div className="overflow-hidden w-full">
             <FallbackImage
               src={article.image}
-              alt={article.title}
+              alt={article.title?.replace(/<[^>]*>/g, '')}
               fill={false}
               width={900}
               height={600}
@@ -964,9 +984,8 @@ export default function ArticlePageClient({
           <h1
             className="main-headline telugu-text text-[#cc0000] mb-3.5"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-          >
-            {article.title}
-          </h1>
+            dangerouslySetInnerHTML={{ __html: article.title }}
+          />
 
           {/* Limited Description & Toggled Read Button */}
           <div className="telugu-text space-y-[18px] text-gray-800 article-body" style={{ fontFamily: 'Mandali, "Noto Sans Telugu", sans-serif', lineHeight: '1.85' }}>
@@ -992,9 +1011,9 @@ export default function ArticlePageClient({
               </div>
             )}
 
-            <p className="article-summary telugu-text">
-              {article.body ? article.description : `${article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. తాజా సమాచారం ఇక్కడ లభిస్తుంది.`}
-            </p>
+            <p className="article-summary telugu-text" dangerouslySetInnerHTML={{
+              __html: article.body ? article.description : `${article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. తాజా సమాచారం ఇక్కడ లభిస్తుంది.`
+            }} />
           </div>
 
 
@@ -1009,7 +1028,7 @@ export default function ArticlePageClient({
                 {reporter.name}
               </Link>
             </div>
-            <ShareButton title={article.title} />
+            <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
           </div>
 
           {/* "పూర్తిగా చదవండి" button under reporter/share */}

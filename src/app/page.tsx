@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
@@ -65,49 +65,59 @@ function SidebarLatestVideos() {
     }
   }, []);
 
+  const getYoutubeId = (urlOrId: string) => {
+    if (!urlOrId) return '';
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = urlOrId.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : urlOrId.trim();
+  };
+
   return (
     <div className="bg-white rounded-lg border border-gray-100 p-3 md:p-4 shadow-xs mb-1 md:mb-4 select-none">
       <h3 className="font-black text-[#fe0000] md:text-gray-900 text-[16px] md:text-[18px] mb-3 text-left pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-        హై టీవీ వీడియోలు
+        హై టీవీ వీడియోస్
       </h3>
       
       <div className="flex md:flex-col overflow-x-auto md:overflow-x-visible gap-3.5 md:gap-0 md:space-y-4 pb-2 md:pb-0 snap-x snap-mandatory scroll-smooth hide-scrollbar">
-        {videos.slice(0, 3).map((vid, idx) => (
-          <div 
-            key={`${vid.id}-${idx}`} 
-            onClick={() => setSelectedVideo(vid.id)}
-            className="flex-shrink-0 w-[180px] md:w-full snap-start flex flex-col gap-2 text-left group cursor-pointer pb-0 md:pb-4 border-b-0 md:border-b border-gray-100 last:border-b-0 last:pb-0"
-          >
-            {/* Top: Thumbnail with Play Overlay */}
+        {videos.slice(0, 3).map((vid, idx) => {
+          const ytId = getYoutubeId(vid.id);
+          return (
             <div 
-              className="relative w-full aspect-video rounded-md overflow-hidden shadow-xs border border-gray-150 bg-black/5"
+              key={`${vid.id}-${idx}`} 
+              onClick={() => setSelectedVideo(ytId)}
+              className="flex-shrink-0 w-[180px] md:w-full snap-start flex flex-col gap-2 text-left group cursor-pointer pb-0 md:pb-4 border-b-0 md:border-b border-gray-100 last:border-b-0 last:pb-0"
             >
-              <img 
-                src={vid.thumbnail || `https://img.youtube.com/vi/${vid.id}/hqdefault.jpg`} 
-                alt={vid.title}
-                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
-              />
-              {/* Red play icon overlay */}
-              <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
-                <div className="w-8 h-8 md:w-10 md:h-10 bg-red-650 rounded-full flex items-center justify-center text-white shadow-md transform group-hover:scale-110 transition-transform duration-200">
-                  <svg className="w-3.5 h-3.5 md:w-4.5 md:h-4.5 fill-white text-white ml-0.5" viewBox="0 0 24 24">
-                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                  </svg>
+              {/* Top: Thumbnail with Play Overlay */}
+              <div 
+                className="relative w-full aspect-video rounded-md overflow-hidden shadow-xs border border-gray-150 bg-black/5"
+              >
+                <img 
+                  src={vid.thumbnail || `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} 
+                  alt={vid.title}
+                  className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
+                />
+                {/* Red play icon overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
+                  <div className="w-8 h-8 md:w-10 md:h-10 bg-red-650 rounded-full flex items-center justify-center text-white shadow-md transform group-hover:scale-110 transition-transform duration-200">
+                    <svg className="w-3.5 h-3.5 md:w-4.5 md:h-4.5 fill-white text-white ml-0.5" viewBox="0 0 24 24">
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                  </div>
                 </div>
               </div>
+              
+              {/* Bottom: Title */}
+              <div className="py-1.5 px-1">
+                <h4 
+                  className="text-[15px] md:text-[17px] font-black text-gray-800 leading-relaxed group-hover:text-red-600 transition-colors telugu-text line-clamp-2"
+                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                >
+                  {vid.title}
+                </h4>
+              </div>
             </div>
-            
-            {/* Bottom: Title */}
-            <div className="py-1.5 px-1">
-              <h4 
-                className="text-[15px] md:text-[17px] font-black text-gray-800 leading-relaxed group-hover:text-red-600 transition-colors telugu-text line-clamp-2"
-                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-              >
-                {vid.title}
-              </h4>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* E-Paper Promo Link */}
@@ -234,9 +244,8 @@ function LatestNewsFeed() {
             <p 
               className="flex-1 min-w-0 text-[14px] font-bold text-gray-800 leading-normal group-hover:text-[#02599c] transition-colors telugu-text" 
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-            >
-              {article.title}
-            </p>
+              dangerouslySetInnerHTML={{ __html: article.title }}
+            />
           </Link>
         ))}
       </div>
@@ -257,11 +266,22 @@ export default function HomePage() {
   const [districtList, setDistrictList] = useState(districtNews);
   const [adyathmikamList, setAdyathmikamList] = useState(adyathmikamNews);
   const [dbArticles, setDbArticles] = useState<any[]>([]);
+  const [dbShorts, setDbShorts] = useState<any[]>([]);
+
+  const homepageShorts = useMemo(() => {
+    return dbShorts;
+  }, [dbShorts]);
+
+  const homepagePhotos = useMemo(() => {
+    return dbArticles.filter(art => art.categorySlug === 'photos');
+  }, [dbArticles]);
+
   const [trendingList, setTrendingList] = useState<any[]>(featuredNews.filter((n) => n.isTrending));
   const [activeRegionalFeed, setActiveRegionalFeed] = useState<'default' | 'tg' | 'ap'>('default');
 
   useEffect(() => {
-    fetch('/api/articles?limit=500&t=' + Date.now())
+    // 1. Fetch main news feed (excluding body, limit 150)
+    fetch('/api/articles?limit=150&excludeBody=true&t=' + Date.now())
       .then(res => res.json())
       .then(dbArticlesData => {
         if (!Array.isArray(dbArticlesData)) return;
@@ -313,6 +333,18 @@ export default function HomePage() {
       })
       .catch(e => {
         console.error('Error loading custom articles on homepage', e);
+      });
+
+    // 2. Fetch shorts separately (includes body to play videos)
+    fetch('/api/articles?category=shorts&limit=10&t=' + Date.now())
+      .then(res => res.json())
+      .then(dbShortsData => {
+        if (Array.isArray(dbShortsData)) {
+          setDbShorts(dbShortsData);
+        }
+      })
+      .catch(e => {
+        console.error('Error loading shorts on homepage', e);
       });
   }, []);
 
@@ -434,7 +466,7 @@ export default function HomePage() {
                         <img
                           src={article.image}
                           alt={article.title}
-                          className="w-full h-full object-contain group-hover:scale-[1.04] transition-transform duration-200"
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-200"
                         />
                       </div>
                       <div className="flex-1 min-w-0 py-1 px-1">
@@ -556,19 +588,15 @@ export default function HomePage() {
               </div>
             </div>
 
-            <NewsSection title="Horoscopes" titleTelugu="శుభఫలాలు" articles={rasipalaluList} viewAllLink="/category/rasipalalu" accentColor="#b45309" layout="grid4" />
+
+
+            <VideoSection videos={homepageShorts} />
             {/* Mobile-only Dummy Ad Box */}
             <div className="lg:hidden">
               <AdBanner position="dummy" />
             </div>
 
-            <VideoSection />
-            {/* Mobile-only Dummy Ad Box */}
-            <div className="lg:hidden">
-              <AdBanner position="dummy" />
-            </div>
-
-            <PhotoGallery />
+            <PhotoGallery photos={homepagePhotos} />
             {/* Mobile-only Dummy Ad Box */}
             <div className="lg:hidden">
               <AdBanner position="dummy" />
