@@ -284,6 +284,13 @@ export default function EditorialPageClient({ allArticles }: { allArticles: Arti
         </div>
       </div>
 
+      {/* Page Header */}
+      <div className="mb-6 text-left">
+        <h1 className="text-2xl md:text-3xl font-black text-gray-900 border-b-2 border-gray-100 pb-2 relative telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+          <span className="border-b-4 border-[#002f6c] pb-[10px]">ఎడిటోరియల్</span>
+        </h1>
+      </div>
+
       {/* Main Grid Content */}
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-5">
         <div className="w-full lg:col-span-7">
@@ -293,12 +300,10 @@ export default function EditorialPageClient({ allArticles }: { allArticles: Arti
               // If there are no articles in this section, and it's not the only section, we can skip it
               return null;
             }
-            // Ensure the main editorial page section is always displayed in Telugu as 'ఎడిటోరియల్'
-            const displayTitle = sec.slug === 'sampadakiyam' ? 'ఎడిటోరియల్' : sec.title;
             return (
               <EditorialSection 
                 key={sec.id}
-                title={displayTitle} 
+                title={sec.title} 
                 articles={secArticles} 
                 categorySlug={sec.slug} 
               />
