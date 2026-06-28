@@ -2596,7 +2596,7 @@ export default function AdminPage() {
         cleanBodyHTML = `<video src="${newsVideo}" controls class="w-full h-auto rounded-xl my-4 block"></video>` + cleanBodyHTML;
       }
     }
-    const excerptText = descriptionPlainText || (editorRef.current ? editorRef.current.innerText.slice(0, 140).trim().replace(/<[^>]*>/g, '') + '...' : '');
+    const excerptText = newsDescription.trim() || descriptionPlainText || (editorRef.current ? editorRef.current.innerText.slice(0, 140).trim().replace(/<[^>]*>/g, '') + '...' : '');
 
     const slugToUse = newsSlug.trim() || (() => {
       const base = titlePlainText.toLowerCase()
@@ -4228,21 +4228,24 @@ export default function AdminPage() {
                     <span className="text-[10px] text-slate-400">Slug is mandatory for the URL. Strictly use alphanumeric English characters and hyphens.</span>
                   </div>
 
-                  {/* Short Excerpt Block */}
+                  {/* Meta Description Block */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
-                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Short Excerpt (Optional)</label>
-                    <div className="flex flex-col border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-                      <MiniWysiwygToolbar editorRef={newsDescriptionRef} />
-                      <div
-                        contentEditable
-                        ref={newsDescriptionRef}
-                        suppressContentEditableWarning
-                        onInput={(e) => setNewsDescription(e.currentTarget.innerText)}
-                        data-placeholder="Brief summary of the article..."
-                        className="wysiwyg-editor-mini w-full bg-slate-50 border-t border-slate-200/60 focus:bg-white px-4 py-3 text-xs outline-none transition-colors telugu-text text-slate-800 min-h-[70px]"
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                      />
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Meta Description (SEO Summary - Optional)</label>
+                      <span className="text-[10px] font-bold text-slate-400">{newsDescription.length}/160 chars</span>
                     </div>
+                    <textarea
+                      rows={3}
+                      value={newsDescription}
+                      onChange={(e) => {
+                        setNewsDescription(e.target.value);
+                        if (newsDescriptionRef.current) newsDescriptionRef.current.innerText = e.target.value;
+                      }}
+                      placeholder="Enter concise, engaging meta description for Search Engines (Google) and Social Media sharing..."
+                      className="w-full bg-slate-50 border border-slate-200/60 focus:bg-white focus:border-rose-500 rounded-xl px-4 py-3 text-xs outline-none transition-colors telugu-text text-slate-800 resize-y"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    />
+                    <span className="text-[10px] text-slate-400">This text appears as the snippet under your article title on Google search results and WhatsApp shares.</span>
                   </div>
 
                   {/* Article Content WYSIWYG Editor Block */}
@@ -6606,21 +6609,23 @@ export default function AdminPage() {
                         />
                       </div>
 
-                      {/* Short Excerpt */}
+                      {/* Meta Description Block */}
                       <div className="flex flex-col gap-1">
-                        <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Short Excerpt</label>
-                        <div className="flex flex-col border border-slate-200 rounded-xl overflow-hidden shadow-2xs bg-white">
-                          <MiniWysiwygToolbar editorRef={weatherDescriptionRef} />
-                          <div
-                            contentEditable
-                            ref={weatherDescriptionRef}
-                            suppressContentEditableWarning
-                            onInput={(e) => setNewsDescription(e.currentTarget.innerText)}
-                            data-placeholder="Brief summary..."
-                            className="wysiwyg-editor-mini w-full bg-slate-50 border-t border-slate-200/60 focus:bg-white px-4 py-2 text-xs outline-none transition-colors telugu-text text-slate-800 min-h-[60px]"
-                            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                          />
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Meta Description (SEO)</label>
+                          <span className="text-[9px] font-bold text-slate-400">{newsDescription.length}/160</span>
                         </div>
+                        <textarea
+                          rows={2}
+                          value={newsDescription}
+                          onChange={(e) => {
+                            setNewsDescription(e.target.value);
+                            if (weatherDescriptionRef.current) weatherDescriptionRef.current.innerText = e.target.value;
+                          }}
+                          placeholder="Brief summary for Google search and social shares..."
+                          className="w-full bg-slate-50 border border-slate-200/60 focus:bg-white focus:border-rose-500 rounded-xl px-4 py-2 text-xs outline-none transition-colors telugu-text text-slate-800 resize-y"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        />
                       </div>
 
                       {/* Featured Image */}

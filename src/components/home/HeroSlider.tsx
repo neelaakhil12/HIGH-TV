@@ -11,40 +11,60 @@ export default function HeroSlider({ dbArticles }: { dbArticles?: any[] }) {
   const [slides, setSlides] = useState<any[]>(featuredNews);
 
   useEffect(() => {
-    try {
-      const savedSlides = localStorage.getItem('homepage_banner_slides');
-      if (savedSlides) {
-        const parsed = JSON.parse(savedSlides);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setSlides(parsed.map((item: any, index: number) => ({
-            id: `custom-slide-${index}`,
-            title: item.title,
-            image: item.image,
-            link: item.link || '',
-            slug: item.link ? '' : `custom-slide-${index}`
-          })));
-          return;
+    const fetchSlides = async () => {
+      try {
+        const res = await fetch('/api/slides');
+        if (res.ok) {
+          const dbSlides = await res.json();
+          if (Array.isArray(dbSlides) && dbSlides.length > 0) {
+            setSlides(dbSlides.map((item: any, index: number) => ({
+              id: `db-slide-${index}`,
+              title: item.title,
+              image: item.image,
+              link: item.link || '',
+              slug: item.link ? '' : `db-slide-${index}`
+            })));
+            return;
+          }
         }
+      } catch (err) {
+        console.error('Error fetching API slides:', err);
       }
 
-      let mergedAll = featuredNews;
-      if (dbArticles && Array.isArray(dbArticles)) {
-        const dbIds = new Set(dbArticles.map(a => a.id));
-        const filteredStatic = featuredNews.filter(a => !dbIds.has(a.id));
-        mergedAll = [...dbArticles, ...filteredStatic];
-      } else {
-        mergedAll = getMergedArticles(featuredNews);
-      }
+      try {
+        const savedSlides = localStorage.getItem('homepage_banner_slides');
+        if (savedSlides) {
+          const parsed = JSON.parse(savedSlides);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setSlides(parsed.map((item: any, index: number) => ({
+              id: `custom-slide-${index}`,
+              title: item.title,
+              image: item.image,
+              link: item.link || '',
+              slug: item.link ? '' : `custom-slide-${index}`
+            })));
+            return;
+          }
+        }
 
-      const customFeatured = mergedAll.filter((art: any) => art.isBreaking || art.isFeatured || art.categorySlug === 'featured');
-      const featuredToPrepend = customFeatured.length > 0 ? customFeatured : mergedAll.slice(0, 3);
-      
-      const customIds = new Set(featuredToPrepend.map((a: any) => a.id));
-      const filteredStatic = mergedAll.filter((art) => !customIds.has(art.id));
-      setSlides([...featuredToPrepend, ...filteredStatic]);
-    } catch (e) {
-      console.error('Error loading custom slider news', e);
-    }
+        let mergedAll = featuredNews;
+        if (dbArticles && Array.isArray(dbArticles)) {
+          const dbIds = new Set(dbArticles.map(a => a.id));
+          const filteredStatic = featuredNews.filter(a => !dbIds.has(a.id));
+          mergedAll = [...dbArticles, ...filteredStatic];
+        } else {
+          mergedAll = getMergedArticles(featuredNews);
+        }
+
+        const customFeatured = mergedAll.filter((art: any) => art.isBreaking || art.isFeatured || art.categorySlug === 'featured');
+        const featuredToPrepend = customFeatured.length > 0 ? customFeatured.slice(0, 5) : mergedAll.slice(0, 5);
+        setSlides(featuredToPrepend);
+      } catch (e) {
+        console.error('Error loading custom slider news', e);
+      }
+    };
+
+    fetchSlides();
   }, [dbArticles]);
 
   const next = useCallback(() => {
