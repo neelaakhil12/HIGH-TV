@@ -34,12 +34,18 @@ function getLinkedArticle(imgArt: Article, allArticles: Article[]) {
   return allArticles.find(a => a.slug === targetSlug);
 }
 
+function getCleanTitle(title: string | null | undefined): string {
+  if (!title) return '';
+  return title.replace(/<[^>]*>/g, '').trim().toLowerCase();
+}
+
 function EditorialSection({ title, articles, categorySlug }: { title: string; articles: Article[]; categorySlug: string }) {
   // Separate image link articles and normal articles
   const imageLinkArticles = articles.filter(a => a.slug?.startsWith('editorial-img-'));
   const normalArticles = articles.filter(a => !a.slug?.startsWith('editorial-img-'));
 
   const usedNormalIds = new Set<string>();
+  const usedTitles = new Set<string>();
   const rows: { imgArt: Article; linkedArt: Article | null; rightArt: Article | null }[] = [];
 
   if (imageLinkArticles.length > 0) {
@@ -48,16 +54,21 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
       let linkedArt = getLinkedArticle(imgArt, normalArticles);
       if (linkedArt) {
         usedNormalIds.add(linkedArt.id);
+        usedTitles.add(getCleanTitle(linkedArt.title));
       } else {
         // Fallback: take the first unused normal article
-        linkedArt = normalArticles.find(a => !usedNormalIds.has(a.id)) || null;
-        if (linkedArt) usedNormalIds.add(linkedArt.id);
+        linkedArt = normalArticles.find(a => !usedNormalIds.has(a.id) && !usedTitles.has(getCleanTitle(a.title))) || null;
+        if (linkedArt) {
+          usedNormalIds.add(linkedArt.id);
+          usedTitles.add(getCleanTitle(linkedArt.title));
+        }
       }
 
       // Find the next unused normal article (displays on right next to the big image)
-      const rightArt = normalArticles.find(a => !usedNormalIds.has(a.id)) || null;
+      const rightArt = normalArticles.find(a => !usedNormalIds.has(a.id) && !usedTitles.has(getCleanTitle(a.title))) || null;
       if (rightArt) {
         usedNormalIds.add(rightArt.id);
+        usedTitles.add(getCleanTitle(rightArt.title));
       }
 
       rows.push({ imgArt, linkedArt, rightArt });
@@ -67,15 +78,24 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
   const fallbackRows: { imgArt: Article | null; linkedArts: Article[] } = { imgArt: null, linkedArts: [] };
   if (imageLinkArticles.length === 0 && normalArticles.length > 0) {
     const mainArt = normalArticles[0];
-    const rightArts = normalArticles.slice(1, 3);
+    usedNormalIds.add(mainArt.id);
+    usedTitles.add(getCleanTitle(mainArt.title));
+
+    const rightArts: Article[] = [];
+    for (const art of normalArticles) {
+      if (rightArts.length >= 2) break;
+      if (!usedNormalIds.has(art.id) && !usedTitles.has(getCleanTitle(art.title))) {
+        rightArts.push(art);
+        usedNormalIds.add(art.id);
+        usedTitles.add(getCleanTitle(art.title));
+      }
+    }
+    
     fallbackRows.imgArt = mainArt;
     fallbackRows.linkedArts = rightArts;
-    
-    usedNormalIds.add(mainArt.id);
-    rightArts.forEach(a => usedNormalIds.add(a.id));
   }
 
-  const remainingArticles = normalArticles.filter(a => !usedNormalIds.has(a.id));
+  const remainingArticles = normalArticles.filter(a => !usedNormalIds.has(a.id) && !usedTitles.has(getCleanTitle(a.title)));
 
   return (
     <div className="mb-12 text-left">
