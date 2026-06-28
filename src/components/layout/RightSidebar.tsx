@@ -293,12 +293,12 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
           onClick={(e) => {
             if (!ad.body) e.preventDefault();
           }}
-          className="w-full h-[160px] flex items-center justify-center bg-slate-50/50 overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200"
+          className="w-full overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200 block"
         >
           <img
             src={ad.image}
             alt={ad.title}
-            className="w-full h-full object-contain"
+            className="w-full h-auto object-cover block"
           />
         </a>
       ))}
@@ -369,12 +369,12 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
           onClick={(e) => {
             if (!ad.body) e.preventDefault();
           }}
-          className="w-full h-[160px] flex items-center justify-center bg-slate-50/50 overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200"
+          className="w-full overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200 block"
         >
           <img
             src={ad.image}
             alt={ad.title}
-            className="w-full h-full object-contain"
+            className="w-full h-auto object-cover block"
           />
         </a>
       ))}
@@ -392,12 +392,12 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
           onClick={(e) => {
             if (!ad.body) e.preventDefault();
           }}
-          className="w-full h-[160px] flex items-center justify-center bg-slate-50/50 overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200"
+          className="w-full overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200 block"
         >
           <img
             src={ad.image}
             alt={ad.title}
-            className="w-full h-full object-contain"
+            className="w-full h-auto object-cover block"
           />
         </a>
       ))}
