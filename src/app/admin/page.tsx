@@ -422,6 +422,7 @@ const SIDEBAR_CATEGORIES = [
   { slug: 'upadi', name: 'ఉపాధి (Upadi)' },
   { slug: 'rasipalalu', name: 'శుభఫలాలు (Astrology)' },
   { slug: 'weather', name: 'వెదర్ (Weather)' },
+  { slug: 'sampadakiyam', name: 'ఎడిటోరియల్ (Editorial)' },
 ];
 
 const getArticleCategoryName = (art: any) => {
