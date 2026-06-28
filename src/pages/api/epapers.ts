@@ -1,10 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
+import fs from 'fs';
+import path from 'path';
 
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '50mb', // Support large PDF Base64 payloads up to 50MB
+      sizeLimit: '50mb', // Support large PDF uploads up to 50MB
     },
   },
 };
@@ -35,6 +37,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           data = JSON.parse(data);
         } catch (e) {}
       }
+
+      // If pdfUrl is a Base64 string, write it to public/uploads/epapers file storage
+      if (data && data.pdfUrl && data.pdfUrl.startsWith('data:application/pdf;base64,')) {
+        const base64Data = data.pdfUrl.replace(/^data:application\/pdf;base64,/, '');
+        const buffer = Buffer.from(base64Data, 'base64');
+        
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'epapers');
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        
+        const cleanTitleSlug = (data.title || 'edition').toLowerCase().replace(/[^a-z0-9]/g, '-').substring(0, 20);
+        const fileName = `epaper-${Date.now()}-${cleanTitleSlug}.pdf`;
+        const filePath = path.join(uploadDir, fileName);
+        
+        fs.writeFileSync(filePath, buffer);
+        
+        // Save clean URL path in database
+        data.pdfUrl = `/uploads/epapers/${fileName}`;
+      }
+
       const epaper = await prisma.epaper.create({ data });
       return res.status(201).json(epaper);
     } catch (error: any) {
@@ -50,6 +73,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (method === 'DELETE') {
     try {
       const id = String(req.query.id || '');
+      const existing = await prisma.epaper.findUnique({ where: { id } });
+      if (existing && existing.pdfUrl && existing.pdfUrl.startsWith('/uploads/epapers/')) {
+        const filePath = path.join(process.cwd(), 'public', existing.pdfUrl);
+        if (fs.existsSync(filePath)) {
+          try { fs.unlinkSync(filePath); } catch (e) {}
+        }
+      }
       await prisma.epaper.delete({ where: { id } });
       return res.status(200).json({ success: true });
     } catch (error) {
