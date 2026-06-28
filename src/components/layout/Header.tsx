@@ -18,19 +18,36 @@ export default function Header() {
   const [isVidyaMobileExpanded, setIsVidyaMobileExpanded] = useState(false);
   const [isUpadiMobileExpanded, setIsUpadiMobileExpanded] = useState(false);
   const [isMoreMobileExpanded, setIsMoreMobileExpanded] = useState(false);
-  const [headerAd, setHeaderAd] = useState<{id: string; title: string; image: string; body: string | null} | null>(null);
+  const [headerAds, setHeaderAds] = useState<{id: string; title: string; image: string; body: string | null}[]>([]);
+  const [currentAdIndex, setCurrentAdIndex] = useState(0);
+  const [adFade, setAdFade] = useState(true);
 
   useEffect(() => {
-    fetch('/api/articles?category=header-ad&limit=10&t=' + Date.now())
+    fetch('/api/articles?category=header-ad&limit=20&t=' + Date.now())
       .then(r => r.json())
       .then((data: any[]) => {
         if (Array.isArray(data) && data.length > 0) {
-          const active = data.find(ad => ad.categorySlug === 'header-ad');
-          setHeaderAd(active ? { id: active.id, title: active.title, image: active.image, body: active.body } : null);
+          const active = data
+            .filter(ad => ad.categorySlug === 'header-ad' && ad.category === 'active')
+            .map(ad => ({ id: ad.id, title: ad.title, image: ad.image, body: ad.body }));
+          setHeaderAds(active);
         }
       })
       .catch(() => {});
   }, []);
+
+  // Rotate header ads every 2 seconds with fade transition
+  useEffect(() => {
+    if (headerAds.length <= 1) return;
+    const interval = setInterval(() => {
+      setAdFade(false);
+      setTimeout(() => {
+        setCurrentAdIndex(prev => (prev + 1) % headerAds.length);
+        setAdFade(true);
+      }, 300);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [headerAds.length]);
 
   useEffect(() => {
     setIsTGMobileExpanded(false);
@@ -210,22 +227,43 @@ export default function Header() {
             )}
           </div>
           
-          {/* Header Ad Banner (Center — desktop only) — managed via Admin Panel */}
-          {headerAd && (
-            <a
-              href={headerAd.body || '#'}
-              target={headerAd.body ? '_blank' : '_self'}
-              rel="noopener noreferrer"
-              onClick={(e) => { if (!headerAd.body) e.preventDefault(); }}
-              className="hidden md:flex flex-1 justify-center max-w-[550px] h-[90px] overflow-hidden relative group mx-4 select-none items-center cursor-pointer"
-            >
-              <img
-                src={headerAd.image}
-                alt={headerAd.title || 'Header Advertisement'}
-                className="w-full h-full object-contain rounded"
-              />
-            </a>
-          )}
+          {/* Header Ad Banner (Center — desktop only) — rotating slideshow managed via Admin Panel */}
+          {headerAds.length > 0 && (() => {
+            const ad = headerAds[currentAdIndex];
+            return (
+              <a
+                key={ad.id}
+                href={ad.body || '#'}
+                target={ad.body ? '_blank' : '_self'}
+                rel="noopener noreferrer"
+                onClick={(e) => { if (!ad.body) e.preventDefault(); }}
+                className="hidden md:flex flex-1 justify-center max-w-[550px] h-[90px] overflow-hidden relative group mx-4 select-none items-center cursor-pointer rounded"
+                style={{
+                  opacity: adFade ? 1 : 0,
+                  transition: 'opacity 0.3s ease-in-out',
+                }}
+              >
+                <img
+                  src={ad.image}
+                  alt={ad.title || 'Header Advertisement'}
+                  className="w-full h-full object-contain rounded"
+                />
+                {/* Dot indicators (only show if multiple ads) */}
+                {headerAds.length > 1 && (
+                  <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-1">
+                    {headerAds.map((_, i) => (
+                      <span
+                        key={i}
+                        className={`block w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                          i === currentAdIndex ? 'bg-white scale-125' : 'bg-white/40'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </a>
+            );
+          })()}
 
           {/* Actions Dashboard (Right — desktop only) */}
           <div className="hidden md:flex items-center justify-center flex-shrink-0">
