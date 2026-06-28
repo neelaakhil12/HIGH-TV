@@ -40,11 +40,11 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
   const normalArticles = articles.filter(a => !a.slug?.startsWith('editorial-img-'));
 
   const usedNormalIds = new Set<string>();
-  const rows: { imgArt: Article; linkedArt: Article | null }[] = [];
+  const rows: { imgArt: Article; linkedArt: Article | null; rightArt: Article | null }[] = [];
 
   if (imageLinkArticles.length > 0) {
     imageLinkArticles.forEach(imgArt => {
-      // Find the linked article
+      // Find the linked article (displays on left)
       let linkedArt = getLinkedArticle(imgArt, normalArticles);
       if (linkedArt) {
         usedNormalIds.add(linkedArt.id);
@@ -53,7 +53,14 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
         linkedArt = normalArticles.find(a => !usedNormalIds.has(a.id)) || null;
         if (linkedArt) usedNormalIds.add(linkedArt.id);
       }
-      rows.push({ imgArt, linkedArt });
+
+      // Find the next unused normal article (displays on right next to the big image)
+      const rightArt = normalArticles.find(a => !usedNormalIds.has(a.id)) || null;
+      if (rightArt) {
+        usedNormalIds.add(rightArt.id);
+      }
+
+      rows.push({ imgArt, linkedArt, rightArt });
     });
   }
 
@@ -85,7 +92,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
       </div>
 
       {/* 1. Custom Image-Link Rows */}
-      {rows.map(({ imgArt, linkedArt }) => (
+      {rows.map(({ imgArt, linkedArt, rightArt }) => (
         <div key={imgArt.id} className="grid grid-cols-1 md:grid-cols-10 gap-5 mb-6 items-start">
           {/* Left Big Image */}
           <div className="md:col-span-6 w-full">
@@ -105,23 +112,23 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
             </Link>
           </div>
 
-          {/* Right Linked Article Card */}
+          {/* Right Stacked Article Card */}
           <div className="md:col-span-4 w-full">
-            {linkedArt ? (
+            {rightArt ? (
               (() => {
-                const cleanTitle = linkedArt.title ? linkedArt.title.replace(/<[^>]*>/g, '').trim() : '';
-                const cleanDesc = linkedArt.description ? linkedArt.description.replace(/<[^>]*>/g, '').trim() : '';
+                const cleanTitle = rightArt.title ? rightArt.title.replace(/<[^>]*>/g, '').trim() : '';
+                const cleanDesc = rightArt.description ? rightArt.description.replace(/<[^>]*>/g, '').trim() : '';
                 return (
                   <div className="flex gap-4 items-start group bg-white hover:bg-slate-50/50 p-2.5 rounded-xl border border-transparent hover:border-slate-100 transition-all">
-                    <Link href={getArticleHref(linkedArt)} className="w-20 h-14 sm:w-24 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 block shadow-3xs relative">
+                    <Link href={getArticleHref(rightArt)} className="w-20 h-14 sm:w-24 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden bg-slate-50 border border-gray-150 block shadow-3xs relative">
                       <img
-                        src={linkedArt.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
+                        src={rightArt.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
                         alt={cleanTitle}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                       />
                     </Link>
                     <div className="flex-1 text-left min-w-0">
-                      <Link href={getArticleHref(linkedArt)}>
+                      <Link href={getArticleHref(rightArt)}>
                         <h4 className="text-[15px] sm:text-[16px] md:text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2 pl-1 pt-0.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                           {cleanTitle}
                         </h4>
@@ -137,7 +144,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
               })()
             ) : (
               <div className="p-4 text-center text-slate-400 text-xs font-bold border border-dashed border-slate-200 rounded-xl">
-                No linked article.
+                No additional articles.
               </div>
             )}
           </div>
