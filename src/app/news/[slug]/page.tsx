@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 export const dynamic = 'force-dynamic';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';

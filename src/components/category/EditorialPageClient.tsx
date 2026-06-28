@@ -13,6 +13,16 @@ interface Article {
   image?: string | null;
   categorySlug?: string;
   publishedAt?: any;
+  body?: string | null;
+}
+
+function getArticleHref(art: any) {
+  if (!art) return '#';
+  if (art.slug && art.slug.startsWith('editorial-img-') && art.body) {
+    const cleanSlug = art.body.replace('[LINKED_ARTICLE_SLUG]:', '').trim();
+    return `/news/${cleanSlug}`;
+  }
+  return `/news/${art.slug}`;
 }
 
 function EditorialSection({ title, articles, categorySlug }: { title: string; articles: Article[]; categorySlug: string }) {
@@ -42,7 +52,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
         {/* Left Big Featured Article */}
         <div className="md:col-span-7 w-full">
           {mainArticle && (
-            <Link href={`/news/${mainArticle.slug}`} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
+            <Link href={getArticleHref(mainArticle)} className="relative block aspect-[16/10] w-full rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5">
               <img
                 src={mainArticle.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
                 alt={mainArticle.title}
@@ -60,7 +70,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
         {/* Right Stacked Featured Articles */}
         <div className="md:col-span-3 flex flex-col gap-4 w-full justify-between">
           {rightArticles.map((art) => (
-            <Link key={art.id} href={`/news/${art.slug}`} className="relative flex-1 aspect-[16/9] md:aspect-auto rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5 min-h-[125px]">
+            <Link key={art.id} href={getArticleHref(art)} className="relative flex-1 aspect-[16/9] md:aspect-auto rounded-lg overflow-hidden group border border-gray-150 shadow-3xs bg-black/5 min-h-[125px]">
               <img
                 src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
                 alt={art.title}
@@ -82,7 +92,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
         <div className="lg:col-span-4 flex flex-col gap-4">
           {bottomLeftArticles.map((art) => (
             <div key={art.id} className="flex gap-3 items-start group">
-              <Link href={`/news/${art.slug}`} className="w-[100px] h-[70px] flex-shrink-0 rounded overflow-hidden bg-slate-50 border border-gray-150 relative block shadow-3xs">
+              <Link href={getArticleHref(art)} className="w-[100px] h-[70px] flex-shrink-0 rounded overflow-hidden bg-slate-50 border border-gray-150 relative block shadow-3xs">
                 <img
                   src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
                   alt={art.title}
@@ -90,7 +100,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
                 />
               </Link>
               <div className="flex-1 text-left">
-                <Link href={`/news/${art.slug}`}>
+                <Link href={getArticleHref(art)}>
                   <h4 className="text-[17.5px] font-black text-[#02599c] hover:text-red-650 hover:underline leading-snug telugu-text line-clamp-2 pl-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                     {art.title}
                   </h4>
@@ -107,7 +117,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
             {col1.map((art) => (
               <div key={art.id} className="flex items-start gap-1.5 py-2.5 border-b border-dashed border-gray-200 last:border-b-0">
                 <span className="text-[#a90000] text-[10px] mt-2 shrink-0">▶</span>
-                <Link href={`/news/${art.slug}`}>
+                <Link href={getArticleHref(art)}>
                   <h5 className="text-[16px] md:text-[18px] font-black text-gray-800 hover:text-red-650 hover:underline leading-relaxed telugu-text line-clamp-2 pl-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                     {art.title}
                   </h5>
@@ -121,7 +131,7 @@ function EditorialSection({ title, articles, categorySlug }: { title: string; ar
             {col2.map((art) => (
               <div key={art.id} className="flex items-start gap-1.5 py-2.5 border-b border-dashed border-gray-200 last:border-b-0">
                 <span className="text-[#a90000] text-[10px] mt-2 shrink-0">▶</span>
-                <Link href={`/news/${art.slug}`}>
+                <Link href={getArticleHref(art)}>
                   <h5 className="text-[16px] md:text-[18px] font-black text-gray-800 hover:text-red-650 hover:underline leading-relaxed telugu-text line-clamp-2 pl-1.5" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                     {art.title}
                   </h5>

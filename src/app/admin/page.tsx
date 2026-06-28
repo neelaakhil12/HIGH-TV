@@ -669,7 +669,7 @@ export default function AdminPage() {
   // ── Editorial Page Manager states ──────────────────────────────────────────
   const [editorialSections, setEditorialSections] = useState<{ id: string; title: string; slug: string }[]>(DEFAULT_EDITORIAL_SECTIONS);
   const [editorialActiveSection, setEditorialActiveSection] = useState<string>('sampadakiyam');
-  const [editorialFormMode, setEditorialFormMode] = useState<'none' | 'add-section' | 'edit-section' | 'add-article' | 'edit-article'>('none');
+  const [editorialFormMode, setEditorialFormMode] = useState<'none' | 'add-section' | 'edit-section' | 'add-article' | 'edit-article' | 'add-image' | 'edit-image'>('none');
   const [editorialEditingSection, setEditorialEditingSection] = useState<{ id: string; title: string; slug: string } | null>(null);
   const [editorialEditingArticle, setEditorialEditingArticle] = useState<any | null>(null);
   const [editorialSectionTitle, setEditorialSectionTitle] = useState('');
@@ -680,6 +680,13 @@ export default function AdminPage() {
   const editorialEditorRef = useRef<HTMLDivElement>(null);
   const editorialImageInputRef = useRef<HTMLInputElement>(null);
   const [isSavingEditorialArticle, setIsSavingEditorialArticle] = useState(false);
+
+  // Editorial Image Link states
+  const [editorialImageCaption, setEditorialImageCaption] = useState('');
+  const [editorialImageFile, setEditorialImageFile] = useState('');
+  const [editorialImageLinkSlug, setEditorialImageLinkSlug] = useState('');
+  const [editorialSearchQuery, setEditorialSearchQuery] = useState('');
+  const [showEditorialArticlePicker, setShowEditorialArticlePicker] = useState(false);
 
   // Pinned District News states
   const [pinnedApNews, setPinnedApNews] = useState<any[]>([]);
@@ -2361,6 +2368,20 @@ export default function AdminPage() {
       alert('Error saving article.');
     } finally {
       setIsSavingArticle(false);
+    }
+  };
+
+  const editEditorialItem = (art: any) => {
+    if (art.slug && art.slug.startsWith('editorial-img-')) {
+      setEditorialEditingArticle(art);
+      setEditorialImageCaption(art.title || '');
+      setEditorialImageFile(art.image || '');
+      const linked = art.body ? art.body.replace('[LINKED_ARTICLE_SLUG]:', '').trim() : '';
+      setEditorialImageLinkSlug(linked);
+      setEditorialFormMode('edit-image');
+    } else {
+      startEditing(art);
+      setActiveTab('news');
     }
   };
 
@@ -8772,6 +8793,190 @@ export default function AdminPage() {
                     </div>
                   )}
 
+                  {/* Image link Form */}
+                  {(editorialFormMode === 'add-image' || editorialFormMode === 'edit-image') && (
+                    <div className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm flex flex-col gap-4 text-left">
+                      <h3 className="text-base font-black text-slate-800 flex items-center gap-1.5">
+                        {editorialFormMode === 'add-image' ? '🖼️ Add Image Link' : '✏️ Edit Image Link'}
+                      </h3>
+                      
+                      {/* Caption/Title */}
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Image Caption / Title *</label>
+                        <input
+                          type="text"
+                          value={editorialImageCaption}
+                          onChange={(e) => setEditorialImageCaption(e.target.value)}
+                          placeholder="చిత్రానికి శీర్షిక ఇక్కడ రాయండి..."
+                          className="bg-slate-50 border border-slate-200 focus:border-[#02599c] rounded-xl px-3 py-2.5 text-sm outline-none text-slate-900 font-bold telugu-text"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        />
+                      </div>
+
+                      {/* Image Selector */}
+                      <div className="flex flex-col gap-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Select Image *</label>
+                        <div className="flex items-start gap-4">
+                          <button
+                            type="button"
+                            onClick={() => editorialImageInputRef.current?.click()}
+                            className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-black text-xs py-2.5 px-4 rounded-xl cursor-pointer"
+                          >
+                            <Upload className="w-4 h-4" />
+                            Upload Image
+                          </button>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            ref={editorialImageInputRef}
+                            className="hidden"
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) {
+                                handleCompressAndSetImage(f, setEditorialImageFile);
+                              }
+                            }}
+                          />
+                          {editorialImageFile && (
+                            <div className="relative w-24 h-16 rounded-lg overflow-hidden border border-slate-200">
+                              <img src={editorialImageFile} alt="preview" className="w-full h-full object-cover" />
+                              <button
+                                type="button"
+                                onClick={() => setEditorialImageFile('')}
+                                className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-black"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          )}
+                          {!editorialImageFile && <span className="text-xs text-slate-400 font-bold mt-2">No image selected</span>}
+                        </div>
+                      </div>
+
+                      {/* Linked Article Slug */}
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Linked Related Article *</label>
+                        <div className="flex gap-2">
+                          {editorialImageLinkSlug ? (
+                            <div className="flex-1 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2.5 flex items-center justify-between min-w-0">
+                              <span className="text-xs font-bold text-blue-700 truncate font-mono">
+                                {editorialImageLinkSlug}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setEditorialImageLinkSlug('')}
+                                className="text-blue-400 hover:text-red-500 font-black text-sm ml-2 cursor-pointer"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowEditorialArticlePicker(true);
+                                setEditorialSearchQuery('');
+                              }}
+                              className="flex-1 bg-slate-50 hover:bg-slate-100/80 border border-dashed border-slate-350 text-slate-500 font-bold text-xs py-3 px-4 rounded-xl cursor-pointer flex items-center justify-center gap-2"
+                            >
+                              <FileText className="w-4 h-4" />
+                              <span>Select Related News Article to Link</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Save/Cancel Buttons */}
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          disabled={isSavingEditorialArticle}
+                          onClick={async () => {
+                            const caption = editorialImageCaption.trim();
+                            if (!caption || !editorialImageFile || !editorialImageLinkSlug) {
+                              alert('Caption, Image, and Linked Article are required!');
+                              return;
+                            }
+                            setIsSavingEditorialArticle(true);
+                            
+                            const sec = editorialSections.find(s => s.slug === editorialActiveSection);
+                            const imgArticleData = {
+                              title: caption,
+                              slug: (editorialFormMode === 'edit-image' && editorialEditingArticle)
+                                ? editorialEditingArticle.slug
+                                : `editorial-img-${Date.now().toString().slice(-6)}`,
+                              categorySlug: editorialActiveSection,
+                              category: sec?.title || 'ఎడిటోరియల్',
+                              author: 'హై టీవీ డెస్క్',
+                              publishedAt: new Date().toISOString(),
+                              description: caption,
+                              body: `[LINKED_ARTICLE_SLUG]:${editorialImageLinkSlug}`,
+                              image: editorialImageFile,
+                              isBreaking: false,
+                              isTrending: false,
+                              isFeatured: false
+                            };
+
+                            try {
+                              if (editorialFormMode === 'add-image') {
+                                const r = await fetch('/api/articles', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify(imgArticleData)
+                                });
+                                if (r.ok) {
+                                  const a = await r.json();
+                                  setCustomNewsList(p => [a, ...p]);
+                                  alert('Editorial Image Link created successfully!');
+                                } else {
+                                  alert('Failed to save image link.');
+                                }
+                              } else if (editorialEditingArticle) {
+                                const r = await fetch(`/api/articles/${editorialEditingArticle.id}`, {
+                                  method: 'PUT',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify(imgArticleData)
+                                });
+                                if (r.ok) {
+                                  const a = await r.json();
+                                  setCustomNewsList(p => p.map(x => x.id === editorialEditingArticle.id ? a : x));
+                                  alert('Editorial Image Link updated successfully!');
+                                } else {
+                                  alert('Failed to update.');
+                                }
+                              }
+                              setEditorialFormMode('none');
+                              setEditorialEditingArticle(null);
+                              setEditorialImageCaption('');
+                              setEditorialImageFile('');
+                              setEditorialImageLinkSlug('');
+                            } catch (e: any) {
+                              alert('Error: ' + e.message);
+                            } finally {
+                              setIsSavingEditorialArticle(false);
+                            }
+                          }}
+                          className={`font-black text-xs py-2.5 px-6 rounded-xl cursor-pointer shadow-sm flex items-center gap-2 ${
+                            isSavingEditorialArticle ? 'bg-slate-350 text-slate-500 cursor-not-allowed' : 'bg-[#02599c] hover:bg-[#024a82] text-white'
+                          }`}
+                        >
+                          {isSavingEditorialArticle ? 'Saving...' : 'Save Image Link'}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditorialFormMode('none');
+                            setEditorialEditingArticle(null);
+                            setEditorialImageCaption('');
+                            setEditorialImageFile('');
+                            setEditorialImageLinkSlug('');
+                          }}
+                          className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs py-2.5 px-5 rounded-xl cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
 
 
                   {/* Articles list */}
@@ -8785,17 +8990,31 @@ export default function AdminPage() {
                             <h3 className="text-base font-black text-slate-800 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>{sec?.title || editorialActiveSection}</h3>
                             <p className="text-xs text-slate-400 font-bold mt-0.5">{arts.length} article{arts.length !== 1 ? 's' : ''} · slug: <code className="font-mono bg-slate-100 px-1 rounded">{editorialActiveSection}</code></p>
                           </div>
-                          <button onClick={() => { setSelectedCategories([editorialActiveSection]); setIsBreakingChecked(false); setIsTrendingChecked(false); setIsFeaturedChecked(false); setNewsViewMode('add'); setActiveTab('news'); }} className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2 px-4 rounded-xl cursor-pointer flex items-center gap-1.5 shadow-sm"><Plus className="w-3.5 h-3.5" />Add Article</button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => {
+                                setEditorialImageCaption('');
+                                setEditorialImageFile('');
+                                setEditorialImageLinkSlug('');
+                                setEditorialFormMode('add-image');
+                              }}
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs py-2 px-4 rounded-xl cursor-pointer flex items-center gap-1.5 shadow-sm hover:scale-[1.01] transition-all"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                              <span>Add Image</span>
+                            </button>
+                            <button onClick={() => { setSelectedCategories([editorialActiveSection]); setIsBreakingChecked(false); setIsTrendingChecked(false); setIsFeaturedChecked(false); setNewsViewMode('add'); setActiveTab('news'); }} className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2 px-4 rounded-xl cursor-pointer flex items-center gap-1.5 shadow-sm hover:scale-[1.01] transition-all"><Plus className="w-3.5 h-3.5" />Add Article</button>
+                          </div>
                         </div>
                         {arts.length === 0 ? (
-                          <div className="p-10 text-center text-slate-400"><FileText className="w-10 h-10 mx-auto mb-3 opacity-30" /><p className="text-sm font-bold">No articles in this section yet.</p><p className="text-xs mt-1">Click "Add Article" to add the first one.</p></div>
+                          <div className="p-10 text-center text-slate-400"><FileText className="w-10 h-10 mx-auto mb-3 opacity-30" /><p className="text-sm font-bold">No articles in this section yet.</p><p className="text-xs mt-1">Click "Add Article" or "Add Image" to add the first one.</p></div>
                         ) : (
                           <div className="divide-y divide-slate-100">
                             {arts.map((art: any) => (
                               <div key={art.id} className="flex items-center gap-4 px-5 py-3 hover:bg-slate-50 transition-colors group">
                                 <button
                                   type="button"
-                                  onClick={() => { startEditing(art); setActiveTab('news'); }}
+                                  onClick={() => editEditorialItem(art)}
                                   className="w-16 h-11 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0 border border-slate-200 cursor-pointer hover:border-[#02599c] hover:bg-blue-50/50 transition-all flex items-center justify-center"
                                   title="Add/Edit Article Image"
                                 >
@@ -8810,18 +9029,31 @@ export default function AdminPage() {
                                 <div className="flex-1 min-w-0">
                                   <button
                                     type="button"
-                                    onClick={() => { startEditing(art); setActiveTab('news'); }}
+                                    onClick={() => editEditorialItem(art)}
                                     className="text-left hover:text-[#02599c] cursor-pointer block"
                                   >
-                                    <p className="text-sm font-black text-slate-800 line-clamp-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                                      {art.title}
-                                    </p>
+                                    <div className="flex items-center gap-2">
+                                      <p className="text-sm font-black text-slate-800 line-clamp-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                        {art.title}
+                                      </p>
+                                      {art.slug?.startsWith('editorial-img-') && (
+                                        <span className="bg-emerald-100 text-emerald-800 text-[8px] font-black px-1.5 py-0.5 rounded border border-emerald-200 uppercase tracking-wide shrink-0">
+                                          🔗 Image Link
+                                        </span>
+                                      )}
+                                    </div>
                                   </button>
                                   <p className="text-[11px] text-slate-400 mt-0.5 font-mono truncate">{art.slug}</p>
                                 </div>
                                 <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                                  <Link href={`/news/${art.slug}`} target="_blank" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-[#02599c]" title="Preview"><Eye className="w-4 h-4" /></Link>
-                                  <button onClick={() => { startEditing(art); setActiveTab('news'); }} className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600" title="Edit"><Pencil className="w-4 h-4" /></button>
+                                  {art.slug?.startsWith('editorial-img-') ? (
+                                    art.body && (
+                                      <Link href={`/news/${art.body.replace('[LINKED_ARTICLE_SLUG]:', '').trim()}`} target="_blank" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-[#02599c]" title="Preview Linked Article"><Eye className="w-4 h-4" /></Link>
+                                    )
+                                  ) : (
+                                    <Link href={`/news/${art.slug}`} target="_blank" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-[#02599c]" title="Preview"><Eye className="w-4 h-4" /></Link>
+                                  )}
+                                  <button onClick={() => editEditorialItem(art)} className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600" title="Edit"><Pencil className="w-4 h-4" /></button>
                                   <button onClick={async () => { if (!confirm(`Delete "${art.title}"?`)) return; try { await fetch(`/api/articles/${art.id}`, { method: 'DELETE' }); setCustomNewsList(p => p.filter(a => a.id !== art.id)); } catch { alert('Error deleting.'); } }} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-600" title="Delete"><Trash2 className="w-4 h-4" /></button>
                                 </div>
                               </div>
@@ -8959,6 +9191,91 @@ export default function AdminPage() {
 
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* ── Editorial Article Picker Modal ── */}
+      {showEditorialArticlePicker && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white border border-slate-200/80 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col overflow-hidden max-h-[85vh] animate-scale-up text-left">
+            
+            {/* Modal Header */}
+            <div className="bg-[#02599c] text-white p-5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                <h3 className="font-black text-sm select-none">Select Related News Article to Link</h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setShowEditorialArticlePicker(false)}
+                className="text-white/80 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer transition-colors text-base font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Search Bar */}
+            <div className="p-4 border-b border-slate-100 bg-slate-50/50">
+              <div className="relative">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  value={editorialSearchQuery}
+                  onChange={(e) => setEditorialSearchQuery(e.target.value)}
+                  placeholder="Type title or slug to search news articles..."
+                  className="w-full pl-10 pr-4 py-2.5 text-xs bg-white border border-slate-250/70 focus:border-[#02599c] rounded-xl outline-none text-slate-800"
+                />
+              </div>
+            </div>
+
+            {/* Articles List */}
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-2 max-h-[400px]">
+              {(() => {
+                 const searchStr = editorialSearchQuery.trim().toLowerCase();
+                 const editorialSectionSlugs = editorialSections.map(s => s.slug);
+                 const filtered = customNewsList
+                   .filter((a) => !a.slug?.startsWith('editorial-img-') && a.categorySlug !== 'polls')
+                   .filter((a) => editorialSectionSlugs.includes(a.categorySlug))
+                   .filter((a) => !searchStr || a.title?.toLowerCase().includes(searchStr) || a.slug?.toLowerCase().includes(searchStr));
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="p-8 text-center text-slate-400 text-xs font-bold">
+                      No matching news articles found.
+                    </div>
+                  );
+                }
+
+                return filtered.slice(0, 15).map((art) => (
+                  <div key={art.id} className="p-3 flex items-center justify-between gap-4 hover:bg-slate-50 rounded-xl transition-colors">
+                    <div className="min-w-0 flex-1 flex items-center gap-3">
+                      <div className="w-12 h-8 rounded overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0">
+                        {art.image && <img src={art.image} alt={art.title} className="w-full h-full object-cover" />}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className="text-xs font-extrabold text-slate-800 line-clamp-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                          {art.title}
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono block mt-0.5 truncate">
+                          {art.slug}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditorialImageLinkSlug(art.slug);
+                        setShowEditorialArticlePicker(false);
+                      }}
+                      className="bg-blue-50 hover:bg-blue-100 text-blue-700 font-extrabold text-[10px] py-1.5 px-3 rounded-lg cursor-pointer transition-colors"
+                    >
+                      Link This
+                    </button>
+                  </div>
+                ));
+              })()}
+            </div>
           </div>
         </div>
       )}
