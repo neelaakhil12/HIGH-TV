@@ -7,8 +7,8 @@ import { ChevronDown, X, Search, TrendingUp } from 'lucide-react';
 import FlashNewsBar from '@/components/home/FlashNewsBar';
 
 export default function Header() {
-  const pathname = usePathname();
-
+  const rawPathname = usePathname();
+  const pathname = rawPathname || '';
   const isHome = pathname === '/';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [teluguDate, setTeluguDate] = useState('');

@@ -84,7 +84,7 @@ export default function ArticlePageClient({
   englishCategories
 }: ArticlePageClientProps) {
   const searchParams = useSearchParams();
-  const isCompact = searchParams.get('compact') === '1';
+  const isCompact = searchParams?.get('compact') === '1';
   const [isExpanded, setIsExpanded] = useState(!isCompact);
   const [inlineImage, setInlineImage] = useState<string | null>(null);
   const [inlineCaption, setInlineCaption] = useState<string>('యోగ ఆసనాలు వేస్తున్న మోదీ..');
