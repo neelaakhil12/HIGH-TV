@@ -186,36 +186,59 @@ export default function HoroscopePageClient() {
   const [fontScale, setFontScale] = useState<1 | 1.15 | 1.3>(1);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('horoscope_daily_data');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setHoroscopeDate(parsed.date || '');
-        setHoroscopeWeeklyRange(parsed.weeklyRange || '');
-        setHoroscopePanchangam(parsed.panchangam || '');
-        const loadedPreds = parsed.predictions || [];
-        const merged = DEFAULT_HOROSCOPE_PREDICTIONS.map((def) => {
-          const matched = loadedPreds.find((p: any) => p.id === def.id);
-          return {
-            ...def,
-            prediction: matched?.prediction ?? def.prediction,
-            weeklyPrediction: matched?.weeklyPrediction ?? def.weeklyPrediction,
-          };
-        });
-        setHoroscopePredictions(merged);
-      } else {
-        const now = new Date();
-        setHoroscopeDate(`తేది: ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}, ${DAYS_TE[now.getDay()]}`);
+    const handleResolveHoroscope = (horoscopeData: string | null) => {
+      try {
+        if (horoscopeData) {
+          const parsed = JSON.parse(horoscopeData);
+          setHoroscopeDate(parsed.date || '');
+          setHoroscopeWeeklyRange(parsed.weeklyRange || '');
+          setHoroscopePanchangam(parsed.panchangam || '');
+          const loadedPreds = parsed.predictions || [];
+          const merged = DEFAULT_HOROSCOPE_PREDICTIONS.map((def) => {
+            const matched = loadedPreds.find((p: any) => p.id === def.id);
+            return {
+              ...def,
+              prediction: matched?.prediction ?? def.prediction,
+              weeklyPrediction: matched?.weeklyPrediction ?? def.weeklyPrediction,
+            };
+          });
+          setHoroscopePredictions(merged);
+        } else {
+          const now = new Date();
+          setHoroscopeDate(`తేది: ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}, ${DAYS_TE[now.getDay()]}`);
+          setHoroscopeWeeklyRange('');
+          setHoroscopePanchangam(DEFAULT_HOROSCOPE_PANCHANGAM);
+          setHoroscopePredictions(DEFAULT_HOROSCOPE_PREDICTIONS);
+        }
+      } catch {
+        setHoroscopeDate('');
         setHoroscopeWeeklyRange('');
         setHoroscopePanchangam(DEFAULT_HOROSCOPE_PANCHANGAM);
         setHoroscopePredictions(DEFAULT_HOROSCOPE_PREDICTIONS);
       }
-    } catch {
-      setHoroscopeDate('');
-      setHoroscopeWeeklyRange('');
-      setHoroscopePanchangam(DEFAULT_HOROSCOPE_PANCHANGAM);
-      setHoroscopePredictions(DEFAULT_HOROSCOPE_PREDICTIONS);
-    }
+    };
+
+    fetch('/api/settings?key=horoscope_daily_data&t=' + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((data: any) => {
+        const horoscopeVal = data.horoscope_daily_data || null;
+        if (horoscopeVal) {
+          handleResolveHoroscope(horoscopeVal);
+        } else {
+          try {
+            handleResolveHoroscope(localStorage.getItem('horoscope_daily_data'));
+          } catch {
+            handleResolveHoroscope(null);
+          }
+        }
+      })
+      .catch(() => {
+        try {
+          handleResolveHoroscope(localStorage.getItem('horoscope_daily_data'));
+        } catch {
+          handleResolveHoroscope(null);
+        }
+      });
   }, []);
 
   const panchangamItems = splitPanchangam(horoscopePanchangam);

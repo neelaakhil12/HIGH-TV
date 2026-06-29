@@ -137,14 +137,28 @@ export default function WeatherPageClient({ dbArticles }: WeatherPageClientProps
   const [weatherData, setWeatherData] = useState<any[]>(DEFAULT_WEATHER_DATA);
 
   useEffect(() => {
-    try {
-      const savedWeather = localStorage.getItem('weather_page_reports_data');
-      if (savedWeather) {
-        setWeatherData(JSON.parse(savedWeather));
-      }
-    } catch (e) {
-      console.error('Error loading custom weather reports:', e);
-    }
+    fetch('/api/settings?key=weather_page_reports_data&t=' + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((data: any) => {
+        const weatherVal = data.weather_page_reports_data || null;
+        if (weatherVal) {
+          try {
+            setWeatherData(JSON.parse(weatherVal));
+            return;
+          } catch {}
+        }
+        // Fallback
+        const savedWeather = localStorage.getItem('weather_page_reports_data');
+        if (savedWeather) {
+          try { setWeatherData(JSON.parse(savedWeather)); } catch {}
+        }
+      })
+      .catch(() => {
+        try {
+          const savedWeather = localStorage.getItem('weather_page_reports_data');
+          if (savedWeather) setWeatherData(JSON.parse(savedWeather));
+        } catch {}
+      });
   }, []);
 
   return (

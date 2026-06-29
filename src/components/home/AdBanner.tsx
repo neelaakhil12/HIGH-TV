@@ -301,9 +301,11 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
   const [customAd, setCustomAd] = useState<{ image: string; link: string } | null>(null);
 
   useEffect(() => {
+    let adsDataCached: string | null = null;
+
     const handleResolveAd = () => {
       try {
-        const parsedAds = JSON.parse(localStorage.getItem('custom_ads_config') || '{}');
+        const parsedAds = JSON.parse(adsDataCached || '{}');
         const isMobile = window.innerWidth < 768;
         
         let prefix = '';
@@ -366,7 +368,26 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
       }
     };
 
-    handleResolveAd();
+    fetch('/api/settings?key=custom_ads_config&t=' + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((data: any) => {
+        const adsVal = data.custom_ads_config || null;
+        if (adsVal) {
+          adsDataCached = adsVal;
+        } else {
+          try {
+            adsDataCached = localStorage.getItem('custom_ads_config');
+          } catch {}
+        }
+        handleResolveAd();
+      })
+      .catch(() => {
+        try {
+          adsDataCached = localStorage.getItem('custom_ads_config');
+        } catch {}
+        handleResolveAd();
+      });
+
     window.addEventListener('resize', handleResolveAd);
     return () => window.removeEventListener('resize', handleResolveAd);
   }, [position]);

@@ -53,27 +53,50 @@ export default function WeatherWidget() {
   const [weatherList, setWeatherList] = useState<any[]>(STATIC_HOME_WEATHER_DATA);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('weather_page_reports_data');
-      if (saved) {
-        const customReports = JSON.parse(saved);
-        const updated = STATIC_HOME_WEATHER_DATA.map((staticCity) => {
-          const matched = customReports.find((c: any) => c.city === staticCity.city);
-          if (matched) {
-            return {
-              ...staticCity,
-              temp: matched.temp,
-              condition: matched.condition,
-              icon: getWeatherIcon(matched.condition, 32)
-            };
-          }
-          return staticCity;
-        });
-        setWeatherList(updated);
+    const handleResolveWeather = (weatherData: string | null) => {
+      try {
+        if (weatherData) {
+          const customReports = JSON.parse(weatherData);
+          const updated = STATIC_HOME_WEATHER_DATA.map((staticCity) => {
+            const matched = customReports.find((c: any) => c.city === staticCity.city);
+            if (matched) {
+              return {
+                ...staticCity,
+                temp: matched.temp,
+                condition: matched.condition,
+                icon: getWeatherIcon(matched.condition, 32)
+              };
+            }
+            return staticCity;
+          });
+          setWeatherList(updated);
+        }
+      } catch (e) {
+        console.error('Error resolving weather widget data:', e);
       }
-    } catch (e) {
-      console.error('Error loading homepage weather widget data:', e);
-    }
+    };
+
+    fetch('/api/settings?key=weather_page_reports_data&t=' + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((data: any) => {
+        const weatherVal = data.weather_page_reports_data || null;
+        if (weatherVal) {
+          handleResolveWeather(weatherVal);
+        } else {
+          try {
+            handleResolveWeather(localStorage.getItem('weather_page_reports_data'));
+          } catch {
+            handleResolveWeather(null);
+          }
+        }
+      })
+      .catch(() => {
+        try {
+          handleResolveWeather(localStorage.getItem('weather_page_reports_data'));
+        } catch {
+          handleResolveWeather(null);
+        }
+      });
   }, []);
 
   return (

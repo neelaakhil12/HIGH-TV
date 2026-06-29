@@ -44,83 +44,116 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
   };
 
   useEffect(() => {
-    // Read from localStorage to check popup configurations set in the admin panel for this specific ID
-    const savedEnabled = localStorage.getItem(`promo_popup_${id}_enabled`);
-    const savedType = localStorage.getItem(`promo_popup_${id}_type`);
-    const savedAdImage = localStorage.getItem(`promo_ad_${id}_image`);
-    const savedAdLink = localStorage.getItem(`promo_ad_${id}_link`);
-    const savedAdOrientation = localStorage.getItem(`promo_ad_${id}_orientation`);
-    const savedPollQuestion = localStorage.getItem(`promo_poll_${id}_question`);
-    const savedOptYes = localStorage.getItem(`promo_poll_${id}_option_yes`);
-    const savedOptNo = localStorage.getItem(`promo_poll_${id}_option_no`);
-    const savedOptUnsure = localStorage.getItem(`promo_poll_${id}_option_unsure`);
+    const keys = [
+      `promo_popup_${id}_enabled`,
+      `promo_popup_${id}_type`,
+      `promo_ad_${id}_image`,
+      `promo_ad_${id}_link`,
+      `promo_ad_${id}_orientation`,
+      `promo_poll_${id}_question`,
+      `promo_poll_${id}_option_yes`,
+      `promo_poll_${id}_option_no`,
+      `promo_poll_${id}_option_unsure`,
+      `promo_poll_${id}_options`
+    ];
 
-    const isActuallyEnabled = savedEnabled === null ? true : savedEnabled === 'true';
-    setIsEnabled(isActuallyEnabled);
+    fetch(`/api/settings?keys=${keys.join(',')}&t=` + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((dbSettings: any) => {
+        const getSetting = (key: string, defaultValue: string | null = null) => {
+          if (dbSettings[key] !== undefined && dbSettings[key] !== null) return dbSettings[key];
+          try {
+            return localStorage.getItem(key) || defaultValue;
+          } catch {
+            return defaultValue;
+          }
+        };
 
-    if (savedType !== null) setPopupType(savedType as 'ad' | 'poll');
-    if (savedAdImage !== null) setAdImage(savedAdImage);
-    if (savedAdLink !== null) setAdLink(savedAdLink);
-    if (savedAdOrientation !== null) setAdOrientation(savedAdOrientation as 'horizontal' | 'vertical');
-    
-    const activeQuestion = savedPollQuestion || 'కాంగ్రెస్‌లో టీఎన్ఎస్ పార్టీని విలీనం చేస్తారని మీరు భావిస్తున్నారా?';
-    setPollQuestion(activeQuestion);
+        const savedEnabled = getSetting(`promo_popup_${id}_enabled`);
+        const savedType = getSetting(`promo_popup_${id}_type`);
+        const savedAdImage = getSetting(`promo_ad_${id}_image`);
+        const savedAdLink = getSetting(`promo_ad_${id}_link`);
+        const savedAdOrientation = getSetting(`promo_ad_${id}_orientation`);
+        const savedPollQuestion = getSetting(`promo_poll_${id}_question`);
+        const savedOptYes = getSetting(`promo_poll_${id}_option_yes`);
+        const savedOptNo = getSetting(`promo_poll_${id}_option_no`);
+        const savedOptUnsure = getSetting(`promo_poll_${id}_option_unsure`);
 
-    const savedOptions = localStorage.getItem(`promo_poll_${id}_options`);
-    let optsList: string[] = ['అవును', 'కాదు'];
-    if (savedOptions) {
-      try {
-        optsList = JSON.parse(savedOptions);
-      } catch (e) {}
-    } else {
-      if (savedOptYes || savedOptNo || savedOptUnsure) {
-        optsList = [];
-        if (savedOptYes) optsList.push(savedOptYes);
-        if (savedOptNo) optsList.push(savedOptNo);
-        if (savedOptUnsure) optsList.push(savedOptUnsure);
-      }
-    }
-    const mappedOptions = optsList.map((text, index) => ({
-      id: `opt_${index}`,
-      text
-    }));
-    setPollOptions(mappedOptions);
+        const isActuallyEnabled = savedEnabled === null ? true : savedEnabled === 'true';
+        setIsEnabled(isActuallyEnabled);
 
-    // Check if user has voted on this question
-    const hasVotedKey = `promo_poll_${id}_voted_for_${activeQuestion}`;
-    const userHasVoted = localStorage.getItem(hasVotedKey) === 'true';
-    setHasVoted(userHasVoted);
+        if (savedType !== null) setPopupType(savedType as 'ad' | 'poll');
+        if (savedAdImage !== null) setAdImage(savedAdImage);
+        if (savedAdLink !== null) setAdLink(savedAdLink);
+        if (savedAdOrientation !== null) setAdOrientation(savedAdOrientation as 'horizontal' | 'vertical');
+        
+        const activeQuestion = savedPollQuestion || 'కాంగ్రెస్‌లో టీఎన్ఎస్ పార్టీని విలీనం చేస్తారని మీరు భావిస్తున్నారా?';
+        setPollQuestion(activeQuestion);
 
-    // Load or initialize vote counts
-    const votesKey = `promo_poll_${id}_votes_data`;
-    const savedVotesData = localStorage.getItem(votesKey);
-    let votes: Record<string, number> = {};
-    
-    let parsedData: any = null;
-    if (savedVotesData) {
-      try {
-        parsedData = JSON.parse(savedVotesData);
-      } catch (e) {}
-    }
+        const savedOptions = getSetting(`promo_poll_${id}_options`);
+        let optsList: string[] = ['అవును', 'కాదు'];
+        if (savedOptions) {
+          try {
+            optsList = JSON.parse(savedOptions);
+          } catch (e) {}
+        } else {
+          if (savedOptYes || savedOptNo || savedOptUnsure) {
+            optsList = [];
+            if (savedOptYes) optsList.push(savedOptYes);
+            if (savedOptNo) optsList.push(savedOptNo);
+            if (savedOptUnsure) optsList.push(savedOptUnsure);
+          }
+        }
+        const mappedOptions = optsList.map((text, index) => ({
+          id: `opt_${index}`,
+          text
+        }));
+        setPollOptions(mappedOptions);
 
-    if (parsedData && parsedData.question === activeQuestion && userHasVoted) {
-      votes = parsedData.votes;
-    } else {
-      // Initialize with exactly 0 votes if user has not voted yet or question changed
-      votes = {};
-      mappedOptions.forEach((opt) => {
-        votes[opt.id] = 0;
-      });
-      localStorage.setItem(votesKey, JSON.stringify({ question: activeQuestion, votes }));
-    }
-    setPollVotes(votes);
+        // Check if user has voted on this question
+        const hasVotedKey = `promo_poll_${id}_voted_for_${activeQuestion}`;
+        let userHasVoted = false;
+        try {
+          userHasVoted = localStorage.getItem(hasVotedKey) === 'true';
+        } catch {}
+        setHasVoted(userHasVoted);
 
-    if (isActuallyEnabled) {
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-      }, 25000); // 25 seconds delay on load
-      return () => clearTimeout(timer);
-    }
+        // Load or initialize vote counts
+        const votesKey = `promo_poll_${id}_votes_data`;
+        let savedVotesData: string | null = null;
+        try {
+          savedVotesData = localStorage.getItem(votesKey);
+        } catch {}
+        let votes: Record<string, number> = {};
+        
+        let parsedData: any = null;
+        if (savedVotesData) {
+          try {
+            parsedData = JSON.parse(savedVotesData);
+          } catch (e) {}
+        }
+
+        if (parsedData && parsedData.question === activeQuestion && userHasVoted) {
+          votes = parsedData.votes;
+        } else {
+          votes = {};
+          mappedOptions.forEach((opt) => {
+            votes[opt.id] = 0;
+          });
+          try {
+            localStorage.setItem(votesKey, JSON.stringify({ question: activeQuestion, votes }));
+          } catch {}
+        }
+        setPollVotes(votes);
+
+        if (isActuallyEnabled) {
+          const timer = setTimeout(() => {
+            setIsOpen(true);
+          }, 25000); // 25 seconds delay on load
+          return () => clearTimeout(timer);
+        }
+      })
+      .catch(err => console.error('Error fetching popup settings:', err));
   }, [id]);
 
   if (!isOpen || !isEnabled) return null;

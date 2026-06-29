@@ -97,3 +97,9 @@ model LatestVideo {
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
 }
+
+model Setting {
+  key       String   @id @db.VarChar(255)
+  value     String   @db.LongText
+  updatedAt DateTime @updatedAt
+}

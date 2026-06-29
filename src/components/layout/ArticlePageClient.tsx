@@ -227,23 +227,63 @@ export default function ArticlePageClient({
   }, [initialArticle]);
 
   useEffect(() => {
-    const isEnabled = localStorage.getItem('inline_article_image_enabled') === 'true';
-    if (isEnabled) {
-      const savedImage = localStorage.getItem('inline_article_image_data');
-      const savedCaption = localStorage.getItem('inline_article_image_caption');
-      if (savedImage) {
-        setInlineImage(savedImage);
-      }
-      if (savedCaption) {
-        setInlineCaption(savedCaption);
-      }
-    } else {
-      setInlineImage(null);
-    }
+    const keys = [
+      'inline_article_image_enabled',
+      'inline_article_image_data',
+      'inline_article_image_caption',
+      'inline_article_promos_enabled'
+    ];
 
-    const savedPromos = localStorage.getItem('inline_article_promos_enabled');
-    setInlinePromosEnabled(savedPromos === null ? true : savedPromos === 'true');
-    setIsMounted(true); // Mark as mounted so promo blocks now render with correct state
+    fetch(`/api/settings?keys=${keys.join(',')}&t=` + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((dbSettings: any) => {
+        const getSetting = (key: string, defaultValue: string | null = null) => {
+          if (dbSettings[key] !== undefined && dbSettings[key] !== null) return dbSettings[key];
+          try {
+            return localStorage.getItem(key) || defaultValue;
+          } catch {
+            return defaultValue;
+          }
+        };
+
+        const isEnabled = getSetting('inline_article_image_enabled') === 'true';
+        if (isEnabled) {
+          const savedImage = getSetting('inline_article_image_data');
+          const savedCaption = getSetting('inline_article_image_caption');
+          if (savedImage) {
+            setInlineImage(savedImage);
+          }
+          if (savedCaption) {
+            setInlineCaption(savedCaption);
+          }
+        } else {
+          setInlineImage(null);
+        }
+
+        const savedPromos = getSetting('inline_article_promos_enabled');
+        setInlinePromosEnabled(savedPromos === null ? true : savedPromos === 'true');
+        setIsMounted(true);
+      })
+      .catch(() => {
+        try {
+          const isEnabled = localStorage.getItem('inline_article_image_enabled') === 'true';
+          if (isEnabled) {
+            const savedImage = localStorage.getItem('inline_article_image_data');
+            const savedCaption = localStorage.getItem('inline_article_image_caption');
+            if (savedImage) {
+              setInlineImage(savedImage);
+            }
+            if (savedCaption) {
+              setInlineCaption(savedCaption);
+            }
+          } else {
+            setInlineImage(null);
+          }
+          const savedPromos = localStorage.getItem('inline_article_promos_enabled');
+          setInlinePromosEnabled(savedPromos === null ? true : savedPromos === 'true');
+        } catch {}
+        setIsMounted(true);
+      });
   }, []);
   
   const currentCategorySlug = article.categorySlug;

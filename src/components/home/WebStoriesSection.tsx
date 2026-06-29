@@ -21,17 +21,37 @@ export default function WebStoriesSection() {
 
   // Load custom stories on mount
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('custom_web_stories');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setActiveStories([...parsed, ...storiesData]);
+    fetch('/api/settings?key=custom_web_stories&t=' + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((data: any) => {
+        const storiesVal = data.custom_web_stories || null;
+        if (storiesVal) {
+          const parsed = JSON.parse(storiesVal);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setActiveStories([...parsed, ...storiesData]);
+            return;
+          }
         }
-      }
-    } catch (e) {
-      console.error('Error loading custom web stories:', e);
-    }
+        // Fallback
+        const saved = localStorage.getItem('custom_web_stories');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setActiveStories([...parsed, ...storiesData]);
+          }
+        }
+      })
+      .catch(() => {
+        try {
+          const saved = localStorage.getItem('custom_web_stories');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setActiveStories([...parsed, ...storiesData]);
+            }
+          }
+        } catch {}
+      });
   }, []);
 
   // Typewriter effect triggered on slide index or story changes

@@ -1287,7 +1287,6 @@ export default function AdminPage() {
       if (savedTrending) {
         setTrendingNewsList(JSON.parse(savedTrending));
       } else {
-        // These are the same defaults used in Header.tsx
         const trendingDefaults = [
           { text: "ఎన్నికల ఫలితాలు", link: "/search?q=ఎన్నికల ఫలితాలు" },
           { text: "ఆంధ్రప్రదేశ్‌లో భారీ వర్షాలు", link: "/search?q=వర్షాలు" },
@@ -1303,196 +1302,128 @@ export default function AdminPage() {
       setTrendingNewsList([]);
     }
 
-    // Load Web Stories list
-    try {
-      const savedStories = localStorage.getItem('custom_web_stories');
-      if (savedStories) {
-        setWebStoriesList(JSON.parse(savedStories));
-      } else {
-        setWebStoriesList([]);
-      }
-    } catch {
-      setWebStoriesList([]);
-    }
-
-    // Load Pinned District News
-    try {
-      setPinnedApNews(JSON.parse(localStorage.getItem('pinned_ap_district_news') || '[]'));
-      setPinnedTgNews(JSON.parse(localStorage.getItem('pinned_tg_district_news') || '[]'));
-    } catch {
-      setPinnedApNews([]);
-      setPinnedTgNews([]);
-    }
-
-    // Load Videos list from Database API
-    fetch('/api/latest-videos?t=' + Date.now())
-      .then(res => res.ok ? res.json() : [])
-      .then(dbVideos => {
-        if (Array.isArray(dbVideos) && dbVideos.length > 0) {
-          setVideosList(dbVideos);
-        } else {
-          // Fallback to local storage or defaults if empty
-          try {
-            const saved = localStorage.getItem('latest_videos');
-            if (saved) {
-              setVideosList(JSON.parse(saved));
-            } else {
-              setVideosList([
-                {
-                  id: "p_kI2pXWkAc",
-                  title: "దేవర పార్ట్-1 అఫీషియల్ ట్రైలర్ - జూనియర్ ఎన్టీఆర్, కొరటాల శివ",
-                  thumbnail: ""
-                },
-                {
-                  id: "1kVkYOS9I18",
-                  title: "పుష్ప-2 ది రూల్ అఫీషియల్ టీజర్ - అల్లు అర్జున్, సుకుమార్",
-                  thumbnail: ""
-                },
-                {
-                  id: "q6h3C_s8sSw",
-                  title: "గేమ్ చేంజర్ అఫీషియల్ సాంగ్ - రామ్ చరణ్, శంకర్",
-                  thumbnail: ""
-                }
-              ]);
-            }
-          } catch {
-            setVideosList([]);
-          }
-        }
-      })
-      .catch(err => {
-        console.error("Error fetching latest videos from DB:", err);
-        try {
-          const saved = localStorage.getItem('latest_videos');
-          if (saved) setVideosList(JSON.parse(saved));
-        } catch {
-          setVideosList([]);
-        }
-      });
-
-    // Load Weather Reports data
-    try {
-      const savedWeather = localStorage.getItem('weather_page_reports_data');
-      if (savedWeather) {
-        setWeatherReports(JSON.parse(savedWeather));
-      } else {
-        setWeatherReports(DEFAULT_WEATHER_DATA);
-      }
-    } catch {
-      setWeatherReports(DEFAULT_WEATHER_DATA);
-    }
-
-    // Load Horoscope data
-    try {
-      const savedHoroscope = localStorage.getItem('horoscope_daily_data');
-      if (savedHoroscope) {
-        const parsed = JSON.parse(savedHoroscope);
-        setHoroscopeDate(parsed.date || '');
-        setHoroscopeWeeklyRange(parsed.weeklyRange || '');
-        
-        const rawPanchangam = parsed.panchangam || '';
-        const parts = splitPanchangam(rawPanchangam);
-        setHoroscopePanchangamTitle(parts[0] || '');
-        setHoroscopePanchangam(parts.slice(1).join('; '));
-        
-        setHoroscopePredictions(parsed.predictions || DEFAULT_HOROSCOPE_PREDICTIONS);
-      } else {
-        const days = ['ఆదివారం', 'సోమవారం', 'మంగళవారం', 'బుధవారం', 'గురువారం', 'శుక్రవారం', 'శనివారం'];
-        const now = new Date();
-        const formattedDate = `తేది: ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}, ${days[now.getDay()]}`;
-        
-        setHoroscopeDate(formattedDate);
-        setHoroscopeWeeklyRange('');
-        
-        const parts = splitPanchangam(DEFAULT_HOROSCOPE_PANCHANGAM);
-        setHoroscopePanchangamTitle(parts[0] || '');
-        setHoroscopePanchangam(parts.slice(1).join('; '));
-        
-        setHoroscopePredictions(DEFAULT_HOROSCOPE_PREDICTIONS);
-      }
-    } catch {
-      setHoroscopeDate('');
-      setHoroscopeWeeklyRange('');
-      const parts = splitPanchangam(DEFAULT_HOROSCOPE_PANCHANGAM);
-      setHoroscopePanchangamTitle(parts[0] || '');
-      setHoroscopePanchangam(parts.slice(1).join('; '));
-      setHoroscopePredictions(DEFAULT_HOROSCOPE_PREDICTIONS);
-    }
-
-    // Load Custom Ads
-    try {
-      const parsedAds = JSON.parse(localStorage.getItem('custom_ads_config') || '{}');
-      setCustomAds(parsedAds);
-      const activeAd = parsedAds[activeAdSpot] || { enabled: false, image: '', link: '#' };
-      setAdSpotEnabled(activeAd.enabled);
-      setAdSpotImage(activeAd.image);
-      setAdSpotLink(activeAd.link);
-    } catch {
-      setCustomAds({});
-    }
-
-    // Load popups
-    const savedEnabled = localStorage.getItem(`promo_popup_${popupScope}_enabled`);
-    const savedType = localStorage.getItem(`promo_popup_${popupScope}_type`);
-    const savedAdImage = localStorage.getItem(`promo_ad_${popupScope}_image`);
-    const savedAdLink = localStorage.getItem(`promo_ad_${popupScope}_link`);
-    const savedPollQuestion = localStorage.getItem(`promo_poll_${popupScope}_question`);
-    const savedOptYes = localStorage.getItem(`promo_poll_${popupScope}_option_yes`);
-    const savedOptNo = localStorage.getItem(`promo_poll_${popupScope}_option_no`);
-    const savedOptUnsure = localStorage.getItem(`promo_poll_${popupScope}_option_unsure`);
-
-    setPopupEnabled(savedEnabled === null ? true : savedEnabled === 'true');
-    setPopupType((savedType as 'ad' | 'poll') || 'ad');
-    setAdImage(savedAdImage || '/popup-ad.png');
-    setAdLink(savedAdLink || '#');
-    setPollQuestion(savedPollQuestion || 'కాంగ్రెస్‌లో టీఎన్ఎస్ పార్టీని విలీనం చేస్తారని మీరు భావిస్తున్నారా?');
-    setOptYes(savedOptYes || 'అవును');
-    setOptNo(savedOptNo || 'కాదు');
-    setOptUnsure(savedOptUnsure || 'చెప్పలేం');
-
-    // Inline Image
-    setInlineImageEnabled(localStorage.getItem('inline_article_image_enabled') === 'true');
-    setInlineImageData(localStorage.getItem('inline_article_image_data') || '');
-    setInlineImageCaption(localStorage.getItem('inline_article_image_caption') || 'యోగ ఆసనాలు వేస్తున్న మోదీ..');
-
-    // Inline Promos
-    const savedInlinePromos = localStorage.getItem('inline_article_promos_enabled');
-    setInlinePromosEnabled(savedInlinePromos === null ? true : savedInlinePromos === 'true');
-
-    // E-paper list
+    // Load E-paper list
     fetchEpapersData();
 
-    // Load Homepage slides
-    try {
-      const savedSlides = localStorage.getItem('homepage_banner_slides');
-      if (savedSlides) {
-        setSliderSlidesList(JSON.parse(savedSlides));
-      } else {
-        const defaults = featuredNews.map(item => ({
-          title: item.title,
-          image: item.image,
-          link: `/news/${item.slug}`
-        }));
-        setSliderSlidesList(defaults);
-      }
-      // Load selected slider article IDs
-      const savedSliderIds = localStorage.getItem('homepage_slider_article_ids');
-      if (savedSliderIds) {
-        setSliderSelectedIds(new Set(JSON.parse(savedSliderIds)));
-      }
-    } catch {
-      setSliderSlidesList([]);
-    }
+    // Fetch unified database settings
+    fetch('/api/settings?t=' + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((dbSettings: any) => {
+        const getSetting = (key: string, defaultValue: string = '') => {
+          if (dbSettings[key] !== undefined && dbSettings[key] !== null) return dbSettings[key];
+          try {
+            return localStorage.getItem(key) || defaultValue;
+          } catch {
+            return defaultValue;
+          }
+        };
 
-    // Load Category Sidebar news pins
-    try {
-      const savedPins = localStorage.getItem('sidebar_category_pins');
-      if (savedPins) {
-        setSidebarCategoryPins(JSON.parse(savedPins));
-      }
-    } catch (e) {
-      console.error("Error loading sidebar_category_pins", e);
-    }
+        // 1. Web Stories list
+        const storiesVal = getSetting('custom_web_stories');
+        if (storiesVal) {
+          try { setWebStoriesList(JSON.parse(storiesVal)); } catch {}
+        } else {
+          setWebStoriesList([]);
+        }
+
+        // 2. Category Sidebar news pins
+        const pinsVal = getSetting('sidebar_category_pins');
+        if (pinsVal) {
+          try { setSidebarCategoryPins(JSON.parse(pinsVal)); } catch {}
+        }
+
+        // 3. Weather Reports data
+        const weatherVal = getSetting('weather_page_reports_data');
+        if (weatherVal) {
+          try { setWeatherReports(JSON.parse(weatherVal)); } catch {}
+        } else {
+          setWeatherReports(DEFAULT_WEATHER_DATA);
+        }
+
+        // 4. Horoscope daily data
+        const horoscopeVal = getSetting('horoscope_daily_data');
+        if (horoscopeVal) {
+          try {
+            const parsed = JSON.parse(horoscopeVal);
+            setHoroscopeDate(parsed.date || '');
+            setHoroscopeWeeklyRange(parsed.weeklyRange || '');
+            const rawPanchangam = parsed.panchangam || '';
+            const parts = splitPanchangam(rawPanchangam);
+            setHoroscopePanchangamTitle(parts[0] || '');
+            setHoroscopePanchangam(parts.slice(1).join('; '));
+            setHoroscopePredictions(parsed.predictions || DEFAULT_HOROSCOPE_PREDICTIONS);
+          } catch {}
+        } else {
+          const days = ['ఆదివారం', 'సోమవారం', 'మంగళవారం', 'బుధవారం', 'గురువారం', 'శుక్రవారం', 'శనివారం'];
+          const now = new Date();
+          const formattedDate = `తేది: ${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}, ${days[now.getDay()]}`;
+          setHoroscopeDate(formattedDate);
+          setHoroscopeWeeklyRange('');
+          const parts = splitPanchangam(DEFAULT_HOROSCOPE_PANCHANGAM);
+          setHoroscopePanchangamTitle(parts[0] || '');
+          setHoroscopePanchangam(parts.slice(1).join('; '));
+          setHoroscopePredictions(DEFAULT_HOROSCOPE_PREDICTIONS);
+        }
+
+        // 5. Custom Ads
+        const adsVal = getSetting('custom_ads_config');
+        if (adsVal) {
+          try {
+            const parsedAds = JSON.parse(adsVal);
+            setCustomAds(parsedAds);
+            const activeAd = parsedAds[activeAdSpot] || { enabled: false, image: '', link: '#' };
+            setAdSpotEnabled(activeAd.enabled);
+            setAdSpotImage(activeAd.image);
+            setAdSpotLink(activeAd.link);
+          } catch {}
+        } else {
+          setCustomAds({});
+        }
+
+        // 6. Popups/Polls
+        const savedEnabled = getSetting(`promo_popup_${popupScope}_enabled`);
+        const savedType = getSetting(`promo_popup_${popupScope}_type`);
+        const savedAdImage = getSetting(`promo_ad_${popupScope}_image`);
+        const savedAdLink = getSetting(`promo_ad_${popupScope}_link`);
+        const savedPollQuestion = getSetting(`promo_poll_${popupScope}_question`);
+        const savedOptYes = getSetting(`promo_poll_${popupScope}_option_yes`);
+        const savedOptNo = getSetting(`promo_poll_${popupScope}_option_no`);
+        const savedOptUnsure = getSetting(`promo_poll_${popupScope}_option_unsure`);
+
+        setPopupEnabled(savedEnabled === null ? true : savedEnabled === 'true');
+        setPopupType((savedType as 'ad' | 'poll') || 'ad');
+        setAdImage(savedAdImage || '/popup-ad.png');
+        setAdLink(savedAdLink || '#');
+        setPollQuestion(savedPollQuestion || 'కాంగ్రెస్‌లో టీఎన్ఎస్ పార్టీని విలీనం చేస్తారని మీరు భావిస్తున్నారా?');
+        setOptYes(savedOptYes || 'అవును');
+        setOptNo(savedOptNo || 'కాదు');
+        setOptUnsure(savedOptUnsure || 'చెప్పలేం');
+
+        // 7. Inline Image & Promos
+        setInlineImageEnabled(getSetting('inline_article_image_enabled') === 'true');
+        setInlineImageData(getSetting('inline_article_image_data') || '');
+        setInlineImageCaption(getSetting('inline_article_image_caption') || 'యోగ ఆసనాలు వేస్తున్న మోదీ..');
+        const savedInlinePromos = getSetting('inline_article_promos_enabled');
+        setInlinePromosEnabled(savedInlinePromos === null ? true : savedInlinePromos === 'true');
+
+        // 8. Homepage banner slides fallback
+        const savedSlides = getSetting('homepage_banner_slides');
+        if (savedSlides) {
+          try { setSliderSlidesList(JSON.parse(savedSlides)); } catch {}
+        } else {
+          const defaults = featuredNews.map(item => ({
+            title: item.title,
+            image: item.image,
+            link: `/news/${item.slug}`
+          }));
+          setSliderSlidesList(defaults);
+        }
+        const savedSliderIds = getSetting('homepage_slider_article_ids');
+        if (savedSliderIds) {
+          try { setSliderSelectedIds(new Set(JSON.parse(savedSliderIds))); } catch {}
+        }
+      })
+      .catch(err => console.error("Error loading unified settings:", err));
   }, [isAuthenticated, popupScope, activeAdSpot, refreshCounter]);
 
   // Initialize Horoscope Panchangam editor content when tab becomes active
@@ -2576,6 +2507,11 @@ export default function AdminPage() {
       };
       
       localStorage.setItem('sidebar_category_pins', JSON.stringify(updated));
+      fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sidebar_category_pins: JSON.stringify(updated) })
+      }).catch(err => console.error('Failed to sync sidebar category pins:', err));
       return updated;
     });
   };
@@ -2982,6 +2918,11 @@ export default function AdminPage() {
 
     setWebStoriesList(updatedList);
     localStorage.setItem('custom_web_stories', JSON.stringify(updatedList));
+    fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ custom_web_stories: JSON.stringify(updatedList) })
+    }).catch(err => console.error('Failed to sync web stories:', err));
     setWebStoryFormMode('list');
     resetWebStoryForm();
   };
@@ -2991,6 +2932,11 @@ export default function AdminPage() {
     const updatedList = webStoriesList.filter(story => story.id !== id);
     setWebStoriesList(updatedList);
     localStorage.setItem('custom_web_stories', JSON.stringify(updatedList));
+    fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ custom_web_stories: JSON.stringify(updatedList) })
+    }).catch(err => console.error('Failed to sync web stories:', err));
     alert('Web Story deleted successfully!');
   };
 
@@ -3043,6 +2989,8 @@ export default function AdminPage() {
     e.preventDefault();
     setSaveStatus('saving');
 
+    const settingsObj: Record<string, string> = {};
+
     if (activeTab === 'overlays') {
       // Save Overlays
       localStorage.setItem(`promo_popup_${popupScope}_enabled`, String(popupEnabled));
@@ -3061,9 +3009,25 @@ export default function AdminPage() {
 
       // Save Inline promos
       localStorage.setItem('inline_article_promos_enabled', String(inlinePromosEnabled));
+
+      // Append to settings object
+      settingsObj[`promo_popup_${popupScope}_enabled`] = String(popupEnabled);
+      settingsObj[`promo_popup_${popupScope}_type`] = popupType;
+      settingsObj[`promo_ad_${popupScope}_image`] = adImage;
+      settingsObj[`promo_ad_${popupScope}_link`] = adLink;
+      settingsObj[`promo_poll_${popupScope}_question`] = pollQuestion;
+      settingsObj[`promo_poll_${popupScope}_option_yes`] = optYes;
+      settingsObj[`promo_poll_${popupScope}_option_no`] = optNo;
+      settingsObj[`promo_poll_${popupScope}_option_unsure`] = optUnsure;
+      settingsObj['inline_article_image_enabled'] = String(inlineImageEnabled);
+      settingsObj['inline_article_image_data'] = inlineImageData;
+      settingsObj['inline_article_image_caption'] = inlineImageCaption;
+      settingsObj['inline_article_promos_enabled'] = String(inlinePromosEnabled);
+
     } else if (activeTab === 'weather') {
       // Save weather reports
       localStorage.setItem('weather_page_reports_data', JSON.stringify(weatherReports));
+      settingsObj['weather_page_reports_data'] = JSON.stringify(weatherReports);
     } else if (activeTab === 'high-tv-videos') {
       localStorage.setItem('latest_videos', JSON.stringify(videosList));
       try {
@@ -3087,9 +3051,22 @@ export default function AdminPage() {
       };
       setCustomAds(updatedAds);
       localStorage.setItem('custom_ads_config', JSON.stringify(updatedAds));
+      settingsObj['custom_ads_config'] = JSON.stringify(updatedAds);
     } else if (activeTab === 'breaking') {
       // Save Scrolling marquee items
       localStorage.setItem('flash_news_items', JSON.stringify(flashNewsList));
+    }
+
+    if (Object.keys(settingsObj).length > 0) {
+      try {
+        await fetch('/api/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(settingsObj),
+        });
+      } catch (err) {
+        console.error("Failed to sync settings to DB:", err);
+      }
     }
 
     setTimeout(() => {
@@ -7744,8 +7721,17 @@ export default function AdminPage() {
                       predictions: horoscopePredictions
                     };
                     localStorage.setItem('horoscope_daily_data', JSON.stringify(payload));
+                    fetch('/api/settings', {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ horoscope_daily_data: JSON.stringify(payload) })
+                    })
+                      .then(() => alert('Horoscope saved to Database successfully!'))
+                      .catch(err => {
+                        console.error('Failed to sync horoscope data:', err);
+                        alert('Horoscope saved locally, but database sync failed.');
+                      });
                     setHoroscopePanchangam(currentPanchangam);
-                    alert('Horoscope configurations successfully saved to localStorage!');
                   }}
                   className="bg-[#02599c] hover:bg-[#024a82] text-white font-black text-xs py-3 px-8 rounded-xl transition-all cursor-pointer shadow-md"
                 >
