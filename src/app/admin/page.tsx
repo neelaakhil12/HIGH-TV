@@ -1324,11 +1324,7 @@ export default function AdminPage() {
       .then((dbSettings: any) => {
         const getSetting = (key: string, defaultValue: string = '') => {
           if (dbSettings[key] !== undefined && dbSettings[key] !== null) return dbSettings[key];
-          try {
-            return localStorage.getItem(key) || defaultValue;
-          } catch {
-            return defaultValue;
-          }
+          return defaultValue;
         };
 
         // 1. Web Stories list
@@ -1416,7 +1412,7 @@ export default function AdminPage() {
         setInlineImageEnabled(getSetting('inline_article_image_enabled') === 'true');
         setInlineImageData(getSetting('inline_article_image_data') || '');
         setInlineImageCaption(getSetting('inline_article_image_caption') || 'యోగ ఆసనాలు వేస్తున్న మోదీ..');
-        const savedInlinePromos = getSetting('inline_article_promos_enabled');
+        const savedInlinePromos = getSetting('inline_article_promos_enabled', 'true');
         setInlinePromosEnabled(savedInlinePromos === null ? true : savedInlinePromos === 'true');
 
         // 8. Homepage banner slides fallback

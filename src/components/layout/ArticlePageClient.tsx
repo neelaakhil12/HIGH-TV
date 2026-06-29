@@ -239,11 +239,7 @@ export default function ArticlePageClient({
       .then((dbSettings: any) => {
         const getSetting = (key: string, defaultValue: string | null = null) => {
           if (dbSettings[key] !== undefined && dbSettings[key] !== null) return dbSettings[key];
-          try {
-            return localStorage.getItem(key) || defaultValue;
-          } catch {
-            return defaultValue;
-          }
+          return defaultValue;
         };
 
         const isEnabled = getSetting('inline_article_image_enabled') === 'true';
@@ -265,23 +261,8 @@ export default function ArticlePageClient({
         setIsMounted(true);
       })
       .catch(() => {
-        try {
-          const isEnabled = localStorage.getItem('inline_article_image_enabled') === 'true';
-          if (isEnabled) {
-            const savedImage = localStorage.getItem('inline_article_image_data');
-            const savedCaption = localStorage.getItem('inline_article_image_caption');
-            if (savedImage) {
-              setInlineImage(savedImage);
-            }
-            if (savedCaption) {
-              setInlineCaption(savedCaption);
-            }
-          } else {
-            setInlineImage(null);
-          }
-          const savedPromos = localStorage.getItem('inline_article_promos_enabled');
-          setInlinePromosEnabled(savedPromos === null ? true : savedPromos === 'true');
-        } catch {}
+        setInlineImage(null);
+        setInlinePromosEnabled(true);
         setIsMounted(true);
       });
   }, []);
