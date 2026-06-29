@@ -675,6 +675,7 @@ export default function EPaperReader() {
   // Load default PDF Document for the dashboard fallback
   useEffect(() => {
     if (!pdfjs) return;
+    if (isDbEpapersLoading) return; // wait for DB fetch first
     const loadDefaultPdf = async () => {
       try {
         // Check IndexedDB first
@@ -725,7 +726,11 @@ export default function EPaperReader() {
           // Fallback: any DB paper for this date
           const fallbackDbPaper = matchingDbPaper || dbEpapers.find(p => p.date === selectedDate) || dbEpapers[0];
           
-          const targetUrl = fallbackDbPaper ? fallbackDbPaper.pdfUrl : '/BalagamTV_Main_Edition__13_Jun_2026.pdf';
+          if (!fallbackDbPaper) {
+            // No PDF in DB for this date — skip loading
+            return;
+          }
+          const targetUrl = fallbackDbPaper.pdfUrl;
           const loadingTask = pdfjs.getDocument({ url: targetUrl });
           pdf = await loadingTask.promise;
         }
@@ -745,7 +750,7 @@ export default function EPaperReader() {
       }
     };
     loadDefaultPdf();
-  }, [pdfjs, selectedDate, selectedEdition, dbEpapers]);
+  }, [pdfjs, selectedDate, selectedEdition, dbEpapers, isDbEpapersLoading]);
 
   const isArticleView = urlParams?.get('view') === 'article';
   const targetDate = isArticleView ? activeArticleDate : selectedDate;
