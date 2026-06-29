@@ -577,65 +577,90 @@ export default function AdminPage() {
     { id: 'b', label: '', votes: 0 },
   ]);
 
-  // Popup Manager states (persisted to localStorage)
+  // Popup Manager states (persisted to database settings API)
   type PopupId = 'home' | 'article';
-  const loadPopupConfig = (id: PopupId) => {
-    const savedOptions = localStorage.getItem(`promo_poll_${id}_options`);
-    let pollOpts: string[] = ['అవును', 'కాదు'];
-    if (savedOptions) {
-      try {
-        pollOpts = JSON.parse(savedOptions);
-      } catch (e) {}
-    } else {
-      const yes = localStorage.getItem(`promo_poll_${id}_option_yes`);
-      const no = localStorage.getItem(`promo_poll_${id}_option_no`);
-      const unsure = localStorage.getItem(`promo_poll_${id}_option_unsure`);
-      if (yes || no || unsure) {
-        pollOpts = [];
-        if (yes) pollOpts.push(yes);
-        if (no) pollOpts.push(no);
-        if (unsure) pollOpts.push(unsure);
-      }
-    }
-    return {
-      enabled: localStorage.getItem(`promo_popup_${id}_enabled`) !== 'false',
-      type: (localStorage.getItem(`promo_popup_${id}_type`) || 'ad') as 'ad' | 'poll',
-      adImage: localStorage.getItem(`promo_ad_${id}_image`) || '',
-      adLink: localStorage.getItem(`promo_ad_${id}_link`) || '',
-      adOrientation: (localStorage.getItem(`promo_ad_${id}_orientation`) || 'horizontal') as 'horizontal' | 'vertical',
-      pollQuestion: localStorage.getItem(`promo_poll_${id}_question`) || '',
-      pollOpts,
-    };
-  };
   const [homePopup, setHomePopup] = useState({ enabled: true, type: 'ad' as 'ad'|'poll', adImage: '', adLink: '', adOrientation: 'horizontal' as 'horizontal'|'vertical', pollQuestion: '', pollOpts: ['అవును','కాదు'] });
   const [articlePopup, setArticlePopup] = useState({ enabled: true, type: 'ad' as 'ad'|'poll', adImage: '', adLink: '', adOrientation: 'horizontal' as 'horizontal'|'vertical', pollQuestion: '', pollOpts: ['అవును','కాదు'] });
   const [popupSaved, setPopupSaved] = useState<'home'|'article'|null>(null);
 
-  // Load popup configs from localStorage on mount
+  // Load popup configs from database settings API on mount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setHomePopup(loadPopupConfig('home') as any);
-      setArticlePopup(loadPopupConfig('article') as any);
-    }
+    const ids: PopupId[] = ['home', 'article'];
+    ids.forEach(id => {
+      const keys = [
+        `promo_popup_${id}_enabled`,
+        `promo_popup_${id}_type`,
+        `promo_ad_${id}_image`,
+        `promo_ad_${id}_link`,
+        `promo_ad_${id}_orientation`,
+        `promo_poll_${id}_question`,
+        `promo_poll_${id}_options`,
+        `promo_poll_${id}_option_yes`,
+        `promo_poll_${id}_option_no`,
+        `promo_poll_${id}_option_unsure`,
+      ];
+      fetch(`/api/settings?keys=${keys.join(',')}&t=` + Date.now())
+        .then(res => res.ok ? res.json() : {})
+        .then((dbSettings: any) => {
+          const get = (key: string, def: string = '') => dbSettings[key] ?? def;
+          let pollOpts: string[] = ['అవును', 'కాదు'];
+          const savedOptions = get(`promo_poll_${id}_options`);
+          if (savedOptions) {
+            try { pollOpts = JSON.parse(savedOptions); } catch {}
+          } else {
+            const yes = get(`promo_poll_${id}_option_yes`);
+            const no = get(`promo_poll_${id}_option_no`);
+            const unsure = get(`promo_poll_${id}_option_unsure`);
+            if (yes || no || unsure) {
+              pollOpts = [];
+              if (yes) pollOpts.push(yes);
+              if (no) pollOpts.push(no);
+              if (unsure) pollOpts.push(unsure);
+            }
+          }
+          const config = {
+            enabled: get(`promo_popup_${id}_enabled`) !== 'false',
+            type: (get(`promo_popup_${id}_type`) || 'ad') as 'ad' | 'poll',
+            adImage: get(`promo_ad_${id}_image`),
+            adLink: get(`promo_ad_${id}_link`),
+            adOrientation: (get(`promo_ad_${id}_orientation`) || 'horizontal') as 'horizontal' | 'vertical',
+            pollQuestion: get(`promo_poll_${id}_question`),
+            pollOpts,
+          };
+          if (id === 'home') setHomePopup(config as any);
+          else setArticlePopup(config as any);
+        })
+        .catch(err => console.error(`Error loading popup config for ${id}:`, err));
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const savePopupConfig = (id: PopupId, config: typeof homePopup) => {
-    localStorage.setItem(`promo_popup_${id}_enabled`, String(config.enabled));
-    localStorage.setItem(`promo_popup_${id}_type`, config.type);
-    localStorage.setItem(`promo_ad_${id}_image`, config.adImage);
-    localStorage.setItem(`promo_ad_${id}_link`, config.adLink);
-    localStorage.setItem(`promo_ad_${id}_orientation`, config.adOrientation);
-    localStorage.setItem(`promo_poll_${id}_question`, config.pollQuestion);
-    localStorage.setItem(`promo_poll_${id}_options`, JSON.stringify(config.pollOpts));
-    
-    // Legacy support
-    localStorage.setItem(`promo_poll_${id}_option_yes`, config.pollOpts[0] || '');
-    localStorage.setItem(`promo_poll_${id}_option_no`, config.pollOpts[1] || '');
-    localStorage.setItem(`promo_poll_${id}_option_unsure`, config.pollOpts[2] || '');
-    
-    setPopupSaved(id);
-    setTimeout(() => setPopupSaved(null), 2500);
+    const payload: Record<string, string> = {
+      [`promo_popup_${id}_enabled`]: String(config.enabled),
+      [`promo_popup_${id}_type`]: config.type,
+      [`promo_ad_${id}_image`]: config.adImage,
+      [`promo_ad_${id}_link`]: config.adLink,
+      [`promo_ad_${id}_orientation`]: config.adOrientation,
+      [`promo_poll_${id}_question`]: config.pollQuestion,
+      [`promo_poll_${id}_options`]: JSON.stringify(config.pollOpts),
+      [`promo_poll_${id}_option_yes`]: config.pollOpts[0] || '',
+      [`promo_poll_${id}_option_no`]: config.pollOpts[1] || '',
+      [`promo_poll_${id}_option_unsure`]: config.pollOpts[2] || '',
+    };
+    fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    .then(() => {
+      setPopupSaved(id);
+      setTimeout(() => setPopupSaved(null), 2500);
+    })
+    .catch(err => {
+      console.error(`Error saving popup config for ${id}:`, err);
+      alert('Failed to save popup config to server.');
+    });
   };
 
   // Team Manager states

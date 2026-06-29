@@ -62,11 +62,7 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
       .then((dbSettings: any) => {
         const getSetting = (key: string, defaultValue: string | null = null) => {
           if (dbSettings[key] !== undefined && dbSettings[key] !== null) return dbSettings[key];
-          try {
-            return localStorage.getItem(key) || defaultValue;
-          } catch {
-            return defaultValue;
-          }
+          return defaultValue;
         };
 
         const savedEnabled = getSetting(`promo_popup_${id}_enabled`);
