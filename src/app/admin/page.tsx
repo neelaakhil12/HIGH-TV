@@ -9231,7 +9231,11 @@ export default function AdminPage() {
                                   const file = e.target.files?.[0];
                                   if (file) {
                                     handleCompressAndSetImage(file, (base64) => {
-                                      setConfig(prev => ({ ...prev, adImage: base64 }));
+                                      setConfig(prev => {
+                                        const updated = { ...prev, adImage: base64 };
+                                        savePopupConfig(id, updated);
+                                        return updated;
+                                      });
                                     });
                                   }
                                 }}
@@ -9247,7 +9251,13 @@ export default function AdminPage() {
                               {config.adImage && (
                                 <button
                                   type="button"
-                                  onClick={() => setConfig(prev => ({ ...prev, adImage: '' }))}
+                                  onClick={() => {
+                                    setConfig(prev => {
+                                      const updated = { ...prev, adImage: '' };
+                                      savePopupConfig(id, updated);
+                                      return updated;
+                                    });
+                                  }}
                                   className="border border-rose-200 hover:bg-rose-50 text-rose-500 font-bold text-xs py-2 px-3 rounded-xl transition-all cursor-pointer"
                                 >
                                   తొలగించు (Remove)

@@ -88,7 +88,7 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
         setIsEnabled(isActuallyEnabled);
 
         if (savedType !== null) setPopupType(savedType as 'ad' | 'poll');
-        if (savedAdImage !== null) setAdImage(savedAdImage);
+        if (savedAdImage !== null && savedAdImage.trim() !== '') setAdImage(savedAdImage);
         if (savedAdLink !== null) setAdLink(savedAdLink);
         if (savedAdOrientation !== null) setAdOrientation(savedAdOrientation as 'horizontal' | 'vertical');
         
