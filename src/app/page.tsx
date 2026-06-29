@@ -55,14 +55,29 @@ function SidebarLatestVideos() {
   ]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('latest_videos');
-    if (saved) {
-      try {
-        setVideos(JSON.parse(saved));
-      } catch (e) {
-        console.error("Error parsing latest videos", e);
-      }
-    }
+    fetch('/api/latest-videos?t=' + Date.now())
+      .then(res => res.ok ? res.json() : [])
+      .then(dbVideos => {
+        if (Array.isArray(dbVideos) && dbVideos.length > 0) {
+          setVideos(dbVideos);
+        } else {
+          const saved = localStorage.getItem('latest_videos');
+          if (saved) {
+            try {
+              setVideos(JSON.parse(saved));
+            } catch (e) {
+              console.error("Error parsing latest videos", e);
+            }
+          }
+        }
+      })
+      .catch(err => {
+        console.error("Error fetching latest videos:", err);
+        try {
+          const saved = localStorage.getItem('latest_videos');
+          if (saved) setVideos(JSON.parse(saved));
+        } catch {}
+      });
   }, []);
 
   const getYoutubeId = (urlOrId: string) => {

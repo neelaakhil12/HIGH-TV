@@ -1324,33 +1324,51 @@ export default function AdminPage() {
       setPinnedTgNews([]);
     }
 
-    // Load Videos list
-    try {
-      const saved = localStorage.getItem('latest_videos');
-      if (saved) {
-        setVideosList(JSON.parse(saved));
-      } else {
-        setVideosList([
-          {
-            id: "p_kI2pXWkAc",
-            title: "దేవర పార్ట్-1 అఫీషియల్ ట్రైలర్ - జూనియర్ ఎన్టీఆర్, కొరటాల శివ",
-            thumbnail: ""
-          },
-          {
-            id: "1kVkYOS9I18",
-            title: "పుష్ప-2 ది రూల్ అఫీషియల్ టీజర్ - అల్లు అర్జున్, సుకుమార్",
-            thumbnail: ""
-          },
-          {
-            id: "q6h3C_s8sSw",
-            title: "గేమ్ చేంజర్ అఫీషియల్ సాంగ్ - రామ్ చరణ్, శంకర్",
-            thumbnail: ""
+    // Load Videos list from Database API
+    fetch('/api/latest-videos?t=' + Date.now())
+      .then(res => res.ok ? res.json() : [])
+      .then(dbVideos => {
+        if (Array.isArray(dbVideos) && dbVideos.length > 0) {
+          setVideosList(dbVideos);
+        } else {
+          // Fallback to local storage or defaults if empty
+          try {
+            const saved = localStorage.getItem('latest_videos');
+            if (saved) {
+              setVideosList(JSON.parse(saved));
+            } else {
+              setVideosList([
+                {
+                  id: "p_kI2pXWkAc",
+                  title: "దేవర పార్ట్-1 అఫీషియల్ ట్రైలర్ - జూనియర్ ఎన్టీఆర్, కొరటాల శివ",
+                  thumbnail: ""
+                },
+                {
+                  id: "1kVkYOS9I18",
+                  title: "పుష్ప-2 ది రూల్ అఫీషియల్ టీజర్ - అల్లు అర్జున్, సుకుమార్",
+                  thumbnail: ""
+                },
+                {
+                  id: "q6h3C_s8sSw",
+                  title: "గేమ్ చేంజర్ అఫీషియల్ సాంగ్ - రామ్ చరణ్, శంకర్",
+                  thumbnail: ""
+                }
+              ]);
+            }
+          } catch {
+            setVideosList([]);
           }
-        ]);
-      }
-    } catch {
-      setVideosList([]);
-    }
+        }
+      })
+      .catch(err => {
+        console.error("Error fetching latest videos from DB:", err);
+        try {
+          const saved = localStorage.getItem('latest_videos');
+          if (saved) setVideosList(JSON.parse(saved));
+        } catch {
+          setVideosList([]);
+        }
+      });
 
     // Load Weather Reports data
     try {
@@ -3021,7 +3039,7 @@ export default function AdminPage() {
   };
 
   // Save configurations helper (Popups, ads ticker)
-  const handleSaveConfigs = (e: React.FormEvent) => {
+  const handleSaveConfigs = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaveStatus('saving');
 
@@ -3048,6 +3066,15 @@ export default function AdminPage() {
       localStorage.setItem('weather_page_reports_data', JSON.stringify(weatherReports));
     } else if (activeTab === 'high-tv-videos') {
       localStorage.setItem('latest_videos', JSON.stringify(videosList));
+      try {
+        await fetch('/api/latest-videos', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(videosList),
+        });
+      } catch (err) {
+        console.error("Failed to sync videos list to DB:", err);
+      }
     } else if (activeTab === 'categories') {
       // Save General banners
       const updatedAds = {

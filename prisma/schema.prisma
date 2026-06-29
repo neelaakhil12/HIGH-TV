@@ -88,3 +88,12 @@ model EpaperSection {
   key       String   @unique @db.VarChar(100)
   createdAt DateTime @default(now())
 }
+
+model LatestVideo {
+  id        Int      @id @default(autoincrement())
+  youtubeId String   @db.VarChar(500)
+  title     String   @db.Text
+  thumbnail String   @db.LongText
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
