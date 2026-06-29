@@ -1037,10 +1037,10 @@ export default function EPaperReader() {
       const renderScale = (targetWidth / originalViewport.width) * scaleFactor;
       const viewport = page.getViewport({ scale: renderScale });
       
-      // Load logo image
+      // Load yellow epaper logo image
       const logoImg = await new Promise<HTMLImageElement | null>((resolve) => {
         const img = new Image();
-        img.src = '/logo.png';
+        img.src = '/epaper-logo.png';
         img.onload = () => resolve(img);
         img.onerror = () => resolve(null);
       });
@@ -1107,8 +1107,8 @@ export default function EPaperReader() {
             clipBox.height * scaleFactor
           );
           
-          // 4. Draw metadata & link at the bottom
-          const currentHost = typeof window !== 'undefined' ? window.location.origin : 'https://hightv.in';
+          // Enforce production URL path
+          const currentHost = 'https://hightv.in';
           const clipLink = `${currentHost}/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
           
           const getEditionDisplayName = (editionVal: string) => {
@@ -1181,10 +1181,10 @@ export default function EPaperReader() {
       const renderScale = (targetWidth / originalViewport.width) * scaleFactor;
       const viewport = page.getViewport({ scale: renderScale });
       
-      // Load logo image
+      // Load yellow epaper logo image
       const logoImg = await new Promise<HTMLImageElement | null>((resolve) => {
         const img = new Image();
-        img.src = '/logo.png';
+        img.src = '/epaper-logo.png';
         img.onload = () => resolve(img);
         img.onerror = () => resolve(null);
       });
@@ -1251,8 +1251,8 @@ export default function EPaperReader() {
             activeArticle.height * scaleFactor
           );
           
-          // 4. Draw metadata & link at the bottom
-          const currentHost = typeof window !== 'undefined' ? window.location.origin : 'https://hightv.in';
+          // Enforce production URL path
+          const currentHost = 'https://hightv.in';
           const clipLink = `${currentHost}/category/epaper?view=article&date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}&articleId=${activeArticle.id}`;
           
           const getEditionDisplayName = (editionVal: string) => {
