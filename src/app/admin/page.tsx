@@ -51,7 +51,8 @@ import {
   ToggleLeft,
   ToggleRight,
   Link2,
-  ImagePlay
+  ImagePlay,
+  Zap
 } from 'lucide-react';
 
 import { 
@@ -578,6 +579,104 @@ export default function AdminPage() {
   ]);
 
   // Popup Manager states (persisted to database settings API)
+  
+  // ════════════ LIVE UPDATES MANAGER STATES ════════════
+  const [liveListings, setLiveListings] = useState<any[]>([]);
+  const [selectedLiveSlug, setSelectedLiveSlug] = useState<string>('');
+  const [livePosts, setLivePosts] = useState<any[]>([]);
+  
+  // Listing Form State ('none' | 'add' | 'edit')
+  const [listingFormMode, setListingFormMode] = useState<'none' | 'add' | 'edit'>('none');
+  const [editingListing, setEditingListing] = useState<any | null>(null);
+  const [listingTitle, setListingTitle] = useState('హై టీవీ ఫ్లాష్ న్యూస్');
+  const [listingDescription, setListingDescription] = useState('');
+  const [listingDate, setListingDate] = useState('');
+  const [listingSlug, setListingSlug] = useState('');
+
+  // Post Form State ('none' | 'add' | 'edit')
+  const [postFormMode, setPostFormMode] = useState<'none' | 'add' | 'edit'>('none');
+  const [editingPost, setEditingPost] = useState<any | null>(null);
+  const [postTime, setPostTime] = useState('');
+  const [postTitle, setPostTitle] = useState('');
+  const [postCategory, setPostCategory] = useState<string>('telangana');
+  const [postIsImportant, setPostIsImportant] = useState(false);
+  const [postBulletsText, setPostBulletsText] = useState('');
+  const [postImage, setPostImage] = useState('');
+  const postImageInputRef = useRef<HTMLInputElement>(null);
+
+  // Load Live Updates Listings on mount
+  useEffect(() => {
+    fetch('/api/settings?key=live_updates_listings&t=' + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((dict: any) => {
+        let list = [];
+        if (dict.live_updates_listings) {
+          try { list = typeof dict.live_updates_listings === 'string' ? JSON.parse(dict.live_updates_listings) : dict.live_updates_listings; } catch {}
+        }
+        if (!list || list.length === 0) {
+          try {
+            const saved = localStorage.getItem('live_updates_listings');
+            if (saved) list = JSON.parse(saved);
+          } catch {}
+        }
+        if (!list || list.length === 0) {
+          list = [
+            { id: 'list-1', title: 'హై టీవీ ఫ్లాష్ న్యూస్', description: 'ప్రపంచ వ్యాప్తంగా జరిగే వివిధ సంఘటనల అప్‌డేట్స్‌ను ఎప్పటికప్పుడు ఇక్కడ చదవండి..', date: '21 జూన్ 2026', slug: '21st-june-2026' },
+            { id: 'list-2', title: 'హై టీవీ ఫ్లాష్ న్యూస్', description: '20 జూన్ 2026 నాటి ఏపీ, తెలంగాణ మరియు జాతీయ అంతర్జాతీయ రాజకీయ పరిణామాల లైవ్ అప్‌డేట్స్.', date: '20 జూన్ 2026', slug: '20th-june-2026' },
+            { id: 'list-3', title: 'హై టీవీ ఫ్లాష్ న్యూస్', description: '19 జూన్ 2026 నాటి ప్రధాన క్రీడా వార్తలు, రాజకీయ పరిణామాలు మరియు ముఖ్యాంశాలు.', date: '19 జూన్ 2026', slug: '19th-june-2026' }
+          ];
+        }
+        setLiveListings(list);
+        if (list.length > 0) {
+          setSelectedLiveSlug(prev => prev || list[0].slug);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Load Live Update Posts when selectedLiveSlug changes
+  useEffect(() => {
+    if (!selectedLiveSlug) return;
+    const key = `live_updates_feed_${selectedLiveSlug}`;
+    fetch(`/api/settings?key=${key}&t=` + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((dict: any) => {
+        let posts = [];
+        if (dict[key]) {
+          try { posts = typeof dict[key] === 'string' ? JSON.parse(dict[key]) : dict[key]; } catch {}
+        }
+        if (!posts || posts.length === 0) {
+          try {
+            const saved = localStorage.getItem(key);
+            if (saved) posts = JSON.parse(saved);
+          } catch {}
+        }
+        setLivePosts(posts || []);
+      })
+      .catch(() => {});
+  }, [selectedLiveSlug]);
+
+  const saveLiveListingsToDB = (newListings: any[]) => {
+    setLiveListings(newListings);
+    try { localStorage.setItem('live_updates_listings', JSON.stringify(newListings)); } catch {}
+    fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ live_updates_listings: JSON.stringify(newListings) })
+    }).catch(err => console.error('Error saving live listings:', err));
+  };
+
+  const saveLivePostsToDB = (slug: string, newPosts: any[]) => {
+    setLivePosts(newPosts);
+    const key = `live_updates_feed_${slug}`;
+    try { localStorage.setItem(key, JSON.stringify(newPosts)); } catch {}
+    fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [key]: JSON.stringify(newPosts) })
+    }).catch(err => console.error('Error saving live posts:', err));
+  };
+
   type PopupId = 'home' | 'article';
   const [homePopup, setHomePopup] = useState({ enabled: true, type: 'ad' as 'ad'|'poll', adImage: '', adLink: '', adOrientation: 'horizontal' as 'horizontal'|'vertical', pollQuestion: '', pollOpts: ['అవును','కాదు'] });
   const [articlePopup, setArticlePopup] = useState({ enabled: true, type: 'ad' as 'ad'|'poll', adImage: '', adLink: '', adOrientation: 'horizontal' as 'horizontal'|'vertical', pollQuestion: '', pollOpts: ['అవును','కాదు'] });
@@ -10818,6 +10917,516 @@ export default function AdminPage() {
           </div>
         </div>
       )}
+
+      {/* ══════════════ VIEW: LIVE UPDATES MANAGER ══════════════ */}
+      {activeTab === 'live-updates' && (
+        <div className="space-y-6 text-left">
+          {/* Top Bar Header */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-600">
+                <Zap className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="text-xl font-black text-slate-800 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  లైవ్ అప్‌డేట్స్ మేనేజర్ (Live Updates Manager)
+                </h2>
+                <p className="text-xs text-slate-500 font-medium">
+                  లైవ్ వార్తల రోజువారీ ఫోల్డర్లు మరియు బ్రేకింగ్ పోస్ట్‌లను ఇక్కడ నిర్వర్తించండి
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  const todayStr = new Date().toLocaleDateString('te-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+                  const slug = Date.now() + '-live';
+                  setListingFormMode('add');
+                  setEditingListing(null);
+                  setListingTitle('హై టీవీ ఫ్లాష్ న్యూస్');
+                  setListingDescription('తాజా లైవ్ అప్‌డేట్స్ మరియు ప్రధాన పరిణామాలు.');
+                  setListingDate(todayStr);
+                  setListingSlug(slug);
+                }}
+                className="bg-amber-500 hover:bg-amber-600 text-white font-black text-xs py-3 px-5 rounded-xl transition-all cursor-pointer shadow-sm flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>+ కొత్త రోజువారీ ఫోల్డర్</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 2-Column Main Workspace */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            {/* Left Column (4/12): Day Listings Folders */}
+            <div className="lg:col-span-4 bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">
+                  రోజువారీ ఫోల్డర్లు ({liveListings.length})
+                </h3>
+              </div>
+
+              {/* Listings Stack */}
+              <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1">
+                {liveListings.map((list) => {
+                  const isSelected = selectedLiveSlug === list.slug;
+                  return (
+                    <div
+                      key={list.id || list.slug}
+                      onClick={() => {
+                        setSelectedLiveSlug(list.slug);
+                        setPostFormMode('none');
+                      }}
+                      className={"group relative p-4 rounded-xl border cursor-pointer transition-all " + (
+                        isSelected
+                          ? "bg-slate-900 text-white border-slate-900 shadow-md"
+                          : "bg-slate-50 text-slate-800 border-slate-200 hover:border-slate-300 hover:bg-slate-100/80"
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                        <span className={"text-xs font-black px-2 py-0.5 rounded-md " + (
+                          isSelected ? "bg-amber-400 text-slate-900" : "bg-slate-200 text-slate-700"
+                        )}>
+                          {list.date}
+                        </span>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingListing(list);
+                              setListingTitle(list.title || '');
+                              setListingDescription(list.description || '');
+                              setListingDate(list.date || '');
+                              setListingSlug(list.slug || '');
+                              setListingFormMode('edit');
+                            }}
+                            className="p-1 rounded bg-white/20 hover:bg-white/40 text-current"
+                            title="Edit Folder"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (!confirm('డేటా తీసివేయాలా? "' + list.date + '"?')) return;
+                              const updated = liveListings.filter(l => l.slug !== list.slug);
+                              saveLiveListingsToDB(updated);
+                              if (selectedLiveSlug === list.slug) {
+                                setSelectedLiveSlug(updated[0]?.slug || '');
+                              }
+                            }}
+                            className="p-1 rounded bg-rose-500/20 hover:bg-rose-500/40 text-rose-300"
+                            title="Delete Folder"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                      <h4 className="text-sm font-bold telugu-text line-clamp-1" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                        {list.title}
+                      </h4>
+                      <p className={"text-xs mt-1 line-clamp-2 telugu-text " + (isSelected ? "text-slate-300" : "text-slate-500")} style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                        {list.description}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Right Column (8/12): Posts Management inside selected day */}
+            <div className="lg:col-span-8 space-y-6">
+              
+              {/* Add/Edit Listing Form Modal/Card */}
+              {(listingFormMode === 'add' || listingFormMode === 'edit') && (
+                <div className="bg-white border-2 border-amber-400 rounded-2xl p-6 shadow-md space-y-4">
+                  <h3 className="text-base font-black text-slate-800 flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-amber-500" />
+                    <span>{listingFormMode === 'add' ? '+ కొత్త రోజువారీ ఫోల్డర్ జతచేయండి' : '✏️ ఫోల్డర్ సవరించండి'}</span>
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">ఫోల్డర్ టైటిల్</label>
+                      <input
+                        type="text"
+                        value={listingTitle}
+                        onChange={(e) => setListingTitle(e.target.value)}
+                        placeholder="హై టీవీ ఫ్లాష్ న్యూస్"
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-amber-500 telugu-text"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">తేదీ (Display Date)</label>
+                      <input
+                        type="text"
+                        value={listingDate}
+                        onChange={(e) => setListingDate(e.target.value)}
+                        placeholder="22 జూన్ 2026"
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-amber-500 telugu-text"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">వివరణ (Description)</label>
+                    <textarea
+                      value={listingDescription}
+                      onChange={(e) => setListingDescription(e.target.value)}
+                      rows={2}
+                      placeholder="ఈ రోజు లైవ్ అప్‌డేట్స్ వివరణ..."
+                      className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-800 outline-none focus:border-amber-500 telugu-text"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    />
+                  </div>
+                  <div className="flex items-center gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!listingTitle.trim() || !listingDate.trim()) {
+                          alert('దయచేసి టైటిల్ మరియు తేదీ నమోదు చేయండి');
+                          return;
+                        }
+                        const slugToUse = listingSlug.trim() || (Date.now() + '-live');
+                        let updated = [];
+                        if (listingFormMode === 'add') {
+                          const item = { id: 'list-' + Date.now(), title: listingTitle.trim(), description: listingDescription.trim(), date: listingDate.trim(), slug: slugToUse };
+                          updated = [item, ...liveListings];
+                          setSelectedLiveSlug(slugToUse);
+                        } else {
+                          updated = liveListings.map(l => l.slug === editingListing?.slug ? { ...l, title: listingTitle.trim(), description: listingDescription.trim(), date: listingDate.trim() } : l);
+                        }
+                        saveLiveListingsToDB(updated);
+                        setListingFormMode('none');
+                      }}
+                      className="bg-amber-500 hover:bg-amber-600 text-white font-black text-xs py-2.5 px-6 rounded-xl cursor-pointer transition-all shadow-sm"
+                    >
+                      {listingFormMode === 'add' ? 'ఫోల్డర్ సృష్టించండి' : 'మార్పులు సేవ్‌ చేయండి'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setListingFormMode('none')}
+                      className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 px-5 rounded-xl cursor-pointer"
+                    >
+                      రద్దు చేయండి
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Posts Workspace Header */}
+              <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-black text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded uppercase tracking-wider">
+                    ఎంచుకున్న ఫోల్డర్
+                  </span>
+                  <h3 className="text-lg font-black text-slate-800 mt-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    {(liveListings.find(l => l.slug === selectedLiveSlug)?.title || 'లైవ్ అప్‌డేట్స్') + ' (' + selectedLiveSlug + ')'}
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const now = new Date();
+                    const hours = now.getHours().toString().padStart(2, '0');
+                    const mins = now.getMinutes().toString().padStart(2, '0');
+                    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    const fullTimeStr = monthNames[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear() + ' ' + hours + ':' + mins + ' IST';
+                    setPostFormMode('add');
+                    setEditingPost(null);
+                    setPostTime(fullTimeStr);
+                    setPostTitle('');
+                    setPostCategory('telangana');
+                    setPostIsImportant(false);
+                    setPostBulletsText('');
+                    setPostImage('');
+                  }}
+                  className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-5 rounded-xl transition-all cursor-pointer shadow-sm flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>+ కొత్త లైవ్ పోస్ట్ (Add Post)</span>
+                </button>
+              </div>
+
+              {/* Add/Edit Live Post Form */}
+              {(postFormMode === 'add' || postFormMode === 'edit') && (
+                <div className="bg-white border-2 border-rose-500 rounded-2xl p-6 shadow-lg space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 className="text-base font-black text-slate-800 flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-rose-600" />
+                      <span>{postFormMode === 'add' ? 'కొత్త లైవ్ అప్‌డేట్ పోస్ట్ రాయండి' : 'లైవ్ పోస్ట్ సవరించండి'}</span>
+                    </h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div className="md:col-span-8 flex flex-col gap-1.5">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">వార్త ముఖ్యాంశం (Post Title) *</label>
+                      <input
+                        type="text"
+                        value={postTitle}
+                        onChange={(e) => setPostTitle(e.target.value)}
+                        placeholder="ఉదా: హైదరాబాద్: వినాయక చవితి నిమజ్జనంపై సమీక్ష..."
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-rose-500 telugu-text"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      />
+                    </div>
+                    <div className="md:col-span-4 flex flex-col gap-1.5">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">విభాగం (Category)</label>
+                      <select
+                        value={postCategory}
+                        onChange={(e) => setPostCategory(e.target.value)}
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-rose-500"
+                      >
+                        <option value="telangana">తెలంగాణ (Telangana)</option>
+                        <option value="ap">ఆంధ్రప్రదేశ్ (AP)</option>
+                        <option value="politics">రాజకీయాలు (Politics)</option>
+                        <option value="national">జాతీయ (National)</option>
+                        <option value="international">అంతర్జాతీయ (International)</option>
+                        <option value="sports">క్రీడలు (Sports)</option>
+                        <option value="general">జనరల్ (General)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                    <div className="md:col-span-8 flex flex-col gap-1.5">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">సమయం/Timestamp (e.g. Jun 22, 2026 14:30 IST)</label>
+                      <input
+                        type="text"
+                        value={postTime}
+                        onChange={(e) => setPostTime(e.target.value)}
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-800 outline-none focus:border-rose-500"
+                      />
+                    </div>
+                    <div className="md:col-span-4 pt-4">
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={postIsImportant}
+                          onChange={(e) => setPostIsImportant(e.target.checked)}
+                          className="w-4 h-4 text-rose-600 rounded cursor-pointer"
+                        />
+                        <span className="text-xs font-black text-rose-600 bg-rose-50 border border-rose-200 px-2 py-1 rounded">
+                          🔥 Flash Highlight (Important)
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      వార్తా అంశాలు / బుల్లెట్ పాయింట్లు (Bullets - 1 line per point)
+                    </label>
+                    <textarea
+                      value={postBulletsText}
+                      onChange={(e) => setPostBulletsText(e.target.value)}
+                      rows={4}
+                      placeholder="ఒక్కో పాయింట్ కొత్త లైన్‌లో రాయండి..."
+                      className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-800 outline-none focus:border-rose-500 telugu-text leading-relaxed"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    />
+                  </div>
+
+                  {/* Image input */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">చిత్రం (Optional Image URL / Upload)</label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="text"
+                        value={postImage}
+                        onChange={(e) => setPostImage(e.target.value)}
+                        placeholder="https://... లేదా ఇమేజ్ అప్‌లోడ్ చేయండి"
+                        className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-800 outline-none focus:border-rose-500"
+                      />
+                      <input
+                        type="file"
+                        ref={postImageInputRef}
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => { setPostImage(ev.target?.result as string); };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => postImageInputRef.current?.click()}
+                        className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-xl cursor-pointer flex items-center gap-1.5"
+                      >
+                        <Upload className="w-4 h-4" /> Upload
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 pt-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!postTitle.trim()) {
+                          alert('దయచేసి పోస్ట్ టైటిల్ నమోదు చేయండి');
+                          return;
+                        }
+                        const bullets = postBulletsText.split(String.fromCharCode(10)).map(b => b.trim()).filter(Boolean);
+                        const timeOnlyStr = postTime.includes('IST') ? postTime.split(' ').slice(-2, -1)[0] || '12:00' : '12:00';
+                        let updated = [];
+                        if (postFormMode === 'add') {
+                          const newPost = {
+                            id: 'lu-' + Date.now(),
+                            timestamp: postTime.trim(),
+                            timeOnly: timeOnlyStr,
+                            title: postTitle.trim(),
+                            category: postCategory,
+                            isImportant: postIsImportant,
+                            bullets: bullets.length > 0 ? bullets : [postTitle.trim()],
+                            image: postImage.trim() || undefined
+                          };
+                          updated = [newPost, ...livePosts];
+                        } else {
+                          updated = livePosts.map(p => p.id === editingPost?.id ? {
+                            ...p,
+                            timestamp: postTime.trim(),
+                            timeOnly: timeOnlyStr,
+                            title: postTitle.trim(),
+                            category: postCategory,
+                            isImportant: postIsImportant,
+                            bullets: bullets.length > 0 ? bullets : [postTitle.trim()],
+                            image: postImage.trim() || undefined
+                          } : p);
+                        }
+                        saveLivePostsToDB(selectedLiveSlug, updated);
+                        setPostFormMode('none');
+                      }}
+                      className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-6 rounded-xl cursor-pointer transition-all shadow-sm"
+                    >
+                      {postFormMode === 'add' ? 'పోస్ట్ ప్రచురించండి (Publish)' : 'పోస్ట్ సేవ్‌ చేయండి'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPostFormMode('none')}
+                      className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 px-5 rounded-xl cursor-pointer"
+                    >
+                      రద్దు చేయండి
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Live Posts Feed Cards */}
+              <div className="space-y-4">
+                {livePosts.length === 0 ? (
+                  <div className="bg-white border border-slate-200/80 rounded-2xl p-12 text-center text-slate-400">
+                    <Zap className="w-8 h-8 mx-auto mb-2 opacity-40 text-amber-500" />
+                    <p className="text-sm font-bold">ఈ ఫోల్డర్‌లో పోస్ట్‌లు లేవు.</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const now = new Date();
+                        const hours = now.getHours().toString().padStart(2, '0');
+                        const mins = now.getMinutes().toString().padStart(2, '0');
+                        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                        setPostFormMode('add');
+                        setEditingPost(null);
+                        setPostTime(monthNames[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear() + ' ' + hours + ':' + mins + ' IST');
+                        setPostTitle('');
+                      }}
+                      className="mt-3 text-xs font-bold text-rose-600 hover:underline cursor-pointer"
+                    >
+                      + మొదటి లైవ్ పోస్ట్ సృష్టించండి
+                    </button>
+                  </div>
+                ) : (
+                  livePosts.map((post) => (
+                    <div
+                      key={post.id}
+                      className={"bg-white border rounded-2xl p-5 shadow-xs transition-all relative " + (
+                        post.isImportant ? "border-amber-400 bg-amber-50/10" : "border-slate-200"
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-4 mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="bg-slate-900 text-white text-[11px] font-mono font-bold px-2 py-0.5 rounded">
+                            {post.timestamp || post.timeOnly}
+                          </span>
+                          <span className="bg-blue-100 text-blue-800 text-[10px] font-black uppercase px-2 py-0.5 rounded">
+                            {post.category}
+                          </span>
+                          {post.isImportant && (
+                            <span className="bg-rose-600 text-white text-[10px] font-black px-2 py-0.5 rounded shadow-xs">
+                              🔥 Flash Highlight
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingPost(post);
+                              setPostTime(post.timestamp || '');
+                              setPostTitle(post.title || '');
+                              setPostCategory(post.category || 'telangana');
+                              setPostIsImportant(!!post.isImportant);
+                              setPostBulletsText(Array.isArray(post.bullets) ? post.bullets.join(String.fromCharCode(10)) : '');
+                              setPostImage(post.image || '');
+                              setPostFormMode('edit');
+                            }}
+                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
+                            title="Edit Post"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!confirm('ఈ లైవ్ పోస్ట్‌ను తొలగించాలా?')) return;
+                              const updated = livePosts.filter(p => p.id !== post.id);
+                              saveLivePostsToDB(selectedLiveSlug, updated);
+                            }}
+                            className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 cursor-pointer"
+                            title="Delete Post"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <h4 className="text-base font-black text-slate-900 telugu-text mb-3 leading-snug" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                        {post.title}
+                      </h4>
+
+                      {post.bullets && post.bullets.length > 0 && (
+                        <ul className="space-y-1.5 text-xs text-slate-700 telugu-text pl-2 border-l-2 border-slate-200" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                          {post.bullets.map((bullet: string, idx: number) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span className="text-rose-500 font-bold">•</span>
+                              <span>{bullet}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {post.image && (
+                        <div className="mt-3 max-w-md rounded-xl overflow-hidden border border-slate-200">
+                          <img src={post.image} alt={post.title} className="w-full h-auto object-cover max-h-60" />
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* ── Editorial Article Picker Modal ── */}
       {showEditorialArticlePicker && (

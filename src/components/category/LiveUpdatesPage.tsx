@@ -236,12 +236,32 @@ export default function LiveUpdatesPage() {
 
   // Load Day Listings on mount
   useEffect(() => {
-    const saved = localStorage.getItem('live_updates_listings');
-    if (saved) {
-      setListings(JSON.parse(saved));
-    } else {
-      setListings(listingItems);
-    }
+    fetch('/api/settings?key=live_updates_listings&t=' + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((dict: any) => {
+        if (dict.live_updates_listings) {
+          try {
+            const parsed = typeof dict.live_updates_listings === 'string' ? JSON.parse(dict.live_updates_listings) : dict.live_updates_listings;
+            setListings(parsed);
+            localStorage.setItem('live_updates_listings', JSON.stringify(parsed));
+            return;
+          } catch (e) {}
+        }
+        const saved = localStorage.getItem('live_updates_listings');
+        if (saved) {
+          setListings(JSON.parse(saved));
+        } else {
+          setListings(listingItems);
+        }
+      })
+      .catch(() => {
+        const saved = localStorage.getItem('live_updates_listings');
+        if (saved) {
+          setListings(JSON.parse(saved));
+        } else {
+          setListings(listingItems);
+        }
+      });
   }, []);
 
   // Load timeline updates when selected day changes
@@ -250,16 +270,41 @@ export default function LiveUpdatesPage() {
       setUpdates([]);
       return;
     }
-    const savedFeed = localStorage.getItem(`live_updates_feed_${selectedUpdate.slug}`);
-    if (savedFeed) {
-      setUpdates(JSON.parse(savedFeed));
-    } else {
-      if (selectedUpdate.slug === '21st-june-2026') {
-        setUpdates(initialLiveUpdates);
-      } else {
-        setUpdates([]);
-      }
-    }
+    const key = `live_updates_feed_${selectedUpdate.slug}`;
+    fetch(`/api/settings?key=${key}&t=` + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((dict: any) => {
+        if (dict[key]) {
+          try {
+            const parsed = typeof dict[key] === 'string' ? JSON.parse(dict[key]) : dict[key];
+            setUpdates(parsed);
+            localStorage.setItem(key, JSON.stringify(parsed));
+            return;
+          } catch (e) {}
+        }
+        const savedFeed = localStorage.getItem(key);
+        if (savedFeed) {
+          setUpdates(JSON.parse(savedFeed));
+        } else {
+          if (selectedUpdate.slug === '21st-june-2026') {
+            setUpdates(initialLiveUpdates);
+          } else {
+            setUpdates([]);
+          }
+        }
+      })
+      .catch(() => {
+        const savedFeed = localStorage.getItem(key);
+        if (savedFeed) {
+          setUpdates(JSON.parse(savedFeed));
+        } else {
+          if (selectedUpdate.slug === '21st-june-2026') {
+            setUpdates(initialLiveUpdates);
+          } else {
+            setUpdates([]);
+          }
+        }
+      });
     setVisibleCount(8); // Reset pagination view limit when switching days
   }, [selectedUpdate]);
 
