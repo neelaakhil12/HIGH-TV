@@ -341,7 +341,7 @@ export default function EPaperReader() {
   }, []);
 
   useEffect(() => {
-    fetch(`/api/epapers?t=` + Date.now())
+    fetch(`/api/epapers?date=${selectedDate}&t=` + Date.now())
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -353,41 +353,120 @@ export default function EPaperReader() {
 
   const getEditionsForSection = (sectionKey: string, staticList: any[]) => {
     const keyLower = (sectionKey || '').toLowerCase();
-    let dbPapers = dbEpapers.filter(p => (p.section || '').toLowerCase() === keyLower);
+    
+    // Filter by selectedDate
+    const dailyPapers = dbEpapers.filter(p => p.date === selectedDate);
+    
+    let dbPapers = dailyPapers.filter(p => (p.section || '').toLowerCase() === keyLower);
     if (keyLower === 'main') {
-      dbPapers = dbEpapers.filter(p => {
+      dbPapers = dailyPapers.filter(p => {
         const sec = (p.section || '').toLowerCase();
         return sec === 'main' || sec === 'general-main' || sec.endsWith('-main');
       });
     } else if (keyLower === 'telangana') {
-      dbPapers = dbEpapers.filter(p => {
+      dbPapers = dailyPapers.filter(p => {
         const sec = (p.section || '').toLowerCase();
         return sec === 'telangana' || (sec.startsWith('telangana-') && sec !== 'telangana-main') || tgDistricts.some(d => d.slug === sec);
       });
     } else if (keyLower === 'ap') {
-      dbPapers = dbEpapers.filter(p => {
+      dbPapers = dailyPapers.filter(p => {
         const sec = (p.section || '').toLowerCase();
         return sec === 'ap' || (sec.startsWith('ap-') && sec !== 'ap-main') || apDistricts.some(d => d.slug === sec);
       });
     }
 
-    const list = dbPapers.map(paper => {
-      const staticMatch = staticList.find(
-        item => item.value.toLowerCase() === paper.title.toLowerCase() ||
-                item.value === paper.title ||
-                item.name === paper.title
-      );
+    // Map over staticList to preserve the baseline cards
+    const list = staticList.map(item => {
+      const matchingDbPaper = dbPapers.find(p => {
+        const titleLower = p.title.toLowerCase();
+        const itemValLower = item.value.toLowerCase();
+        const itemNameLower = item.name.toLowerCase();
+        
+        // Match by title
+        if (titleLower === itemValLower || 
+            titleLower === itemNameLower || 
+            p.title === item.nameTe ||
+            p.title.includes(item.nameTe) ||
+            item.nameTe.includes(p.title)) {
+          return true;
+        }
+        
+        // Match by section slug
+        const sec = (p.section || '').toLowerCase();
+        if (keyLower === 'main') {
+          if (sec === `${itemValLower}-main` || 
+              sec === `${itemNameLower}-main` ||
+              (sec === 'telangana-main' && itemValLower === 'telangana') ||
+              (sec === 'ap-main' && itemValLower === 'ap') ||
+              (sec === 'hyderabad-main' && itemValLower === 'hyderabad')) {
+            return true;
+          }
+        } else {
+          if (sec === `${keyLower}-${itemValLower}` || 
+              sec === `${keyLower}-${itemNameLower}` || 
+              sec === itemValLower) {
+            return true;
+          }
+        }
+        return false;
+      });
+
       return {
-        name: staticMatch ? (staticMatch.nameTe || staticMatch.name) : paper.title,
-        nameTe: staticMatch ? (staticMatch.nameTe || staticMatch.name) : paper.title,
-        value: paper.title,
-        pdfUrl: paper.pdfUrl,
-        isDb: true
+        name: item.nameTe || item.name,
+        nameTe: item.nameTe || item.name,
+        value: item.value,
+        pdfUrl: matchingDbPaper ? matchingDbPaper.pdfUrl : null,
+        isDb: !!matchingDbPaper
       };
     });
 
-    if (!searchQuery) return list;
-    return list.filter(ed => 
+    // Add any database papers that didn't match any static edition
+    const unmatchedDbPapers = dbPapers.filter(p => {
+      return !staticList.some(item => {
+        const titleLower = p.title.toLowerCase();
+        const itemValLower = item.value.toLowerCase();
+        const itemNameLower = item.name.toLowerCase();
+        
+        if (titleLower === itemValLower || 
+            titleLower === itemNameLower || 
+            p.title === item.nameTe ||
+            p.title.includes(item.nameTe) ||
+            item.nameTe.includes(p.title)) {
+          return true;
+        }
+        
+        const sec = (p.section || '').toLowerCase();
+        if (keyLower === 'main') {
+          if (sec === `${itemValLower}-main` || 
+              sec === `${itemNameLower}-main` ||
+              (sec === 'telangana-main' && itemValLower === 'telangana') ||
+              (sec === 'ap-main' && itemValLower === 'ap') ||
+              (sec === 'hyderabad-main' && itemValLower === 'hyderabad')) {
+            return true;
+          }
+        } else {
+          if (sec === `${keyLower}-${itemValLower}` || 
+              sec === `${keyLower}-${itemNameLower}` || 
+              sec === itemValLower) {
+            return true;
+          }
+        }
+        return false;
+      });
+    });
+
+    const unmatchedList = unmatchedDbPapers.map(paper => ({
+      name: paper.title,
+      nameTe: paper.title,
+      value: paper.title,
+      pdfUrl: paper.pdfUrl,
+      isDb: true
+    }));
+
+    const finalResult = [...list, ...unmatchedList];
+
+    if (!searchQuery) return finalResult;
+    return finalResult.filter(ed => 
       ed.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
       ed.nameTe.includes(searchQuery)
     );
@@ -395,7 +474,7 @@ export default function EPaperReader() {
 
   const getCustomSectionPapers = (sectionKey: string) => {
     const list = dbEpapers
-      .filter(p => p.section === sectionKey)
+      .filter(p => p.date === selectedDate && p.section === sectionKey)
       .map(paper => ({
         name: paper.title,
         nameTe: paper.title,
@@ -413,6 +492,7 @@ export default function EPaperReader() {
 
   const customSections = Array.from(new Set(
     dbEpapers
+      .filter(p => p.date === selectedDate)
       .map(p => p.section)
       .filter(s => s && s !== 'main' && s !== 'telangana' && s !== 'ap')
   ));
@@ -618,12 +698,21 @@ export default function EPaperReader() {
           pdf = await loadingTask.promise;
         } else {
           // Check if there is any uploaded PDF for this date and selectedEdition
-          const matchingDbPaper = dbEpapers.find(
-            p => p.title.toLowerCase() === selectedEdition.toLowerCase() ||
-                 p.title === selectedEdition
-          );
+          const matchingDbPaper = dbEpapers.find(p => {
+            if (p.date !== selectedDate) return false;
+            const titleLower = p.title.toLowerCase();
+            const selectedLower = selectedEdition.toLowerCase();
+            if (titleLower === selectedLower || p.title === selectedEdition) return true;
+            
+            const sec = (p.section || '').toLowerCase();
+            if (sec === `${selectedLower}-main` || sec === selectedLower) return true;
+            if (selectedLower === 'telangana' && sec === 'telangana-main') return true;
+            if (selectedLower === 'ap' && sec === 'ap-main') return true;
+            if (selectedLower === 'hyderabad' && sec === 'hyderabad-main') return true;
+            return false;
+          });
           // Fallback: any DB paper for this date
-          const fallbackDbPaper = matchingDbPaper || dbEpapers[0];
+          const fallbackDbPaper = matchingDbPaper || dbEpapers.find(p => p.date === selectedDate) || dbEpapers[0];
           
           const targetUrl = fallbackDbPaper ? fallbackDbPaper.pdfUrl : '/BalagamTV_Main_Edition__13_Jun_2026.pdf';
           const loadingTask = pdfjs.getDocument({ url: targetUrl });
@@ -692,10 +781,19 @@ export default function EPaperReader() {
           const blob = new Blob([customData], { type: 'application/pdf' });
           setLoadedPdfUrl(URL.createObjectURL(blob));
         } else {
-          const matchingDbPaper = dbEpapers.find(
-            p => p.title.toLowerCase() === selectedEdition.toLowerCase() ||
-                 p.title === selectedEdition
-          );
+          const matchingDbPaper = dbEpapers.find(p => {
+            if (p.date !== targetDate) return false;
+            const titleLower = p.title.toLowerCase();
+            const selectedLower = selectedEdition.toLowerCase();
+            if (titleLower === selectedLower || p.title === selectedEdition) return true;
+            
+            const sec = (p.section || '').toLowerCase();
+            if (sec === `${selectedLower}-main` || sec === selectedLower) return true;
+            if (selectedLower === 'telangana' && sec === 'telangana-main') return true;
+            if (selectedLower === 'ap' && sec === 'ap-main') return true;
+            if (selectedLower === 'hyderabad' && sec === 'hyderabad-main') return true;
+            return false;
+          });
 
           let targetUrl = '';
           if (matchingDbPaper) {

@@ -1,0 +1,191 @@
+const fs = require('fs');
+const path = require('path');
+
+const filePath = path.join(__dirname, 'src', 'app', 'admin', 'page.tsx');
+let content = fs.readFileSync(filePath, 'utf8');
+
+const target = `  // Weather page states`;
+const pos = content.indexOf(target);
+if (pos < 0) {
+  console.log('Error: target not found');
+  process.exit(1);
+}
+
+const insertion = `  // Team Manager states
+  const [teamFormMode, setTeamFormMode] = useState<'list' | 'add-member' | 'edit-member' | 'add-section'>('list');
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [teamSections, setTeamSections] = useState<any[]>([]);
+  const [editingMember, setEditingMember] = useState<any | null>(null);
+
+  // Member fields
+  const [memberName, setMemberName] = useState('');
+  const [memberSlug, setMemberSlug] = useState('');
+  const [memberRole, setMemberRole] = useState('');
+  const [memberBio, setMemberBio] = useState('');
+  const [memberImage, setMemberImage] = useState('');
+  const [memberSectionId, setMemberSectionId] = useState('');
+
+  // Section fields
+  const [sectionName, setSectionName] = useState('');
+  const [sectionSlug, setSectionSlug] = useState('');
+  const [isSavingTeam, setIsSavingTeam] = useState(false);
+
+  const fetchTeamData = () => {
+    fetch('/api/articles?category=team-member&limit=100&t=' + Date.now())
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setTeamMembers(data);
+        }
+      })
+      .catch(err => console.error('Error loading team members:', err));
+
+    fetch('/api/articles?category=team-section&limit=50&t=' + Date.now())
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setTeamSections(data);
+        }
+      })
+      .catch(err => console.error('Error loading team sections:', err));
+  };
+
+  useEffect(() => {
+    if (activeTab === 'team-manager') {
+      fetchTeamData();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  const handleSaveTeamMember = async () => {
+    if (!memberName.trim()) {
+      alert('Member Name is required!');
+      return;
+    }
+    if (!memberSectionId) {
+      alert('Please select a section for this member!');
+      return;
+    }
+
+    setIsSavingTeam(true);
+    const mSlug = memberSlug.trim() || \`member-\${Date.now().toString().slice(-6)}\`;
+    const memberData = {
+      title: memberName.trim(),
+      slug: (teamFormMode === 'edit-member' && editingMember) ? editingMember.slug : mSlug,
+      categorySlug: 'team-member',
+      category: memberRole.trim(),
+      description: memberBio.trim(),
+      body: memberSectionId,
+      image: memberImage || '',
+      author: 'హై టీవీ డెస్క్',
+      isBreaking: false,
+      isTrending: false,
+      isFeatured: false,
+      publishedAt: new Date().toISOString(),
+    };
+
+    try {
+      if (teamFormMode === 'add-member') {
+        const response = await fetch('/api/articles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(memberData),
+        });
+        if (response.ok) {
+          alert('Team member added successfully!');
+        } else {
+          alert('Failed to add team member.');
+        }
+      } else if (teamFormMode === 'edit-member' && editingMember) {
+        const response = await fetch(\`/api/articles/\${editingMember.id}\`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(memberData),
+        });
+        if (response.ok) {
+          alert('Team member updated successfully!');
+        } else {
+          alert('Failed to update team member.');
+        }
+      }
+      setTeamFormMode('list');
+      setEditingMember(null);
+      setMemberName('');
+      setMemberRole('');
+      setMemberBio('');
+      setMemberImage('');
+      setMemberSectionId('');
+      fetchTeamData();
+    } catch (err: any) {
+      console.error(err);
+      alert('Error saving team member: ' + (err.message || String(err)));
+    } finally {
+      setIsSavingTeam(false);
+    }
+  };
+
+  const handleSaveSection = async () => {
+    if (!sectionName.trim()) {
+      alert('Section Name is required!');
+      return;
+    }
+
+    setIsSavingTeam(true);
+    const sSlug = sectionSlug.trim() || \`section-\${Date.now().toString().slice(-6)}\`;
+    const sectionData = {
+      title: sectionName.trim(),
+      slug: sSlug,
+      categorySlug: 'team-section',
+      author: 'హై టీవీ డెస్క్',
+      isBreaking: false,
+      isTrending: false,
+      isFeatured: false,
+      publishedAt: new Date().toISOString(),
+    };
+
+    try {
+      const response = await fetch('/api/articles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sectionData),
+      });
+      if (response.ok) {
+        alert('Section added successfully!');
+        setSectionName('');
+        setSectionSlug('');
+        setTeamFormMode('list');
+        fetchTeamData();
+      } else {
+        alert('Failed to add section.');
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert('Error saving section: ' + (err.message || String(err)));
+    } finally {
+      setIsSavingTeam(false);
+    }
+  };
+
+  const handleDeleteTeamItem = async (id: string, type: 'member' | 'section') => {
+    if (!confirm(\`Are you sure you want to delete this \${type}?\`)) return;
+    try {
+      const response = await fetch(\`/api/articles/\${id}\`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        alert(\`\${type === 'member' ? 'Team member' : 'Section'} deleted successfully!\`);
+        fetchTeamData();
+      } else {
+        alert(\`Failed to delete \${type}.\`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert(\`Error deleting \${type}\`);
+    }
+  };
+
+`;
+
+content = content.slice(0, pos) + insertion + content.slice(pos);
+fs.writeFileSync(filePath, content, 'utf8');
+console.log('SUCCESS: Team Manager states and helper functions added!');

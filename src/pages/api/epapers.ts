@@ -22,6 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where,
         orderBy: { createdAt: 'desc' }
       });
+      res.setHeader('Cache-Control', 'no-store, max-age=0, must-revalidate');
       return res.status(200).json(epapers);
     } catch (error) {
       console.error('Error fetching epapers in Pages API:', error);
