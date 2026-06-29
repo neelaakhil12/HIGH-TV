@@ -13,7 +13,7 @@ export async function GET(
     const filePath = path.join(process.cwd(), 'public', 'uploads', 'epapers', filename);
     
     if (!fs.existsSync(filePath)) {
-      return new NextResponse('File Not Found', { status: 404 });
+      return new NextResponse(`File Not Found. filename=${filename}, path=${filePath}, cwd=${process.cwd()}`, { status: 404 });
     }
     
     const fileBuffer = fs.readFileSync(filePath);
