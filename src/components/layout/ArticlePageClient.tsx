@@ -62,6 +62,63 @@ function FallbackImage({ src, alt, className = '', fill, width, height, ...props
   );
 }
 
+function getCategoryLinkInfo(article: any, englishCategories: Record<string, string>) {
+  const slug = article?.categorySlug || 'national';
+  
+  const categoryMap: Record<string, { label: string; href: string }> = {
+    'latest': { label: 'Breaking News', href: '/category/latest' },
+    'breaking': { label: 'Breaking News', href: '/category/latest' },
+    'health': { label: 'Health News', href: '/category/health' },
+    'national': { label: 'India News', href: '/category/national' },
+    'india': { label: 'India News', href: '/category/national' },
+    'politics': { label: 'Politics News', href: '/category/politics' },
+    'entertainment': { label: 'Entertainment News', href: '/category/entertainment' },
+    'sports': { label: 'Sports News', href: '/category/sports' },
+    'technology': { label: 'Technology News', href: '/category/technology' },
+    'business': { label: 'Business News', href: '/category/business' },
+    'telangana': { label: 'Telangana News', href: '/category/telangana' },
+    'andhra-pradesh': { label: 'Andhra Pradesh News', href: '/category/andhra-pradesh' },
+    'international': { label: 'International News', href: '/category/international' },
+    'doctors-corner': { label: "Doctor's Corner News", href: '/category/doctors-corner' },
+    'viral': { label: 'Viral News', href: '/category/viral' },
+    'viral-stories': { label: 'Viral News', href: '/category/viral' },
+    'lifestyle': { label: 'Lifestyle News', href: '/category/lifestyle' },
+    'women': { label: 'Women News', href: '/category/women' },
+    'webstories': { label: 'Web Stories', href: '/category/webstories' },
+    'photos': { label: 'Photo Gallery', href: '/category/photos' },
+    'shorts': { label: 'Shorts News', href: '/category/shorts' },
+    'sampadakiyam': { label: 'Editorial News', href: '/category/sampadakiyam' },
+    'editorial': { label: 'Editorial News', href: '/category/sampadakiyam' },
+    'adyathmikam': { label: 'Devotional News', href: '/category/adyathmikam' },
+    'devotional': { label: 'Devotional News', href: '/category/adyathmikam' },
+    'antharmadanam': { label: 'Opinion News', href: '/category/antharmadanam' },
+    'rasipalalu': { label: 'Astrology News', href: '/category/rasipalalu' },
+    'vidya': { label: 'Education News', href: '/category/vidya' },
+    'admissions': { label: 'Admissions News', href: '/category/admissions' },
+    'current-affairs': { label: 'Current Affairs News', href: '/category/current-affairs' },
+    'upadi': { label: 'Employment News', href: '/category/upadi' },
+    'notification': { label: 'Notification News', href: '/category/notification' },
+    'citizen-reporter': { label: 'Citizen Reporter News', href: '/category/citizen-reporter' },
+    'weather': { label: 'Weather News', href: '/category/weather' },
+    'live-updates': { label: 'Live Updates', href: '/category/live-updates' }
+  };
+
+  if (categoryMap[slug]) {
+    return categoryMap[slug];
+  }
+
+  const engName = englishCategories?.[slug] || article?.category || slug;
+  const cleanEng = /[^\x00-\x7F]/.test(engName) 
+    ? slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+    : engName;
+    
+  const label = cleanEng.toLowerCase().includes('news') ? cleanEng : `${cleanEng} News`;
+  return {
+    label,
+    href: `/category/${slug}`
+  };
+}
+
 interface ArticlePageClientProps {
   article: any;
   reporter: any;
@@ -221,6 +278,7 @@ export default function ArticlePageClient({
   }, []);
   
   const currentCategorySlug = article.categorySlug;
+  const categoryLinkInfo = getCategoryLinkInfo(article, englishCategories);
 
   const [selectedDistrictSlug, setSelectedDistrictSlug] = useState<string>(
     article.districtSlug || ''
@@ -723,7 +781,7 @@ export default function ArticlePageClient({
 
 
                 {/* Read latest & Follow us strip */}
-                <div className="hidden lg:block border-t border-gray-100 pt-5 mt-6 space-y-2.5 text-gray-800 font-sans text-[15px] select-none leading-normal">
+                <div className="border-t border-gray-100 pt-5 mt-6 space-y-2.5 text-gray-800 font-sans text-[15px] select-none leading-normal">
                   <div className="flex items-start gap-2.5">
                     <span className="flex-shrink-0 bg-[#e60000] text-white rounded-[3px] w-4.5 h-4.5 flex items-center justify-center mt-1 select-none">
                       <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
@@ -732,8 +790,8 @@ export default function ArticlePageClient({
                     </span>
                     <span>
                       Read latest{' '}
-                      <Link href="/category/national" className="text-[#e60000] font-bold hover:underline">
-                        India News
+                      <Link href={categoryLinkInfo.href} className="text-[#e60000] font-bold hover:underline">
+                        {categoryLinkInfo.label}
                       </Link>{' '}
                       and{' '}
                       <Link href="/" className="text-[#e60000] font-bold hover:underline">
