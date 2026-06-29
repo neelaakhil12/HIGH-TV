@@ -795,6 +795,7 @@ export default function EPaperReader() {
           setLoadedPdfUrl(URL.createObjectURL(blob));
         } else {
           const matchingDbPaper = dbEpapers.find(p => {
+            console.log('[EPaper] checking p.date:', p.date, 'vs targetDate:', targetDate, 'title:', p.title, 'section:', p.section);
             if (p.date !== targetDate) return false;
             const titleLower = p.title.toLowerCase();
             const selectedLower = selectedEdition.toLowerCase();
@@ -807,6 +808,7 @@ export default function EPaperReader() {
             if (selectedLower === 'hyderabad' && sec === 'hyderabad-main') return true;
             return false;
           });
+          console.log('[EPaper] dbEpapers count:', dbEpapers.length, 'matchingDbPaper:', matchingDbPaper?.pdfUrl, 'selectedEdition:', selectedEdition, 'targetDate:', targetDate);
 
           if (matchingDbPaper) {
             // Load from the AWS server pdfUrl stored in DB
@@ -2260,7 +2262,7 @@ export default function EPaperReader() {
                       </div>
                       <h3 className="text-lg font-black text-gray-900">E-Paper PDF Not Uploaded Yet</h3>
                       <p className="text-sm text-gray-500 mt-2 max-w-sm">
-                        The Balagam TV Main Edition PDF file for this date is not uploaded to the server yet. Please try again later.
+                        The {selectedEdition} Edition PDF file for {selectedDate} is not uploaded yet. Please upload it from the admin panel.
                       </p>
                       <button
                         onClick={() => setViewMode('dashboard')}
