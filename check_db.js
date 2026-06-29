@@ -15,19 +15,13 @@ const adapter = new PrismaMariaDb(config);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  const articles = await prisma.article.findMany({
-    where: {
-      OR: [
-        { title: { contains: 'నాగరాజు' } },
-        { body: { contains: 'నాగరాజు' } },
-        { title: { contains: 'బలగం' } },
-        { body: { contains: 'బలగం' } },
-      ]
-    }
+  const epapers = await prisma.epaper.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 10
   });
-  console.log('Matches found:', articles.length);
-  for (const art of articles) {
-    console.log(`- ID: ${art.id}\n  Title: ${art.title}\n  Slug: ${art.slug}\n  Body: ${art.body}\n`);
+  console.log('Epaper entries found:', epapers.length);
+  for (const ep of epapers) {
+    console.log(`- ID: ${ep.id}\n  Title: ${ep.title}\n  Date: ${ep.date}\n  Section: ${ep.section}\n  pdfUrl: ${ep.pdfUrl}\n`);
   }
 }
 

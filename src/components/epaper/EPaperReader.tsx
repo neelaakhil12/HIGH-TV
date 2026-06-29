@@ -627,8 +627,11 @@ export default function EPaperReader() {
   // Dynamically load PDF.js client-side
   useEffect(() => {
     import('pdfjs-dist').then((pdfjsModule) => {
-      pdfjsModule.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
-      setPdfjs(pdfjsModule);
+      const pdfjsLib = (pdfjsModule as any).default || pdfjsModule;
+      if (pdfjsLib.GlobalWorkerOptions) {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+      }
+      setPdfjs(pdfjsLib);
     }).catch(err => {
       console.error('Failed to load pdfjs-dist', err);
     });
