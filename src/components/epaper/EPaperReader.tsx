@@ -1725,7 +1725,7 @@ export default function EPaperReader() {
           <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
             <button
               onClick={() => {
-                const url = `https://hightv.in/clip/article-${activeArticleId}`;
+                const url = `https://hightv.in/category/epaper?view=article&date=${activeArticleDate}&edition=${selectedEdition}&page=${activeArticlePageIdx + 1}&articleId=${activeArticleId}`;
                 navigator.clipboard.writeText(url);
                 alert("Article link copied!");
               }}
@@ -2362,7 +2362,7 @@ export default function EPaperReader() {
                         {/* Facebook Share */}
                         <button
                           onClick={() => {
-                            const shareUrl = `https://hightv.in/clip/clip-${Date.now()}`;
+                            const shareUrl = `https://hightv.in/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
                             window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), '_blank');
                           }}
                           className="w-9 h-9 rounded-lg bg-[#3b5998] hover:bg-[#2d4373] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 cursor-pointer"
@@ -2376,7 +2376,7 @@ export default function EPaperReader() {
                         {/* X (Twitter) Share */}
                         <button
                           onClick={() => {
-                            const shareUrl = `https://hightv.in/clip/clip-${Date.now()}`;
+                            const shareUrl = `https://hightv.in/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
                             window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent('HIGH TV News Clip'), '_blank');
                           }}
                           className="w-9 h-9 rounded-lg bg-black hover:bg-gray-950 text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 border border-gray-800 cursor-pointer"
@@ -2390,7 +2390,7 @@ export default function EPaperReader() {
                         {/* Email Share */}
                         <button
                           onClick={() => {
-                            const shareUrl = `https://hightv.in/clip/clip-${Date.now()}`;
+                            const shareUrl = `https://hightv.in/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
                             window.location.href = 'mailto:?subject=HIGH TV News Clip&body=Check out this news clip: ' + shareUrl;
                           }}
                           className="w-9 h-9 rounded-lg bg-[#f97316] hover:bg-[#ea580c] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 cursor-pointer"
@@ -2405,7 +2405,7 @@ export default function EPaperReader() {
                         {/* WhatsApp Share */}
                         <button
                           onClick={() => {
-                            const shareUrl = `https://hightv.in/clip/clip-${Date.now()}`;
+                            const shareUrl = `https://hightv.in/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
                             window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent('Check out this news clip: ' + shareUrl), '_blank');
                           }}
                           className="w-9 h-9 rounded-lg bg-[#22c55e] hover:bg-[#16a34a] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 cursor-pointer"
@@ -2419,7 +2419,7 @@ export default function EPaperReader() {
                         {/* Copy Link */}
                         <button
                           onClick={() => {
-                            const shareUrl = `https://hightv.in/clip/clip-${Date.now()}`;
+                            const shareUrl = `https://hightv.in/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
                             navigator.clipboard.writeText(shareUrl);
                             alert("Clip link copied!");
                           }}
@@ -2718,12 +2718,12 @@ export default function EPaperReader() {
                   <input
                     type="text"
                     readOnly
-                    value={`https://hightv.in/clip/article-${activeArticle.id}`}
+                    value={`https://hightv.in/category/epaper?view=article&date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}&articleId=${activeArticle.id}`}
                     className="flex-1 bg-transparent text-xs font-semibold text-gray-600 outline-none select-all overflow-ellipsis"
                   />
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText(`https://hightv.in/clip/article-${activeArticle.id}`);
+                      navigator.clipboard.writeText(`https://hightv.in/category/epaper?view=article&date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}&articleId=${activeArticle.id}`);
                       setArticleCopied(true);
                       setTimeout(() => setArticleCopied(false), 2000);
                     }}
@@ -2748,7 +2748,7 @@ export default function EPaperReader() {
                 {/* Social Links */}
                 <div className="flex items-center justify-center gap-4 py-1">
                   <a
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://hightv.in/clip/article-${activeArticle.id}`)}`}
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://hightv.in/category/epaper?view=article&date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}&articleId=${activeArticle.id}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full bg-[#1877f2] hover:bg-[#166fe5] text-white flex items-center justify-center transition-all hover:scale-110 shadow"
@@ -2759,7 +2759,7 @@ export default function EPaperReader() {
                   </a>
                   
                   <a
-                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://hightv.in/clip/article-${activeArticle.id}`)}&text=${encodeURIComponent(`Check out this story: ${activeArticle.title}`)}`}
+                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://hightv.in/category/epaper?view=article&date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}&articleId=${activeArticle.id}`)}&text=${encodeURIComponent(`Check out this story: ${activeArticle.title}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full bg-black hover:bg-gray-800 text-white flex items-center justify-center transition-all hover:scale-110 shadow"
@@ -2770,7 +2770,7 @@ export default function EPaperReader() {
                   </a>
 
                   <a
-                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this story: ${activeArticle.title} - https://hightv.in/clip/article-${activeArticle.id}`)}`}
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this story: ${activeArticle.title} - https://hightv.in/category/epaper?view=article&date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}&articleId=${activeArticle.id}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full bg-[#25d366] hover:bg-[#20ba5a] text-white flex items-center justify-center transition-all hover:scale-110 shadow"
@@ -2781,7 +2781,7 @@ export default function EPaperReader() {
                   </a>
 
                   <a
-                    href={`mailto:?subject=${encodeURIComponent(activeArticle.title)}&body=${encodeURIComponent("Check out this story: " + activeArticle.title + " - https://hightv.in/clip/article-" + activeArticle.id)}`}
+                    href={`mailto:?subject=${encodeURIComponent(activeArticle.title)}&body=${encodeURIComponent("Check out this story: " + activeArticle.title + " - https://hightv.in/category/epaper?view=article&date=" + selectedDate + "&edition=" + selectedEdition + "&page=" + (activePageIdx + 1) + "&articleId=" + activeArticle.id)}`}
                     className="w-10 h-10 rounded-full bg-[#ea4335] hover:bg-[#d93025] text-white flex items-center justify-center transition-all hover:scale-110 shadow"
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
