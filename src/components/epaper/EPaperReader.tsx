@@ -572,6 +572,7 @@ export default function EPaperReader() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [generatedClipUrl, setGeneratedClipUrl] = useState('');
   const [clipCopied, setClipCopied] = useState(false);
+  const [isShareUploading, setIsShareUploading] = useState(false);
 
   // Article Reader Modal state
   const [showArticleModal, setShowArticleModal] = useState(false);
@@ -1167,6 +1168,162 @@ export default function EPaperReader() {
       }
     } catch (err) {
       console.error('Error downloading clip:', err);
+    }
+  };
+
+  const getOrUploadClip = async (): Promise<string | null> => {
+    if (!pdfDoc) return null;
+    setIsShareUploading(true);
+    try {
+      const page = await pdfDoc.getPage(activePageIdx + 1);
+      const originalViewport = page.getViewport({ scale: 1.0 });
+      const targetWidth = BASE_WIDTH;
+      
+      const scaleFactor = 2; // high resolution upload
+      const renderScale = (targetWidth / originalViewport.width) * scaleFactor;
+      const viewport = page.getViewport({ scale: renderScale });
+      
+      // Load yellow epaper logo image
+      const logoImg = await new Promise<HTMLImageElement | null>((resolve) => {
+        const img = new Image();
+        img.src = '/epaper-logo.png';
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+      });
+
+      const headerHeightVal = 110;
+      const footerHeightVal = 65;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = clipBox.width * scaleFactor;
+      canvas.height = (clipBox.height + headerHeightVal + footerHeightVal) * scaleFactor;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        setIsShareUploading(false);
+        return null;
+      }
+
+      // 1. Fill white background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // 2. Draw logo (centered at top)
+      if (logoImg) {
+        const logoMaxH = 75 * scaleFactor;
+        const logoMaxW = canvas.width * 0.9;
+        let drawW = logoImg.width;
+        let drawH = logoImg.height;
+        const logoRatio = drawW / drawH;
+        if (drawH > logoMaxH) {
+          drawH = logoMaxH;
+          drawW = drawH * logoRatio;
+        }
+        if (drawW > logoMaxW) {
+          drawW = logoMaxW;
+          drawH = drawW / logoRatio;
+        }
+        const lx = (canvas.width - drawW) / 2;
+        const ly = ((headerHeightVal * scaleFactor) - drawH) / 2;
+        ctx.drawImage(logoImg, lx, ly, drawW, drawH);
+      } else {
+        ctx.fillStyle = '#02599c';
+        ctx.font = `bold ${36 * scaleFactor}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('HIGH TV', canvas.width / 2, (headerHeightVal * scaleFactor) / 2);
+      }
+
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = viewport.width;
+      tempCanvas.height = viewport.height;
+      const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) {
+        setIsShareUploading(false);
+        return null;
+      }
+
+      const renderContext = {
+        canvasContext: tempCtx,
+        viewport: viewport
+      };
+      await page.render(renderContext).promise;
+      
+      // 3. Draw newspaper clip in the middle
+      ctx.drawImage(
+        tempCanvas,
+        clipBox.x * scaleFactor,
+        clipBox.y * scaleFactor,
+        clipBox.width * scaleFactor,
+        clipBox.height * scaleFactor,
+        0,
+        headerHeightVal * scaleFactor,
+        canvas.width,
+        clipBox.height * scaleFactor
+      );
+      
+      // 4. Draw metadata & link at the bottom
+      const currentHost = 'https://hightv.in';
+      const clipLink = `${currentHost}/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
+      
+      const getEditionDisplayName = (editionVal: string) => {
+        const allEditions = [...MAIN_EDITIONS, ...AP_EDITIONS, ...TG_EDITIONS];
+        const found = allEditions.find(ed => ed.value === editionVal);
+        return found ? `${found.nameTe} (${found.name})` : editionVal;
+      };
+
+      const formatDateForClip = (dateStr: string) => {
+        if (!dateStr) return '';
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+          return `${parts[2]}/${parts[1]}/${parts[0]}`; // dd/mm/yyyy
+        }
+        return dateStr;
+      };
+
+      const editionText = getEditionDisplayName(selectedEdition);
+      const pageText = `Page : ${activePageIdx + 1}`;
+      const metadataText = `${formatDateForClip(selectedDate)} | ${editionText} | ${pageText}`;
+
+      const footerStartY = (headerHeightVal + clipBox.height) * scaleFactor;
+      const maxTextW = canvas.width - (20 * scaleFactor);
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const fillTextToFit = (text: string, x: number, y: number, baseSize: number, isBold = true, color = '#1e293b') => {
+        ctx.fillStyle = color;
+        let size = baseSize * scaleFactor;
+        ctx.font = `${isBold ? 'bold ' : ''}${size}px sans-serif`;
+        let measured = ctx.measureText(text).width;
+        while (measured > maxTextW && size > 8 * scaleFactor) {
+          size -= 1;
+          ctx.font = `${isBold ? 'bold ' : ''}${size}px sans-serif`;
+          measured = ctx.measureText(text).width;
+        }
+        ctx.fillText(text, x, y);
+      };
+
+      fillTextToFit(metadataText, canvas.width / 2, footerStartY + (22 * scaleFactor), 13, true, '#1e293b');
+      fillTextToFit(`Source : ${clipLink}`, canvas.width / 2, footerStartY + (44 * scaleFactor), 11, true, '#02599c');
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      
+      const res = await fetch('/api/clips/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: imgData })
+      });
+      const data = await res.json();
+      setIsShareUploading(false);
+      
+      if (data.url) {
+        return `https://hightv.in${data.url}`;
+      }
+      return null;
+    } catch (err) {
+      console.error('Error generating/sharing clip:', err);
+      setIsShareUploading(false);
+      return null;
     }
   };
 
@@ -2260,7 +2417,13 @@ export default function EPaperReader() {
                     ref={imageContainerRef}
                     className="relative shadow-2xl bg-white rounded-lg overflow-hidden select-none border border-gray-300 w-full h-full"
                   >
-                  {/* PDF Page Canvas */}
+                    {isShareUploading && (
+                      <div className="absolute inset-0 bg-slate-900/75 flex flex-col items-center justify-center gap-3 z-[9999] animate-fade-in pointer-events-auto select-none">
+                        <div className="w-10 h-10 border-4 border-t-sky-500 border-slate-700 rounded-full animate-spin" />
+                        <span className="text-xs md:text-sm font-semibold text-slate-200">లింక్ సిద్ధం చేయబడుతోంది... (Generating link...)</span>
+                      </div>
+                    )}
+                    {/* PDF Page Canvas */}
                   {pdfDoc ? (
                     <>
                       <NewspaperPDFPage
@@ -2361,9 +2524,11 @@ export default function EPaperReader() {
                       >
                         {/* Facebook Share */}
                         <button
-                          onClick={() => {
-                            const shareUrl = `https://hightv.in/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
-                            window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), '_blank');
+                          onClick={async () => {
+                            const shareUrl = await getOrUploadClip();
+                            if (shareUrl) {
+                              window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), '_blank');
+                            }
                           }}
                           className="w-9 h-9 rounded-lg bg-[#3b5998] hover:bg-[#2d4373] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 cursor-pointer"
                           title="Share on Facebook"
@@ -2375,9 +2540,11 @@ export default function EPaperReader() {
 
                         {/* X (Twitter) Share */}
                         <button
-                          onClick={() => {
-                            const shareUrl = `https://hightv.in/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
-                            window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent('HIGH TV News Clip'), '_blank');
+                          onClick={async () => {
+                            const shareUrl = await getOrUploadClip();
+                            if (shareUrl) {
+                              window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent('HIGH TV News Clip'), '_blank');
+                            }
                           }}
                           className="w-9 h-9 rounded-lg bg-black hover:bg-gray-950 text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 border border-gray-800 cursor-pointer"
                           title="Share on X"
@@ -2389,9 +2556,11 @@ export default function EPaperReader() {
 
                         {/* Email Share */}
                         <button
-                          onClick={() => {
-                            const shareUrl = `https://hightv.in/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
-                            window.location.href = 'mailto:?subject=HIGH TV News Clip&body=Check out this news clip: ' + shareUrl;
+                          onClick={async () => {
+                            const shareUrl = await getOrUploadClip();
+                            if (shareUrl) {
+                              window.location.href = 'mailto:?subject=HIGH TV News Clip&body=Check out this news clip: ' + shareUrl;
+                            }
                           }}
                           className="w-9 h-9 rounded-lg bg-[#f97316] hover:bg-[#ea580c] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 cursor-pointer"
                           title="Share via Email"
@@ -2404,9 +2573,11 @@ export default function EPaperReader() {
 
                         {/* WhatsApp Share */}
                         <button
-                          onClick={() => {
-                            const shareUrl = `https://hightv.in/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
-                            window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent('Check out this news clip: ' + shareUrl), '_blank');
+                          onClick={async () => {
+                            const shareUrl = await getOrUploadClip();
+                            if (shareUrl) {
+                              window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent('Check out this news clip: ' + shareUrl), '_blank');
+                            }
                           }}
                           className="w-9 h-9 rounded-lg bg-[#22c55e] hover:bg-[#16a34a] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 cursor-pointer"
                           title="Share on WhatsApp"
@@ -2418,10 +2589,12 @@ export default function EPaperReader() {
 
                         {/* Copy Link */}
                         <button
-                          onClick={() => {
-                            const shareUrl = `https://hightv.in/category/epaper?date=${selectedDate}&edition=${selectedEdition}&page=${activePageIdx + 1}`;
-                            navigator.clipboard.writeText(shareUrl);
-                            alert("Clip link copied!");
+                          onClick={async () => {
+                            const shareUrl = await getOrUploadClip();
+                            if (shareUrl) {
+                              navigator.clipboard.writeText(shareUrl);
+                              alert("Clip link copied!");
+                            }
                           }}
                           className="w-9 h-9 rounded-lg bg-[#4b5563] hover:bg-[#374151] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 cursor-pointer"
                           title="Copy Link to Clipboard"
