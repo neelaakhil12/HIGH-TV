@@ -77,10 +77,10 @@ export default async function ClipPage({ params }: ClipPageProps) {
       </header>
 
       {/* Main Content Area */}
-      <main className="w-full max-w-3xl flex-1 px-4 py-8 flex flex-col items-center gap-6">
-        <div className="w-full bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-2xl p-4 md:p-6 flex flex-col items-center">
+      <main className="w-full max-w-xl flex-1 px-4 py-8 flex flex-col items-center gap-6">
+        <div className="w-full bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-2xl p-4 flex flex-col items-center">
           {/* Crop Container */}
-          <div className="relative w-full max-w-2xl bg-white rounded-xl overflow-hidden shadow-inner border border-slate-200">
+          <div className="relative w-full max-w-md bg-white rounded-xl overflow-hidden shadow-inner border border-slate-200">
             <img 
               src={imageUrl} 
               alt="Cropped E-paper Section" 
