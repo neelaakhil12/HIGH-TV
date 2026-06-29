@@ -10932,23 +10932,23 @@ export default function AdminPage() {
 
       {/* ══════════════ VIEW: LIVE UPDATES MANAGER ══════════════ */}
       {activeTab === 'live-updates' && (
-        <div className="space-y-6 text-left">
+        <div className="space-y-4 text-left pt-2 md:pt-4">
           {/* Top Bar Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-600">
-                <Zap className="w-6 h-6" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white border border-slate-200/80 rounded-xl p-3.5 md:p-4 shadow-xs">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 md:w-9 md:h-9 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-600 shrink-0">
+                <Zap className="w-4 h-4 md:w-5 md:h-5" />
               </div>
               <div>
-                <h2 className="text-xl font-black text-slate-800 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                <h2 className="text-sm md:text-base font-black text-slate-800 telugu-text leading-tight" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                   లైవ్ అప్‌డేట్స్ మేనేజర్ (Live Updates Manager)
                 </h2>
-                <p className="text-xs text-slate-500 font-medium">
+                <p className="text-[11px] text-slate-500 font-medium leading-tight mt-0.5">
                   లైవ్ వార్తల రోజువారీ ఫోల్డర్లు మరియు బ్రేకింగ్ పోస్ట్‌లను ఇక్కడ నిర్వర్తించండి
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
                 onClick={() => {
@@ -10961,10 +10961,10 @@ export default function AdminPage() {
                   setListingDate(todayStr);
                   setListingSlug(slug);
                 }}
-                className="bg-amber-500 hover:bg-amber-600 text-white font-black text-xs py-3 px-5 rounded-xl transition-all cursor-pointer shadow-sm flex items-center gap-2"
+                className="bg-amber-500 hover:bg-amber-600 text-white font-black text-xs py-2 px-3.5 rounded-lg transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
               >
-                <Plus className="w-4 h-4" />
-                <span>+ కొత్త రోజువారీ ఫోల్డర్</span>
+                <Plus className="w-3.5 h-3.5" />
+                <span>+ కొత్త ఫోల్డర్</span>
               </button>
             </div>
           </div>
