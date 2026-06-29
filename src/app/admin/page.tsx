@@ -1205,6 +1205,51 @@ export default function AdminPage() {
             });
 
             setCustomNewsList(combined);
+
+            // Fetch slides from API and match them to loaded articles
+            fetch('/api/slides?t=' + Date.now())
+              .then(res => res.ok ? res.json() : [])
+              .then(dbSlides => {
+                if (Array.isArray(dbSlides) && dbSlides.length > 0) {
+                  const matchedSlides = dbSlides.map(slide => {
+                    const article = combined.find((art: any) => {
+                      const expectedLink = `/news/${art.slug}`;
+                      return slide.link === expectedLink || slide.title === art.title;
+                    });
+                    return {
+                      title: slide.title,
+                      image: slide.image,
+                      link: slide.link || '',
+                      articleId: article ? String(article.id) : undefined
+                    };
+                  });
+                  setSliderSlidesList(matchedSlides);
+                  const selectedIds = new Set(matchedSlides.map(s => s.articleId).filter(Boolean) as string[]);
+                  setSliderSelectedIds(selectedIds);
+                }
+              })
+              .catch(err => console.error("Error fetching slides from DB:", err));
+
+            // Fetch Flash News from API
+            fetch('/api/flash-news?t=' + Date.now())
+              .then(res => res.ok ? res.json() : [])
+              .then(dbFlash => {
+                if (Array.isArray(dbFlash) && dbFlash.length > 0) {
+                  setFlashNewsList(dbFlash.map((item: any) => ({ text: item.text, link: item.link })));
+                }
+              })
+              .catch(err => console.error("Error fetching flash news from DB:", err));
+
+            // Fetch Trending News from API
+            fetch('/api/trending-news?t=' + Date.now())
+              .then(res => res.ok ? res.json() : [])
+              .then(dbTrending => {
+                if (Array.isArray(dbTrending) && dbTrending.length > 0) {
+                  setTrendingNewsList(dbTrending.map((item: any) => ({ text: item.text, link: item.link })));
+                }
+              })
+              .catch(err => console.error("Error fetching trending news from DB:", err));
+
           } catch (e) {
             console.error('Error merging local custom articles in admin:', e);
             setCustomNewsList(data);
@@ -2459,26 +2504,36 @@ export default function AdminPage() {
   // Toggle an article in/out of the homepage hero slider
   const toggleSliderArticle = (article: any) => {
     const id = String(article.id);
-    setSliderSelectedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      // Persist selected IDs
-      localStorage.setItem('homepage_slider_article_ids', JSON.stringify([...next]));
-      // Also update sliderSlidesList so HeroSlider picks them up via the existing key
-      const allArticlesForSlider = [...customNewsList]; // customNewsList has latest DB articles
-      const selectedSlides = [...next].map(sid => {
-        const art = allArticlesForSlider.find((a: any) => String(a.id) === sid);
-        if (!art) return null;
-        return { title: art.title, image: art.image, link: `/news/${art.slug}`, articleId: sid };
-      }).filter(Boolean);
-      setSliderSlidesList(selectedSlides);
-      localStorage.setItem('homepage_banner_slides', JSON.stringify(selectedSlides));
-      return next;
-    });
+    const next = new Set(sliderSelectedIds);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    setSliderSelectedIds(next);
+
+    const allArticlesForSlider = [...customNewsList];
+    const selectedSlides = [...next].map(sid => {
+      const art = allArticlesForSlider.find((a: any) => String(a.id) === sid);
+      if (!art) return null;
+      return { title: art.title, image: art.image, link: `/news/${art.slug}`, articleId: sid };
+    }).filter(Boolean) as any[];
+
+    setSliderSlidesList(selectedSlides);
+    localStorage.setItem('homepage_slider_article_ids', JSON.stringify([...next]));
+    localStorage.setItem('homepage_banner_slides', JSON.stringify(selectedSlides));
+
+    fetch('/api/slides', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(selectedSlides)
+    })
+      .then(res => {
+        if (!res.ok) console.error('Failed to save slides in DB');
+      })
+      .catch(err => console.error('Error saving slides in DB:', err));
   };
 
   // Toggle sidebar news pin (trending or breaking) for a category
@@ -3038,6 +3093,18 @@ export default function AdminPage() {
     localStorage.setItem('flash_news_items', JSON.stringify(updated));
     setNewNewsText('');
     setNewNewsLink('');
+
+    fetch('/api/flash-news', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updated)
+    })
+      .then(res => {
+        if (!res.ok) console.error('Failed to update flash news in DB');
+      })
+      .catch(err => console.error('Error updating flash news in DB:', err));
   };
 
   const startEditingFlashNews = (index: number) => {
@@ -3053,6 +3120,18 @@ export default function AdminPage() {
     const updated = flashNewsList.filter((_, index) => index !== idx);
     setFlashNewsList(updated);
     localStorage.setItem('flash_news_items', JSON.stringify(updated));
+
+    fetch('/api/flash-news', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updated)
+    })
+      .then(res => {
+        if (!res.ok) console.error('Failed to update flash news in DB');
+      })
+      .catch(err => console.error('Error updating flash news in DB:', err));
   };
 
   // Add/Edit trending news item
@@ -3076,6 +3155,18 @@ export default function AdminPage() {
     localStorage.setItem('trending_news_items', JSON.stringify(updated));
     setNewTrendingText('');
     setNewTrendingLink('');
+
+    fetch('/api/trending-news', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updated)
+    })
+      .then(res => {
+        if (!res.ok) console.error('Failed to update trending news in DB');
+      })
+      .catch(err => console.error('Error updating trending news in DB:', err));
   };
 
   const startEditingTrendingNews = (index: number) => {
@@ -3091,6 +3182,18 @@ export default function AdminPage() {
     const updated = trendingNewsList.filter((_, index) => index !== idx);
     setTrendingNewsList(updated);
     localStorage.setItem('trending_news_items', JSON.stringify(updated));
+
+    fetch('/api/trending-news', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updated)
+    })
+      .then(res => {
+        if (!res.ok) console.error('Failed to update trending news in DB');
+      })
+      .catch(err => console.error('Error updating trending news in DB:', err));
   };
 
   // Handle Video fields edits
@@ -6916,6 +7019,15 @@ export default function AdminPage() {
                             setSliderSlidesList([]);
                             localStorage.setItem('homepage_slider_article_ids', '[]');
                             localStorage.setItem('homepage_banner_slides', '[]');
+                            fetch('/api/slides', {
+                              method: 'PUT',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify([])
+                            })
+                              .then(res => {
+                                if (!res.ok) console.error('Failed to clear slides in DB');
+                              })
+                              .catch(err => console.error('Error clearing slides in DB:', err));
                           }}
                           className="w-full text-[11px] font-bold text-red-500 hover:text-red-700 py-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
                         >

@@ -30,14 +30,36 @@ export default function FlashNewsBar({ isMobileHeader = false }: { isMobileHeade
   ]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('flash_news_items');
-    if (saved) {
-      try {
-        setFlashNewsItems(JSON.parse(saved));
-      } catch (e) {
-        console.error("Error parsing flash news items", e);
-      }
-    }
+    // Fetch from database API first
+    fetch('/api/flash-news?t=' + Date.now())
+      .then(res => res.ok ? res.json() : [])
+      .then(dbFlash => {
+        if (Array.isArray(dbFlash) && dbFlash.length > 0) {
+          setFlashNewsItems(dbFlash.map((item: any) => ({ text: item.text, link: item.link })));
+        } else {
+          // Fallback to localStorage
+          const saved = localStorage.getItem('flash_news_items');
+          if (saved) {
+            try {
+              setFlashNewsItems(JSON.parse(saved));
+            } catch (e) {
+              console.error("Error parsing flash news items", e);
+            }
+          }
+        }
+      })
+      .catch(err => {
+        console.error("Error loading flash news from DB:", err);
+        const saved = localStorage.getItem('flash_news_items');
+        if (saved) {
+          try {
+            setFlashNewsItems(JSON.parse(saved));
+          } catch (e) {
+            console.error("Error parsing flash news items", e);
+          }
+        }
+      });
+
     const savedLabel = localStorage.getItem('flash_news_label');
     if (savedLabel) {
       setTickerLabel(savedLabel);
