@@ -1046,14 +1046,14 @@ export default function EPaperReader() {
         img.onerror = () => resolve(null);
       });
 
-      const standardClipWidth = 800;
+      const standardClipWidth = 600;
       const canvasWidth = standardClipWidth * scaleFactor;
       
       const cropScale = standardClipWidth / clipBox.width;
       const drawnCropHeight = clipBox.height * cropScale;
       
-      const headerHeightVal = 100;
-      const footerHeightVal = 70;
+      const headerHeightVal = 90;
+      const footerHeightVal = 65;
 
       const canvas = document.createElement('canvas');
       canvas.width = canvasWidth;
@@ -1066,7 +1066,7 @@ export default function EPaperReader() {
         
         // 2. Draw logo (centered at top)
         if (logoImg) {
-          const logoMaxH = 65 * scaleFactor;
+          const logoMaxH = 55 * scaleFactor;
           const logoMaxW = canvas.width * 0.8;
           let drawW = logoImg.width;
           let drawH = logoImg.height;
@@ -1138,7 +1138,7 @@ export default function EPaperReader() {
           const metadataText = `${formatDateForClip(selectedDate)} | ${editionText} | ${pageText}`;
 
           const footerStartY = (headerHeightVal + drawnCropHeight) * scaleFactor;
-          const maxTextW = canvas.width - (40 * scaleFactor);
+          const maxTextW = canvas.width - (50 * scaleFactor);
 
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
@@ -1149,7 +1149,7 @@ export default function EPaperReader() {
             let size = baseSize * scaleFactor;
             ctx.font = `${isBold ? 'bold ' : ''}${size}px sans-serif`;
             let measured = ctx.measureText(text).width;
-            while (measured > maxTextW && size > 8 * scaleFactor) {
+            while (measured > maxTextW && size > 7 * scaleFactor) {
               size -= 1;
               ctx.font = `${isBold ? 'bold ' : ''}${size}px sans-serif`;
               measured = ctx.measureText(text).width;
@@ -1158,10 +1158,10 @@ export default function EPaperReader() {
           };
 
           // Draw metadata line
-          fillTextToFit(metadataText, canvas.width / 2, footerStartY + (22 * scaleFactor), 13, true, '#1e293b');
+          fillTextToFit(metadataText, canvas.width / 2, footerStartY + (20 * scaleFactor), 12, true, '#1e293b');
 
           // Draw link line
-          fillTextToFit(`Source : ${clipLink}`, canvas.width / 2, footerStartY + (44 * scaleFactor), 11, true, '#02599c');
+          fillTextToFit(`Source : ${clipLink}`, canvas.width / 2, footerStartY + (40 * scaleFactor), 10, true, '#02599c');
 
           const imgData = canvas.toDataURL('image/jpeg', 0.95);
           const link = document.createElement('a');
@@ -1197,14 +1197,14 @@ export default function EPaperReader() {
         img.onerror = () => resolve(null);
       });
 
-      const standardClipWidth = 800;
+      const standardClipWidth = 600;
       const canvasWidth = standardClipWidth * scaleFactor;
       
       const cropScale = standardClipWidth / clipBox.width;
       const drawnCropHeight = clipBox.height * cropScale;
       
-      const headerHeightVal = 100;
-      const footerHeightVal = 70;
+      const headerHeightVal = 90;
+      const footerHeightVal = 65;
 
       const canvas = document.createElement('canvas');
       canvas.width = canvasWidth;
@@ -1221,7 +1221,7 @@ export default function EPaperReader() {
       
       // 2. Draw logo (centered at top)
       if (logoImg) {
-        const logoMaxH = 65 * scaleFactor;
+        const logoMaxH = 55 * scaleFactor;
         const logoMaxW = canvas.width * 0.8;
         let drawW = logoImg.width;
         let drawH = logoImg.height;
@@ -1297,7 +1297,7 @@ export default function EPaperReader() {
       const metadataText = `${formatDateForClip(selectedDate)} | ${editionText} | ${pageText}`;
 
       const footerStartY = (headerHeightVal + drawnCropHeight) * scaleFactor;
-      const maxTextW = canvas.width - (40 * scaleFactor);
+      const maxTextW = canvas.width - (50 * scaleFactor);
 
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -1307,7 +1307,7 @@ export default function EPaperReader() {
         let size = baseSize * scaleFactor;
         ctx.font = `${isBold ? 'bold ' : ''}${size}px sans-serif`;
         let measured = ctx.measureText(text).width;
-        while (measured > maxTextW && size > 8 * scaleFactor) {
+        while (measured > maxTextW && size > 7 * scaleFactor) {
           size -= 1;
           ctx.font = `${isBold ? 'bold ' : ''}${size}px sans-serif`;
           measured = ctx.measureText(text).width;
@@ -1315,8 +1315,8 @@ export default function EPaperReader() {
         ctx.fillText(text, x, y);
       };
 
-      fillTextToFit(metadataText, canvas.width / 2, footerStartY + (22 * scaleFactor), 13, true, '#1e293b');
-      fillTextToFit(`Source : ${clipLink}`, canvas.width / 2, footerStartY + (44 * scaleFactor), 11, true, '#02599c');
+      fillTextToFit(metadataText, canvas.width / 2, footerStartY + (20 * scaleFactor), 12, true, '#1e293b');
+      fillTextToFit(`Source : ${clipLink}`, canvas.width / 2, footerStartY + (40 * scaleFactor), 10, true, '#02599c');
 
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
       
