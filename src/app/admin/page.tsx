@@ -10803,134 +10803,9 @@ export default function AdminPage() {
             </div>
           )}
 
-        </div>
-      </main>
+        
 
-      {/* ── Related News Promos Inserter Modal ── */}
-      {showPromoLinkModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white border border-slate-200/80 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col overflow-hidden max-h-[85vh] animate-scale-up text-left">
-            
-            {/* Modal Header */}
-            <div className="bg-[#02599c] text-white p-5 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Tv className="w-5 h-5" />
-                <h3 className="font-black text-sm select-none">Related News Inserter (ఈ వార్తా చదవండి)</h3>
-              </div>
-              <button 
-                type="button" 
-                onClick={() => setShowPromoLinkModal(false)}
-                className="text-white/80 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer transition-colors text-base font-bold"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6 overflow-y-auto flex flex-col gap-5">
-              
-              {/* Option A: Search & Select from Existing Articles */}
-              <div className="flex flex-col gap-2.5">
-                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">Option A: Link Existing Article</h4>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={promoSearchQuery}
-                    onChange={(e) => setPromoSearchQuery(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 focus:border-[#02599c] focus:bg-white rounded-xl pl-10 pr-4 py-3 text-xs outline-none text-slate-900"
-                    placeholder="Search articles by title or category..."
-                  />
-                  <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
-                </div>
-
-                <div className="border border-slate-200 rounded-xl overflow-hidden max-h-[200px] overflow-y-auto divide-y divide-slate-100 bg-slate-50">
-                  {(() => {
-                    const query = promoSearchQuery.trim().toLowerCase();
-                    const list = allArticles.filter(art => 
-                      !query || 
-                      art.title.toLowerCase().includes(query) || 
-                      (art.category && art.category.toLowerCase().includes(query))
-                    );
-
-                    if (list.length === 0) {
-                      return <div className="p-5 text-center text-slate-400 text-xs font-bold">No articles match your query.</div>;
-                    }
-
-                    return list.map((art) => (
-                      <button
-                        key={art.id}
-                        type="button"
-                        onClick={() => handleInsertPromoLink(art.title, art.slug)}
-                        className="w-full text-left p-3.5 hover:bg-[#02599c]/5 active:bg-[#02599c]/10 transition-colors flex items-center justify-between gap-4 cursor-pointer text-xs"
-                      >
-                        <span className="font-bold text-slate-800 line-clamp-2 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                          {art.title}
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-bold bg-white border border-slate-200 rounded px-2 py-0.5 whitespace-nowrap">
-                          {getArticleCategoryName(art)}
-                        </span>
-                      </button>
-                    ));
-                  })()}
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="relative flex py-1 items-center">
-                <div className="flex-grow border-t border-slate-200"></div>
-                <span className="flex-shrink mx-4 text-slate-400 text-[10px] font-black uppercase tracking-widest">or</span>
-                <div className="flex-grow border-t border-slate-200"></div>
-              </div>
-
-              {/* Option B: Enter Custom Title and Slug/URL manually */}
-              <div className="flex flex-col gap-3.5">
-                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">Option B: Custom Promo Box</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Custom Title (Telugu/English)</label>
-                    <input
-                      type="text"
-                      value={customPromoTitle}
-                      onChange={(e) => setCustomPromoTitle(e.target.value)}
-                      placeholder="e.g. ఇక్కడ వేరే వార్త టైటిల్ రాయండి"
-                      className="bg-slate-50 border border-slate-200 focus:border-[#02599c] focus:bg-white rounded-xl px-3 py-2.5 text-xs outline-none text-slate-900 font-bold telugu-text"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Article Slug or Full URL</label>
-                    <input
-                      type="text"
-                      value={customPromoSlug}
-                      onChange={(e) => setCustomPromoSlug(e.target.value)}
-                      placeholder="e.g. ap-heavy-rains-alert-2024"
-                      className="bg-slate-50 border border-slate-200 focus:border-[#02599c] focus:bg-white rounded-xl px-3 py-2.5 text-xs outline-none text-slate-900 font-mono"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  disabled={!customPromoTitle.trim() || !customPromoSlug.trim()}
-                  onClick={() => handleInsertPromoLink(customPromoTitle, customPromoSlug)}
-                  className={`mt-1 font-black text-xs py-3 px-6 rounded-xl transition-all cursor-pointer text-center shadow-md flex items-center justify-center gap-1.5 ${
-                    customPromoTitle.trim() && customPromoSlug.trim()
-                      ? 'bg-rose-600 hover:bg-rose-700 text-white hover:scale-[1.01]'
-                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                  }`}
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Insert Custom Promo Box</span>
-                </button>
-                </div>
-
-            </div>
-
-          </div>
-        </div>
-      )}
-
-      {/* ══════════════ VIEW: LIVE UPDATES MANAGER ══════════════ */}
+{/* ══════════════ VIEW: LIVE UPDATES MANAGER ══════════════ */}
       {activeTab === 'live-updates' && (
         <div className="flex flex-col gap-6 animate-fade-in text-left">
           {/* Header */}
@@ -11432,6 +11307,132 @@ export default function AdminPage() {
         </div>
       )}
 
+</div>
+      </main>
+
+      {/* ── Related News Promos Inserter Modal ── */}
+      {showPromoLinkModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white border border-slate-200/80 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col overflow-hidden max-h-[85vh] animate-scale-up text-left">
+            
+            {/* Modal Header */}
+            <div className="bg-[#02599c] text-white p-5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Tv className="w-5 h-5" />
+                <h3 className="font-black text-sm select-none">Related News Inserter (ఈ వార్తా చదవండి)</h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setShowPromoLinkModal(false)}
+                className="text-white/80 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer transition-colors text-base font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto flex flex-col gap-5">
+              
+              {/* Option A: Search & Select from Existing Articles */}
+              <div className="flex flex-col gap-2.5">
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">Option A: Link Existing Article</h4>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={promoSearchQuery}
+                    onChange={(e) => setPromoSearchQuery(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-[#02599c] focus:bg-white rounded-xl pl-10 pr-4 py-3 text-xs outline-none text-slate-900"
+                    placeholder="Search articles by title or category..."
+                  />
+                  <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-slate-400" />
+                </div>
+
+                <div className="border border-slate-200 rounded-xl overflow-hidden max-h-[200px] overflow-y-auto divide-y divide-slate-100 bg-slate-50">
+                  {(() => {
+                    const query = promoSearchQuery.trim().toLowerCase();
+                    const list = allArticles.filter(art => 
+                      !query || 
+                      art.title.toLowerCase().includes(query) || 
+                      (art.category && art.category.toLowerCase().includes(query))
+                    );
+
+                    if (list.length === 0) {
+                      return <div className="p-5 text-center text-slate-400 text-xs font-bold">No articles match your query.</div>;
+                    }
+
+                    return list.map((art) => (
+                      <button
+                        key={art.id}
+                        type="button"
+                        onClick={() => handleInsertPromoLink(art.title, art.slug)}
+                        className="w-full text-left p-3.5 hover:bg-[#02599c]/5 active:bg-[#02599c]/10 transition-colors flex items-center justify-between gap-4 cursor-pointer text-xs"
+                      >
+                        <span className="font-bold text-slate-800 line-clamp-2 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                          {art.title}
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-bold bg-white border border-slate-200 rounded px-2 py-0.5 whitespace-nowrap">
+                          {getArticleCategoryName(art)}
+                        </span>
+                      </button>
+                    ));
+                  })()}
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="relative flex py-1 items-center">
+                <div className="flex-grow border-t border-slate-200"></div>
+                <span className="flex-shrink mx-4 text-slate-400 text-[10px] font-black uppercase tracking-widest">or</span>
+                <div className="flex-grow border-t border-slate-200"></div>
+              </div>
+
+              {/* Option B: Enter Custom Title and Slug/URL manually */}
+              <div className="flex flex-col gap-3.5">
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">Option B: Custom Promo Box</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Custom Title (Telugu/English)</label>
+                    <input
+                      type="text"
+                      value={customPromoTitle}
+                      onChange={(e) => setCustomPromoTitle(e.target.value)}
+                      placeholder="e.g. ఇక్కడ వేరే వార్త టైటిల్ రాయండి"
+                      className="bg-slate-50 border border-slate-200 focus:border-[#02599c] focus:bg-white rounded-xl px-3 py-2.5 text-xs outline-none text-slate-900 font-bold telugu-text"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Article Slug or Full URL</label>
+                    <input
+                      type="text"
+                      value={customPromoSlug}
+                      onChange={(e) => setCustomPromoSlug(e.target.value)}
+                      placeholder="e.g. ap-heavy-rains-alert-2024"
+                      className="bg-slate-50 border border-slate-200 focus:border-[#02599c] focus:bg-white rounded-xl px-3 py-2.5 text-xs outline-none text-slate-900 font-mono"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={!customPromoTitle.trim() || !customPromoSlug.trim()}
+                  onClick={() => handleInsertPromoLink(customPromoTitle, customPromoSlug)}
+                  className={`mt-1 font-black text-xs py-3 px-6 rounded-xl transition-all cursor-pointer text-center shadow-md flex items-center justify-center gap-1.5 ${
+                    customPromoTitle.trim() && customPromoSlug.trim()
+                      ? 'bg-rose-600 hover:bg-rose-700 text-white hover:scale-[1.01]'
+                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  }`}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Insert Custom Promo Box</span>
+                </button>
+                </div>
+
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* ── Editorial Article Picker Modal ── */}
       {showEditorialArticlePicker && (
