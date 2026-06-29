@@ -154,9 +154,9 @@ export function DynamicCardThumbnail({ pdfjs, pdfUrl }: DynamicCardThumbnailProp
   if (!pdfDoc) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center select-none bg-slate-50">
-        <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-[#cc0000] font-black text-xs mb-1 animate-pulse">B</div>
-        <span className="text-[8px] text-gray-500 font-bold uppercase">Balagam TV</span>
-        <span className="text-[6px] text-red-500 font-bold mt-0.5 uppercase tracking-wider">Loading...</span>
+        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-[#02599c] font-black text-xs mb-1 animate-pulse">📰</div>
+        <span className="text-[8px] text-gray-500 font-bold uppercase">High TV</span>
+        <span className="text-[6px] text-blue-500 font-bold mt-0.5 uppercase tracking-wider">Loading...</span>
       </div>
     );
   }
@@ -174,9 +174,9 @@ export function EditionCardThumbnail({ pdfDoc, cardIdx, totalPages }: EditionCar
   if (!pdfDoc) {
     return (
       <div className="flex flex-col items-center justify-center p-4 text-center select-none">
-        <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-[#cc0000] font-black text-lg mb-2">B</div>
-        <span className="text-[10px] text-gray-500 font-bold uppercase">Balagam TV</span>
-        <span className="text-[8px] text-red-500 font-bold mt-1 uppercase tracking-wider">Loading...</span>
+        <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-[#02599c] font-black text-lg mb-2 animate-pulse">📰</div>
+        <span className="text-[10px] text-gray-500 font-bold uppercase">High TV</span>
+        <span className="text-[8px] text-blue-500 font-bold mt-1 uppercase tracking-wider">Loading...</span>
       </div>
     );
   }
