@@ -294,24 +294,7 @@ export default function HoroscopePageClient() {
                   </h2>
                 </div>
 
-                {/* Right: astrologer */}
-                <div className="flex items-center gap-2">
-                  <span
-                    className="text-xs md:text-sm font-bold text-gray-700 telugu-text text-right hidden sm:block"
-                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                  >
-                    డా॥ శంకరమంచి శివ సిద్ధాంతి
-                  </span>
-                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden border-2 border-white shadow-md flex-shrink-0">
-                    <Image
-                      src="/astrologer_portrait.png"
-                      alt="Astrologer"
-                      width={56}
-                      height={56}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
+
               </div>
 
               {/* Font size controls + social icons */}
