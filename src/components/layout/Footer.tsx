@@ -56,7 +56,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm leading-relaxed mb-5 text-blue-200 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-              హై టీవీ, హై స్వరం మీడియా జనం ఆకాంక్షలకు అనుగుణంగా, అత్యున్నత సాంకేతిక ప్రమాణాలు, నిష్పక్షపాత విశ్లేషణలతో, సమకాలీన రాజకీయాలు, ప్రజా సమస్యలపై వాస్తవాధారిత జర్నలిజానికి విశ్వసనీయ వేదిక. విలువలతో కూడిన మీడియాకు ప్రతిరూపమై ప్రతి సామాన్యుడి గుండె చప్పుడును వినిపించే నిఖార్సైన గళం ఇది
+              హై టీవీ,హై స్వరం మీడియా జనం ఆకాంక్షలకు అనుగుణంగా, అత్యున్నత సాంకేతిక ప్రమాణాలు, నిష్పక్షపాత విశ్లేషణలతో, సమకాలీన రాజకీయాలు, ప్రజా సమస్యలపై వాస్తవాధారిత జర్నలిజానికి విశ్వసనీయ వేదిక. విలువలతో కూడిన మీడియాకు ప్రతిరూపమై ప్రతి సామాన్యుడి గుండె చప్పుడును వినిపించే నిఖార్సైన గళం ఇది
             </p>
             <div className="flex gap-3">
               {[
@@ -105,12 +105,12 @@ export default function Footer() {
               <li className="flex items-start gap-2 text-sm">
                 <MapPin size={15} className="text-hover-yellow mt-0.5 flex-shrink-0" />
                 <span className="telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  జుబ్లీ హిల్స్, రోడ్ నెం. 86, హైదరాబాద్, తెలంగాణ, భారతదేశం - 500096
+                  హైదరాబాద్
                 </span>
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <Phone size={15} className="text-hover-yellow flex-shrink-0" />
-                <a href="tel:+919705999515" className="hover:text-hover-yellow transition-colors">+91-97059-99515</a>
+                <a href="tel:+919705999515" className="hover:text-hover-yellow transition-colors">+91-9705999515</a>
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <Mail size={15} className="text-hover-yellow flex-shrink-0" />
