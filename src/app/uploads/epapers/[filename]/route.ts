@@ -11,7 +11,34 @@ export async function GET(
     
     // Resolve path to the uploaded PDF file in public/uploads/epapers/
     const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'epapers');
-    const filePath = path.join(uploadDir, filename);
+    let filePath = path.join(uploadDir, filename);
+    
+    if (!fs.existsSync(filePath)) {
+      // Fuzzy matching fallback for legacy files with timestamp mismatches
+      const match = filename.match(/^epaper-(\d+)-(.+)\.pdf$/);
+      if (match) {
+        const timestamp = parseInt(match[1]);
+        const slug = match[2];
+        const files = fs.existsSync(uploadDir) ? fs.readdirSync(uploadDir) : [];
+        
+        let foundFile = '';
+        for (const file of files) {
+          const fMatch = file.match(/^epaper-(\d+)-(.+)\.pdf$/);
+          if (fMatch) {
+            const fTimestamp = parseInt(fMatch[1]);
+            const fSlug = fMatch[2];
+            if (fSlug === slug && Math.abs(fTimestamp - timestamp) < 5000) {
+              foundFile = file;
+              break;
+            }
+          }
+        }
+        
+        if (foundFile) {
+          filePath = path.join(uploadDir, foundFile);
+        }
+      }
+    }
     
     if (!fs.existsSync(filePath)) {
       const files = fs.existsSync(uploadDir) ? fs.readdirSync(uploadDir) : [];
