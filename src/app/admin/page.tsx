@@ -3835,6 +3835,18 @@ export default function AdminPage() {
             </div>
           </button>
 
+          <button
+            onClick={() => { setActiveTab('live-updates'); setListingFormMode('none'); setPostFormMode('none'); }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'live-updates' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Zap className="w-4 h-4 text-amber-400" />
+              <span>లైవ్ అప్‌డేట్స్ (Live Updates)</span>
+            </div>
+          </button>
+
 
 
         </nav>
