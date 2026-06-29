@@ -635,7 +635,13 @@ export default function EPaperReader() {
     import('pdfjs-dist').then((pdfjsModule) => {
       const pdfjsLib = (pdfjsModule as any).default || pdfjsModule;
       if (pdfjsLib.GlobalWorkerOptions) {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+        const localVersion = '6.0.227';
+        if (pdfjsLib.version === localVersion) {
+          pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+        } else {
+          console.warn(`[EPaper] Worker version mismatch detected (API: ${pdfjsLib.version}, Local: ${localVersion}). Falling back to CDN worker.`);
+          pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+        }
       }
       setPdfjs(pdfjsLib);
     }).catch(err => {
