@@ -327,6 +327,7 @@ export default function EPaperReader() {
   };
   const [selectedDate, setSelectedDate] = useState(getTodayString());
   const [dbEpapers, setDbEpapers] = useState<any[]>([]);
+  const [isDbEpapersLoading, setIsDbEpapersLoading] = useState(true);
   const [sectionsList, setSectionsList] = useState<{ id: string; name: string; key: string }[]>([]);
 
   useEffect(() => {
@@ -341,14 +342,19 @@ export default function EPaperReader() {
   }, []);
 
   useEffect(() => {
+    setIsDbEpapersLoading(true);
     fetch(`/api/epapers?date=${selectedDate}&t=` + Date.now())
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) {
           setDbEpapers(data);
         }
+        setIsDbEpapersLoading(false);
       })
-      .catch(err => console.error('Error fetching dynamic epapers:', err));
+      .catch(err => {
+        console.error('Error fetching dynamic epapers:', err);
+        setIsDbEpapersLoading(false);
+      });
   }, [selectedDate]);
 
   const getEditionsForSection = (sectionKey: string, staticList: any[]) => {
@@ -748,6 +754,8 @@ export default function EPaperReader() {
   // Load selected date PDF for reader view
   useEffect(() => {
     if (!pdfjs) return;
+    // Wait until dbEpapers has been fetched before deciding what to load
+    if (isDbEpapersLoading) return;
     const loadReaderPdf = async () => {
       try {
         setLoadError(false);
@@ -800,31 +808,17 @@ export default function EPaperReader() {
             return false;
           });
 
-          let targetUrl = '';
           if (matchingDbPaper) {
-            targetUrl = matchingDbPaper.pdfUrl;
+            // Load from the AWS server pdfUrl stored in DB
+            const loadingTask = pdfjs.getDocument({ url: matchingDbPaper.pdfUrl });
+            const pdf = await loadingTask.promise;
+            setPdfDoc(pdf);
+            setTotalPages(pdf.numPages);
+            setLoadedPdfUrl(matchingDbPaper.pdfUrl);
           } else {
-            const url = getPdfUrlForDate(targetDate);
-            let pdfExists = false;
-            try {
-              const checkRes = await fetch(url, { method: 'HEAD' });
-              if (checkRes.ok) {
-                pdfExists = true;
-              } else if (checkRes.status === 405) {
-                const checkResGet = await fetch(url);
-                pdfExists = checkResGet.ok;
-              }
-            } catch {
-              pdfExists = false;
-            }
-            targetUrl = pdfExists ? url : '/BalagamTV_Main_Edition__13_Jun_2026.pdf';
+            // No PDF uploaded for this edition/date — show error
+            setLoadError(true);
           }
-
-          const loadingTask = pdfjs.getDocument({ url: targetUrl });
-          const pdf = await loadingTask.promise;
-          setPdfDoc(pdf);
-          setTotalPages(pdf.numPages);
-          setLoadedPdfUrl(targetUrl);
         }
       } catch (err) {
         console.error('Error loading reader PDF:', err);
@@ -832,7 +826,7 @@ export default function EPaperReader() {
       }
     };
     loadReaderPdf();
-  }, [pdfjs, targetDate, selectedEdition, dbEpapers]);
+  }, [pdfjs, targetDate, selectedEdition, dbEpapers, isDbEpapersLoading]);
 
   // Adjust aspect ratio based on page dimensions
   useEffect(() => {
