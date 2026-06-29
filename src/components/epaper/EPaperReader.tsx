@@ -463,7 +463,9 @@ export default function EPaperReader() {
       isDb: true
     }));
 
-    const finalResult = [...list, ...unmatchedList];
+    const finalResult = [...list, ...unmatchedList].filter(
+      item => item.pdfUrl !== null && item.pdfUrl !== undefined && item.pdfUrl !== ''
+    );
 
     if (!searchQuery) return finalResult;
     return finalResult.filter(ed => 
