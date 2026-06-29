@@ -56,7 +56,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm leading-relaxed mb-5 text-blue-200 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-              హై టీవీ – జెన్-జీ యాజమాన్యంలోని దేశపు మొట్టమొదటి జాతీయ డిజిటల్ వార్తా నెట్వర్క్. అత్యున్నత సాంకేతిక ప్రమాణాలు, నిష్పక్షపాత విశ్లేషణలతో సమకాలీన రాజకీయాలు, ప్రజా సమస్యలపై వాస్తవాధారిత జర్నలిజానికి విశ్వసనీయ వేదిక. విలువలతో కూడిన పత్రికారంగానికి ప్రతిరూపమై ప్రతి సామాన్యుడి గుండె చప్పుడును వినిపించే నిఖార్సైన గళం— హై స్వరం
+              హై టీవీ, హై స్వరం మీడియా జనం ఆకాంక్షలకు అనుగుణంగా, అత్యున్నత సాంకేతిక ప్రమాణాలు, నిష్పక్షపాత విశ్లేషణలతో, సమకాలీన రాజకీయాలు, ప్రజా సమస్యలపై వాస్తవాధారిత జర్నలిజానికి విశ్వసనీయ వేదిక. విలువలతో కూడిన మీడియాకు ప్రతిరూపమై ప్రతి సామాన్యుడి గుండె చప్పుడును వినిపించే నిఖార్సైన గళం ఇది
             </p>
             <div className="flex gap-3">
               {[
@@ -110,7 +110,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <Phone size={15} className="text-hover-yellow flex-shrink-0" />
-                <a href="tel:+919985450001" className="hover:text-hover-yellow transition-colors">+91-99854-50001</a>
+                <a href="tel:+919705999515" className="hover:text-hover-yellow transition-colors">+91-97059-99515</a>
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <Mail size={15} className="text-hover-yellow flex-shrink-0" />
