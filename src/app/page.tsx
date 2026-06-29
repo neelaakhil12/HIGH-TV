@@ -492,7 +492,9 @@ export default function HomePage() {
             {/* Breaking News */}
             <BreakingNewsSection dbArticles={dbArticles} />
 
-            <AdBanner position="rectangle" />
+            <div className="lg:hidden">
+              <AdBanner position="rectangle" />
+            </div>
 
             {/* Web Stories Section */}
             <WebStoriesSection />
