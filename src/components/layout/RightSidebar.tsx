@@ -70,16 +70,18 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
           trendUrl = `/api/articles?category=trending&limit=15`;
         }
 
-        const [trendRes, breakRes] = await Promise.all([
+        const [trendRes, breakRes, settingsRes] = await Promise.all([
           fetch(trendUrl, { signal: controller.signal }),
           fetch(`/api/articles?category=latest&limit=15`, { signal: controller.signal }),
+          fetch(`/api/settings?key=sidebar_category_pins`, { signal: controller.signal }),
         ]);
 
         if (!trendRes.ok || !breakRes.ok) throw new Error('Fetch failed');
 
-        const [allCatArticles, allBreaking] = await Promise.all([
+        const [allCatArticles, allBreaking, settingsData] = await Promise.all([
           trendRes.json(),
           breakRes.json(),
+          settingsRes.ok ? settingsRes.json() : {},
         ]);
 
         // Filter breaking news to this category
@@ -87,13 +89,13 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
           ? allBreaking
           : allBreaking.filter((a: any) => a.categorySlug === apiCat);
 
-        // Load custom sidebar configuration pins from localStorage
+        // Load custom sidebar configuration pins strictly from the database settings
         let pinnedTrendingIds: string[] = [];
         let pinnedBreakingIds: string[] = [];
         try {
-          const savedPins = localStorage.getItem('sidebar_category_pins');
+          const savedPins = settingsData.sidebar_category_pins;
           if (savedPins) {
-            const parsed = JSON.parse(savedPins);
+            const parsed = typeof savedPins === 'string' ? JSON.parse(savedPins) : savedPins;
             // Read from activeCat (e.g. telangana-districts) and also base slug (e.g. telangana)
             const isDistrict = activeCat.startsWith('district-') || activeCat.endsWith('-districts');
             const isHomeInherited = activeCat === 'photos' || activeCat === 'webstories' || activeCat === 'shorts';

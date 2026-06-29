@@ -302,13 +302,18 @@ export default function ArticlePageClient({
   useEffect(() => {
     const loadPinnedNews = async () => {
       try {
-        const savedPins = localStorage.getItem('sidebar_category_pins');
+        const settingsRes = await fetch('/api/settings?key=sidebar_category_pins');
+        let savedPins = null;
+        if (settingsRes.ok) {
+          const dict = await settingsRes.json();
+          savedPins = dict.sidebar_category_pins;
+        }
         if (!savedPins) {
           setDisplayTrending([]);
           setDisplayLatest([]);
           return;
         }
-        const parsed = JSON.parse(savedPins);
+        const parsed = typeof savedPins === 'string' ? JSON.parse(savedPins) : savedPins;
         const catPins = parsed[currentCategorySlug] || { trending: [], breaking: [] };
         // Also check district-specific pins if the article or selection has a districtSlug
         const activeDistrictSlug = selectedDistrictSlug || article.districtSlug;
