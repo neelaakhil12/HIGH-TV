@@ -6414,7 +6414,7 @@ export default function AdminPage() {
                     const report = weatherReports[selectedWeatherCityIndex];
                     return (
                       <div className="space-y-4 animate-fade-in pt-2">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                           <div className="flex flex-col gap-1">
                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Temperature (°C)</label>
                             <input
