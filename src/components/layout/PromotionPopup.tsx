@@ -32,13 +32,21 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
         [selectedOption]: (pollVotes[selectedOption] || 0) + 1
       };
       setPollVotes(updatedVotes);
-      
+
+      // Save vote counts to database (shared across all profiles/users)
       const votesKey = `promo_poll_${id}_votes_data`;
-      localStorage.setItem(votesKey, JSON.stringify({ question: pollQuestion, votes: updatedVotes }));
-      
+      fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          [votesKey]: JSON.stringify({ question: pollQuestion, votes: updatedVotes })
+        }),
+      }).catch(err => console.error('Error saving poll votes:', err));
+
+      // Mark this browser as having voted (per-browser state — localStorage is correct here)
       const hasVotedKey = `promo_poll_${id}_voted_for_${pollQuestion}`;
-      localStorage.setItem(hasVotedKey, 'true');
-      
+      try { localStorage.setItem(hasVotedKey, 'true'); } catch {}
+
       setHasVoted(true);
     }
   };
@@ -54,7 +62,8 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
       `promo_poll_${id}_option_yes`,
       `promo_poll_${id}_option_no`,
       `promo_poll_${id}_option_unsure`,
-      `promo_poll_${id}_options`
+      `promo_poll_${id}_options`,
+      `promo_poll_${id}_votes_data`,
     ];
 
     fetch(`/api/settings?keys=${keys.join(',')}&t=` + Date.now())
@@ -106,39 +115,28 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
         }));
         setPollOptions(mappedOptions);
 
-        // Check if user has voted on this question
+        // Check if this browser has voted (per-browser localStorage — intentional)
         const hasVotedKey = `promo_poll_${id}_voted_for_${activeQuestion}`;
         let userHasVoted = false;
-        try {
-          userHasVoted = localStorage.getItem(hasVotedKey) === 'true';
-        } catch {}
+        try { userHasVoted = localStorage.getItem(hasVotedKey) === 'true'; } catch {}
         setHasVoted(userHasVoted);
 
-        // Load or initialize vote counts
-        const votesKey = `promo_poll_${id}_votes_data`;
-        let savedVotesData: string | null = null;
-        try {
-          savedVotesData = localStorage.getItem(votesKey);
-        } catch {}
+        // Load vote counts from database (shared across all users/profiles)
+        const savedVotesData = getSetting(`promo_poll_${id}_votes_data`);
         let votes: Record<string, number> = {};
-        
-        let parsedData: any = null;
+
         if (savedVotesData) {
           try {
-            parsedData = JSON.parse(savedVotesData);
+            const parsedData = JSON.parse(savedVotesData);
+            if (parsedData && parsedData.question === activeQuestion && parsedData.votes) {
+              votes = parsedData.votes;
+            }
           } catch (e) {}
         }
 
-        if (parsedData && parsedData.question === activeQuestion && userHasVoted) {
-          votes = parsedData.votes;
-        } else {
-          votes = {};
-          mappedOptions.forEach((opt) => {
-            votes[opt.id] = 0;
-          });
-          try {
-            localStorage.setItem(votesKey, JSON.stringify({ question: activeQuestion, votes }));
-          } catch {}
+        // If no valid vote data, initialise zeros
+        if (Object.keys(votes).length === 0) {
+          mappedOptions.forEach((opt) => { votes[opt.id] = 0; });
         }
         setPollVotes(votes);
 
