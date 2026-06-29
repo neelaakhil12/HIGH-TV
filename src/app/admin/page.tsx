@@ -721,6 +721,19 @@ export default function AdminPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
+  useEffect(() => {
+    if (activeTab === 'high-tv-videos') {
+      fetch('/api/latest-videos?t=' + Date.now())
+        .then(res => res.ok ? res.json() : [])
+        .then(dbVideos => {
+          if (Array.isArray(dbVideos)) {
+            setVideosList(dbVideos);
+          }
+        })
+        .catch(err => console.error("Error loading latest videos:", err));
+    }
+  }, [activeTab]);
+
   const handleSaveAd = async () => {
     if (!sidebarAdTitle.trim()) {
       alert('Ad Title is required!');
@@ -1422,6 +1435,15 @@ export default function AdminPage() {
         if (savedSliderIds) {
           try { setSliderSelectedIds(new Set(JSON.parse(savedSliderIds))); } catch {}
         }
+        // Load latest videos from server on mount
+        fetch('/api/latest-videos?t=' + Date.now())
+          .then(res => res.ok ? res.json() : [])
+          .then(dbVideos => {
+            if (Array.isArray(dbVideos)) {
+              setVideosList(dbVideos);
+            }
+          })
+          .catch(err => console.error("Error fetching latest videos:", err));
       })
       .catch(err => console.error("Error loading unified settings:", err));
   }, [isAuthenticated, popupScope, activeAdSpot, refreshCounter]);
