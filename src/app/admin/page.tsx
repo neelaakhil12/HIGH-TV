@@ -10932,41 +10932,34 @@ export default function AdminPage() {
 
       {/* ══════════════ VIEW: LIVE UPDATES MANAGER ══════════════ */}
       {activeTab === 'live-updates' && (
-        <div className="space-y-4 text-left pt-2 md:pt-4">
-          {/* Top Bar Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white border border-slate-200/80 rounded-xl p-3.5 md:p-4 shadow-xs">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 md:w-9 md:h-9 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-600 shrink-0">
-                <Zap className="w-4 h-4 md:w-5 md:h-5" />
-              </div>
-              <div>
-                <h2 className="text-sm md:text-base font-black text-slate-800 telugu-text leading-tight" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  లైవ్ అప్‌డేట్స్ మేనేజర్ (Live Updates Manager)
-                </h2>
-                <p className="text-[11px] text-slate-500 font-medium leading-tight mt-0.5">
-                  లైవ్ వార్తల రోజువారీ ఫోల్డర్లు మరియు బ్రేకింగ్ పోస్ట్‌లను ఇక్కడ నిర్వర్తించండి
-                </p>
-              </div>
+        <div className="flex flex-col gap-6 animate-fade-in text-left">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-black text-slate-800 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                లైవ్ అప్‌డేట్స్ మేనేజర్ (Live Updates Manager)
+              </h2>
+              <p className="text-slate-500 text-xs mt-0.5">
+                లైవ్ వార్తల రోజువారీ ఫోల్డర్లు మరియు బ్రేకింగ్ పోస్ట్‌లను ఇక్కడ నిర్వర్తించండి
+              </p>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  const todayStr = new Date().toLocaleDateString('te-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-                  const slug = Date.now() + '-live';
-                  setListingFormMode('add');
-                  setEditingListing(null);
-                  setListingTitle('హై టీవీ ఫ్లాష్ న్యూస్');
-                  setListingDescription('తాజా లైవ్ అప్‌డేట్స్ మరియు ప్రధాన పరిణామాలు.');
-                  setListingDate(todayStr);
-                  setListingSlug(slug);
-                }}
-                className="bg-amber-500 hover:bg-amber-600 text-white font-black text-xs py-2 px-3.5 rounded-lg transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>+ కొత్త ఫోల్డర్</span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const todayStr = new Date().toLocaleDateString('te-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+                const slug = Date.now() + '-live';
+                setListingFormMode('add');
+                setEditingListing(null);
+                setListingTitle('హై టీవీ ఫ్లాష్ న్యూస్');
+                setListingDescription('తాజా లైవ్ అప్‌డేట్స్ మరియు ప్రధాన పరిణామాలు.');
+                setListingDate(todayStr);
+                setListingSlug(slug);
+              }}
+              className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-3 px-5 rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-2 self-start hover:scale-[1.01]"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ కొత్త రోజువారీ ఫోల్డర్</span>
+            </button>
           </div>
 
           {/* 2-Column Main Workspace */}
