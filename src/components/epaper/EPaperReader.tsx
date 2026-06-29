@@ -730,8 +730,10 @@ export default function EPaperReader() {
             // No PDF in DB for this date — skip loading
             return;
           }
-          const targetUrl = fallbackDbPaper.pdfUrl;
-          const loadingTask = pdfjs.getDocument({ url: targetUrl });
+          const relUrl = fallbackDbPaper.pdfUrl;
+          const targetUrl = relUrl.startsWith('http') ? relUrl : `${window.location.origin}${relUrl}`;
+          console.log('[EPaper] loadDefaultPdf loading URL:', targetUrl);
+          const loadingTask = pdfjs.getDocument({ url: targetUrl, withCredentials: false });
           pdf = await loadingTask.promise;
         }
 
@@ -745,8 +747,8 @@ export default function EPaperReader() {
         } catch (aspectErr) {
           console.error('Error loading default page aspect ratio:', aspectErr);
         }
-      } catch (err) {
-        console.error('Error loading default PDF:', err);
+      } catch (err: any) {
+        console.error('Error loading default PDF:', err?.message || err?.name || JSON.stringify(err) || err);
       }
     };
     loadDefaultPdf();
@@ -816,19 +818,22 @@ export default function EPaperReader() {
           console.log('[EPaper] dbEpapers count:', dbEpapers.length, 'matchingDbPaper:', matchingDbPaper?.pdfUrl, 'selectedEdition:', selectedEdition, 'targetDate:', targetDate);
 
           if (matchingDbPaper) {
-            // Load from the AWS server pdfUrl stored in DB
-            const loadingTask = pdfjs.getDocument({ url: matchingDbPaper.pdfUrl });
+            // Load from the AWS server pdfUrl stored in DB — use absolute URL
+            const relUrl = matchingDbPaper.pdfUrl;
+            const absoluteUrl = relUrl.startsWith('http') ? relUrl : `${window.location.origin}${relUrl}`;
+            console.log('[EPaper] loadReaderPdf loading URL:', absoluteUrl);
+            const loadingTask = pdfjs.getDocument({ url: absoluteUrl, withCredentials: false });
             const pdf = await loadingTask.promise;
             setPdfDoc(pdf);
             setTotalPages(pdf.numPages);
-            setLoadedPdfUrl(matchingDbPaper.pdfUrl);
+            setLoadedPdfUrl(absoluteUrl);
           } else {
             // No PDF uploaded for this edition/date — show error
             setLoadError(true);
           }
         }
-      } catch (err) {
-        console.error('Error loading reader PDF:', err);
+      } catch (err: any) {
+        console.error('Error loading reader PDF:', err?.message || err?.name || JSON.stringify(err) || err);
         setLoadError(true);
       }
     };
