@@ -60,23 +60,10 @@ function SidebarLatestVideos() {
       .then(dbVideos => {
         if (Array.isArray(dbVideos) && dbVideos.length > 0) {
           setVideos(dbVideos);
-        } else {
-          const saved = localStorage.getItem('latest_videos');
-          if (saved) {
-            try {
-              setVideos(JSON.parse(saved));
-            } catch (e) {
-              console.error("Error parsing latest videos", e);
-            }
-          }
         }
       })
       .catch(err => {
         console.error("Error fetching latest videos:", err);
-        try {
-          const saved = localStorage.getItem('latest_videos');
-          if (saved) setVideos(JSON.parse(saved));
-        } catch {}
       });
   }, []);
 
@@ -202,10 +189,6 @@ function LatestNewsFeed() {
         }));
 
         const getMergedList = (staticList: any[], categorySlug?: string) => {
-          const localDeleted = new Set([
-            ...JSON.parse(localStorage.getItem('deleted_news_articles') || '[]'),
-            ...JSON.parse(localStorage.getItem('db_deleted_news_articles') || '[]')
-          ]);
           const dbFiltered = mappedArticles.filter(art => {
             if (categorySlug) {
               return art.categorySlug === categorySlug || (categorySlug === 'latest' && art.isBreaking);
@@ -213,7 +196,7 @@ function LatestNewsFeed() {
             return true;
           });
           const dbIds = new Set(dbFiltered.map(a => a.id));
-          const filteredStatic = staticList.filter(a => !dbIds.has(a.id) && !localDeleted.has(a.id));
+          const filteredStatic = staticList.filter(a => !dbIds.has(a.id));
           return [...dbFiltered, ...filteredStatic];
         };
 
@@ -309,10 +292,6 @@ export default function HomePage() {
         setDbArticles(mappedArticles);
 
         const getMergedList = (staticList: any[], categorySlug?: string) => {
-          const localDeleted = new Set([
-            ...JSON.parse(localStorage.getItem('deleted_news_articles') || '[]'),
-            ...JSON.parse(localStorage.getItem('db_deleted_news_articles') || '[]')
-          ]);
           const dbFiltered = mappedArticles.filter(art => {
             if (categorySlug) {
               return art.categorySlug === categorySlug || (categorySlug === 'latest' && art.isBreaking);
@@ -320,7 +299,7 @@ export default function HomePage() {
             return true;
           });
           const dbIds = new Set(dbFiltered.map(a => a.id));
-          const filteredStatic = staticList.filter(a => !dbIds.has(a.id) && !localDeleted.has(a.id));
+          const filteredStatic = staticList.filter(a => !dbIds.has(a.id));
           return [...dbFiltered, ...filteredStatic];
         };
 

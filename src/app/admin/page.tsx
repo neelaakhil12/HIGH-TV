@@ -4966,8 +4966,17 @@ export default function AdminPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        localStorage.setItem('flash_news_label', flashNewsLabel.trim() || 'Flash News');
-                        alert('Label saved!');
+                        const lbl = flashNewsLabel.trim() || 'Flash News';
+                        fetch('/api/settings', {
+                          method: 'PUT',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ flash_news_label: lbl })
+                        })
+                        .then(() => alert('Label saved to AWS Live Server!'))
+                        .catch(err => {
+                          console.error("Error saving label:", err);
+                          alert('Failed to save label to server.');
+                        });
                       }}
                       className="bg-[#02599c] hover:bg-[#024a82] text-white font-black text-xs py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-sm shrink-0"
                     >
@@ -10344,7 +10353,7 @@ export default function AdminPage() {
                       <span className="text-sm font-black telugu-text truncate" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>{sec.title}</span>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1">
                         <button onClick={(e) => { e.stopPropagation(); setEditorialEditingSection(sec); setEditorialSectionTitle(sec.title); setEditorialSectionSlug(sec.slug); setEditorialFormMode('edit-section'); }} className="p-1 rounded-lg hover:bg-white/20 text-current" title="Edit"><Pencil className="w-3 h-3" /></button>
-                        <button onClick={(e) => { e.stopPropagation(); if (!confirm(`Delete "${sec.title}"? Articles stay in DB.`)) return; const updated = editorialSections.filter(s => s.id !== sec.id); setEditorialSections(updated); localStorage.setItem('editorial_sections_config', JSON.stringify(updated)); if (editorialActiveSection === sec.slug) setEditorialActiveSection(updated[0]?.slug || 'sampadakiyam'); }} className="p-1 rounded-lg hover:bg-red-500/20 text-red-400" title="Delete"><Trash2 className="w-3 h-3" /></button>
+                        <button onClick={(e) => { e.stopPropagation(); if (!confirm(`Delete "${sec.title}"? Articles stay in DB.`)) return; const updated = editorialSections.filter(s => s.id !== sec.id); setEditorialSections(updated); fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ editorial_sections_config: JSON.stringify(updated) }) }).catch(err => console.error("Error deleting editorial section:", err)); if (editorialActiveSection === sec.slug) setEditorialActiveSection(updated[0]?.slug || 'sampadakiyam'); }} className="p-1 rounded-lg hover:bg-red-500/20 text-red-400" title="Delete"><Trash2 className="w-3 h-3" /></button>
                       </div>
                     </div>
                   ))}
@@ -10367,7 +10376,7 @@ export default function AdminPage() {
                         </div>
                       </div>
                       <div className="flex gap-2 mt-4">
-                        <button onClick={() => { if (!editorialSectionTitle.trim() || !editorialSectionSlug.trim()) { alert('Title and Slug required!'); return; } let updated; if (editorialFormMode === 'add-section') { const ns = { id: `sec-${Date.now()}`, title: editorialSectionTitle.trim(), slug: editorialSectionSlug.trim() }; updated = [...editorialSections, ns]; setEditorialActiveSection(ns.slug); } else { updated = editorialSections.map(s => s.id === editorialEditingSection?.id ? { ...s, title: editorialSectionTitle.trim(), slug: editorialSectionSlug.trim() } : s); } setEditorialSections(updated); localStorage.setItem('editorial_sections_config', JSON.stringify(updated)); setEditorialFormMode('none'); setEditorialEditingSection(null); }} className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-5 rounded-xl transition-all cursor-pointer shadow-sm">{editorialFormMode === 'add-section' ? 'Create Section' : 'Save Changes'}</button>
+                        <button onClick={() => { if (!editorialSectionTitle.trim() || !editorialSectionSlug.trim()) { alert('Title and Slug required!'); return; } let updated; if (editorialFormMode === 'add-section') { const ns = { id: `sec-${Date.now()}`, title: editorialSectionTitle.trim(), slug: editorialSectionSlug.trim() }; updated = [...editorialSections, ns]; setEditorialActiveSection(ns.slug); } else { updated = editorialSections.map(s => s.id === editorialEditingSection?.id ? { ...s, title: editorialSectionTitle.trim(), slug: editorialSectionSlug.trim() } : s); } setEditorialSections(updated); fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ editorial_sections_config: JSON.stringify(updated) }) }).catch(err => console.error("Error saving editorial section:", err)); setEditorialFormMode('none'); setEditorialEditingSection(null); }} className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-5 rounded-xl transition-all cursor-pointer shadow-sm">{editorialFormMode === 'add-section' ? 'Create Section' : 'Save Changes'}</button>
                         <button onClick={() => { setEditorialFormMode('none'); setEditorialEditingSection(null); }} className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs py-2.5 px-5 rounded-xl transition-all cursor-pointer">Cancel</button>
                       </div>
                     </div>

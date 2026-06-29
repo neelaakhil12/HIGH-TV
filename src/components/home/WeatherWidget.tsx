@@ -80,22 +80,10 @@ export default function WeatherWidget() {
       .then(res => res.ok ? res.json() : {})
       .then((data: any) => {
         const weatherVal = data.weather_page_reports_data || null;
-        if (weatherVal) {
-          handleResolveWeather(weatherVal);
-        } else {
-          try {
-            handleResolveWeather(localStorage.getItem('weather_page_reports_data'));
-          } catch {
-            handleResolveWeather(null);
-          }
-        }
+        handleResolveWeather(weatherVal);
       })
       .catch(() => {
-        try {
-          handleResolveWeather(localStorage.getItem('weather_page_reports_data'));
-        } catch {
-          handleResolveWeather(null);
-        }
+        handleResolveWeather(null);
       });
   }, []);
 

@@ -374,17 +374,10 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
         const adsVal = data.custom_ads_config || null;
         if (adsVal) {
           adsDataCached = adsVal;
-        } else {
-          try {
-            adsDataCached = localStorage.getItem('custom_ads_config');
-          } catch {}
         }
         handleResolveAd();
       })
       .catch(() => {
-        try {
-          adsDataCached = localStorage.getItem('custom_ads_config');
-        } catch {}
         handleResolveAd();
       });
 

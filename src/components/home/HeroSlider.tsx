@@ -32,21 +32,6 @@ export default function HeroSlider({ dbArticles }: { dbArticles?: any[] }) {
       }
 
       try {
-        const savedSlides = localStorage.getItem('homepage_banner_slides');
-        if (savedSlides) {
-          const parsed = JSON.parse(savedSlides);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setSlides(parsed.map((item: any, index: number) => ({
-              id: `custom-slide-${index}`,
-              title: item.title,
-              image: item.image,
-              link: item.link || '',
-              slug: item.link ? '' : `custom-slide-${index}`
-            })));
-            return;
-          }
-        }
-
         let mergedAll = featuredNews;
         if (dbArticles && Array.isArray(dbArticles)) {
           const dbIds = new Set(dbArticles.map(a => a.id));

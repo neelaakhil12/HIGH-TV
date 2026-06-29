@@ -175,22 +175,24 @@ export default function EditorialPageClient({ allArticles }: { allArticles: Arti
   ]);
 
   React.useEffect(() => {
-    try {
-      const saved = localStorage.getItem('editorial_sections_config');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        const migrated = parsed.map((s: any) => {
-          if (s.slug === 'sampadakiyam' && s.title === 'సంపాదకీయం') {
-            return { ...s, title: 'ఎడిటోరియల్' };
-          }
-          return s;
-        });
-        setSections(migrated);
-        localStorage.setItem('editorial_sections_config', JSON.stringify(migrated));
-      }
-    } catch (e) {
-      console.error('Error loading dynamic editorial sections config:', e);
-    }
+    fetch('/api/settings?key=editorial_sections_config&t=' + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((data: any) => {
+        const saved = data.editorial_sections_config;
+        if (saved) {
+          const parsed = typeof saved === 'string' ? JSON.parse(saved) : saved;
+          const migrated = parsed.map((s: any) => {
+            if (s.slug === 'sampadakiyam' && s.title === 'సంపాదకీయం') {
+              return { ...s, title: 'ఎడిటోరియల్' };
+            }
+            return s;
+          });
+          setSections(migrated);
+        }
+      })
+      .catch(e => {
+        console.error('Error loading dynamic editorial sections config from DB:', e);
+      });
   }, []);
 
   // Helper to filter articles by category (only explicitly added articles show here)

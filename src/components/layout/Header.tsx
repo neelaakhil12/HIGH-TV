@@ -153,28 +153,10 @@ export default function Header() {
       .then(dbTrending => {
         if (Array.isArray(dbTrending) && dbTrending.length > 0) {
           setTrendingItems(dbTrending.map((item: any) => ({ text: item.text, link: item.link })));
-        } else {
-          // Fallback to localStorage
-          const saved = localStorage.getItem('trending_news_items');
-          if (saved) {
-            try {
-              setTrendingItems(JSON.parse(saved));
-            } catch (e) {
-              console.error("Error parsing trending items", e);
-            }
-          }
         }
       })
       .catch(err => {
         console.error("Error loading trending items from DB:", err);
-        const saved = localStorage.getItem('trending_news_items');
-        if (saved) {
-          try {
-            setTrendingItems(JSON.parse(saved));
-          } catch (e) {
-            console.error("Error parsing trending items", e);
-          }
-        }
       });
   }, []);
 

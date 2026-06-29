@@ -128,35 +128,8 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
           missingIds.delete(String(a.id));
         });
 
-        // Load custom and modified articles from localStorage
-        let localCustom: any[] = [];
-        let localModified: Record<string, any> = {};
-        try {
-          localCustom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
-          localModified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
-        } catch (e) {
-          console.error("Error parsing custom/modified articles from localStorage in RightSidebar:", e);
-        }
-        
         // Fetch remaining missing articles in parallel
         const missingArticlesList: any[] = [];
-        // First resolve any missing ids from localStorage custom or modified lists
-        missingIds.forEach(id => {
-          const foundCustom = localCustom.find((art: any) => String(art.id) === String(id));
-          if (foundCustom) {
-            const activeCustom = localModified[foundCustom.id] ? { ...foundCustom, ...localModified[foundCustom.id] } : foundCustom;
-            missingArticlesList.push(activeCustom);
-            missingIds.delete(id);
-          } else {
-            if (localModified[id]) {
-              const staticArt = existingArticles.find((a: any) => String(a.id) === String(id));
-              if (staticArt) {
-                missingArticlesList.push({ ...staticArt, ...localModified[id] });
-                missingIds.delete(id);
-              }
-            }
-          }
-        });
 
         if (missingIds.size > 0) {
           const fetchPromises = Array.from(missingIds).map(async (id) => {
@@ -164,7 +137,7 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
               const res = await fetch(`/api/articles/${id}`, { signal: controller.signal });
               if (res.ok) {
                 const fetched = await res.json();
-                return localModified[id] ? { ...fetched, ...localModified[id] } : fetched;
+                return fetched;
               }
             } catch (err) {
               console.error(`Error fetching pinned article ${id}`, err);

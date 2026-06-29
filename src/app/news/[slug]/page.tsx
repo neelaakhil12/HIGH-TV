@@ -187,7 +187,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           views: true,
           isBreaking: true,
           isTrending: true,
-          isFeatured: true
+          isFeatured: true,
+          body: true
         }
       }),
       prisma.article.findMany({
@@ -205,6 +206,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   // 2. Map database articles and combine with static mock articles
   const mappedDbArticles = dbArticles.map((art) => ({
     ...art,
+    body: art.body || '',
     content: art.body || '',
   }));
 

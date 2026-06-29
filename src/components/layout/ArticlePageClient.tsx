@@ -118,30 +118,7 @@ export default function ArticlePageClient({
 
   const [mediaLibrary, setMediaLibrary] = useState<Record<string, string>>({});
   useEffect(() => {
-    try {
-      setMediaLibrary(JSON.parse(localStorage.getItem('custom_media_library') || '{}'));
-    } catch (e) {
-      console.error('Error loading media library:', e);
-    }
-    // Load pinned district news
-    try {
-      const savedAp = localStorage.getItem('pinned_ap_district_news');
-      if (savedAp) {
-        const parsedAp = JSON.parse(savedAp);
-        if (Array.isArray(parsedAp) && parsedAp.length > 0) {
-          setApNewsList(parsedAp);
-        }
-      }
-      const savedTg = localStorage.getItem('pinned_tg_district_news');
-      if (savedTg) {
-        const parsedTg = JSON.parse(savedTg);
-        if (Array.isArray(parsedTg) && parsedTg.length > 0) {
-          setTgNewsList(parsedTg);
-        }
-      }
-    } catch (e) {
-      console.error('Error loading pinned district news in client:', e);
-    }
+    // District news pins now loaded from DB settings API in the sidebar pins effect below
   }, [apDistrictNews, tgDistrictNews]);
 
   const resolveMediaPlaceholders = (htmlContent: string) => {
@@ -199,31 +176,7 @@ export default function ArticlePageClient({
   const [reporter, setReporter] = useState(initialReporter);
 
   useEffect(() => {
-    try {
-      const pathSegments = window.location.pathname.split('/');
-      const slugFromUrl = decodeURIComponent(pathSegments[pathSegments.length - 1]);
-      
-      const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
-      const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
-      
-      const foundCustom = custom.find((art: any) => art.slug === slugFromUrl);
-      if (foundCustom) {
-        const activeCustom = modified[foundCustom.id] ? { ...foundCustom, ...modified[foundCustom.id] } : foundCustom;
-        setArticle(activeCustom);
-        setReporter({
-          name: formatAuthorName(activeCustom.author || activeCustom.reporter),
-          slug: 'hightv-reporter',
-          avatar: '/logo.png',
-          bio: 'హై టీవీ డెస్క్'
-        });
-      } else if (modified[initialArticle.id]) {
-        setArticle({ ...initialArticle, ...modified[initialArticle.id] });
-      } else {
-        setArticle(initialArticle);
-      }
-    } catch (e) {
-      console.error('Error looking up custom article', e);
-    }
+    setArticle(initialArticle);
   }, [initialArticle]);
 
   useEffect(() => {
@@ -338,42 +291,14 @@ export default function ArticlePageClient({
           if (a) missingIds.delete(String(a.id));
         });
 
-        // Load custom and modified articles from localStorage
-        let localCustom: any[] = [];
-        let localModified: Record<string, any> = {};
-        try {
-          localCustom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
-          localModified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
-        } catch (e) {
-          console.error("Error parsing custom/modified articles from localStorage in ArticlePageClient:", e);
-        }
-
         const fetchedMissing: any[] = [];
-        // First resolve any missing ids from localStorage custom or modified lists
-        missingIds.forEach(id => {
-          const foundCustom = localCustom.find((art: any) => String(art.id) === String(id));
-          if (foundCustom) {
-            const activeCustom = localModified[foundCustom.id] ? { ...foundCustom, ...localModified[foundCustom.id] } : foundCustom;
-            fetchedMissing.push(activeCustom);
-            missingIds.delete(id);
-          } else {
-            if (localModified[id]) {
-              const staticArt = allProps.find((a: any) => String(a.id) === String(id));
-              if (staticArt) {
-                fetchedMissing.push({ ...staticArt, ...localModified[id] });
-                missingIds.delete(id);
-              }
-            }
-          }
-        });
 
         if (missingIds.size > 0) {
           const promises = Array.from(missingIds).map(async (id) => {
             try {
               const res = await fetch(`/api/articles/${id}`);
               if (res.ok) {
-                const fetched = await res.json();
-                return localModified[id] ? { ...fetched, ...localModified[id] } : fetched;
+                return await res.json();
               }
             } catch (e) {
               console.error("Error loading missing pinned article in client:", e);

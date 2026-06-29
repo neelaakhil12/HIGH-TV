@@ -144,21 +144,10 @@ export default function WeatherPageClient({ dbArticles }: WeatherPageClientProps
         if (weatherVal) {
           try {
             setWeatherData(JSON.parse(weatherVal));
-            return;
           } catch {}
         }
-        // Fallback
-        const savedWeather = localStorage.getItem('weather_page_reports_data');
-        if (savedWeather) {
-          try { setWeatherData(JSON.parse(savedWeather)); } catch {}
-        }
       })
-      .catch(() => {
-        try {
-          const savedWeather = localStorage.getItem('weather_page_reports_data');
-          if (savedWeather) setWeatherData(JSON.parse(savedWeather));
-        } catch {}
-      });
+      .catch(() => {});
   }, []);
 
   return (

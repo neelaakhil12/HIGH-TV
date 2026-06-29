@@ -30,25 +30,10 @@ export default function WebStoriesPage() {
             return;
           }
         }
-        // Fallback
-        const saved = localStorage.getItem('custom_web_stories');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setActiveStories([...parsed, ...storiesData]);
-          }
-        }
+        setActiveStories(storiesData);
       })
       .catch(() => {
-        try {
-          const saved = localStorage.getItem('custom_web_stories');
-          if (saved) {
-            const parsed = JSON.parse(saved);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              setActiveStories([...parsed, ...storiesData]);
-            }
-          }
-        } catch {}
+        setActiveStories(storiesData);
       });
   }, []);
 

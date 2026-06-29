@@ -222,22 +222,10 @@ export default function HoroscopePageClient() {
       .then(res => res.ok ? res.json() : {})
       .then((data: any) => {
         const horoscopeVal = data.horoscope_daily_data || null;
-        if (horoscopeVal) {
-          handleResolveHoroscope(horoscopeVal);
-        } else {
-          try {
-            handleResolveHoroscope(localStorage.getItem('horoscope_daily_data'));
-          } catch {
-            handleResolveHoroscope(null);
-          }
-        }
+        handleResolveHoroscope(horoscopeVal);
       })
       .catch(() => {
-        try {
-          handleResolveHoroscope(localStorage.getItem('horoscope_daily_data'));
-        } catch {
-          handleResolveHoroscope(null);
-        }
+        handleResolveHoroscope(null);
       });
   }, []);
 
