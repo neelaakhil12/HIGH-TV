@@ -10,10 +10,31 @@ export async function GET(
     const { filename } = await params;
     
     // Resolve path to the uploaded PDF file in public/uploads/epapers/
-    const filePath = path.join(process.cwd(), 'public', 'uploads', 'epapers', filename);
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'epapers');
+    const filePath = path.join(uploadDir, filename);
     
     if (!fs.existsSync(filePath)) {
-      return new NextResponse(`File Not Found. filename=${filename}, path=${filePath}, cwd=${process.cwd()}`, { status: 404 });
+      const files = fs.existsSync(uploadDir) ? fs.readdirSync(uploadDir) : [];
+      const debugInfo = files.map(f => {
+        return {
+          file: f,
+          lengthMatch: f.length === filename.length,
+          exactMatch: f === filename,
+          fileCharCodes: Array.from(f).map(c => c.charCodeAt(0)),
+          paramCharCodes: Array.from(filename).map(c => c.charCodeAt(0))
+        };
+      });
+      
+      return new NextResponse(JSON.stringify({
+        error: 'File Not Found',
+        filename,
+        path: filePath,
+        cwd: process.cwd(),
+        debugInfo
+      }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
     
     const fileBuffer = fs.readFileSync(filePath);
@@ -25,6 +46,9 @@ export async function GET(
       }
     });
   } catch (error: any) {
-    return new NextResponse(`Error serving file: ${error.message}`, { status: 500 });
+    return new NextResponse(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
