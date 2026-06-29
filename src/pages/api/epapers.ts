@@ -49,7 +49,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           fs.mkdirSync(uploadDir, { recursive: true });
         }
         
-        const cleanTitleSlug = (data.title || 'edition').toLowerCase().replace(/[^a-z0-9]/g, '-').substring(0, 20);
+        const rawSlug = (data.title || 'edition').toLowerCase().replace(/[^a-z0-9]/g, '-');
+        const cleanTitleSlug = (rawSlug.replace(/-+/g, '-').replace(/^-|-$/g, '').substring(0, 20)) || 'edition';
         const fileName = `epaper-${Date.now()}-${cleanTitleSlug}.pdf`;
         const filePath = path.join(uploadDir, fileName);
         
@@ -99,7 +100,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!fs.existsSync(uploadDir)) {
           fs.mkdirSync(uploadDir, { recursive: true });
         }
-        const cleanTitleSlug = (title || 'edition').toLowerCase().replace(/[^a-z0-9]/g, '-').substring(0, 20);
+        const rawSlug = (title || 'edition').toLowerCase().replace(/[^a-z0-9]/g, '-');
+        const cleanTitleSlug = (rawSlug.replace(/-+/g, '-').replace(/^-|-$/g, '').substring(0, 20)) || 'edition';
         const fileName = `epaper-${Date.now()}-${cleanTitleSlug}.pdf`;
         const filePath = path.join(uploadDir, fileName);
         fs.writeFileSync(filePath, buffer);
