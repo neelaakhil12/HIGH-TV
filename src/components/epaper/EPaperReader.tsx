@@ -1046,12 +1046,18 @@ export default function EPaperReader() {
         img.onerror = () => resolve(null);
       });
 
-      const headerHeightVal = 110;
-      const footerHeightVal = 65;
+      const standardClipWidth = 800;
+      const canvasWidth = standardClipWidth * scaleFactor;
+      
+      const cropScale = standardClipWidth / clipBox.width;
+      const drawnCropHeight = clipBox.height * cropScale;
+      
+      const headerHeightVal = 100;
+      const footerHeightVal = 70;
 
       const canvas = document.createElement('canvas');
-      canvas.width = clipBox.width * scaleFactor;
-      canvas.height = (clipBox.height + headerHeightVal + footerHeightVal) * scaleFactor;
+      canvas.width = canvasWidth;
+      canvas.height = (headerHeightVal + drawnCropHeight + footerHeightVal) * scaleFactor;
       const ctx = canvas.getContext('2d');
       if (ctx) {
         // 1. Fill white background
@@ -1060,8 +1066,8 @@ export default function EPaperReader() {
         
         // 2. Draw logo (centered at top)
         if (logoImg) {
-          const logoMaxH = 75 * scaleFactor;
-          const logoMaxW = canvas.width * 0.9;
+          const logoMaxH = 65 * scaleFactor;
+          const logoMaxW = canvas.width * 0.8;
           let drawW = logoImg.width;
           let drawH = logoImg.height;
           const logoRatio = drawW / drawH;
@@ -1095,7 +1101,7 @@ export default function EPaperReader() {
           };
           await page.render(renderContext).promise;
           
-          // 3. Draw newspaper clip in the middle
+          // 3. Draw newspaper clip in the middle (scaled to standard width)
           ctx.drawImage(
             tempCanvas,
             clipBox.x * scaleFactor,
@@ -1104,8 +1110,8 @@ export default function EPaperReader() {
             clipBox.height * scaleFactor,
             0,
             headerHeightVal * scaleFactor,
-            canvas.width,
-            clipBox.height * scaleFactor
+            canvasWidth,
+            drawnCropHeight * scaleFactor
           );
           
           // Enforce production URL path
@@ -1131,8 +1137,8 @@ export default function EPaperReader() {
           const pageText = `Page : ${activePageIdx + 1}`;
           const metadataText = `${formatDateForClip(selectedDate)} | ${editionText} | ${pageText}`;
 
-          const footerStartY = (headerHeightVal + clipBox.height) * scaleFactor;
-          const maxTextW = canvas.width - (20 * scaleFactor);
+          const footerStartY = (headerHeightVal + drawnCropHeight) * scaleFactor;
+          const maxTextW = canvas.width - (40 * scaleFactor);
 
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
@@ -1191,12 +1197,18 @@ export default function EPaperReader() {
         img.onerror = () => resolve(null);
       });
 
-      const headerHeightVal = 110;
-      const footerHeightVal = 65;
+      const standardClipWidth = 800;
+      const canvasWidth = standardClipWidth * scaleFactor;
+      
+      const cropScale = standardClipWidth / clipBox.width;
+      const drawnCropHeight = clipBox.height * cropScale;
+      
+      const headerHeightVal = 100;
+      const footerHeightVal = 70;
 
       const canvas = document.createElement('canvas');
-      canvas.width = clipBox.width * scaleFactor;
-      canvas.height = (clipBox.height + headerHeightVal + footerHeightVal) * scaleFactor;
+      canvas.width = canvasWidth;
+      canvas.height = (headerHeightVal + drawnCropHeight + footerHeightVal) * scaleFactor;
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         setIsShareUploading(false);
@@ -1209,8 +1221,8 @@ export default function EPaperReader() {
       
       // 2. Draw logo (centered at top)
       if (logoImg) {
-        const logoMaxH = 75 * scaleFactor;
-        const logoMaxW = canvas.width * 0.9;
+        const logoMaxH = 65 * scaleFactor;
+        const logoMaxW = canvas.width * 0.8;
         let drawW = logoImg.width;
         let drawH = logoImg.height;
         const logoRatio = drawW / drawH;
@@ -1248,7 +1260,7 @@ export default function EPaperReader() {
       };
       await page.render(renderContext).promise;
       
-      // 3. Draw newspaper clip in the middle
+      // 3. Draw newspaper clip in the middle (scaled to standard width)
       ctx.drawImage(
         tempCanvas,
         clipBox.x * scaleFactor,
@@ -1257,8 +1269,8 @@ export default function EPaperReader() {
         clipBox.height * scaleFactor,
         0,
         headerHeightVal * scaleFactor,
-        canvas.width,
-        clipBox.height * scaleFactor
+        canvasWidth,
+        drawnCropHeight * scaleFactor
       );
       
       // 4. Draw metadata & link at the bottom
@@ -1284,8 +1296,8 @@ export default function EPaperReader() {
       const pageText = `Page : ${activePageIdx + 1}`;
       const metadataText = `${formatDateForClip(selectedDate)} | ${editionText} | ${pageText}`;
 
-      const footerStartY = (headerHeightVal + clipBox.height) * scaleFactor;
-      const maxTextW = canvas.width - (20 * scaleFactor);
+      const footerStartY = (headerHeightVal + drawnCropHeight) * scaleFactor;
+      const maxTextW = canvas.width - (40 * scaleFactor);
 
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
