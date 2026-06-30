@@ -211,6 +211,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           isBreaking: true,
           isTrending: true,
           isFeatured: true,
+          updatedAt: true,
           body: true
         }
       }),
