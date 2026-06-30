@@ -73,9 +73,9 @@ export default function MultiDistrictFeed({
               className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-355"
             />
             {/* Map pin badge */}
-            <div className="absolute top-1.5 left-1.5 bg-[#025390] text-white px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-0.5 shadow-sm">
-              <MapPin size={9} className="text-white flex-shrink-0" />
-              <span className="telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+            <div className="absolute bottom-1.5 left-1.5 bg-white/95 border border-gray-250 px-1.5 py-0.5 rounded shadow-3xs flex items-center gap-1 select-none text-[10px] sm:text-[11px] font-bold">
+              <MapPin size={9} className="text-[#025390] flex-shrink-0" />
+              <span className="text-gray-700 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                 {art.districtName}
               </span>
             </div>
