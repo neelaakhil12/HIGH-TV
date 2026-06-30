@@ -419,26 +419,32 @@ export default function ArticlePageClient({
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
+        hour12: true
       });
       const parts = formatter.formatToParts(d);
-      let day = '', month = '', year = '', hour = '', minute = '';
+      let day = '', month = '', year = '', hour = '', minute = '', dayPeriod = '';
       parts.forEach(p => {
         if (p.type === 'day') day = p.value;
         if (p.type === 'month') month = p.value;
         if (p.type === 'year') year = p.value;
         if (p.type === 'hour') hour = p.value;
         if (p.type === 'minute') minute = p.value;
+        if (p.type === 'dayPeriod') dayPeriod = p.value;
       });
-      return `${day} ${month} ${year} | ${hour}:${minute} IST`;
+      const ampm = dayPeriod ? ` ${dayPeriod.toUpperCase()}` : '';
+      return `${day} ${month} ${year} | ${hour}:${minute}${ampm} IST`;
     } catch (e) {
       const day = d.getDate();
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const month = months[d.getMonth()];
       const year = d.getFullYear();
-      const hours = String(d.getHours()).padStart(2, '0');
+      let hoursNum = d.getHours();
+      const ampm = hoursNum >= 12 ? ' PM' : ' AM';
+      hoursNum = hoursNum % 12;
+      hoursNum = hoursNum ? hoursNum : 12; // the hour '0' should be '12'
+      const hours = String(hoursNum).padStart(2, '0');
       const mins = String(d.getMinutes()).padStart(2, '0');
-      return `${day} ${month} ${year} | ${hours}:${mins} IST`;
+      return `${day} ${month} ${year} | ${hours}:${mins}${ampm} IST`;
     }
   }
 
@@ -450,19 +456,25 @@ export default function ArticlePageClient({
         timeZone: 'Asia/Kolkata',
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
+        hour12: true
       });
       const parts = formatter.formatToParts(d);
-      let hour = '', minute = '';
+      let hour = '', minute = '', dayPeriod = '';
       parts.forEach(p => {
         if (p.type === 'hour') hour = p.value;
         if (p.type === 'minute') minute = p.value;
+        if (p.type === 'dayPeriod') dayPeriod = p.value;
       });
-      return `${hour}:${minute}`;
+      const ampm = dayPeriod ? ` ${dayPeriod.toUpperCase()}` : '';
+      return `${hour}:${minute}${ampm}`;
     } catch (e) {
-      const hours = String(d.getHours()).padStart(2, '0');
+      let hoursNum = d.getHours();
+      const ampm = hoursNum >= 12 ? ' PM' : ' AM';
+      hoursNum = hoursNum % 12;
+      hoursNum = hoursNum ? hoursNum : 12;
+      const hours = String(hoursNum).padStart(2, '0');
       const mins = String(d.getMinutes()).padStart(2, '0');
-      return `${hours}:${mins}`;
+      return `${hours}:${mins}${ampm}`;
     }
   }
 
