@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { resolveArticleImage } from '@/lib/saveBase64Image';
 
 export const dynamic = 'force-dynamic';
 
@@ -81,6 +82,10 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
+    // Convert base64 image to a real file URL so social crawlers can fetch it
+    if (data.image) {
+      data.image = await resolveArticleImage(data.image, data.slug) ?? data.image;
+    }
     const article = await prisma.article.create({ data });
     return NextResponse.json(article, { status: 201 });
   } catch (error: any) {

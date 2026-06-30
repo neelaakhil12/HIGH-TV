@@ -118,9 +118,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
-  const imageUrl = article?.image 
-    ? (article.image.startsWith('http') ? article.image : `https://hightv.in${article.image}`)
-    : 'https://hightv.in/logo.png';
+  // base64 data URIs cannot be fetched by social media crawlers — use a real hosted URL instead
+  const isBase64 = article?.image?.startsWith('data:');
+  const isRelative = article?.image && !article.image.startsWith('http') && !isBase64;
+  const imageUrl = isBase64 || !article?.image
+    ? 'https://hightv.in/og-preview.jpg'
+    : isRelative
+      ? `https://hightv.in${article.image}`
+      : article.image;
 
   const cleanTitle = article?.title ? article.title.replace(/<[^>]*>/g, '') : 'వార్త | హై టీవీ';
   const cleanDesc = article?.description ? article.description.replace(/<[^>]*>/g, '') : '';

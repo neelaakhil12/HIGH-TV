@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { resolveArticleImage } from '@/lib/saveBase64Image';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +44,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     // Remove fields that shouldn't be directly updated
     delete data.id;
     delete data.createdAt;
-
+    // Convert base64 image to real file URL so social crawlers can fetch it
+    if (data.image) {
+      data.image = await resolveArticleImage(data.image, data.slug) ?? data.image;
+    }
     const article = await prisma.article.update({ where: { id }, data });
     return new NextResponse(JSON.stringify(article), {
       status: 200,
