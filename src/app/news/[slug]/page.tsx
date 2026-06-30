@@ -136,11 +136,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title: `${cleanTitle} | హై టీవీ`,
       description: cleanDesc || undefined,
-      url: `https://hightv.in/news/${slug}`,
+      url: `https://hightv.in/news/${encodeURIComponent(decodedSlug)}`,
       siteName: 'హై టీవీ',
       images: [
         {
           url: imageUrl,
+          secureUrl: imageUrl,
           width: 1200,
           height: 630,
           alt: cleanTitle,
