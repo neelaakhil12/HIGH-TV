@@ -220,7 +220,32 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   });
 
   const article = allArticles.find((n) => n.slug === decodedSlug) || allArticles[0];
-  const reporter = getReporterByAuthor(article.author);
+
+  // Find the reporter profile dynamically from the DB first (or fall back to mockData)
+  let reporter: any = null;
+  if (article && article.author) {
+    const dbMembers = await prisma.article.findMany({
+      where: { categorySlug: 'team-member', isDeleted: false }
+    });
+    const dbReporterMember = dbMembers.find(m => 
+      article.author === m.title || 
+      article.author.toLowerCase().includes(m.title.toLowerCase())
+    );
+
+    if (dbReporterMember) {
+      reporter = {
+        name: dbReporterMember.title,
+        slug: dbReporterMember.slug,
+        role: dbReporterMember.category || '',
+        bio: dbReporterMember.description || '',
+        image: dbReporterMember.image || ''
+      };
+    }
+  }
+
+  if (!reporter && article) {
+    reporter = getReporterByAuthor(article.author);
+  }
 
   // Trending for in-text promo links — filtered by article's category first, fall back to all
   const categoryArticles = allArticles.filter(
