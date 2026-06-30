@@ -233,8 +233,22 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     );
 
     if (dbReporterMember) {
+      let sectionTitle = 'హై టీవీ డెస్క్';
+      if (dbReporterMember.body && dbReporterMember.body !== 'desk') {
+        const dbSection = await prisma.article.findFirst({
+          where: {
+            categorySlug: 'team-section',
+            slug: dbReporterMember.body,
+            isDeleted: false
+          }
+        });
+        if (dbSection) {
+          sectionTitle = dbSection.title;
+        }
+      }
+
       reporter = {
-        name: dbReporterMember.title,
+        name: `${sectionTitle} - ${dbReporterMember.title}`,
         slug: dbReporterMember.slug,
         role: dbReporterMember.category || '',
         bio: dbReporterMember.description || '',
