@@ -14,15 +14,23 @@ export const metadata: Metadata = {
 };
 
 export default async function TeamPage() {
-  // Fetch team members and sections from DB
-  const dbMembers = await prisma.article.findMany({
-    where: { categorySlug: 'team-member', isDeleted: false },
-    orderBy: { publishedAt: 'asc' },
-  });
-  const dbSections = await prisma.article.findMany({
-    where: { categorySlug: 'team-section', isDeleted: false },
-    orderBy: { publishedAt: 'asc' },
-  });
+  // Fetch team members, sections and settings from DB
+  const [dbMembers, dbSections, dbSettings] = await Promise.all([
+    prisma.article.findMany({
+      where: { categorySlug: 'team-member', isDeleted: false },
+      orderBy: { publishedAt: 'asc' },
+    }),
+    prisma.article.findMany({
+      where: { categorySlug: 'team-section', isDeleted: false },
+      orderBy: { publishedAt: 'asc' },
+    }),
+    prisma.setting.findMany()
+  ]);
+
+  const settingsMap = new Map(dbSettings.map(s => [s.key, s.value]));
+  const teamBannerBadge = settingsMap.get('team_banner_badge') || 'హై టీవీ బృందం';
+  const teamBannerTitle = settingsMap.get('team_banner_title') || 'మా వార్తా ప్రతినిధులు';
+  const teamBannerDesc = settingsMap.get('team_banner_desc') || 'సమాజంలోని నిజాలను నిర్భయంగా వెలుగులోకి తెచ్చే నిష్పక్షపాత విలేకరులు, నిపుణులైన విశ్లేషకులు మరియు సంపాదక బృందం.';
 
   const sections = dbSections.length > 0 
     ? dbSections.map(s => ({ id: s.slug, name: s.title }))
@@ -101,19 +109,19 @@ export default async function TeamPage() {
               </div>
               <div className="relative z-10 space-y-2">
                 <div className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-xs font-bold text-[#ffb3d1] uppercase tracking-wider telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  <Users size={12} />  హై టీవీ బృందం
+                  <Users size={12} />  {teamBannerBadge}
                 </div>
                 <h1 
                   className="text-2xl md:text-3.5xl font-black telugu-text"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
-                  మా వార్తా ప్రతినిధులు
+                  {teamBannerTitle}
                 </h1>
                 <p 
                   className="text-gray-200 text-xs md:text-sm max-w-xl leading-relaxed telugu-text"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
-                  సమాజంలోని నిజాలను నిర్భయంగా వెలుగులోకి తెచ్చే నిష్పక్షపాత విలేకరులు, నిపుణులైన విశ్లేషకులు మరియు సంపాదక బృందం.
+                  {teamBannerDesc}
                 </p>
               </div>
             </div>
@@ -123,8 +131,8 @@ export default async function TeamPage() {
               const sectionMembers = members.filter(m => m.sectionId === section.id);
               if (sectionMembers.length === 0) return null;
 
-              // Check if we should show image (section is 'reporters' or similar)
-              const showImage = section.id === 'reporters';
+              // Check if we should show image (every section shows image except HighTV Desk 'desk')
+              const showImage = section.id !== 'desk';
 
               return (
                 <div key={section.id} className="space-y-4 mb-10 text-left">
@@ -160,9 +168,25 @@ export default async function TeamPage() {
                               <p className="text-xs font-bold text-[#0b2545] uppercase tracking-wider">{profile.role}</p>
                             </div>
                             <p className="text-gray-600 text-xs md:text-sm leading-relaxed telugu-text line-clamp-2" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>{profile.bio}</p>
-                            <Link href={`/reporter/${profile.slug}`} className="inline-flex items-center gap-1.5 text-xs font-extrabold text-brand-blue hover:text-[#0b2545] transition-colors group/btn telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                              వార్తలు చూడండి <ArrowRight size={12} className="transition-transform group-hover/btn:translate-x-1 duration-200" />
-                            </Link>
+                            
+                            {articlesByReporter[profile.slug]?.length > 0 && (
+                              <div className="space-y-1 border-t border-gray-100 pt-2 w-full text-left">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">రాసిన వార్తలు (Latest News):</span>
+                                <div className="flex flex-col gap-1">
+                                  {articlesByReporter[profile.slug].slice(0, 3).map((art, idx) => (
+                                    <Link key={idx} href={`/news/${art.slug}`} className="text-[12px] font-bold text-brand-blue hover:underline line-clamp-1 flex items-center gap-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                      <span className="text-gray-300">•</span> {art.title}
+                                    </Link>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="pt-1">
+                              <Link href={`/reporter/${profile.slug}`} className="inline-flex items-center gap-1.5 text-xs font-extrabold text-brand-blue hover:text-[#0b2545] transition-colors group/btn telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                వార్తలు చూడండి <ArrowRight size={12} className="transition-transform group-hover/btn:translate-x-1 duration-200" />
+                              </Link>
+                            </div>
                           </div>
                         </div>
                       ))}

@@ -830,6 +830,12 @@ export default function AdminPage() {
   const [sectionSlug, setSectionSlug] = useState('');
   const [isSavingTeam, setIsSavingTeam] = useState(false);
 
+  // Team Banner States
+  const [teamBannerBadge, setTeamBannerBadge] = useState('హై టీవీ బృందం');
+  const [teamBannerTitle, setTeamBannerTitle] = useState('మా వార్తా ప్రతినిధులు');
+  const [teamBannerDesc, setTeamBannerDesc] = useState('సమాజంలోని నిజాలను నిర్భయంగా వెలుగులోకి తెచ్చే నిష్పక్షపాత విలేకరులు, నిపుణులైన విశ్లేషకులు మరియు సంపాదక బృందం.');
+  const [isSavingTeamBanner, setIsSavingTeamBanner] = useState(false);
+
   const fetchTeamData = () => {
     fetch('/api/articles?category=team-member&limit=100&t=' + Date.now())
       .then(res => res.json())
@@ -848,6 +854,42 @@ export default function AdminPage() {
         }
       })
       .catch(err => console.error('Error loading team sections:', err));
+
+    fetch('/api/settings?t=' + Date.now())
+      .then(res => res.ok ? res.json() : {})
+      .then((dbSettings: any) => {
+        if (dbSettings) {
+          setTeamBannerBadge(dbSettings['team_banner_badge'] || 'హై టీవీ బృందం');
+          setTeamBannerTitle(dbSettings['team_banner_title'] || 'మా వార్తా ప్రతినిధులు');
+          setTeamBannerDesc(dbSettings['team_banner_desc'] || 'సమాజంలోని నిజాలను నిర్భయంగా వెలుగులోకి తెచ్చే నిష్పక్షపాత విలేకరులు, నిపుణులైన విశ్లేషకులు మరియు సంపాదక బృందం.');
+        }
+      })
+      .catch(err => console.error('Error loading team banner settings:', err));
+  };
+
+  const handleSaveTeamBanner = async () => {
+    setIsSavingTeamBanner(true);
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          team_banner_badge: teamBannerBadge,
+          team_banner_title: teamBannerTitle,
+          team_banner_desc: teamBannerDesc,
+        }),
+      });
+      if (response.ok) {
+        alert('Team banner settings saved successfully!');
+      } else {
+        alert('Failed to save team banner settings.');
+      }
+    } catch (err: any) {
+      console.error('Error saving team banner settings:', err);
+      alert('Error saving team banner settings: ' + (err.message || String(err)));
+    } finally {
+      setIsSavingTeamBanner(false);
+    }
   };
 
   useEffect(() => {
@@ -9807,6 +9849,63 @@ export default function AdminPage() {
               {/* LIST MODE */}
               {teamFormMode === 'list' && (
                 <div className="flex flex-col gap-8">
+                  {/* Team Banner Editor Card */}
+                  <div className="bg-white border border-slate-200/60 rounded-3xl p-6 flex flex-col gap-4 shadow-sm text-left">
+                    <h3 className="text-base font-black text-slate-800 font-sans border-b border-slate-100 pb-2 flex items-center gap-2">
+                      <span>మా టీమ్ బ్యానర్ వివరాలు (Edit Team Page Banner)</span>
+                    </h3>
+                    <form onSubmit={(e) => { e.preventDefault(); handleSaveTeamBanner(); }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Badge Text */}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">చిన్న బ్యాడ్జ్ టెక్స్ట్ (Small Badge Text)</label>
+                        <input
+                          type="text"
+                          value={teamBannerBadge}
+                          onChange={(e) => setTeamBannerBadge(e.target.value)}
+                          placeholder="హై టీవీ బృందం"
+                          className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        />
+                      </div>
+                      
+                      {/* Banner Title */}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">ప్రధాన శీర్షిక (Banner Title)</label>
+                        <input
+                          type="text"
+                          value={teamBannerTitle}
+                          onChange={(e) => setTeamBannerTitle(e.target.value)}
+                          placeholder="మా వార్తా ప్రతినిధులు"
+                          className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        />
+                      </div>
+
+                      {/* Banner Description */}
+                      <div className="flex flex-col gap-1 md:col-span-2">
+                        <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">వివరణ టెక్స్ట్ (Banner Description)</label>
+                        <textarea
+                          value={teamBannerDesc}
+                          onChange={(e) => setTeamBannerDesc(e.target.value)}
+                          placeholder="సమాజంలోని నిజాలను నిర్భయంగా వెలుగులోకి తెచ్చే నిష్పక్షపాత విలేకరులు..."
+                          rows={2}
+                          className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold resize-none"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        />
+                      </div>
+
+                      {/* Submit */}
+                      <div className="md:col-span-2">
+                        <button
+                          type="submit"
+                          disabled={isSavingTeamBanner}
+                          className="bg-rose-600 hover:bg-rose-700 disabled:bg-slate-300 text-white font-black text-xs py-2 px-4 rounded-xl transition-colors shadow-sm cursor-pointer"
+                        >
+                          {isSavingTeamBanner ? 'సేవ్ అవుతోంది...' : 'బ్యానర్ వివరాలు సేవ్ చేయండి (Save Banner)'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
                   {/* Load dynamic sections or defaults */}
                   {(() => {
                     const sections = teamSections.length > 0 
@@ -10001,7 +10100,7 @@ export default function AdminPage() {
                     </div>
 
                     {/* Image Upload */}
-                    {memberSectionId === 'reporters' && (
+                    {memberSectionId !== 'desk' && (
                       <div className="flex flex-col gap-2 bg-slate-50 border border-slate-200/50 rounded-2xl p-4">
                         <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide flex items-center gap-1">
                           <ImageIcon className="w-3.5 h-3.5 text-slate-500" /> ప్రొఫైల్ ఫోటో (Profile Photo)
