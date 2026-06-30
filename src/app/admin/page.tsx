@@ -5009,28 +5009,21 @@ export default function AdminPage() {
                       </div>
                     )}
 
+                    {/* Published Date (Auto-managed) */}
                     <div className="flex flex-col gap-1 md:col-span-2">
                       <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest flex items-center gap-2">
                         Publish Date &amp; Time
-                        {newsViewMode === 'add' && (
-                          <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full normal-case tracking-normal">
-                            Auto
-                          </span>
-                        )}
+                        <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full normal-case tracking-normal">
+                          Auto
+                        </span>
                       </label>
-                      {newsViewMode === 'add' ? (
-                        <div className="bg-slate-100 border border-slate-200/60 rounded-xl px-4 py-3 text-xs text-slate-500 flex items-center gap-2">
+                      <div className="bg-slate-100 border border-slate-200/60 rounded-xl px-4 py-3 text-xs text-slate-500 flex items-center gap-2 select-none">
+                        {newsViewMode === 'add' ? (
                           <span>Auto-set to current time when published</span>
-                        </div>
-                      ) : (
-                        <input
-                          type="datetime-local"
-                          required
-                          value={newsPublishedDate}
-                          onChange={(e) => setNewsPublishedDate(e.target.value)}
-                          className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800"
-                        />
-                      )}
+                        ) : (
+                          <span>Keeps original publish time (Updated time will auto-update to edited time)</span>
+                        )}
+                      </div>
                     </div>
                   </div>
 

@@ -874,6 +874,16 @@ export default function ArticlePageClient({
                     </span>
                   </div>
                 </div>
+
+                {/* Published & Updated Date/Time Box */}
+                <div className="border-t border-gray-100 pt-4 mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-bold text-gray-500 font-sans select-none">
+                  <div>
+                    <span className="text-gray-400">Published:</span> {formatDate(article.publishedAt)}
+                  </div>
+                  <div>
+                    <span className="text-gray-400">Updated:</span> {formatDate(article.updatedAt || article.publishedAt)}
+                  </div>
+                </div>
               </div>
 
 

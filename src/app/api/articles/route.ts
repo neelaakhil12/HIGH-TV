@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
       category: true,
       author: true,
       publishedAt: true,
+      updatedAt: true,
       description: true,
       image: true,
       views: true,

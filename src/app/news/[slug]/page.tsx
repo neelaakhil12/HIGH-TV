@@ -208,6 +208,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     ...art,
     body: art.body || '',
     content: art.body || '',
+    publishedAt: art.publishedAt instanceof Date ? art.publishedAt.toISOString() : art.publishedAt,
+    updatedAt: art.updatedAt instanceof Date ? art.updatedAt.toISOString() : art.updatedAt,
   }));
 
   const filteredAllNews = allNews.filter(art => !deletedIds.has(art.id) && !deletedSlugs.has(art.slug));
