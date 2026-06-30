@@ -362,15 +362,65 @@ body {
 }
 /* Telugu Override: +0.2 Line Height and reduced Font Size to prevent overflow */
 .article-body.telugu-text {
-  font-size: 14.5px !important;
+  font-size: 14.5px;
   line-height: 1.85;
 }
 @media (min-width: 768px) {
   .article-body.telugu-text {
-    font-size: 16.5px !important;
+    font-size: 16.5px;
     line-height: 1.85;
   }
 }
+
+/* Rich Text Content Formatting for Article and Live Updates Body */
+.article-body h1 {
+  font-size: 1.8rem !important;
+  font-weight: 800 !important;
+  margin: 20px 0 10px !important;
+  color: inherit !important;
+}
+.article-body h2 {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  margin: 18px 0 8px !important;
+  color: inherit !important;
+}
+.article-body h3 {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  margin: 16px 0 6px !important;
+  color: inherit !important;
+}
+.article-body p {
+  margin-bottom: 8px !important;
+  line-height: 1.85 !important;
+}
+.article-body ul {
+  list-style-type: disc !important;
+  padding-left: 24px !important;
+  margin: 12px 0 !important;
+}
+.article-body ol {
+  list-style-type: decimal !important;
+  padding-left: 24px !important;
+  margin: 12px 0 !important;
+}
+.article-body li {
+  margin-bottom: 6px !important;
+}
+.article-body a {
+  color: #02599c !important;
+  text-decoration: underline !important;
+  font-weight: bold !important;
+}
+
+/* Ensure inline font sizes are strictly honored */
+.article-body font[size="1"], .article-body font[size="2"] { font-size: 12px !important; }
+.article-body font[size="3"] { font-size: 14px !important; }
+.article-body font[size="4"] { font-size: 16px !important; }
+.article-body font[size="5"] { font-size: 18px !important; }
+.article-body font[size="6"] { font-size: 20px !important; }
+.article-body font[size="7"] { font-size: 24px !important; }
 
 /* Force line wrapping and prevent overflow inside article body (handles copy-pasted inline styles) */
 .article-body,

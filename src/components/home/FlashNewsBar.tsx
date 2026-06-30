@@ -44,7 +44,7 @@ export default function FlashNewsBar({ isMobileHeader = false }: { isMobileHeade
 
     // Fetch ticker label from database settings
     fetch('/api/settings?key=flash_news_label&t=' + Date.now())
-      .then(res => res.ok ? res.json() : {})
+      .then(res => res.ok ? res.json() : ({} as any))
       .then(data => {
         if (data.flash_news_label) {
           setTickerLabel(data.flash_news_label);

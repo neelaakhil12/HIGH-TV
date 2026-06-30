@@ -39,187 +39,6 @@ interface ListingItem {
   slug: string;
 }
 
-const listingItems: ListingItem[] = [
-  {
-    id: 'list-1',
-    title: 'హై టీవీ ఫ్లాష్ న్యూస్',
-    description: 'ప్రపంచ వ్యాప్తంగా జరిగే వివిధ సంఘటనల అప్‌డేట్స్‌ను ఎప్పటికప్పుడు ఇక్కడ చదవండి..',
-    date: '21 జూన్ 2026',
-    slug: '21st-june-2026'
-  },
-  {
-    id: 'list-2',
-    title: 'హై టీవీ ఫ్లాష్ న్యూస్',
-    description: '20 జూన్ 2026 నాటి ఏపీ, తెలంగాణ మరియు జాతీయ అంతర్జాతీయ రాజకీయ పరిణామాల లైవ్ అప్‌డేట్స్.',
-    date: '20 జూన్ 2026',
-    slug: '20th-june-2026'
-  },
-  {
-    id: 'list-3',
-    title: 'హై టీవీ ఫ్లాష్ న్యూస్',
-    description: '19 జూన్ 2026 నాటి ప్రధాన క్రీడా వార్తలు, రాజకీయ పరిణామాలు మరియు ముఖ్యాంశాలు.',
-    date: '19 జూన్ 2026',
-    slug: '19th-june-2026'
-  },
-  {
-    id: 'list-4',
-    title: 'హై టీవీ ఫ్లాష్ న్యూస్',
-    description: '18 జూన్ 2026 నాటి వివిధ వర్గాల తాజా సమాచారం, స్థానిక మరియు అంతర్జాతీయ వార్తలు.',
-    date: '18 జూన్ 2026',
-    slug: '18th-june-2026'
-  }
-];
-
-const initialLiveUpdates: LiveUpdateItem[] = [
-  {
-    id: 'lu-1',
-    timestamp: 'Jun 21, 2026 13:18 IST',
-    timeOnly: '13:18',
-    title: 'సీఎం రేవంత్‌రెడ్డికి టీబీజేపీ చీఫ్ రాంచందర్‌రావు లేఖ',
-    category: 'telangana',
-    isImportant: true,
-    bullets: [
-      'నెరవేరని కాంగ్రెస్ గ్యారెంటీలపై వినతిపత్రం ఇచ్చేందుకు రాహుల్ అపాయింట్‌మెంట్ ఇప్పించాలని కోరుతూ లేఖ.',
-      'రాహుల్ అపాయింట్‌మెంట్ కల్పించడంలో టీకాంగ్రెస్ విఫలమైతే అది తెలంగాణ ప్రజలకు మీరు చేసిన ద్రోహమని స్పష్టమవుతుంది: రాంచందర్‌రావు.',
-      'హామీల అమలులో కాంగ్రెస్ విఫలమైంది: రాంచందర్‌రావు.',
-      'ప్రభుత్వంపై అన్ని వర్గాల్లో తీవ్ర అసంతృప్తి ఉంది: రాంచందర్‌రావు.'
-    ]
-  },
-  {
-    id: 'lu-2',
-    timestamp: 'Jun 21, 2026 12:58 IST',
-    timeOnly: '12:58',
-    title: 'కామారెడ్డి: అంతర్రాష్ట్ర గంజాయి ముఠా అరెస్ట్',
-    category: 'telangana',
-    bullets: [
-      'రూ.1.93కోట్ల విలువైన 387 కిలోల గంజాయి సీజ్.',
-      'ముగ్గురు అరెస్ట్, వాహనం, 2 ఫోన్లు స్వాధీనం.',
-      'నిందితులు కరీముల్లా, సుభాష్‌, రహీం నిజామాబాద్ వాసులు.',
-      'ఒడిశా నుంచి మహారాష్ట్రకు గంజాయి తరలిస్తున్న నిందితులు.'
-    ]
-  },
-  {
-    id: 'lu-3',
-    timestamp: 'Jun 21, 2026 12:29 IST',
-    timeOnly: '12:29',
-    title: 'విజయవాడ: సీఐ నాగరాజు నివాసానికి భారీగా వచ్చిన మద్దతుదారులు',
-    category: 'ap',
-    bullets: [
-      'సీఐ నాగరాజుపై చర్యలు తీసుకోవద్దని నిరసన.',
-      'నాగరాజు వల్లే అసాంఘిక కార్యకలాపాలకు బ్రేక్ పడిందంటున్న మద్దతుదారులు.'
-    ]
-  },
-  {
-    id: 'lu-4',
-    timestamp: 'Jun 21, 2026 11:37 IST',
-    timeOnly: '11:37',
-    title: 'హైదరాబాద్: తన నామినేషన్ తిరస్కరణపై స్పందించిన మీనాక్షి',
-    category: 'telangana',
-    bullets: [
-      'నామినేషన్ తిరస్కరణ అంశంపై మాట్లాడాలని నాకు ఉంది: మీనాక్షి.',
-      'ఎన్నికల కమిషన్ చేసిన దుర్మార్గాన్ని తప్పకుండా మాట్లాడుతాను: మీనాక్షి.',
-      'సమయం తీసుకుని తప్పకుండా మాట్లాడుతాను: మీనాక్షి.',
-      'మీ అందర్నీ పిలిచి నా మనసులో ఉన్న మాటలను తప్పకుండా మాట్లాడుతాను: మీనాక్షి.',
-      'నేనిప్పుడు SIR సమావేశం కోసం వచ్చాను: మీనాక్షి.'
-    ]
-  },
-  {
-    id: 'lu-5',
-    timestamp: 'Jun 21, 2026 11:25 IST',
-    timeOnly: '11:25',
-    title: 'భారత నౌకాదళంలోకి మూడు యుద్ధ నౌకలు',
-    category: 'national',
-    isImportant: true,
-    bullets: [
-      'ఒకేసారి మూడు స్వదేశీ యుద్ధనౌకల కమిషనింగ్.',
-      'ప్రధాని మోదీ చేతుల మీదుగా కమిషనింగ్.',
-      'అత్యాధునిక యుద్ధనౌకలు INS దూనగిరి, INS సంశోధక్, INS అగ్రయ్‌ను దేశానికి అంకితం చేసిన ప్రధాని మోదీ.'
-    ]
-  },
-  {
-    id: 'lu-6',
-    timestamp: 'Jun 21, 2026 11:22 IST',
-    timeOnly: '11:22',
-    title: 'ఖమ్మం: గాంధీనగర్‌లో విషాదం',
-    category: 'telangana',
-    bullets: [
-      'ఇద్దరు పిల్లలకు విషం ఇచ్చి తల్లి ఆత్మహత్యాయత్నం.',
-      'చిన్నారులు వేదిక్‌కుమార్(07), తనిష్క్(05) మృతి.',
-      'తల్లి స్వాతి పరిస్థితి విషమం, ఆస్పత్రిలో చికిత్స.'
-    ]
-  },
-  {
-    id: 'lu-7',
-    timestamp: 'Jun 21, 2026 11:21 IST',
-    timeOnly: '11:21',
-    title: 'విజయవాడ: సాయికృష్ణ కేసులో అజ్ఞాతంలోకి ఆరుగురు కానిస్టేబుళ్లు',
-    category: 'ap',
-    bullets: [
-      'నిన్న మధ్యాహ్నం నుంచి అజ్ఞాతంలోకి వెళ్లినట్టు సమాచారం.'
-    ]
-  },
-  {
-    id: 'lu-8',
-    timestamp: 'Jun 21, 2026 11:10 IST',
-    timeOnly: '11:10',
-    title: 'వరంగల్: కేసీఆర్ వరంగల్‌కు చేసిందేమీ లేదు - ఎమ్మెల్యే నాయిని రాజేందర్‌రెడ్డి',
-    category: 'telangana',
-    bullets: [
-      'కల్వకుంట్ల కుటుంబం రాజకీయాన్నే వ్యాపారంగా మార్చుకుంది.',
-      'బీఆర్ఎస్ నేతలు హైనాలకంటే డేంజర్: ఎమ్మెల్యే నాయిని.',
-      'వరంగల్‌కు ఇచ్చిన హామీలపై కేటీఆర్‌ను ప్రజలు నిలదీయాలి: ఎమ్మెల్యే నాయిని.',
-      'వరంగల్‌కు హైడ్రా లాంటి సంస్థను తీసుకొస్తాం: ఎమ్మెల్యే నాయిని.'
-    ]
-  },
-  {
-    id: 'lu-9',
-    timestamp: 'Jun 21, 2026 10:53 IST',
-    timeOnly: '10:53',
-    title: 'ఇరాన్‌తో ఒప్పందం కుదరకపోతే హోర్ముజ్‌లో టోల్ వసూలు చేస్తాం: ట్రంప్',
-    category: 'international',
-    bullets: [
-      'ప్రస్తుతం హోర్ముజ్‌లో 60 రోజుల పాటు స్వేచ్ఛా నౌకాయానం అమల్లో ఉంది: ట్రంప్.',
-      'ప్రస్తుతం ఇరాన్ సుంకాలు వసూలు చేయడం లేదు: ట్రంప్.'
-    ]
-  },
-  {
-    id: 'lu-10',
-    timestamp: 'Jun 21, 2026 10:47 IST',
-    timeOnly: '10:47',
-    title: 'శ్రీలంకతో ఫైనల్: వైభవ్ సూర్యవంశీ ఔట్',
-    category: 'sports',
-    bullets: [
-      '29 బంతుల్లోనే 94 పరుగులు చేసిన సూర్యవంశీ.',
-      '10 ఫోర్లు, 8 సిక్స్‌లతో చెలరేగిన వైభవ్.'
-    ]
-  },
-  {
-    id: 'lu-11',
-    timestamp: 'Jun 21, 2026 10:33 IST',
-    timeOnly: '10:33',
-    title: 'శ్రీలంకతో ఫైనల్: వైభവ് సూర్యవంశీ విధ్వంసం',
-    category: 'sports',
-    bullets: [
-      '11 బంతుల్లోనే వైభవ్ సూర్యవంశీ హాఫ్ సెంచరీ.',
-      '5 ఫోర్లు, 5 సిక్స్‌లతో చెలరేగిన వైభవ్.'
-    ]
-  }
-];
-
-const simulatedUpdates: Omit<LiveUpdateItem, 'id'>[] = [
-  {
-    timestamp: 'Jun 21, 2026 13:35 IST',
-    timeOnly: '13:35',
-    title: 'అమరావతి: ఏపీ క్యాబినెట్ భేటీ ముగింపు - కీలక నిర్ణయాలకు ఆమోదం',
-    category: 'ap',
-    isImportant: true,
-    bullets: [
-      'ముఖ్యమంత్రి నారా చంద్రబాబు నాయుడు అధ్యక్షతన ముగిసిన మంత్రిమండలి సమావేశం.',
-      'రైతు రుణమాఫీ నిధుల విడుదల మరియు నిరుద్యోగ భృతి పథకంపై కీలక నిర్ణయాలు.',
-      'విజయవాడ నగర మెట్రో రైల్ ప్రాజెక్టు రెండో దశకు మంత్రిమండలి ఆమోదం తెలిపిందని సమాచారం.'
-    ]
-  }
-];
 
 export default function LiveUpdatesPage() {
   const [listings, setListings] = useState<ListingItem[]>([]);
@@ -242,25 +61,14 @@ export default function LiveUpdatesPage() {
         if (dict.live_updates_listings) {
           try {
             const parsed = typeof dict.live_updates_listings === 'string' ? JSON.parse(dict.live_updates_listings) : dict.live_updates_listings;
-            setListings(parsed);
-            localStorage.setItem('live_updates_listings', JSON.stringify(parsed));
+            setListings(parsed || []);
             return;
           } catch (e) {}
         }
-        const saved = localStorage.getItem('live_updates_listings');
-        if (saved) {
-          setListings(JSON.parse(saved));
-        } else {
-          setListings(listingItems);
-        }
+        setListings([]);
       })
       .catch(() => {
-        const saved = localStorage.getItem('live_updates_listings');
-        if (saved) {
-          setListings(JSON.parse(saved));
-        } else {
-          setListings(listingItems);
-        }
+        setListings([]);
       });
   }, []);
 
@@ -277,33 +85,14 @@ export default function LiveUpdatesPage() {
         if (dict[key]) {
           try {
             const parsed = typeof dict[key] === 'string' ? JSON.parse(dict[key]) : dict[key];
-            setUpdates(parsed);
-            localStorage.setItem(key, JSON.stringify(parsed));
+            setUpdates(parsed || []);
             return;
           } catch (e) {}
         }
-        const savedFeed = localStorage.getItem(key);
-        if (savedFeed) {
-          setUpdates(JSON.parse(savedFeed));
-        } else {
-          if (selectedUpdate.slug === '21st-june-2026') {
-            setUpdates(initialLiveUpdates);
-          } else {
-            setUpdates([]);
-          }
-        }
+        setUpdates([]);
       })
       .catch(() => {
-        const savedFeed = localStorage.getItem(key);
-        if (savedFeed) {
-          setUpdates(JSON.parse(savedFeed));
-        } else {
-          if (selectedUpdate.slug === '21st-june-2026') {
-            setUpdates(initialLiveUpdates);
-          } else {
-            setUpdates([]);
-          }
-        }
+        setUpdates([]);
       });
     setVisibleCount(8); // Reset pagination view limit when switching days
   }, [selectedUpdate]);
@@ -328,44 +117,6 @@ export default function LiveUpdatesPage() {
     return () => clearInterval(pTimer);
   }, []);
 
-  // Simulate new live updates coming in details view
-  useEffect(() => {
-    if (!selectedUpdate) return;
-    
-    const simulateArrival = () => {
-      setIsSimulating(true);
-      setTimeout(() => {
-        const newUpdate: LiveUpdateItem = {
-          ...simulatedUpdates[0],
-          id: `sim-${Date.now()}`
-        };
-        
-        setUpdates(prev => [newUpdate, ...prev]);
-        setIsSimulating(false);
-
-        if (soundEnabled) {
-          try {
-            const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.frequency.value = 880;
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
-          } catch (e) {
-            console.log('Audio not allowed');
-          }
-        }
-        showToast('తాజా బ్రేకింగ్ న్యూస్ అప్‌డేట్ చేర్చబడింది!');
-      }, 3500);
-    };
-
-    const timer = setTimeout(simulateArrival, 15000);
-    return () => clearTimeout(timer);
-  }, [selectedUpdate, soundEnabled]);
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -699,14 +450,13 @@ export default function LiveUpdatesPage() {
 
                               {/* Title in RED (Authentic ABN style) */}
                               <h3 
-                                className="text-[19px] md:text-[22px] font-black text-[#e60000] leading-snug telugu-text mb-2.5"
+                                className="text-[19px] md:text-[22px] font-black text-[#e60000] leading-snug telugu-text mb-2.5 article-body"
                                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                              >
-                                {update.title}
-                              </h3>
+                                dangerouslySetInnerHTML={{ __html: update.title }}
+                              />
 
                               {/* Bullet Details */}
-                              <ul className="space-y-2 pl-1 select-text">
+                              <ul className="space-y-2 pl-1 select-text article-body">
                                 {update.bullets.map((bullet, bIdx) => (
                                   <li 
                                     key={bIdx}
@@ -714,7 +464,7 @@ export default function LiveUpdatesPage() {
                                     style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                                   >
                                     <span className="w-2 h-2 rounded-full bg-[#e60000] mt-3 flex-shrink-0" />
-                                    <span>{bullet}</span>
+                                    <span dangerouslySetInnerHTML={{ __html: bullet }} />
                                   </li>
                                 ))}
                               </ul>

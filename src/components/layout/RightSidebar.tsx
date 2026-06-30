@@ -81,7 +81,7 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
         const [allCatArticles, allBreaking, settingsData] = await Promise.all([
           trendRes.json(),
           breakRes.json(),
-          settingsRes.ok ? settingsRes.json() : {},
+          settingsRes.ok ? settingsRes.json() : ({} as any),
         ]);
 
         // Filter breaking news to this category

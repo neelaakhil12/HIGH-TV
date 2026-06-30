@@ -52,7 +52,10 @@ import {
   ToggleRight,
   Link2,
   ImagePlay,
-  Zap
+  Zap,
+  AlignLeft,
+  AlignCenter,
+  AlignRight
 } from 'lucide-react';
 
 import { 
@@ -152,17 +155,7 @@ function MiniWysiwygToolbar({ editorRef }: { editorRef: React.RefObject<HTMLDivE
   const handleFontSizeCmd = (size: string) => {
     if (!size) return;
     restoreSelection();
-    document.execCommand('fontSize', false, '7');
-    const fontElements = editorRef.current?.getElementsByTagName('font');
-    if (fontElements) {
-      for (let i = fontElements.length - 1; i >= 0; i--) {
-        const el = fontElements[i];
-        if (el.getAttribute('size') === '7') {
-          el.removeAttribute('size');
-          el.style.fontSize = size;
-        }
-      }
-    }
+    applySelectedFontSize(editorRef.current, size);
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       savedRangeRef.current = selection.getRangeAt(0).cloneRange();
@@ -217,6 +210,13 @@ function MiniWysiwygToolbar({ editorRef }: { editorRef: React.RefObject<HTMLDivE
       {/* Lists */}
       <button type="button" onClick={() => handleFormatCmd('insertUnorderedList')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-slate-600" title="Bullet List"><List className="w-3 h-3" /></button>
       <button type="button" onClick={() => handleFormatCmd('insertOrderedList')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-slate-600" title="Number List"><ListOrdered className="w-3 h-3" /></button>
+
+      <div className="w-px h-4 bg-slate-200 mx-0.5" />
+
+      {/* Alignment */}
+      <button type="button" onClick={() => handleFormatCmd('justifyLeft')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-slate-600" title="Align Left"><AlignLeft className="w-3 h-3" /></button>
+      <button type="button" onClick={() => handleFormatCmd('justifyCenter')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-slate-600" title="Align Center"><AlignCenter className="w-3 h-3" /></button>
+      <button type="button" onClick={() => handleFormatCmd('justifyRight')} className="p-1 hover:bg-slate-200 rounded cursor-pointer text-slate-600" title="Align Right"><AlignRight className="w-3 h-3" /></button>
 
       <div className="w-px h-4 bg-slate-200 mx-0.5" />
 
@@ -380,6 +380,57 @@ function splitPanchangam(html: string): string[] {
     items.push(current.trim());
   }
   return items.filter(Boolean);
+}
+
+function parseHtmlToBullets(html: string): string[] {
+  if (!html) return [];
+  if (typeof window === 'undefined') return [html];
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  
+  const lis = div.getElementsByTagName('li');
+  if (lis.length > 0) {
+    const list: string[] = [];
+    for (let i = 0; i < lis.length; i++) {
+      const content = lis[i].innerHTML.trim();
+      if (content) list.push(content);
+    }
+    return list;
+  }
+  
+  const paragraphs = div.querySelectorAll('p, div');
+  if (paragraphs.length > 0) {
+    const list: string[] = [];
+    paragraphs.forEach(p => {
+      const content = p.innerHTML.trim();
+      if (content && !p.querySelector('p, div')) {
+        list.push(content);
+      }
+    });
+    if (list.length > 0) return list;
+  }
+  
+  const lines = html.split(/<br\s*\/?>/i).map(line => line.trim()).filter(Boolean);
+  return lines.length > 0 ? lines : [html];
+}
+
+function applySelectedFontSize(editorElement: HTMLDivElement | null, size: string) {
+  if (!editorElement || !size) return;
+  try {
+    document.execCommand('styleWithCSS', false, 'false');
+  } catch (e) {}
+  document.execCommand('fontSize', false, '7');
+  const elements = editorElement.querySelectorAll('font, span');
+  elements.forEach((el: any) => {
+    if (el.getAttribute('size') === '7') {
+      el.removeAttribute('size');
+      el.style.fontSize = size;
+    }
+    const inlineFS = el.style.fontSize;
+    if (inlineFS === '-webkit-xxx-large' || inlineFS === 'xxx-large' || inlineFS.includes('xxx-large')) {
+      el.style.fontSize = size;
+    }
+  });
 }
 
 const DEFAULT_HOROSCOPE_PANCHANGAM = "శ్రీ పరాభవ నామ సంవత్సరం; ఉత్తరాయణం; గ్రీష్మరుతువు, నిజ జ్యేష్ఠ మాసం, శుక్ల పక్షం ఏకాదశి: రా. 9-15 తదుపరి ద్వాదశి; స్వాతి: సా. 6-18 తదుపరి విశాఖ వర్జ్యం: రా. 12-23 నుంచి 2-07 వరకు; అమృత ఘడియలు: ఉ. 8-54 నుంచి 10-36 వరకు; దుర్ముహూర్తం: ఉ. 9-52 నుంచి 10-44 వరకు; తిరిగి మ. 3-05 నుంచి 3-57 వరకు; రాహుకాలం: మ. 1-30 నుంచి 3-00 వరకు; సూర్యోదయం: ఉ.5.31; సూర్యాస్తమయం: సా.6.34 నిర్జల ఏకాదశి";
@@ -613,21 +664,8 @@ export default function AdminPage() {
         if (dict.live_updates_listings) {
           try { list = typeof dict.live_updates_listings === 'string' ? JSON.parse(dict.live_updates_listings) : dict.live_updates_listings; } catch {}
         }
-        if (!list || list.length === 0) {
-          try {
-            const saved = localStorage.getItem('live_updates_listings');
-            if (saved) list = JSON.parse(saved);
-          } catch {}
-        }
-        if (!list || list.length === 0) {
-          list = [
-            { id: 'list-1', title: 'హై టీవీ ఫ్లాష్ న్యూస్', description: 'ప్రపంచ వ్యాప్తంగా జరిగే వివిధ సంఘటనల అప్‌డేట్స్‌ను ఎప్పటికప్పుడు ఇక్కడ చదవండి..', date: '21 జూన్ 2026', slug: '21st-june-2026' },
-            { id: 'list-2', title: 'హై టీవీ ఫ్లాష్ న్యూస్', description: '20 జూన్ 2026 నాటి ఏపీ, తెలంగాణ మరియు జాతీయ అంతర్జాతీయ రాజకీయ పరిణామాల లైవ్ అప్‌డేట్స్.', date: '20 జూన్ 2026', slug: '20th-june-2026' },
-            { id: 'list-3', title: 'హై టీవీ ఫ్లాష్ న్యూస్', description: '19 జూన్ 2026 నాటి ప్రధాన క్రీడా వార్తలు, రాజకీయ పరిణామాలు మరియు ముఖ్యాంశాలు.', date: '19 జూన్ 2026', slug: '19th-june-2026' }
-          ];
-        }
-        setLiveListings(list);
-        if (list.length > 0) {
+        setLiveListings(list || []);
+        if (list && list.length > 0) {
           setSelectedLiveSlug(prev => prev || list[0].slug);
         }
       })
@@ -645,16 +683,27 @@ export default function AdminPage() {
         if (dict[key]) {
           try { posts = typeof dict[key] === 'string' ? JSON.parse(dict[key]) : dict[key]; } catch {}
         }
-        if (!posts || posts.length === 0) {
-          try {
-            const saved = localStorage.getItem(key);
-            if (saved) posts = JSON.parse(saved);
-          } catch {}
-        }
         setLivePosts(posts || []);
       })
       .catch(() => {});
   }, [selectedLiveSlug]);
+
+  // Sync Rich Text Editors for Live Updates form
+  useEffect(() => {
+    if (postFormMode === 'add') {
+      if (postTitleEditorRef.current) postTitleEditorRef.current.innerHTML = '';
+      if (postBulletsEditorRef.current) postBulletsEditorRef.current.innerHTML = '';
+    } else if (postFormMode === 'edit' && editingPost) {
+      if (postTitleEditorRef.current) postTitleEditorRef.current.innerHTML = editingPost.title || '';
+      if (postBulletsEditorRef.current) {
+        if (Array.isArray(editingPost.bullets) && editingPost.bullets.length > 0) {
+          postBulletsEditorRef.current.innerHTML = '<ul>' + editingPost.bullets.map((b: string) => `<li>${b}</li>`).join('') + '</ul>';
+        } else {
+          postBulletsEditorRef.current.innerHTML = editingPost.title || '';
+        }
+      }
+    }
+  }, [postFormMode, editingPost]);
 
   const saveLiveListingsToDB = (newListings: any[]) => {
     setLiveListings(newListings);
@@ -1154,6 +1203,8 @@ export default function AdminPage() {
   const videoInputRef = useRef<HTMLInputElement>(null);
   const featuredImageInputRef = useRef<HTMLInputElement>(null);
   const newsVideoInputRef = useRef<HTMLInputElement>(null);
+  const postTitleEditorRef = useRef<HTMLDivElement>(null);
+  const postBulletsEditorRef = useRef<HTMLDivElement>(null);
 
   // Image Resizer overlay state
   const [selectedImage, setSelectedImage] = useState<HTMLImageElement | null>(null);
@@ -2078,17 +2129,7 @@ export default function AdminPage() {
   const handleFontSize = (size: string) => {
     if (!size) return;
     restoreNewsSelection();
-    document.execCommand('fontSize', false, '7');
-    const fontElements = editorRef.current?.getElementsByTagName('font');
-    if (fontElements) {
-      for (let i = fontElements.length - 1; i >= 0; i--) {
-        const el = fontElements[i];
-        if (el.getAttribute('size') === '7') {
-          el.removeAttribute('size');
-          el.style.fontSize = size;
-        }
-      }
-    }
+    applySelectedFontSize(editorRef.current, size);
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       savedSelectionRangeRef.current = selection.getRangeAt(0).cloneRange();
@@ -2102,19 +2143,9 @@ export default function AdminPage() {
   };
 
   const handleEditorFontSize = (ref: React.RefObject<HTMLDivElement | null>, size: string) => {
-    if (!size) return;
-    document.execCommand('fontSize', false, '7');
-    const fontElements = ref.current?.getElementsByTagName('font');
-    if (fontElements) {
-      for (let i = fontElements.length - 1; i >= 0; i--) {
-        const el = fontElements[i];
-        if (el.getAttribute('size') === '7') {
-          el.removeAttribute('size');
-          el.style.fontSize = size;
-        }
-      }
-    }
-    ref.current?.focus();
+    if (!ref.current || !size) return;
+    applySelectedFontSize(ref.current, size);
+    ref.current.focus();
   };
 
   // ── Inline Media Upload & Reference Insertion
@@ -2891,7 +2922,13 @@ export default function AdminPage() {
     setNewsSlug(art.slug || '');
     setNewsDescription(art.description || '');
     setNewsAuthor(art.author || '');
-    setNewsPublishedDate(art.publishedAt ? new Date(art.publishedAt).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16));
+    const getLocalDatetimeString = (dateInput: any) => {
+      const d = new Date(dateInput);
+      if (isNaN(d.getTime())) return '';
+      const pad = (n: number) => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+    setNewsPublishedDate(art.publishedAt ? getLocalDatetimeString(art.publishedAt) : getLocalDatetimeString(new Date()));
     setNewsImage(art.image || '');
     
     // Resolve short video
@@ -11045,14 +11082,17 @@ export default function AdminPage() {
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                     <div className="md:col-span-8 flex flex-col gap-1.5">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">వార్త ముఖ్యాంశం (Post Title) *</label>
-                      <input
-                        type="text"
-                        value={postTitle}
-                        onChange={(e) => setPostTitle(e.target.value)}
-                        placeholder="ఉదా: హైదరాబాద్: వినాయక చవితి నిమజ్జనంపై సమీక్ష..."
-                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-rose-500 telugu-text"
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                      />
+                      <div className="flex flex-col border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                        <MiniWysiwygToolbar editorRef={postTitleEditorRef} />
+                        <div
+                          contentEditable
+                          ref={postTitleEditorRef}
+                          suppressContentEditableWarning
+                          data-placeholder="ఉదా: హైదరాబాద్: వినాయక చవితి నిమజ్జనంపై సమీక్ష..."
+                          className="wysiwyg-editor-mini w-full bg-slate-50 border-t border-slate-200/60 focus:bg-white px-4 py-3 text-base font-bold outline-none transition-colors telugu-text text-slate-800"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        />
+                      </div>
                     </div>
                     <div className="md:col-span-4 flex flex-col gap-1.5">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">విభాగం (Category)</label>
@@ -11099,16 +11139,19 @@ export default function AdminPage() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                      వార్తా అంశాలు / బుల్లెట్ పాయింట్లు (Bullets - 1 line per point)
+                      వార్తా అంశాలు / బుల్లెట్ పాయింట్లు (Bullets)
                     </label>
-                    <textarea
-                      value={postBulletsText}
-                      onChange={(e) => setPostBulletsText(e.target.value)}
-                      rows={4}
-                      placeholder="ఒక్కో పాయింట్ కొత్త లైన్‌లో రాయండి..."
-                      className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-800 outline-none focus:border-rose-500 telugu-text leading-relaxed"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                    />
+                    <div className="flex flex-col border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                      <MiniWysiwygToolbar editorRef={postBulletsEditorRef} />
+                      <div
+                        contentEditable
+                        ref={postBulletsEditorRef}
+                        suppressContentEditableWarning
+                        data-placeholder="ఒక్కో పాయింట్ కొత్త లైన్‌లో రాయండి..."
+                        className="wysiwyg-editor-mini w-full bg-slate-50 border-t border-slate-200/60 focus:bg-white px-4 py-3 text-sm outline-none transition-colors telugu-text text-slate-800 min-h-[120px]"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      />
+                    </div>
                   </div>
 
                   {/* Image input */}
@@ -11150,11 +11193,14 @@ export default function AdminPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        if (!postTitle.trim()) {
+                        const titleHtml = postTitleEditorRef.current?.innerHTML.trim() || '';
+                        const titleText = postTitleEditorRef.current?.innerText.trim() || '';
+                        if (!titleText) {
                           alert('దయచేసి పోస్ట్ టైటిల్ నమోదు చేయండి');
                           return;
                         }
-                        const bullets = postBulletsText.split(String.fromCharCode(10)).map(b => b.trim()).filter(Boolean);
+                        const bulletsHtml = postBulletsEditorRef.current?.innerHTML || '';
+                        const bullets = parseHtmlToBullets(bulletsHtml);
                         const timeOnlyStr = postTime.includes('IST') ? postTime.split(' ').slice(-2, -1)[0] || '12:00' : '12:00';
                         let updated = [];
                         if (postFormMode === 'add') {
@@ -11162,10 +11208,10 @@ export default function AdminPage() {
                             id: 'lu-' + Date.now(),
                             timestamp: postTime.trim(),
                             timeOnly: timeOnlyStr,
-                            title: postTitle.trim(),
+                            title: titleHtml,
                             category: postCategory,
                             isImportant: postIsImportant,
-                            bullets: bullets.length > 0 ? bullets : [postTitle.trim()],
+                            bullets: bullets.length > 0 ? bullets : [titleHtml],
                             image: postImage.trim() || undefined
                           };
                           updated = [newPost, ...livePosts];
@@ -11174,10 +11220,10 @@ export default function AdminPage() {
                             ...p,
                             timestamp: postTime.trim(),
                             timeOnly: timeOnlyStr,
-                            title: postTitle.trim(),
+                            title: titleHtml,
                             category: postCategory,
                             isImportant: postIsImportant,
-                            bullets: bullets.length > 0 ? bullets : [postTitle.trim()],
+                            bullets: bullets.length > 0 ? bullets : [titleHtml],
                             image: postImage.trim() || undefined
                           } : p);
                         }
@@ -11277,16 +11323,18 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      <h4 className="text-base font-black text-slate-900 telugu-text mb-3 leading-snug" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                        {post.title}
-                      </h4>
+                      <h4 
+                        className="text-base font-black text-slate-900 telugu-text mb-3 leading-snug article-body" 
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        dangerouslySetInnerHTML={{ __html: post.title }}
+                      />
 
                       {post.bullets && post.bullets.length > 0 && (
-                        <ul className="space-y-1.5 text-xs text-slate-700 telugu-text pl-2 border-l-2 border-slate-200" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                        <ul className="space-y-1.5 text-xs text-slate-700 telugu-text pl-2 border-l-2 border-slate-200 article-body" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                           {post.bullets.map((bullet: string, idx: number) => (
                             <li key={idx} className="flex items-start gap-2">
                               <span className="text-rose-500 font-bold">•</span>
-                              <span>{bullet}</span>
+                              <span dangerouslySetInnerHTML={{ __html: bullet }} />
                             </li>
                           ))}
                         </ul>

@@ -410,20 +410,60 @@ export default function ArticlePageClient({
 
   function formatDate(dateStr: string) {
     const d = new Date(dateStr);
-    const day = d.getDate();
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const month = months[d.getMonth()];
-    const year = d.getFullYear();
-    const hours = String(d.getHours()).padStart(2, '0');
-    const mins = String(d.getMinutes()).padStart(2, '0');
-    return `${day} ${month} ${year} | ${hours}:${mins} IST`;
+    if (isNaN(d.getTime())) return '';
+    try {
+      const formatter = new Intl.DateTimeFormat('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+      const parts = formatter.formatToParts(d);
+      let day = '', month = '', year = '', hour = '', minute = '';
+      parts.forEach(p => {
+        if (p.type === 'day') day = p.value;
+        if (p.type === 'month') month = p.value;
+        if (p.type === 'year') year = p.value;
+        if (p.type === 'hour') hour = p.value;
+        if (p.type === 'minute') minute = p.value;
+      });
+      return `${day} ${month} ${year} | ${hour}:${minute} IST`;
+    } catch (e) {
+      const day = d.getDate();
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const month = months[d.getMonth()];
+      const year = d.getFullYear();
+      const hours = String(d.getHours()).padStart(2, '0');
+      const mins = String(d.getMinutes()).padStart(2, '0');
+      return `${day} ${month} ${year} | ${hours}:${mins} IST`;
+    }
   }
 
   function formatTimeOnly(dateStr: string) {
     const d = new Date(dateStr);
-    const hours = String(d.getHours()).padStart(2, '0');
-    const mins = String(d.getMinutes()).padStart(2, '0');
-    return `${hours}:${mins}`;
+    if (isNaN(d.getTime())) return '';
+    try {
+      const formatter = new Intl.DateTimeFormat('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+      const parts = formatter.formatToParts(d);
+      let hour = '', minute = '';
+      parts.forEach(p => {
+        if (p.type === 'hour') hour = p.value;
+        if (p.type === 'minute') minute = p.value;
+      });
+      return `${hour}:${minute}`;
+    } catch (e) {
+      const hours = String(d.getHours()).padStart(2, '0');
+      const mins = String(d.getMinutes()).padStart(2, '0');
+      return `${hours}:${mins}`;
+    }
   }
 
   // Create suggestion pool excluding current article
