@@ -1361,38 +1361,12 @@ export default function AdminPage() {
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    // Load Custom News Articles from Database API and merge with localStorage custom articles
+    // Load Custom News Articles from Database API
     fetch('/api/articles?limit=500&t=' + Date.now())
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
-          try {
-            const localCustom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
-            const localDeleted = new Set(JSON.parse(localStorage.getItem('deleted_news_articles') || '[]'));
-            const localModified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
-
-            const activeLocal = localCustom
-              .filter((art: any) => !localDeleted.has(art.id))
-              .map((art: any) => {
-                if (localModified[art.id]) {
-                  return { ...art, ...localModified[art.id] };
-                }
-                return art;
-              });
-
-            const combined = [...data];
-            const seenIds = new Set(data.map((art: any) => art.id));
-            const seenSlugs = new Set(data.map((art: any) => art.slug));
-
-            activeLocal.forEach((art: any) => {
-              if (!seenIds.has(art.id) && !seenSlugs.has(art.slug)) {
-                combined.push(art);
-                seenIds.add(art.id);
-                seenSlugs.add(art.slug);
-              }
-            });
-
-            setCustomNewsList(combined);
+          setCustomNewsList(data);
 
             // Fetch slides from API and match them to loaded articles
             fetch('/api/slides?t=' + Date.now())
@@ -1400,7 +1374,7 @@ export default function AdminPage() {
               .then(dbSlides => {
                 if (Array.isArray(dbSlides) && dbSlides.length > 0) {
                   const matchedSlides = dbSlides.map(slide => {
-                    const article = combined.find((art: any) => {
+                    const article = data.find((art: any) => {
                       const expectedLink = `/news/${art.slug}`;
                       return slide.link === expectedLink || slide.title === art.title;
                     });
@@ -1437,11 +1411,6 @@ export default function AdminPage() {
                 }
               })
               .catch(err => console.error("Error fetching trending news from DB:", err));
-
-          } catch (e) {
-            console.error('Error merging local custom articles in admin:', e);
-            setCustomNewsList(data);
-          }
         }
       })
       .catch(err => console.error('Error loading articles in admin:', err));
@@ -1821,20 +1790,6 @@ export default function AdminPage() {
           alert('Failed to save photo: ' + (errData.error || response.statusText || 'Unknown error'));
         }
       } else if (photosFormMode === 'edit' && editingPhotoAlbum) {
-        try {
-          const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
-          const idx = custom.findIndex((art: any) => art.id === editingPhotoAlbum.id);
-          if (idx !== -1) {
-            custom[idx] = { ...custom[idx], ...articleData, id: editingPhotoAlbum.id };
-            localStorage.setItem('custom_news_articles', JSON.stringify(custom));
-          }
-          const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
-          modified[editingPhotoAlbum.id] = { ...modified[editingPhotoAlbum.id], ...articleData };
-          localStorage.setItem('modified_news_articles', JSON.stringify(modified));
-        } catch (e) {
-          console.error(e);
-        }
-
         const response = await fetch(`/api/articles/${editingPhotoAlbum.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -1956,20 +1911,6 @@ export default function AdminPage() {
           alert('Failed to save poll: ' + (errData.error || response.statusText || 'Unknown error'));
         }
       } else if (pollsFormMode === 'edit' && editingPoll) {
-        try {
-          const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
-          const idx = custom.findIndex((art: any) => art.id === editingPoll.id);
-          if (idx !== -1) {
-            custom[idx] = { ...custom[idx], ...articleData, id: editingPoll.id };
-            localStorage.setItem('custom_news_articles', JSON.stringify(custom));
-          }
-          const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
-          modified[editingPoll.id] = { ...modified[editingPoll.id], ...articleData };
-          localStorage.setItem('modified_news_articles', JSON.stringify(modified));
-        } catch (e) {
-          console.error(e);
-        }
-
         const response = await fetch(`/api/articles/${editingPoll.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -2064,20 +2005,6 @@ export default function AdminPage() {
           alert('Failed to save short: ' + (errData.error || response.statusText || 'Unknown error'));
         }
       } else if (shortsFormMode === 'edit' && editingShort) {
-        try {
-          const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
-          const idx = custom.findIndex((art: any) => art.id === editingShort.id);
-          if (idx !== -1) {
-            custom[idx] = { ...custom[idx], ...articleData, id: editingShort.id };
-            localStorage.setItem('custom_news_articles', JSON.stringify(custom));
-          }
-          const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
-          modified[editingShort.id] = { ...modified[editingShort.id], ...articleData };
-          localStorage.setItem('modified_news_articles', JSON.stringify(modified));
-        } catch (e) {
-          console.error(e);
-        }
-
         const response = await fetch(`/api/articles/${editingShort.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -2825,25 +2752,6 @@ export default function AdminPage() {
           alert('Failed to publish article: ' + (errData.error || response.statusText || 'Unknown error'));
         }
       } else if (newsViewMode === 'edit' && editingArticle) {
-        // Always update in localStorage first if it's a local article
-        let updatedLocally = false;
-        try {
-          const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
-          const idx = custom.findIndex((art: any) => art.id === editingArticle.id);
-          if (idx !== -1) {
-            custom[idx] = { ...custom[idx], ...articleData, id: editingArticle.id };
-            localStorage.setItem('custom_news_articles', JSON.stringify(custom));
-            updatedLocally = true;
-          }
-          
-          // Also update in modified list
-          const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
-          modified[editingArticle.id] = { ...modified[editingArticle.id], ...articleData };
-          localStorage.setItem('modified_news_articles', JSON.stringify(modified));
-        } catch (e) {
-          console.error('Error updating article in localStorage:', e);
-        }
-
         try {
           const response = await fetch(`/api/articles/${editingArticle.id}`, {
             method: 'PUT',
@@ -2856,42 +2764,15 @@ export default function AdminPage() {
             setCustomNewsList(prev => prev.map(a => a.id === editingArticle.id ? updated : a));
             alert('Article updated successfully!');
           } else {
-            // Database update failed. If it was local-only, try migrating it to the database using POST!
-            const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
-            const isLocal = custom.some((art: any) => art.id === editingArticle.id);
-            
-            if (isLocal) {
-              // Try to migrate to the database
-              const createResponse = await fetch('/api/articles', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...articleData, id: editingArticle.id })
-              });
-              
-              if (createResponse.ok) {
-                const added = await createResponse.json();
-                setCustomNewsList(prev => prev.map(a => a.id === editingArticle.id ? added : a));
-                alert('Article updated and saved to database successfully!');
-              } else {
-                // If migration fails, keep local update
-                setCustomNewsList(prev => prev.map(a => a.id === editingArticle.id ? { ...a, ...articleData } : a));
-                alert('Article updated locally successfully!');
-              }
-            } else {
-              const errData = await response.json().catch(() => ({}));
-              alert('Failed to update article: ' + (errData.details || errData.error || response.statusText));
-            }
+            const errData = await response.json().catch(() => ({}));
+            alert('Failed to update article: ' + (errData.details || errData.error || response.statusText));
           }
         } catch (e: any) {
           console.error('Error saving article edit:', e);
-          if (updatedLocally) {
-            setCustomNewsList(prev => prev.map(a => a.id === editingArticle.id ? { ...a, ...articleData } : a));
-            alert('Article updated locally successfully!');
-          } else {
-            alert('Failed to update article: ' + (e?.message || String(e)));
-          }
+          alert('Failed to update article: ' + (e?.message || String(e)));
         }
       }
+
       setNewsViewMode('list');
       setRefreshCounter(prev => prev + 1);
     } catch (e) {
@@ -2996,54 +2877,25 @@ export default function AdminPage() {
     }, 100);
   };
 
+
+
   const handleDeleteArticle = async (articleId: string) => {
     if (!confirm('Are you sure you want to delete this article?')) return;
-
-    // Always clean from localStorage first for client-side custom articles fallback
-    let deletedLocally = false;
-    try {
-      const custom = JSON.parse(localStorage.getItem('custom_news_articles') || '[]');
-      const filtered = custom.filter((art: any) => art.id !== articleId);
-      if (custom.length !== filtered.length) {
-        localStorage.setItem('custom_news_articles', JSON.stringify(filtered));
-        deletedLocally = true;
-      }
-
-      // Clean from modified/deleted track lists
-      const modified = JSON.parse(localStorage.getItem('modified_news_articles') || '{}');
-      if (modified[articleId]) {
-        delete modified[articleId];
-        localStorage.setItem('modified_news_articles', JSON.stringify(modified));
-      }
-
-      const deletedIds = JSON.parse(localStorage.getItem('deleted_news_articles') || '[]');
-      if (!deletedIds.includes(articleId)) {
-        deletedIds.push(articleId);
-        localStorage.setItem('deleted_news_articles', JSON.stringify(deletedIds));
-      }
-    } catch (e) {
-      console.error('Error clearing localStorage entry:', e);
-    }
 
     try {
       const response = await fetch(`/api/articles/${articleId}`, {
         method: 'DELETE'
       });
       
-      if (response.ok || deletedLocally) {
+      if (response.ok) {
         setCustomNewsList(prev => prev.filter(art => art.id !== articleId));
         alert('Article deleted successfully!');
       } else {
         alert('Failed to delete article.');
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error deleting article:', e);
-      if (deletedLocally) {
-        setCustomNewsList(prev => prev.filter(art => art.id !== articleId));
-        alert('Article deleted successfully!');
-      } else {
-        alert('Failed to delete article.');
-      }
+      alert('Failed to delete article: ' + (e.message || String(e)));
     }
   };
 
