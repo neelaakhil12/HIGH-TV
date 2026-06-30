@@ -812,10 +812,11 @@ export default function AdminPage() {
   };
 
   // Team Manager states
-  const [teamFormMode, setTeamFormMode] = useState<'list' | 'add-member' | 'edit-member' | 'add-section'>('list');
+  const [teamFormMode, setTeamFormMode] = useState<'list' | 'add-member' | 'edit-member' | 'add-section' | 'edit-section'>('list');
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [teamSections, setTeamSections] = useState<any[]>([]);
   const [editingMember, setEditingMember] = useState<any | null>(null);
+  const [editingSection, setEditingSection] = useState<any | null>(null);
 
   // Member fields
   const [memberName, setMemberName] = useState('');
@@ -1124,7 +1125,7 @@ export default function AdminPage() {
     const sSlug = sectionSlug.trim() || `section-${Date.now().toString().slice(-6)}`;
     const sectionData = {
       title: sectionName.trim(),
-      slug: sSlug,
+      slug: (teamFormMode === 'edit-section' && editingSection) ? editingSection.id : sSlug,
       categorySlug: 'team-section',
       author: 'హై టీవీ డెస్క్',
       isBreaking: false,
@@ -1134,20 +1135,34 @@ export default function AdminPage() {
     };
 
     try {
-      const response = await fetch('/api/articles', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sectionData),
-      });
-      if (response.ok) {
-        alert('Section added successfully!');
-        setSectionName('');
-        setSectionSlug('');
-        setTeamFormMode('list');
-        fetchTeamData();
+      if (teamFormMode === 'edit-section' && editingSection) {
+        const response = await fetch(`/api/articles/${editingSection.idDB}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sectionData),
+        });
+        if (response.ok) {
+          alert('Section updated successfully!');
+        } else {
+          alert('Failed to update section.');
+        }
       } else {
-        alert('Failed to add section.');
+        const response = await fetch('/api/articles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sectionData),
+        });
+        if (response.ok) {
+          alert('Section added successfully!');
+        } else {
+          alert('Failed to add section.');
+        }
       }
+      setSectionName('');
+      setSectionSlug('');
+      setEditingSection(null);
+      setTeamFormMode('list');
+      fetchTeamData();
     } catch (err: any) {
       console.error(err);
       alert('Error saving section: ' + (err.message || String(err)));
@@ -9935,15 +9950,29 @@ export default function AdminPage() {
                               <h3 className="text-base font-black text-slate-800 font-sans">{section.name}</h3>
                               <span className="text-[10px] text-slate-400 font-bold">Slug: {section.id}</span>
                             </div>
-                            {/* Option to delete custom sections */}
+                            {/* Option to delete/edit custom sections */}
                             {section.idDB && (
-                              <button
-                                onClick={() => handleDeleteTeamItem(section.idDB, 'section')}
-                                className="text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-2 rounded-xl transition-all cursor-pointer text-xs font-bold flex items-center gap-1"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                                సెక్షన్ తొలగించండి (Delete Section)
-                              </button>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => {
+                                    setEditingSection(section);
+                                    setSectionName(section.name);
+                                    setSectionSlug(section.id);
+                                    setTeamFormMode('edit-section');
+                                  }}
+                                  className="text-sky-600 hover:text-sky-800 hover:bg-sky-50 p-2 rounded-xl transition-all cursor-pointer text-xs font-bold flex items-center gap-1"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                  సవరించండి (Edit Section)
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteTeamItem(section.idDB, 'section')}
+                                  className="text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-2 rounded-xl transition-all cursor-pointer text-xs font-bold flex items-center gap-1"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                  సెక్షన్ తొలగించండి (Delete Section)
+                                </button>
+                              </div>
                             )}
                           </div>
 
@@ -10168,7 +10197,7 @@ export default function AdminPage() {
               )}
 
               {/* ADD SECTION FORM */}
-              {teamFormMode === 'add-section' && (
+              {(teamFormMode === 'add-section' || teamFormMode === 'edit-section') && (
                 <div className="bg-white border border-slate-200/60 rounded-3xl p-6 flex flex-col gap-5 max-w-md shadow-sm">
                   <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
                     <ArrowLeft 
@@ -10176,7 +10205,7 @@ export default function AdminPage() {
                       onClick={() => setTeamFormMode('list')}
                     />
                     <h3 className="text-lg font-black text-slate-800">
-                      కొత్త సెక్షన్ చేర్చండి (Add New Section)
+                      {teamFormMode === 'add-section' ? 'కొత్త సెక్షన్ చేర్చండి (Add New Section)' : 'సెక్షన్ వివరాలు సవరించండి (Edit Section Details)'}
                     </h3>
                   </div>
 
@@ -10202,8 +10231,9 @@ export default function AdminPage() {
                         value={sectionSlug}
                         onChange={(e) => setSectionSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
                         placeholder="digital-team"
+                        disabled={teamFormMode === 'edit-section'}
                         required
-                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold disabled:bg-slate-100 disabled:cursor-not-allowed"
                       />
                     </div>
 
@@ -10214,7 +10244,7 @@ export default function AdminPage() {
                         disabled={isSavingTeam}
                         className="bg-rose-600 hover:bg-rose-700 disabled:bg-slate-300 text-white font-black text-xs py-3 px-6 rounded-xl transition-colors shadow-md cursor-pointer"
                       >
-                        {isSavingTeam ? 'సేవ్ అవుతోంది...' : 'సెక్షన్ సృష్టించండి (Create Section)'}
+                        {isSavingTeam ? 'సేవ్ అవుతోంది...' : (teamFormMode === 'edit-section' ? 'మార్పులను సేవ్ చేయండి (Save Changes)' : 'సెక్షన్ సృష్టించండి (Create Section)')}
                       </button>
                       <button
                         type="button"
