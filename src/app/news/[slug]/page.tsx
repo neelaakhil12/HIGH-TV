@@ -122,7 +122,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const isBase64 = article?.image?.startsWith('data:');
   const isRelative = article?.image && !article.image.startsWith('http') && !isBase64;
   const imageUrl = isBase64 || !article?.image
-    ? 'https://hightv.in/og-preview.jpg'
+    ? 'https://hightv.in/logo.png'
     : isRelative
       ? `https://hightv.in${article.image}`
       : article.image;

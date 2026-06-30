@@ -17,6 +17,15 @@
 /.next/
 /out/
 
+# build archives (too large for GitHub)
+next_build.tar.gz
+next_build.zip
+*.tar.gz
+*.zip
+
+# scratch / temp scripts
+/scratch/
+
 # production
 /build
 
