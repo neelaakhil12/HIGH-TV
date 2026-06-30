@@ -128,7 +128,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       : article.image;
 
   const cleanTitle = article?.title ? article.title.replace(/<[^>]*>/g, '') : 'వార్త | హై టీవీ';
-  const cleanDesc = article?.description ? article.description.replace(/<[^>]*>/g, '') : '';
+  const rawDesc = article?.metaDescription || article?.description || '';
+  const cleanDesc = rawDesc.replace(/<[^>]*>/g, '');
 
   return {
     title: `${cleanTitle} | హై టీవీ`,
@@ -211,8 +212,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           category: true,
           author: true,
           publishedAt: true,
-          description: true,
+           description: true,
+          metaDescription: true,
           image: true,
+          tags: {
+            select: { name: true }
+          },
           views: true,
           isBreaking: true,
           isTrending: true,

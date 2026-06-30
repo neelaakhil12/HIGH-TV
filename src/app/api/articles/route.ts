@@ -15,6 +15,8 @@ export async function GET(req: NextRequest) {
 
     const where: any = { isDeleted: false };
 
+    const tag = searchParams.get('tag');
+
     if (category === 'latest') where.isBreaking = true;
     else if (category === 'trending') where.isTrending = true;
     else if (category === 'featured') where.isFeatured = true;
@@ -25,6 +27,12 @@ export async function GET(req: NextRequest) {
         { title: { contains: search } },
         { description: { contains: search } },
       ];
+    }
+
+    if (tag) {
+      where.tags = {
+        some: { name: tag }
+      };
     }
 
     const selectFields: any = {
@@ -38,7 +46,13 @@ export async function GET(req: NextRequest) {
       publishedAt: true,
       updatedAt: true,
       description: true,
+      metaDescription: true,
       image: true,
+      tags: {
+        select: {
+          name: true
+        }
+      },
       views: true,
       isBreaking: true,
       isTrending: true,
@@ -86,7 +100,25 @@ export async function POST(req: NextRequest) {
     if (data.image) {
       data.image = await resolveArticleImage(data.image, data.slug) ?? data.image;
     }
-    const article = await prisma.article.create({ data });
+    const tagNames: string[] = data.tags || [];
+    delete data.tags;
+
+    const article = await prisma.article.create({
+      data: {
+        ...data,
+        tags: {
+          connectOrCreate: tagNames.map(tagName => ({
+            where: { name: tagName },
+            create: { name: tagName }
+          }))
+        }
+      },
+      include: {
+        tags: {
+          select: { name: true }
+        }
+      }
+    });
     return NextResponse.json(article, { status: 201 });
   } catch (error: any) {
     console.error('POST /api/articles error:', error);

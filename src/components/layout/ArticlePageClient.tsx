@@ -148,6 +148,31 @@ export default function ArticlePageClient({
   // Initialize as false — localStorage check runs in useEffect after hydration to avoid mismatch
   const [inlinePromosEnabled, setInlinePromosEnabled] = useState<boolean>(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [tagFilteredArticles, setTagFilteredArticles] = useState<any[]>([]);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [isLoadingTagNews, setIsLoadingTagNews] = useState(false);
+
+  const handleTagClick = async (tagName: string) => {
+    if (selectedTag === tagName) {
+      setSelectedTag(null);
+      setTagFilteredArticles([]);
+      return;
+    }
+    setSelectedTag(tagName);
+    setIsLoadingTagNews(true);
+    try {
+      const res = await fetch(`/api/articles?tag=${encodeURIComponent(tagName)}&limit=10`);
+      if (res.ok) {
+        const data = await res.json();
+        setTagFilteredArticles(data);
+      }
+    } catch (e) {
+      console.error('Failed to load articles for tag:', e);
+    } finally {
+      setIsLoadingTagNews(false);
+    }
+  };
+
   const [customArticleLeftAds, setCustomArticleLeftAds] = useState<any[]>([]);
   const [customArticleRightAds, setCustomArticleRightAds] = useState<any[]>([]);
 
@@ -879,6 +904,90 @@ export default function ArticlePageClient({
                 <div className="border-t border-gray-100 pt-4 mt-4 text-xs font-bold text-gray-500 font-sans select-none text-left">
                   <span className="text-gray-400">Updated:</span> {formatDate(article.updatedAt || article.publishedAt)}
                 </div>
+
+                {/* Tags Block Section */}
+                {article.tags && article.tags.length > 0 && (
+                  <div className="border-t border-gray-100 pt-5 mt-6 text-left">
+                    <div className="bg-[#002040] text-white p-4 rounded-xl flex flex-col md:flex-row md:items-center gap-3 select-none">
+                      <span className="font-bold text-sm tracking-wide uppercase flex items-center gap-1.5 flex-shrink-0">
+                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                          <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 8.25c-.97 0-1.75-.78-1.75-1.75s.78-1.75 1.75-1.75 1.75.78 1.75 1.75-.78 1.75-1.75 1.75z"/>
+                        </svg>
+                        Tags:
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {article.tags.map((t: any, idx: number) => {
+                          const isSelected = selectedTag === t.name;
+                          return (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => handleTagClick(t.name)}
+                              className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all cursor-pointer shadow-sm ${
+                                isSelected
+                                  ? 'bg-[#e60000] text-white border-[#e60000] scale-105'
+                                  : 'bg-white text-[#002040] border-transparent hover:bg-slate-100'
+                              }`}
+                            >
+                              #{t.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Dynamic Tag filtered news list directly below */}
+                    {selectedTag && (
+                      <div className="mt-6 bg-slate-50 border border-slate-200/60 rounded-xl p-4 md:p-5 shadow-inner">
+                        <h3 className="font-black text-[#002040] text-base md:text-lg mb-4 telugu-text flex items-center justify-between">
+                          <span>#{selectedTag} కి సంబంధించిన వార్తలు</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedTag(null);
+                              setTagFilteredArticles([]);
+                            }}
+                            className="text-[10px] bg-slate-200 hover:bg-rose-500 hover:text-white px-2.5 py-1 rounded transition-colors text-slate-500 cursor-pointer"
+                          >
+                            Close [✕]
+                          </button>
+                        </h3>
+
+                        {isLoadingTagNews ? (
+                          <div className="flex items-center justify-center py-8">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#002040]" />
+                          </div>
+                        ) : tagFilteredArticles.length === 0 ? (
+                          <p className="text-xs text-slate-500 py-4 telugu-text text-center">ఈ ట్యాగ్‌తో మరిన్ని వార్తలు లేవు.</p>
+                        ) : (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {tagFilteredArticles.map((item: any) => (
+                              <Link
+                                key={item.id}
+                                href={`/news/${item.slug}`}
+                                className="flex gap-3 hover:bg-white p-2 rounded-xl border border-transparent hover:border-slate-200 transition-all bg-white/45 shadow-sm group"
+                              >
+                                <div className="w-[80px] h-[55px] flex-shrink-0 overflow-hidden rounded-lg bg-gray-50 border border-gray-150 relative flex items-center justify-center">
+                                  <FallbackImage
+                                    src={item.image}
+                                    alt={item.title?.replace(/<[^>]*>/g, '')}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  />
+                                </div>
+                                <div className="flex flex-col justify-between min-w-0">
+                                  <h4 className="text-[13px] font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-[#e60000] transition-colors telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                    {item.title?.replace(/<[^>]*>/g, '')}
+                                  </h4>
+                                  <span className="text-[9px] font-bold text-slate-400 font-sans">{formatDate(item.publishedAt)}</span>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
 

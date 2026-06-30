@@ -577,6 +577,11 @@ export default function AdminPage() {
   const [newsTitle, setNewsTitle] = useState('');
   const [newsSlug, setNewsSlug] = useState('');
   const [newsDescription, setNewsDescription] = useState('');
+  const [newsTags, setNewsTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
+  const [allTagsSuggestions, setAllTagsSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [metaDescription, setMetaDescription] = useState('');
   const [newsAuthor, setNewsAuthor] = useState('హై టీవీ డెస్క్');
 
 
@@ -657,6 +662,23 @@ export default function AdminPage() {
   const [postBulletsText, setPostBulletsText] = useState('');
   const [postImage, setPostImage] = useState('');
   const postImageInputRef = useRef<HTMLInputElement>(null);
+
+  // Load Autocomplete Tags on mount
+  const fetchAllTags = async () => {
+    try {
+      const res = await fetch('/api/tags');
+      if (res.ok) {
+        const data = await res.json();
+        setAllTagsSuggestions(data.map((t: any) => t.name));
+      }
+    } catch (e) {
+      console.error('Failed to load tags:', e);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllTags();
+  }, []);
 
   // Load Live Updates Listings on mount
   useEffect(() => {
@@ -1685,6 +1707,8 @@ export default function AdminPage() {
       setNewsTitle('');
       setNewsSlug('');
       setNewsDescription('');
+      setNewsTags([]);
+      setMetaDescription('');
       setNewsImage('');
       setNewsVideo('');
       setEditingArticle(null);
@@ -2822,8 +2846,10 @@ export default function AdminPage() {
         ? new Date().toISOString()
         : new Date(newsPublishedDate || Date.now()).toISOString(),
       description: excerptText,
+      metaDescription: metaDescription.trim(),
       body: cleanBodyHTML,
       image: newsImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop',
+      tags: newsTags,
       isBreaking: isBreakingChecked,
       isTrending: isTrendingChecked,
       isFeatured: isFeaturedChecked
@@ -2839,6 +2865,7 @@ export default function AdminPage() {
           const added = await response.json();
           setCustomNewsList(prev => [added, ...prev]);
           alert('Article published successfully!');
+          fetchAllTags();
         } else {
           const errData = await response.json().catch(() => ({}));
           alert('Failed to publish article: ' + (errData.error || response.statusText || 'Unknown error'));
@@ -2855,6 +2882,7 @@ export default function AdminPage() {
             const updated = await response.json();
             setCustomNewsList(prev => prev.map(a => a.id === editingArticle.id ? updated : a));
             alert('Article updated successfully!');
+            fetchAllTags();
           } else {
             const errData = await response.json().catch(() => ({}));
             alert('Failed to update article: ' + (errData.details || errData.error || response.statusText));
@@ -2894,6 +2922,8 @@ export default function AdminPage() {
     setNewsTitle(art.title || '');
     setNewsSlug(art.slug || '');
     setNewsDescription(art.description || '');
+    setNewsTags(art.tags ? art.tags.map((t: any) => t.name) : []);
+    setMetaDescription(art.metaDescription || '');
     setNewsAuthor(art.author || '');
     const getLocalDatetimeString = (dateInput: any) => {
       const d = new Date(dateInput);
@@ -4470,24 +4500,126 @@ export default function AdminPage() {
                     <span className="text-[10px] text-slate-400">Slug is mandatory for the URL. Strictly use alphanumeric English characters and hyphens.</span>
                   </div>
 
+                  {/* Short Summary (Excerpt) Block */}
+                  <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
+                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Short Summary (Excerpt - Optional)</label>
+                    <textarea
+                      rows={2}
+                      value={newsDescription}
+                      onChange={(e) => setNewsDescription(e.target.value)}
+                      placeholder="Enter a brief summary snippet to display on article list pages and cards..."
+                      className="w-full bg-slate-50 border border-slate-200/60 focus:bg-white focus:border-rose-500 rounded-xl px-4 py-3 text-xs outline-none transition-colors telugu-text text-slate-800 resize-y"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    />
+                    <span className="text-[10px] text-slate-400">This snippet is displayed on homepage categories, search pages, and article index card listings.</span>
+                  </div>
+
                   {/* Meta Description Block */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
                     <div className="flex items-center justify-between">
                       <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Meta Description (SEO Summary - Optional)</label>
-                      <span className="text-[10px] font-bold text-slate-400">{newsDescription.length}/160 chars</span>
+                      <span className="text-[10px] font-bold text-slate-400">{metaDescription.length}/160 chars</span>
                     </div>
                     <textarea
                       rows={3}
-                      value={newsDescription}
-                      onChange={(e) => {
-                        setNewsDescription(e.target.value);
-                        if (newsDescriptionRef.current) newsDescriptionRef.current.innerText = e.target.value;
-                      }}
+                      value={metaDescription}
+                      onChange={(e) => setMetaDescription(e.target.value)}
                       placeholder="Enter concise, engaging meta description for Search Engines (Google) and Social Media sharing..."
                       className="w-full bg-slate-50 border border-slate-200/60 focus:bg-white focus:border-rose-500 rounded-xl px-4 py-3 text-xs outline-none transition-colors telugu-text text-slate-800 resize-y"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                     />
                     <span className="text-[10px] text-slate-400">This text appears as the snippet under your article title on Google search results and WhatsApp shares.</span>
+                  </div>
+
+                  {/* Tags Block */}
+                  <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
+                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Tags / Keywords</label>
+                    
+                    {/* Added Tags Chips Container */}
+                    {newsTags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 p-2 bg-slate-50 rounded-xl border border-slate-100 max-h-[120px] overflow-y-auto">
+                        {newsTags.map((tag, idx) => (
+                          <span key={idx} className="bg-white border border-slate-200/60 text-[#02599c] text-[11px] font-bold pl-2.5 pr-1.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm select-none">
+                            #{tag}
+                            <button
+                              type="button"
+                              onClick={() => setNewsTags(newsTags.filter(t => t !== tag))}
+                              className="text-slate-400 hover:text-rose-500 font-bold w-4 h-4 rounded-full hover:bg-rose-50 flex items-center justify-center transition-colors text-[9px]"
+                            >
+                              ✕
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Tag Input Field & Dropdown suggestions */}
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={tagInput}
+                        onChange={(e) => {
+                          setTagInput(e.target.value);
+                          setShowSuggestions(true);
+                        }}
+                        onFocus={() => setShowSuggestions(true)}
+                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const val = tagInput.trim().replace(/,/g, '');
+                            if (val && !newsTags.includes(val)) {
+                              setNewsTags([...newsTags, val]);
+                            }
+                            setTagInput('');
+                          }
+                        }}
+                        onKeyUp={(e) => {
+                          if (e.key === ',' || e.key === 'Enter') {
+                            const val = tagInput.trim().replace(/,/g, '');
+                            if (val && !newsTags.includes(val)) {
+                              setNewsTags([...newsTags, val]);
+                            }
+                            setTagInput('');
+                          }
+                        }}
+                        placeholder="Type a tag and press Enter or Comma..."
+                        className="w-full bg-slate-50 border border-slate-200/60 focus:bg-white focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800"
+                      />
+
+                      {/* Suggestions list */}
+                      {showSuggestions && tagInput.trim() && (
+                        (() => {
+                          const query = tagInput.toLowerCase();
+                          const matches = allTagsSuggestions.filter(
+                            t => t.toLowerCase().includes(query) && !newsTags.includes(t)
+                          );
+                          if (matches.length === 0) return null;
+                          return (
+                            <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 shadow-xl rounded-xl max-h-[160px] overflow-y-auto z-50">
+                              {matches.map((match, idx) => (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  onMouseDown={() => {
+                                    if (!newsTags.includes(match)) {
+                                      setNewsTags([...newsTags, match]);
+                                    }
+                                    setTagInput('');
+                                    setShowSuggestions(false);
+                                  }}
+                                  className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between border-b border-slate-100 last:border-0"
+                                >
+                                  <span>#{match}</span>
+                                  <span className="text-[9px] text-[#02599c] font-black uppercase tracking-wider">Select</span>
+                                </button>
+                              ))}
+                            </div>
+                          );
+                        })()
+                      )}
+                    </div>
+                    <span className="text-[10px] text-slate-400">Type any tag name and press Enter or Comma to save. Autocomplete suggestions will appear if the tag was previously used.</span>
                   </div>
 
                   {/* Article Content WYSIWYG Editor Block */}
@@ -6802,6 +6934,8 @@ export default function AdminPage() {
                           setNewsTitle('');
                           setNewsSlug('');
                           setNewsDescription('');
+                          setNewsTags([]);
+                          setMetaDescription('');
                           setNewsImage('');
                           setNewsAuthor('హై టీవీ డెస్క్');
                           setIsBreakingChecked(false);

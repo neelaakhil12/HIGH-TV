@@ -8,7 +8,14 @@ export const dynamic = 'force-dynamic';
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const article = await prisma.article.findUnique({ where: { id } });
+    const article = await prisma.article.findUnique({
+      where: { id },
+      include: {
+        tags: {
+          select: { name: true }
+        }
+      }
+    });
     if (!article) {
       return new NextResponse(JSON.stringify({ error: 'Not found' }), {
         status: 404,
@@ -48,7 +55,27 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (data.image) {
       data.image = await resolveArticleImage(data.image, data.slug) ?? data.image;
     }
-    const article = await prisma.article.update({ where: { id }, data });
+    const tagNames: string[] = data.tags || [];
+    delete data.tags;
+    
+    const article = await prisma.article.update({
+      where: { id },
+      data: {
+        ...data,
+        tags: {
+          set: [],
+          connectOrCreate: tagNames.map(tagName => ({
+            where: { name: tagName },
+            create: { name: tagName }
+          }))
+        }
+      },
+      include: {
+        tags: {
+          select: { name: true }
+        }
+      }
+    });
     return new NextResponse(JSON.stringify(article), {
       status: 200,
       headers: {
