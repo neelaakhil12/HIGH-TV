@@ -118,14 +118,37 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
+  const imageUrl = article?.image 
+    ? (article.image.startsWith('http') ? article.image : `https://hightv.in${article.image}`)
+    : 'https://hightv.in/logo.png';
+
+  const cleanTitle = article?.title ? article.title.replace(/<[^>]*>/g, '') : 'వార్త | హై టీవీ';
+  const cleanDesc = article?.description ? article.description.replace(/<[^>]*>/g, '') : '';
+
   return {
-    title: article ? `${article.title} | హై టీవీ` : 'వార్త | హై టీవీ',
-    description: article?.description || undefined,
+    title: `${cleanTitle} | హై టీవీ`,
+    description: cleanDesc || undefined,
     openGraph: {
-      title: article?.title,
-      description: article?.description || undefined,
-      images: article?.image ? [article.image] : [],
+      title: `${cleanTitle} | హై టీవీ`,
+      description: cleanDesc || undefined,
+      url: `https://hightv.in/news/${slug}`,
+      siteName: 'హై టీవీ',
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: cleanTitle,
+        }
+      ],
+      type: 'article',
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${cleanTitle} | హై టీవీ`,
+      description: cleanDesc || undefined,
+      images: [imageUrl],
+    }
   };
 }
 
