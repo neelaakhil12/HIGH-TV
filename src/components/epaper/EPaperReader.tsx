@@ -630,10 +630,11 @@ export default function EPaperReader() {
   // Hover/Highlight active article state
   const [highlightedZoneId, setHighlightedZoneId] = useState<string | null>(null);
 
-  // E-Paper Left and Right Ads states
+  // E-Paper Left, Right, Header, and Mobile Ads states
   const [epaperLeftAd, setEpaperLeftAd] = useState<{ image: string; link: string } | null>(null);
   const [epaperRightAd, setEpaperRightAd] = useState<{ image: string; link: string } | null>(null);
   const [epaperHeaderAd, setEpaperHeaderAd] = useState<{ image: string; link: string } | null>(null);
+  const [epaperMobileAd, setEpaperMobileAd] = useState<{ image: string; link: string } | null>(null);
 
   useEffect(() => {
     // Fetch E-Paper Left Ad
@@ -674,6 +675,19 @@ export default function EPaperReader() {
         }
       })
       .catch(err => console.error('Error fetching epaper header ad:', err));
+
+    // Fetch E-Paper Mobile Ad
+    fetch('/api/articles?category=sidebar-ad-epaper-mobile&limit=5&t=' + Date.now())
+      .then(res => res.ok ? res.json() : [])
+      .then((data: any[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const activeAd = data.find(ad => ad.category === 'active');
+          if (activeAd && activeAd.image) {
+            setEpaperMobileAd({ image: activeAd.image, link: activeAd.body || '#' });
+          }
+        }
+      })
+      .catch(err => console.error('Error fetching epaper mobile ad:', err));
   }, []);
 
   // Clear active highlight when page details change
@@ -2176,7 +2190,19 @@ export default function EPaperReader() {
                       
                       {secIdx === 0 && isMobile && (
                         <div className="w-full flex justify-center mt-6">
-                          <AdBanner position="rectangle" />
+                          {epaperMobileAd ? (
+                            <a 
+                              href={epaperMobileAd.link} 
+                              target={epaperMobileAd.link === '#' ? '_self' : '_blank'} 
+                              rel="noopener noreferrer"
+                              onClick={(e) => { if (epaperMobileAd.link === '#') e.preventDefault(); }}
+                              className="block w-full max-w-[340px] overflow-hidden rounded-xl border border-gray-250 shadow-sm"
+                            >
+                              <img src={epaperMobileAd.image} className="w-full h-auto object-contain mx-auto bg-slate-50" alt="Mobile Ad" />
+                            </a>
+                          ) : (
+                            <AdBanner position="rectangle" />
+                          )}
                         </div>
                       )}
                     </div>
@@ -2472,7 +2498,19 @@ export default function EPaperReader() {
                 <div className="flex flex-col items-center gap-2 w-full">
                   {isMobile && (
                     <div className="w-full flex justify-center mb-1 px-4">
-                      <AdBanner position="leaderboard" />
+                      {epaperMobileAd ? (
+                        <a 
+                          href={epaperMobileAd.link} 
+                          target={epaperMobileAd.link === '#' ? '_self' : '_blank'} 
+                          rel="noopener noreferrer"
+                          onClick={(e) => { if (epaperMobileAd.link === '#') e.preventDefault(); }}
+                          className="block w-full max-w-[340px] overflow-hidden rounded-xl border border-gray-250 shadow-sm"
+                        >
+                          <img src={epaperMobileAd.image} className="w-full h-auto object-contain mx-auto bg-slate-50" alt="Mobile Ad" />
+                        </a>
+                      ) : (
+                        <AdBanner position="leaderboard" />
+                      )}
                     </div>
                   )}
 
@@ -2752,7 +2790,19 @@ export default function EPaperReader() {
 
               {isMobile && (
                 <div className="w-full flex justify-center mt-1 px-4 pb-14">
-                  <AdBanner position="rectangle" />
+                  {epaperMobileAd ? (
+                    <a 
+                      href={epaperMobileAd.link} 
+                      target={epaperMobileAd.link === '#' ? '_self' : '_blank'} 
+                      rel="noopener noreferrer"
+                      onClick={(e) => { if (epaperMobileAd.link === '#') e.preventDefault(); }}
+                      className="block w-full max-w-[340px] overflow-hidden rounded-xl border border-gray-250 shadow-sm"
+                    >
+                      <img src={epaperMobileAd.image} className="w-full h-auto object-contain mx-auto bg-slate-50" alt="Mobile Ad" />
+                    </a>
+                  ) : (
+                    <AdBanner position="rectangle" />
+                  )}
                 </div>
               )}
             </div>
