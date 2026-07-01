@@ -577,9 +577,9 @@ export default function AdminPage() {
   const [newsTitle, setNewsTitle] = useState('');
   const [newsSlug, setNewsSlug] = useState('');
   const [newsDescription, setNewsDescription] = useState('');
-  const [newsTags, setNewsTags] = useState<string[]>([]);
+  const [newsTags, setNewsTags] = useState<{ name: string; linkedArticleSlug: string | null }[]>([]);
   const [tagInput, setTagInput] = useState('');
-  const [allTagsSuggestions, setAllTagsSuggestions] = useState<string[]>([]);
+  const [allTagsSuggestions, setAllTagsSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [metaDescription, setMetaDescription] = useState('');
   const [newsAuthor, setNewsAuthor] = useState('హై టీవీ డెస్క్');
@@ -669,7 +669,7 @@ export default function AdminPage() {
       const res = await fetch('/api/tags');
       if (res.ok) {
         const data = await res.json();
-        setAllTagsSuggestions(data.map((t: any) => t.name));
+        setAllTagsSuggestions(data);
       }
     } catch (e) {
       console.error('Failed to load tags:', e);
@@ -2922,7 +2922,7 @@ export default function AdminPage() {
     setNewsTitle(art.title || '');
     setNewsSlug(art.slug || '');
     setNewsDescription(art.description || '');
-    setNewsTags(art.tags ? art.tags.map((t: any) => t.name) : []);
+    setNewsTags(art.tags ? art.tags.map((t: any) => ({ name: t.name, linkedArticleSlug: t.linkedArticleSlug || null })) : []);
     setMetaDescription(art.metaDescription || '');
     setNewsAuthor(art.author || '');
     const getLocalDatetimeString = (dateInput: any) => {
@@ -4537,19 +4537,47 @@ export default function AdminPage() {
                     
                     {/* Added Tags Chips Container */}
                     {newsTags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 p-2 bg-slate-50 rounded-xl border border-slate-100 max-h-[120px] overflow-y-auto">
-                        {newsTags.map((tag, idx) => (
-                          <span key={idx} className="bg-white border border-slate-200/60 text-[#02599c] text-[11px] font-bold pl-2.5 pr-1.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm select-none">
-                            #{tag}
-                            <button
-                              type="button"
-                              onClick={() => setNewsTags(newsTags.filter(t => t !== tag))}
-                              className="text-slate-400 hover:text-rose-500 font-bold w-4 h-4 rounded-full hover:bg-rose-50 flex items-center justify-center transition-colors text-[9px]"
-                            >
-                              ✕
-                            </button>
-                          </span>
-                        ))}
+                      <div className="flex flex-col gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200/60">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 px-1">Link Tags to Specific Articles:</span>
+                        <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1">
+                          {newsTags.map((tagObj, idx) => {
+                            const name = typeof tagObj === 'string' ? tagObj : tagObj.name;
+                            const linkedArticleSlug = typeof tagObj === 'string' ? null : (tagObj.linkedArticleSlug || null);
+                            return (
+                              <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white border border-slate-200/50 p-2.5 rounded-xl shadow-sm">
+                                <span className="bg-blue-50 text-[#02599c] text-xs font-bold px-2.5 py-1 rounded-lg select-none border border-blue-100/50 shrink-0">
+                                  #{name}
+                                </span>
+                                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                                  <span className="text-[10px] text-slate-400 font-medium shrink-0">Link target:</span>
+                                  <select
+                                    value={linkedArticleSlug || ''}
+                                    onChange={(e) => {
+                                      const val = e.target.value || null;
+                                      setNewsTags(newsTags.map(t => (typeof t === 'string' ? t : t.name) === name ? { name, linkedArticleSlug: val } : t));
+                                    }}
+                                    className="text-[11px] bg-slate-50 border border-slate-200 hover:border-slate-350 focus:border-rose-400 focus:bg-white rounded-lg px-2 py-1 text-slate-700 outline-none w-full sm:w-[250px] transition-all cursor-pointer truncate"
+                                  >
+                                    <option value="">-- Related News (Default) --</option>
+                                    {allArticles.map((art: any) => (
+                                      <option key={art.id} value={art.slug}>
+                                        {art.title.replace(/<[^>]*>/g, '')}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <button
+                                    type="button"
+                                    onClick={() => setNewsTags(newsTags.filter(t => (typeof t === 'string' ? t : t.name) !== name))}
+                                    className="text-slate-400 hover:text-rose-500 hover:bg-rose-50 font-bold w-6 h-6 rounded-lg flex items-center justify-center transition-colors text-xs shrink-0 cursor-pointer"
+                                    title="Remove Tag"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
 
@@ -4568,8 +4596,8 @@ export default function AdminPage() {
                           if (e.key === 'Enter') {
                             e.preventDefault();
                             const val = tagInput.trim().replace(/,/g, '');
-                            if (val && !newsTags.includes(val)) {
-                              setNewsTags([...newsTags, val]);
+                            if (val && !newsTags.some(t => (typeof t === 'string' ? t : t.name) === val)) {
+                              setNewsTags([...newsTags, { name: val, linkedArticleSlug: null }]);
                             }
                             setTagInput('');
                           }
@@ -4577,8 +4605,8 @@ export default function AdminPage() {
                         onKeyUp={(e) => {
                           if (e.key === ',' || e.key === 'Enter') {
                             const val = tagInput.trim().replace(/,/g, '');
-                            if (val && !newsTags.includes(val)) {
-                              setNewsTags([...newsTags, val]);
+                            if (val && !newsTags.some(t => (typeof t === 'string' ? t : t.name) === val)) {
+                              setNewsTags([...newsTags, { name: val, linkedArticleSlug: null }]);
                             }
                             setTagInput('');
                           }
@@ -4592,7 +4620,7 @@ export default function AdminPage() {
                         (() => {
                           const query = tagInput.toLowerCase();
                           const matches = allTagsSuggestions.filter(
-                            t => t.toLowerCase().includes(query) && !newsTags.includes(t)
+                            t => t.name.toLowerCase().includes(query) && !newsTags.some(nt => (typeof nt === 'string' ? nt : nt.name) === t.name)
                           );
                           if (matches.length === 0) return null;
                           return (
@@ -4602,15 +4630,15 @@ export default function AdminPage() {
                                   key={idx}
                                   type="button"
                                   onMouseDown={() => {
-                                    if (!newsTags.includes(match)) {
-                                      setNewsTags([...newsTags, match]);
+                                    if (!newsTags.some(nt => (typeof nt === 'string' ? nt : nt.name) === match.name)) {
+                                      setNewsTags([...newsTags, { name: match.name, linkedArticleSlug: match.linkedArticleSlug || null }]);
                                     }
                                     setTagInput('');
                                     setShowSuggestions(false);
                                   }}
-                                  className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between border-b border-slate-100 last:border-0"
+                                  className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between border-b border-slate-100 last:border-0 cursor-pointer"
                                 >
-                                  <span>#{match}</span>
+                                  <span>#{match.name}</span>
                                   <span className="text-[9px] text-[#02599c] font-black uppercase tracking-wider">Select</span>
                                 </button>
                               ))}

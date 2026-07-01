@@ -50,7 +50,8 @@ export async function GET(req: NextRequest) {
       image: true,
       tags: {
         select: {
-          name: true
+          name: true,
+          linkedArticleSlug: true
         }
       },
       views: true,
@@ -100,22 +101,37 @@ export async function POST(req: NextRequest) {
     if (data.image) {
       data.image = await resolveArticleImage(data.image, data.slug) ?? data.image;
     }
-    const tagNames: string[] = data.tags || [];
+    const tagsInput: (string | { name: string, linkedArticleSlug?: string | null })[] = data.tags || [];
     delete data.tags;
+
+    const tagConnects: { id: string }[] = [];
+    for (const t of tagsInput) {
+      const name = typeof t === 'string' ? t : t.name;
+      const linkedArticleSlug = typeof t === 'string' ? null : (t.linkedArticleSlug || null);
+      
+      const tag = await prisma.tag.upsert({
+        where: { name },
+        update: {
+          ...(typeof t !== 'string' ? { linkedArticleSlug } : {})
+        },
+        create: {
+          name,
+          linkedArticleSlug
+        }
+      });
+      tagConnects.push({ id: tag.id });
+    }
 
     const article = await prisma.article.create({
       data: {
         ...data,
         tags: {
-          connectOrCreate: tagNames.map(tagName => ({
-            where: { name: tagName },
-            create: { name: tagName }
-          }))
+          connect: tagConnects
         }
       },
       include: {
         tags: {
-          select: { name: true }
+          select: { name: true, linkedArticleSlug: true }
         }
       }
     });

@@ -918,6 +918,17 @@ export default function ArticlePageClient({
                       <div className="flex flex-wrap gap-2">
                         {article.tags.map((t: any, idx: number) => {
                           const isSelected = selectedTag === t.name;
+                          if (t.linkedArticleSlug) {
+                            return (
+                              <Link
+                                key={idx}
+                                href={`/news/${t.linkedArticleSlug}`}
+                                className="text-xs font-bold px-3 py-1.5 rounded-lg border transition-all cursor-pointer shadow-sm bg-white text-[#002040] border-transparent hover:bg-slate-100"
+                              >
+                                #{t.name}
+                              </Link>
+                            );
+                          }
                           return (
                             <button
                               key={idx}
