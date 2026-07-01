@@ -15,6 +15,7 @@ import AdBanner from '@/components/home/AdBanner';
 import TabbedNewsWidget from '@/components/home/TabbedNewsWidget';
 import FlashNewsBar from '@/components/home/FlashNewsBar';
 import WeatherWidget from '@/components/home/WeatherWidget';
+import PollWidget from '@/components/home/PollWidget';
 
 import {
   politicsNews,
@@ -526,7 +527,27 @@ export default function HomePage() {
             {/* Trending వార్తలు */}
             <NewsSection title="Trending" titleTelugu="ట్రెండింగ్ వార్తలు" articles={trendingList} viewAllLink="/category/trending" accentColor="#ea580c" layout="featured-left" />
 
-            {/* ── MOBILE AD 6 (after Trending) — leaderboard slot ── */}
+            {/* ── MOBILE AD 6 (after Trending, before Polls) — leaderboard slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="leaderboard" />
+            </div>
+
+            {/* ── POLLS SECTION (mobile only — same as sidebar widget) ── */}
+            <div className="block md:hidden my-4">
+              <PollWidget scope="general" />
+            </div>
+
+            {/* ── MOBILE AD 6b (after Polls) — sidebar slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="sidebar" />
+            </div>
+
+            {/* ── MOBILE AD 6c (continuous after Polls) — rectangle slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="rectangle" />
+            </div>
+
+            {/* ── MOBILE AD 6d (continuous after Polls) — leaderboard slot ── */}
             <div className="block md:hidden my-3">
               <AdBanner position="leaderboard" />
             </div>
@@ -589,19 +610,9 @@ export default function HomePage() {
 
             <PhotoGallery photos={homepagePhotos} />
 
-            {/* ── MOBILE AD 13 (after Photo Gallery — continuous end) — sidebar slot ── */}
+            {/* ── MOBILE AD 13 (after Photo Gallery) — sidebar slot — only 1 ad here ── */}
             <div className="block md:hidden my-3">
               <AdBanner position="sidebar" />
-            </div>
-
-            {/* ── MOBILE AD 14 (continuous end) — rectangle slot ── */}
-            <div className="block md:hidden my-3">
-              <AdBanner position="rectangle" />
-            </div>
-
-            {/* ── MOBILE AD 15 (continuous end) — leaderboard slot ── */}
-            <div className="block md:hidden my-3">
-              <AdBanner position="leaderboard" />
             </div>
 
           </div>
