@@ -179,21 +179,35 @@ export default function ArticlePageClient({
   useEffect(() => {
     const fetchArticleAds = async () => {
       try {
-        const [leftRes, rightRes, bothRes] = await Promise.all([
-          fetch('/api/articles?category=sidebar-ad-article-left&limit=50&t=' + Date.now()).then(r => r.json()),
-          fetch('/api/articles?category=sidebar-ad-article-right&limit=50&t=' + Date.now()).then(r => r.json()),
+        const articleCat = article.categorySlug;
+        const leftCat = articleCat ? `sidebar-ad-article-left-${articleCat}` : 'sidebar-ad-article-left';
+        const rightCat = articleCat ? `sidebar-ad-article-right-${articleCat}` : 'sidebar-ad-article-right';
+
+        const [leftRes, rightRes, defaultLeftRes, defaultRightRes, bothRes] = await Promise.all([
+          fetch(`/api/articles?category=${leftCat}&limit=50&t=` + Date.now()).then(r => r.json()),
+          fetch(`/api/articles?category=${rightCat}&limit=50&t=` + Date.now()).then(r => r.json()),
+          articleCat ? fetch('/api/articles?category=sidebar-ad-article-left&limit=50&t=' + Date.now()).then(r => r.json()) : Promise.resolve([]),
+          articleCat ? fetch('/api/articles?category=sidebar-ad-article-right&limit=50&t=' + Date.now()).then(r => r.json()) : Promise.resolve([]),
           fetch('/api/articles?category=sidebar-ad-both&limit=50&t=' + Date.now()).then(r => r.json())
         ]);
-        if (Array.isArray(leftRes) && Array.isArray(rightRes) && Array.isArray(bothRes)) {
-          setCustomArticleLeftAds([...leftRes, ...bothRes].filter((ad: any) => ad.category === 'active'));
-          setCustomArticleRightAds([...rightRes, ...bothRes].filter((ad: any) => ad.category === 'active'));
-        }
+
+        const activeLeft = Array.isArray(leftRes) ? leftRes.filter((ad: any) => ad.category === 'active') : [];
+        const activeRight = Array.isArray(rightRes) ? rightRes.filter((ad: any) => ad.category === 'active') : [];
+        const activeBoth = Array.isArray(bothRes) ? bothRes.filter((ad: any) => ad.category === 'active') : [];
+        const activeDefaultLeft = Array.isArray(defaultLeftRes) ? defaultLeftRes.filter((ad: any) => ad.category === 'active') : [];
+        const activeDefaultRight = Array.isArray(defaultRightRes) ? defaultRightRes.filter((ad: any) => ad.category === 'active') : [];
+
+        const finalLeft = activeLeft.length > 0 ? [...activeLeft, ...activeBoth] : [...activeDefaultLeft, ...activeBoth];
+        const finalRight = activeRight.length > 0 ? [...activeRight, ...activeBoth] : [...activeDefaultRight, ...activeBoth];
+
+        setCustomArticleLeftAds(finalLeft);
+        setCustomArticleRightAds(finalRight);
       } catch (err) {
         console.error("Error loading article sidebar ads:", err);
       }
     };
     fetchArticleAds();
-  }, []);
+  }, [article.categorySlug]);
 
   const [apNewsList, setApNewsList] = useState<any[]>(apDistrictNews);
   const [tgNewsList, setTgNewsList] = useState<any[]>(tgDistrictNews);

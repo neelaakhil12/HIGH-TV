@@ -20,7 +20,13 @@ export async function GET(req: NextRequest) {
     if (category === 'latest') where.isBreaking = true;
     else if (category === 'trending') where.isTrending = true;
     else if (category === 'featured') where.isFeatured = true;
-    else if (category && category !== 'all') where.categorySlug = category;
+    else if (category && category !== 'all') {
+      if (category.endsWith('*')) {
+        where.categorySlug = { startsWith: category.slice(0, -1) };
+      } else {
+        where.categorySlug = category;
+      }
+    }
 
     if (search) {
       where.OR = [

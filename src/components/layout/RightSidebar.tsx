@@ -22,20 +22,31 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
   useEffect(() => {
     const fetchCategoryAds = async () => {
       try {
-        const [catRes, bothRes] = await Promise.all([
-          fetch('/api/articles?category=sidebar-ad-category&limit=50&t=' + Date.now()).then(r => r.json()),
+        const adCat = categorySlug ? `sidebar-ad-category-${categorySlug}` : 'sidebar-ad-category';
+        const [catRes, defaultRes, bothRes] = await Promise.all([
+          fetch(`/api/articles?category=${adCat}&limit=50&t=` + Date.now()).then(r => r.json()),
+          (categorySlug && categorySlug !== 'home') ? fetch('/api/articles?category=sidebar-ad-category&limit=50&t=' + Date.now()).then(r => r.json()) : Promise.resolve([]),
           fetch('/api/articles?category=sidebar-ad-both&limit=50&t=' + Date.now()).then(r => r.json())
         ]);
-        if (Array.isArray(catRes) && Array.isArray(bothRes)) {
-          const combined = [...catRes, ...bothRes];
-          setCustomSidebarAds(combined.filter((ad: any) => ad.category === 'active'));
+        
+        let combined = [];
+        const activeCatAds = Array.isArray(catRes) ? catRes.filter((ad: any) => ad.category === 'active') : [];
+        const activeBothAds = Array.isArray(bothRes) ? bothRes.filter((ad: any) => ad.category === 'active') : [];
+        const activeDefaultAds = Array.isArray(defaultRes) ? defaultRes.filter((ad: any) => ad.category === 'active') : [];
+        
+        if (activeCatAds.length > 0) {
+          combined = [...activeCatAds, ...activeBothAds];
+        } else {
+          combined = [...activeDefaultAds, ...activeBothAds];
         }
+        
+        setCustomSidebarAds(combined);
       } catch (err) {
         console.error("Error loading category sidebar ads:", err);
       }
     };
     fetchCategoryAds();
-  }, []);
+  }, [categorySlug]);
 
   const initialDistrict = categorySlug?.startsWith('district-') ? categorySlug.replace('district-', '') : '';
   const [selectedDistrict, setSelectedDistrict] = useState<string>(initialDistrict);

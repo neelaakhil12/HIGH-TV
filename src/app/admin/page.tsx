@@ -961,32 +961,16 @@ export default function AdminPage() {
   const [sidebarAdStatus, setSidebarAdStatus] = useState<'active' | 'inactive'>('active');
   const [sidebarAdLocation, setSidebarAdLocation] = useState<'category' | 'article-left' | 'article-right' | 'both' | 'header-ad' | 'epaper-left' | 'epaper-right' | 'epaper-header' | 'epaper-mobile'>('category');
   const [isSavingSidebarAd, setIsSavingSidebarAd] = useState(false);
+  const [sidebarAdTargetCategory, setSidebarAdTargetCategory] = useState('');
 
   const fetchAdsData = () => {
     Promise.all([
-      fetch('/api/articles?category=sidebar-ad-category&limit=50&t=' + Date.now()).then(r => r.json()),
-      fetch('/api/articles?category=sidebar-ad-article-left&limit=50&t=' + Date.now()).then(r => r.json()),
-      fetch('/api/articles?category=sidebar-ad-article-right&limit=50&t=' + Date.now()).then(r => r.json()),
-      fetch('/api/articles?category=sidebar-ad-both&limit=50&t=' + Date.now()).then(r => r.json()),
-      fetch('/api/articles?category=header-ad&limit=10&t=' + Date.now()).then(r => r.json()),
-      fetch('/api/articles?category=sidebar-ad-epaper-left&limit=10&t=' + Date.now()).then(r => r.json()),
-      fetch('/api/articles?category=sidebar-ad-epaper-right&limit=10&t=' + Date.now()).then(r => r.json()),
-      fetch('/api/articles?category=sidebar-ad-epaper-header&limit=10&t=' + Date.now()).then(r => r.json()),
-      fetch('/api/articles?category=sidebar-ad-epaper-mobile&limit=10&t=' + Date.now()).then(r => r.json())
+      fetch('/api/articles?category=sidebar-ad-*&limit=200&t=' + Date.now()).then(r => r.json()),
+      fetch('/api/articles?category=header-ad&limit=50&t=' + Date.now()).then(r => r.json())
     ])
-      .then(([catAds, leftAds, rightAds, bothAds, headerAds, epaperLeftAds, epaperRightAds, epaperHeaderAds, epaperMobileAds]) => {
-        if (
-          Array.isArray(catAds) && 
-          Array.isArray(leftAds) && 
-          Array.isArray(rightAds) && 
-          Array.isArray(bothAds) && 
-          Array.isArray(headerAds) &&
-          Array.isArray(epaperLeftAds) &&
-          Array.isArray(epaperRightAds) &&
-          Array.isArray(epaperHeaderAds) &&
-          Array.isArray(epaperMobileAds)
-        ) {
-          setSidebarAds([...catAds, ...leftAds, ...rightAds, ...bothAds, ...headerAds, ...epaperLeftAds, ...epaperRightAds, ...epaperHeaderAds, ...epaperMobileAds]);
+      .then(([sidebarAdsRes, headerAdsRes]) => {
+        if (Array.isArray(sidebarAdsRes) && Array.isArray(headerAdsRes)) {
+          setSidebarAds([...sidebarAdsRes, ...headerAdsRes]);
         }
       })
       .catch(err => console.error('Error loading ads data:', err));
@@ -1046,7 +1030,7 @@ export default function AdminPage() {
     }
 
     setIsSavingSidebarAd(true);
-    const catSlug = sidebarAdLocation === 'category' 
+    let catSlug = sidebarAdLocation === 'category' 
       ? 'sidebar-ad-category' 
       : sidebarAdLocation === 'article-left' 
         ? 'sidebar-ad-article-left' 
@@ -1063,6 +1047,11 @@ export default function AdminPage() {
                   : sidebarAdLocation === 'epaper-mobile'
                     ? 'sidebar-ad-epaper-mobile'
                     : 'sidebar-ad-both';
+    
+    if (sidebarAdTargetCategory && (sidebarAdLocation === 'category' || sidebarAdLocation === 'article-left' || sidebarAdLocation === 'article-right')) {
+      catSlug = `${catSlug}-${sidebarAdTargetCategory}`;
+    }
+
     const cleanSlug = adFormMode === 'edit' && editingAd ? editingAd.slug : `ad-${catSlug.slice(-3)}-${Date.now().toString().slice(-6)}`;
     
     const adData = {
@@ -1096,6 +1085,7 @@ export default function AdminPage() {
         setSidebarAdImage('');
         setSidebarAdStatus('active');
         setSidebarAdLocation('category');
+        setSidebarAdTargetCategory('');
         fetchAdsData();
       } else {
         const errorRes = await res.json();
@@ -10630,11 +10620,18 @@ export default function AdminPage() {
                                 : adActiveSubTab === 'epaper-header'
                                   ? 'sidebar-ad-epaper-header'
                                   : 'sidebar-ad-epaper-mobile';
-                    const activeAds = sidebarAds.filter(
-                      ad => (adActiveSubTab === 'header-ad' || adActiveSubTab === 'epaper-left' || adActiveSubTab === 'epaper-right' || adActiveSubTab === 'epaper-header' || adActiveSubTab === 'epaper-mobile')
-                        ? ad.categorySlug === targetCategorySlug
-                        : (ad.categorySlug === targetCategorySlug || ad.categorySlug === 'sidebar-ad-both')
-                    );
+                    const activeAds = sidebarAds.filter(ad => {
+                      if (adActiveSubTab === 'category') {
+                        return ad.categorySlug.startsWith('sidebar-ad-category') || ad.categorySlug === 'sidebar-ad-both';
+                      }
+                      if (adActiveSubTab === 'article-left') {
+                        return ad.categorySlug.startsWith('sidebar-ad-article-left') || ad.categorySlug === 'sidebar-ad-both';
+                      }
+                      if (adActiveSubTab === 'article-right') {
+                        return ad.categorySlug.startsWith('sidebar-ad-article-right') || ad.categorySlug === 'sidebar-ad-both';
+                      }
+                      return ad.categorySlug === targetCategorySlug;
+                    });
 
                     if (activeAds.length === 0) {
                       return (
@@ -10668,23 +10665,27 @@ export default function AdminPage() {
                                     {ad.category === 'active' ? 'Active' : 'Inactive'}
                                   </span>
                                   <span className="px-2 py-0.5 rounded text-[9px] font-black text-slate-500 bg-slate-100 border border-slate-200">
-                                    {ad.categorySlug === 'sidebar-ad-category' 
-                                      ? 'Category Only' 
-                                      : ad.categorySlug === 'sidebar-ad-article-left' 
-                                        ? 'Article Left Only' 
-                                        : ad.categorySlug === 'sidebar-ad-article-right'
-                                          ? 'Article Right Only'
-                                          : ad.categorySlug === 'header-ad'
-                                            ? '🏠 Header Banner'
-                                            : ad.categorySlug === 'sidebar-ad-epaper-left'
-                                              ? '📰 E-Paper Left'
-                                              : ad.categorySlug === 'sidebar-ad-epaper-right'
-                                                ? '📰 E-Paper Right'
-                                                : ad.categorySlug === 'sidebar-ad-epaper-header'
-                                                  ? '📰 E-Paper Header'
-                                                  : ad.categorySlug === 'sidebar-ad-epaper-mobile'
-                                                    ? '📰 E-Paper Mobile'
-                                                    : 'All Sidebars'}
+                                    {(() => {
+                                      const slug = ad.categorySlug;
+                                      if (slug.startsWith('sidebar-ad-category')) {
+                                        const c = slug.replace('sidebar-ad-category-', '');
+                                        return c === 'sidebar-ad-category' ? 'Category Default' : `Category: ${c.toUpperCase()}`;
+                                      }
+                                      if (slug.startsWith('sidebar-ad-article-left')) {
+                                        const c = slug.replace('sidebar-ad-article-left-', '');
+                                        return c === 'sidebar-ad-article-left' ? 'Article Left Default' : `Article Left: ${c.toUpperCase()}`;
+                                      }
+                                      if (slug.startsWith('sidebar-ad-article-right')) {
+                                        const c = slug.replace('sidebar-ad-article-right-', '');
+                                        return c === 'sidebar-ad-article-right' ? 'Article Right Default' : `Article Right: ${c.toUpperCase()}`;
+                                      }
+                                      if (slug === 'header-ad') return '🏠 Header Banner';
+                                      if (slug === 'sidebar-ad-epaper-left') return '📰 E-Paper Left';
+                                      if (slug === 'sidebar-ad-epaper-right') return '📰 E-Paper Right';
+                                      if (slug === 'sidebar-ad-epaper-header') return '📰 E-Paper Header';
+                                      if (slug === 'sidebar-ad-epaper-mobile') return '📰 E-Paper Mobile';
+                                      return 'All Sidebars';
+                                    })()}
                                   </span>
                                 </div>
                               </div>
@@ -10713,24 +10714,33 @@ export default function AdminPage() {
                                     setSidebarAdLink(ad.body || '');
                                     setSidebarAdImage(ad.image || '');
                                     setSidebarAdStatus(ad.category === 'active' ? 'active' : 'inactive');
-                                    const loc = ad.categorySlug === 'sidebar-ad-category' 
-                                      ? 'category' 
-                                      : ad.categorySlug === 'sidebar-ad-article-left' 
-                                        ? 'article-left' 
-                                        : ad.categorySlug === 'sidebar-ad-article-right'
-                                          ? 'article-right'
-                                          : ad.categorySlug === 'header-ad'
-                                            ? 'header-ad'
-                                            : ad.categorySlug === 'sidebar-ad-epaper-left'
-                                              ? 'epaper-left'
-                                              : ad.categorySlug === 'sidebar-ad-epaper-right'
-                                                ? 'epaper-right'
-                                                : ad.categorySlug === 'sidebar-ad-epaper-header'
-                                                  ? 'epaper-header'
-                                                  : ad.categorySlug === 'sidebar-ad-epaper-mobile'
-                                                    ? 'epaper-mobile'
-                                                    : 'both';
+                                    let loc: 'category' | 'article-left' | 'article-right' | 'both' | 'header-ad' | 'epaper-left' | 'epaper-right' | 'epaper-header' | 'epaper-mobile' = 'both';
+                                    let targetCat = '';
+                                    if (ad.categorySlug.startsWith('sidebar-ad-category')) {
+                                      loc = 'category';
+                                      targetCat = ad.categorySlug.replace('sidebar-ad-category-', '');
+                                      if (targetCat === 'sidebar-ad-category') targetCat = '';
+                                    } else if (ad.categorySlug.startsWith('sidebar-ad-article-left')) {
+                                      loc = 'article-left';
+                                      targetCat = ad.categorySlug.replace('sidebar-ad-article-left-', '');
+                                      if (targetCat === 'sidebar-ad-article-left') targetCat = '';
+                                    } else if (ad.categorySlug.startsWith('sidebar-ad-article-right')) {
+                                      loc = 'article-right';
+                                      targetCat = ad.categorySlug.replace('sidebar-ad-article-right-', '');
+                                      if (targetCat === 'sidebar-ad-article-right') targetCat = '';
+                                    } else if (ad.categorySlug === 'header-ad') {
+                                      loc = 'header-ad';
+                                    } else if (ad.categorySlug === 'sidebar-ad-epaper-left') {
+                                      loc = 'epaper-left';
+                                    } else if (ad.categorySlug === 'sidebar-ad-epaper-right') {
+                                      loc = 'epaper-right';
+                                    } else if (ad.categorySlug === 'sidebar-ad-epaper-header') {
+                                      loc = 'epaper-header';
+                                    } else if (ad.categorySlug === 'sidebar-ad-epaper-mobile') {
+                                      loc = 'epaper-mobile';
+                                    }
                                     setSidebarAdLocation(loc);
+                                    setSidebarAdTargetCategory(targetCat);
                                     setAdFormMode('edit');
                                   }}
                                   className="text-sky-600 hover:text-sky-700 bg-slate-50 border border-slate-200/50 p-1.5 rounded-lg transition-colors cursor-pointer"
@@ -10810,9 +10820,28 @@ export default function AdminPage() {
                         <option value="epaper-header">📰 ఈ-పేపర్ హెడర్ యాడ్ (E-Paper Header Ad)</option>
                         <option value="epaper-mobile">📰 ఈ-పేపర్ మొబైల్ యాడ్ (E-Paper Mobile Ad)</option>
                         <option value="header-ad">🏠 ஹெడర్ బ్యానర్ (Header Banner — Top of Page)</option>
-                        <option value="both">అన్ని సైడ్‌బార్లలోనూ (All Sidebars / Combined)</option>
                       </select>
                     </div>
+
+                    {(sidebarAdLocation === 'category' || sidebarAdLocation === 'article-left' || sidebarAdLocation === 'article-right') && (
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">టార్గెట్ కేటగిరీ (Target Category / Page)</label>
+                        <select
+                          value={sidebarAdTargetCategory}
+                          onChange={(e) => setSidebarAdTargetCategory(e.target.value)}
+                          className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
+                        >
+                          <option value="">అన్ని పేజీలు / డిఫాల్ట్ (All Pages / Default)</option>
+                          <option value="telangana">తెలంగాణ (Telangana)</option>
+                          <option value="andhra-pradesh">ఆంధ్రప్రదేశ్ (Andhra Pradesh)</option>
+                          {MAIN_CATEGORIES_LIST.map((cat) => (
+                            <option key={cat.slug} value={cat.slug}>
+                              {cat.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
 
                     {/* Status Select */}
                     <div className="flex flex-col gap-1">
