@@ -1342,7 +1342,7 @@ export default function AdminPage() {
 
   // General Banners / Ad configs
   const [customAds, setCustomAds] = useState<Record<string, { enabled: boolean; image: string; link: string }>>({});
-  const [activeAdSpot, setActiveAdSpot] = useState<'leaderboard' | 'sidebar' | 'rectangle'>('leaderboard');
+  const [activeAdSpot, setActiveAdSpot] = useState<'leaderboard' | 'sidebar' | 'rectangle' | 'mobile_leaderboard' | 'mobile_sidebar' | 'mobile_rectangle'>('leaderboard');
   const [adSpotEnabled, setAdSpotEnabled] = useState(false);
   const [adSpotImage, setAdSpotImage] = useState('');
   const [adSpotLink, setAdSpotLink] = useState('#');
@@ -5880,19 +5880,50 @@ export default function AdminPage() {
                   🎁 Global Site Sponsor Advertisements
                 </h3>
 
-                <div className="flex bg-slate-100 p-1 rounded-xl gap-1.5 select-none w-full md:max-w-md">
-                  {['leaderboard', 'sidebar', 'rectangle'].map((spot) => (
-                    <button
-                      key={spot}
-                      type="button"
-                      onClick={() => setActiveAdSpot(spot as any)}
-                      className={`flex-1 text-center py-2 text-xs font-black rounded-lg transition-all cursor-pointer capitalize ${
-                        activeAdSpot === spot ? 'bg-[#02599c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
-                      }`}
-                    >
-                      {spot}
-                    </button>
-                  ))}
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-black text-slate-450 uppercase tracking-wider">🖥️ Desktop View Ads</span>
+                    <div className="flex bg-slate-100 p-1 rounded-xl gap-1.5 select-none w-full md:max-w-md">
+                      {[
+                        { key: 'leaderboard', label: 'Leaderboard (Top)' },
+                        { key: 'sidebar', label: 'Sidebar (Square)' },
+                        { key: 'rectangle', label: 'Rectangle (Feed)' }
+                      ].map((spot) => (
+                        <button
+                          key={spot.key}
+                          type="button"
+                          onClick={() => setActiveAdSpot(spot.key as any)}
+                          className={`flex-1 text-center py-2 text-xs font-black rounded-lg transition-all cursor-pointer ${
+                            activeAdSpot === spot.key ? 'bg-[#02599c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                          }`}
+                        >
+                          {spot.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-black text-slate-450 uppercase tracking-wider">📱 Mobile View Ads</span>
+                    <div className="flex bg-slate-100 p-1 rounded-xl gap-1.5 select-none w-full md:max-w-md">
+                      {[
+                        { key: 'mobile_leaderboard', label: 'Leaderboard (Top)' },
+                        { key: 'mobile_sidebar', label: 'Sidebar (Square)' },
+                        { key: 'mobile_rectangle', label: 'Rectangle (Feed)' }
+                      ].map((spot) => (
+                        <button
+                          key={spot.key}
+                          type="button"
+                          onClick={() => setActiveAdSpot(spot.key as any)}
+                          className={`flex-1 text-center py-2 text-xs font-black rounded-lg transition-all cursor-pointer ${
+                            activeAdSpot === spot.key ? 'bg-[#02599c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                          }`}
+                        >
+                          {spot.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col gap-4">
