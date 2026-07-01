@@ -1,6 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+
+const cleanSectionName = (name: string) => {
+  return name.replace(/\s*\([\s\S]*?\)\s*$/, '').trim();
+};
 import Link from 'next/link';
 import {
   Home,
@@ -2130,7 +2134,7 @@ export default function EPaperReader() {
                   return (
                     <div key={sec.id} id={`${sec.key}-editions-section`} className="flex flex-col text-left">
                       <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
-                        {sec.name}
+                        {cleanSectionName(sec.name)}
                       </h2>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
                         {papers.map((item, idx) => (
@@ -2183,7 +2187,7 @@ export default function EPaperReader() {
                 return (
                   <div key={sec.id} id={`${sec.key}-editions-section`} className="flex flex-col text-left">
                     <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
-                      {sec.name}
+                      {cleanSectionName(sec.name)}
                     </h2>
                     {renderCarousel(`${sec.key}-carousel`, papers)}
                     {papers.length === 0 && (

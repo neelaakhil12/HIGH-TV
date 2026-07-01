@@ -4,6 +4,20 @@ import { prisma } from '@/lib/prisma';
 // GET — list all E-Paper sections (auto-populates defaults if table is empty)
 export async function GET() {
   try {
+    // Self-healing database migration: update existing sections with old names to English-only
+    await prisma.epaperSection.updateMany({
+      where: { name: 'Main Editions (ప్రధాన సంచికలు)' },
+      data: { name: 'Main Editions' }
+    });
+    await prisma.epaperSection.updateMany({
+      where: { name: 'Telangana Districts (తెలంగాణ జిల్లాలు)' },
+      data: { name: 'Telangana Districts' }
+    });
+    await prisma.epaperSection.updateMany({
+      where: { name: 'Andhra Pradesh Districts (ఆంధ్రప్రదేశ్ జిల్లాలు)' },
+      data: { name: 'Andhra Pradesh Districts' }
+    });
+
     let sections = await prisma.epaperSection.findMany({
       orderBy: { createdAt: 'asc' }
     });
@@ -11,9 +25,9 @@ export async function GET() {
     if (sections.length === 0) {
       // Auto-populate starting default categories/sections
       const defaults = [
-        { name: 'Main Editions (ప్రధాన సంచికలు)', key: 'main' },
-        { name: 'Telangana Districts (తెలంగాణ జిల్లాలు)', key: 'telangana' },
-        { name: 'Andhra Pradesh Districts (ఆంధ్రప్రదేశ్ జిల్లాలు)', key: 'ap' }
+        { name: 'Main Editions', key: 'main' },
+        { name: 'Telangana Districts', key: 'telangana' },
+        { name: 'Andhra Pradesh Districts', key: 'ap' }
       ];
 
       for (const item of defaults) {
