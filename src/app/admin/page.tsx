@@ -6470,13 +6470,13 @@ export default function AdminPage() {
                   className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 text-xs font-bold focus:outline-hidden focus:ring-2 focus:ring-[#02599c]/20 focus:bg-white transition-all cursor-pointer"
                 >
                   <option value="">హోమ్ పేజీ (Homepage)</option>
-                  <option value="business">బిజినెస్ (Business)</option>
-                  <option value="politics">పాలిటిక్స్ (Politics)</option>
-                  <option value="sports">స్పోర్ట్స్ (Sports)</option>
-                  <option value="entertainment">ఎంటర్‌టైన్‌మెంట్ (Entertainment)</option>
-                  <option value="technology">టెక్నాలజీ (Technology)</option>
-                  <option value="viral">వైరల్ (Viral)</option>
-                  <option value="health">హెల్త్ (Health)</option>
+                  <option value="telangana">తెలంగాణ (Telangana)</option>
+                  <option value="andhra-pradesh">ఆంధ్రప్రదేశ్ (Andhra Pradesh)</option>
+                  {MAIN_CATEGORIES_LIST.map((cat) => (
+                    <option key={cat.slug} value={cat.slug}>
+                      {cat.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
