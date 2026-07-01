@@ -314,7 +314,7 @@ export default function WebStoriesPage() {
 
             {/* Slide Text Panel (Fills the sides fully, spans the bottom of the container, top curved like a circle dome) */}
             <div 
-              className="absolute inset-x-0 bottom-0 bg-black/65 backdrop-blur-md shadow-2xl z-20 pointer-events-none flex flex-col justify-start items-center pt-20 pb-10 px-6 text-center animate-story-panel-pop border-t border-white/10 rounded-t-[50%_90px]"
+              className="absolute inset-x-0 bottom-0 bg-black/65 backdrop-blur-md shadow-2xl z-20 pointer-events-none flex flex-col justify-start items-center h-[200px] md:h-[240px] pt-14 md:pt-20 pb-4 px-6 text-center animate-story-panel-pop border-t border-white/10 rounded-t-[50%_80px] md:rounded-t-[50%_100px]"
             >
               <h3
                 className="text-[17px] md:text-[22px] font-black leading-relaxed text-white telugu-text max-w-xs md:max-w-md mx-auto pl-2.5"
