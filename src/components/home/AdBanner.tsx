@@ -386,36 +386,28 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
   }, [position]);
 
   if (customAd) {
-    const isLeaderboard = position === 'leaderboard';
-    const isSidebar = position === 'sidebar';
-    
     return (
-      <div className={`w-full flex flex-col items-center select-none ${isLeaderboard ? 'mt-1 mb-1 md:my-3' : 'my-3'}`}>
+      <div className="w-full flex flex-col items-center select-none my-3">
         <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 font-sans md:hidden">ADVERTISEMENT</span>
-        <a 
-          href={customAd.link} 
+        <a
+          href={customAd.link}
           target={customAd.link === '#' ? '_self' : '_blank'}
           rel="noopener noreferrer"
           onClick={(e) => {
             if (customAd.link === '#') e.preventDefault();
           }}
-          className={`relative block overflow-hidden rounded-lg border border-slate-200/20 bg-slate-900 shadow-md group hover:border-[#02599c]/50 transition-colors w-full ${
-            isLeaderboard 
-              ? 'h-auto min-h-[90px] max-h-[120px]' 
-              : isSidebar 
-                ? 'aspect-square md:aspect-auto md:min-h-[220px]' 
-                : 'min-h-[120px] max-h-[160px]'
-          }`}
+          className="relative block w-full rounded-lg border border-slate-200/30 overflow-hidden shadow-md group hover:border-[#02599c]/50 transition-colors bg-slate-50"
         >
           {/* Ad label */}
           <div className="absolute top-1.5 left-2 bg-black/50 text-[#ffb3d1] text-[6.5px] font-black px-1.5 py-0.5 rounded leading-none uppercase tracking-wider font-sans z-10">
             Sponsor
           </div>
-          
-          <img 
-            src={customAd.image} 
-            alt="Advertisement" 
-            className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-300"
+
+          {/* Image — natural size, no crop, no clip */}
+          <img
+            src={customAd.image}
+            alt="Advertisement"
+            className="w-full h-auto block group-hover:scale-[1.005] transition-transform duration-300"
           />
 
           {/* Adchoices badge */}
@@ -428,6 +420,7 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
       </div>
     );
   }
+
 
   if (position === 'leaderboard') {
     return (

@@ -397,7 +397,7 @@ export default function HomePage() {
           {/* ══════════════ LEFT CONTENT COLUMN (70%) ══════════════ */}
           <div className="w-full lg:col-span-7">
 
-            {/* Mobile Leaderboard Ad (between Flash News and HeroSlider) */}
+            {/* Mobile Leaderboard Ad (between Flash News and HeroSlider) — UNTOUCHED */}
             <div className="block md:hidden mb-1">
               <AdBanner position="leaderboard" />
             </div>
@@ -482,26 +482,25 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Mobile Ads Block 1 — single full-width ad */}
-            <div className="lg:hidden flex justify-center mt-1.5 mb-4">
-              <div className="w-full">
-                <AdBanner position="sidebar" />
-              </div>
+            {/* ── MOBILE AD 1 (after slide banners) — sidebar slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="sidebar" />
             </div>
 
             {/* Breaking News */}
             <BreakingNewsSection dbArticles={dbArticles} />
 
-            <div className="lg:hidden">
+            {/* ── MOBILE AD 2 (after Breaking News) — rectangle slot ── */}
+            <div className="block md:hidden my-3">
               <AdBanner position="rectangle" />
             </div>
 
             {/* Web Stories Section */}
             <WebStoriesSection />
 
-            {/* Mobile-only Ad (Avasa Estates) */}
-            <div className="lg:hidden">
-              <AdBanner position="avasa-estates" />
+            {/* ── MOBILE AD 3 (after Web Stories) — leaderboard slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="leaderboard" />
             </div>
 
             {/* Dynamic Tabbed News Section */}
@@ -512,91 +511,99 @@ export default function HomePage() {
               businessNews={businessFeed}
             />
 
-            {/* Mobile Ad Block 2 — single full-width square */}
-            <div className="lg:hidden mt-2 mb-3.5">
-              <AdBanner position="gold-loan" />
+            {/* ── MOBILE AD 4 (after Tabbed News) — sidebar slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="sidebar" />
             </div>
 
             <WeatherWidget />
 
+            {/* ── MOBILE AD 5 (after Weather) — rectangle slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="rectangle" />
+            </div>
+
+            {/* Trending వార్తలు */}
             <NewsSection title="Trending" titleTelugu="ట్రెండింగ్ వార్తలు" articles={trendingList} viewAllLink="/category/trending" accentColor="#ea580c" layout="featured-left" />
 
-            {/* Mobile-only Ad (Lalitha Jewellery) */}
-            <div className="lg:hidden">
-              <AdBanner position="lalitha-jewellery" />
+            {/* ── MOBILE AD 6 (after Trending) — leaderboard slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="leaderboard" />
             </div>
 
             <NewsSection title="పాలిటిక్స్" titleTelugu="పాలిటిక్స్" articles={politicsList} viewAllLink="/category/politics" accentColor="#02599c" layout="featured-left" />
 
-            {/* Mobile-only Ad (JioFiber) */}
-            <div className="lg:hidden">
-              <AdBanner position="jiofiber" />
+            {/* ── MOBILE AD 7 (after Politics) — sidebar slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="sidebar" />
             </div>
+
             <NewsSection title="Entertainment" titleTelugu="ఫిల్మ్" articles={entertainmentList} viewAllLink="/category/entertainment" accentColor="#db2777" layout="featured-left" />
 
-            {/* Mobile-only Ad (Ramraj Cottons) */}
-            <div className="lg:hidden">
-              <AdBanner position="ramraj" />
+            {/* ── MOBILE AD 8 (after Entertainment) — rectangle slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="rectangle" />
             </div>
+
             <NewsSection title="Sports" titleTelugu="స్పోర్ట్స్" articles={sportsList} viewAllLink="/category/sports" accentColor="#ea580c" layout="featured-left" />
 
-
-            {/* Mobile-only single full-width Ad */}
-            <div className="lg:hidden flex justify-center mt-2 mb-3.5">
-              <div className="w-full">
-                <AdBanner position="sidebar" />
-              </div>
+            {/* ── MOBILE AD 9 (after Sports) — leaderboard slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="leaderboard" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
               <div>
                 <NewsSection title="Business" titleTelugu="బిజినెస్" articles={businessList} viewAllLink="/category/business" accentColor="#15803d" layout="list" />
-                {/* Mobile-only Ad (SBI Home Loans) */}
-                <div className="lg:hidden">
-                  <AdBanner position="sbi" />
-                </div>
               </div>
               <div>
                 <NewsSection title="Technology" titleTelugu="టెక్నాలజీ" articles={technologyList} viewAllLink="/category/technology" accentColor="#02599c" layout="list" />
-                {/* Mobile-only Ad (OnePlus 12) */}
-                <div className="lg:hidden">
-                  <AdBanner position="oneplus" />
-                </div>
               </div>
             </div>
 
-
+            {/* ── MOBILE AD 10 (after Business & Tech) — sidebar slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="sidebar" />
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
               <div>
                 <NewsSection title="Viral" titleTelugu="వైరల్" articles={viralList} viewAllLink="/category/viral" accentColor="#dc2626" layout="list" />
-                {/* Mobile-only Ad (HDFC) */}
-                <div className="lg:hidden">
-                  <AdBanner position="hdfc" />
-                </div>
               </div>
               <div>
                 <NewsSection title="Health" titleTelugu="హెల్త్" articles={healthList} viewAllLink="/category/health" accentColor="#0891b2" layout="list" />
-                {/* Mobile-only Ad (PharmEasy) */}
-                <div className="lg:hidden">
-                  <AdBanner position="pharmeasy" />
-                </div>
               </div>
             </div>
 
-
+            {/* ── MOBILE AD 11 (after Viral & Health) — rectangle slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="rectangle" />
+            </div>
 
             <VideoSection videos={homepageShorts} />
-            {/* Mobile-only Dummy Ad Box */}
-            <div className="lg:hidden">
-              <AdBanner position="dummy" />
+
+            {/* ── MOBILE AD 12 (after Videos) — leaderboard slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="leaderboard" />
             </div>
 
             <PhotoGallery photos={homepagePhotos} />
-            {/* Mobile-only Dummy Ad Box */}
-            <div className="lg:hidden">
-              <AdBanner position="dummy" />
+
+            {/* ── MOBILE AD 13 (after Photo Gallery — continuous end) — sidebar slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="sidebar" />
             </div>
+
+            {/* ── MOBILE AD 14 (continuous end) — rectangle slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="rectangle" />
+            </div>
+
+            {/* ── MOBILE AD 15 (continuous end) — leaderboard slot ── */}
+            <div className="block md:hidden my-3">
+              <AdBanner position="leaderboard" />
+            </div>
+
           </div>
 
           {/* ══════════════ RIGHT AD COLUMN (30%) — continuous, no breaks ══════════════ */}
