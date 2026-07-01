@@ -2559,7 +2559,7 @@ export default function AdminPage() {
     const excludeCategories = [
       'team-member',
       'team-section',
-      'polls',
+      // 'polls' — intentionally NOT excluded so Polls Manager can list them
       'sidebar-ad-category',
       'sidebar-ad-article-left',
       'sidebar-ad-article-right',
@@ -2576,9 +2576,11 @@ export default function AdminPage() {
   }, [customNewsList]);
 
 
+
   // Filter articles based on sidebar category filter selection
   const filteredArticles = useMemo(() => {
-    let result = allArticles;
+    // Always exclude polls from the news articles table (they are managed in Polls Manager)
+    let result = allArticles.filter((art) => art.categorySlug !== 'polls');
 
     // Filter by category
     if (filterCategory !== 'all') {
@@ -2612,6 +2614,7 @@ export default function AdminPage() {
 
     return result;
   }, [allArticles, filterCategory, searchQuery]);
+
 
   // Quick Action: Toggle flags (isBreaking, isTrending, isFeatured) directly from news list table or edit form
   const toggleArticleFlag = async (articleId: string, flag: 'isBreaking' | 'isTrending' | 'isFeatured') => {
