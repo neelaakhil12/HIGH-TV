@@ -17,6 +17,7 @@ export default function CategoryArticlesFeed({
   districtSlug
 }: CategoryArticlesFeedProps) {
   const [articlesList, setArticlesList] = useState<any[]>(initialArticles);
+  const [visibleCount, setVisibleCount] = useState(6);
 
   useEffect(() => {
     try {
@@ -26,9 +27,11 @@ export default function CategoryArticlesFeed({
       } else {
         setArticlesList(merged);
       }
+      setVisibleCount(6);
     } catch (e) {
       console.error('Error merging custom category articles', e);
       setArticlesList(initialArticles);
+      setVisibleCount(6);
     }
   }, [initialArticles, categorySlug, districtSlug]);
 
@@ -53,7 +56,7 @@ export default function CategoryArticlesFeed({
 
   return (
     <div className={isHealthGrid ? "grid grid-cols-1 sm:grid-cols-2 gap-5" : "grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-0"}>
-      {articlesList.map((article, index) => {
+      {articlesList.slice(0, visibleCount).map((article, index) => {
         if (isHealthGrid) {
           return (
             <div key={article.id} className="contents">
@@ -129,6 +132,19 @@ export default function CategoryArticlesFeed({
           </div>
         );
       })}
+
+      {articlesList.length > visibleCount && (
+        <div className="col-span-1 sm:col-span-2 text-center mt-8 mb-4 py-2">
+          <button
+            type="button"
+            onClick={() => setVisibleCount(articlesList.length)}
+            className="bg-[#02599c] hover:bg-[#013f70] text-white font-bold px-6 py-2.5 rounded-lg transition-colors telugu-text cursor-pointer shadow-sm text-sm sm:text-base"
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            మరిన్ని వార్తలు లోడ్ చేయండి
+          </button>
+        </div>
+      )}
     </div>
   );
 }
