@@ -626,6 +626,52 @@ export default function EPaperReader() {
   // Hover/Highlight active article state
   const [highlightedZoneId, setHighlightedZoneId] = useState<string | null>(null);
 
+  // E-Paper Left and Right Ads states
+  const [epaperLeftAd, setEpaperLeftAd] = useState<{ image: string; link: string } | null>(null);
+  const [epaperRightAd, setEpaperRightAd] = useState<{ image: string; link: string } | null>(null);
+  const [epaperHeaderAd, setEpaperHeaderAd] = useState<{ image: string; link: string } | null>(null);
+
+  useEffect(() => {
+    // Fetch E-Paper Left Ad
+    fetch('/api/articles?category=sidebar-ad-epaper-left&limit=5&t=' + Date.now())
+      .then(res => res.ok ? res.json() : [])
+      .then((data: any[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const activeAd = data.find(ad => ad.category === 'active');
+          if (activeAd && activeAd.image) {
+            setEpaperLeftAd({ image: activeAd.image, link: activeAd.body || '#' });
+          }
+        }
+      })
+      .catch(err => console.error('Error fetching epaper left ad:', err));
+
+    // Fetch E-Paper Right Ad
+    fetch('/api/articles?category=sidebar-ad-epaper-right&limit=5&t=' + Date.now())
+      .then(res => res.ok ? res.json() : [])
+      .then((data: any[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const activeAd = data.find(ad => ad.category === 'active');
+          if (activeAd && activeAd.image) {
+            setEpaperRightAd({ image: activeAd.image, link: activeAd.body || '#' });
+          }
+        }
+      })
+      .catch(err => console.error('Error fetching epaper right ad:', err));
+
+    // Fetch E-Paper Header Ad
+    fetch('/api/articles?category=sidebar-ad-epaper-header&limit=5&t=' + Date.now())
+      .then(res => res.ok ? res.json() : [])
+      .then((data: any[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const activeAd = data.find(ad => ad.category === 'active');
+          if (activeAd && activeAd.image) {
+            setEpaperHeaderAd({ image: activeAd.image, link: activeAd.body || '#' });
+          }
+        }
+      })
+      .catch(err => console.error('Error fetching epaper header ad:', err));
+  }, []);
+
   // Clear active highlight when page details change
   useEffect(() => {
     setHighlightedZoneId(null);
@@ -2012,31 +2058,66 @@ export default function EPaperReader() {
             </div>
           </div>
 
+          {/* E-Paper Header Ad */}
+          {epaperHeaderAd && (
+            <div className="w-full max-w-[1200px] mx-auto px-4 mt-6">
+              <span className="text-[9px] font-bold text-gray-405 uppercase tracking-widest mb-1 block text-center font-sans">ADVERTISEMENT</span>
+              <a 
+                href={epaperHeaderAd.link} 
+                target={epaperHeaderAd.link === '#' ? '_self' : '_blank'} 
+                rel="noopener noreferrer"
+                onClick={(e) => { if (epaperHeaderAd.link === '#') e.preventDefault(); }}
+                className="block w-full overflow-hidden rounded-xl border border-gray-250 shadow-sm bg-white hover:border-gray-300 transition-colors"
+              >
+                <img 
+                  src={epaperHeaderAd.image} 
+                  alt="Header Ad" 
+                  className="w-full h-auto max-h-[140px] object-contain mx-auto" 
+                />
+              </a>
+            </div>
+          )}
+
           {/* Main Editions Sections Wrapper with Skyscraper Ads */}
           <div className="w-full flex justify-center items-start px-4 md:px-10 py-6 md:py-10 max-w-[1600px] mx-auto relative gap-6">
             
             {/* Left Skyscraper Ad */}
-            <div className="hidden xl:flex w-[160px] h-[600px] sticky top-32 bg-white border border-gray-200 rounded-xl shadow-md p-4 flex-col justify-between items-center text-center select-none flex-shrink-0">
-              <div>
-                <span className="bg-red-600 text-white font-bold text-[9px] px-2 py-0.5 rounded tracking-wide uppercase animate-pulse">AD</span>
-                <h3 className="text-gray-900 font-extrabold text-sm telugu-text mt-4 leading-normal" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  స్వర్ణయుగం హౌసింగ్ వెంచర్స్
-                </h3>
-                <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mt-2">
-                  PREMIUM VENTURES
-                </p>
-                <div className="h-px bg-gray-150 my-4 w-full" />
-                <p className="text-gray-700 text-[11px] telugu-text font-bold leading-relaxed" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  భవన నిర్మాణ ప్లాట్లు అమ్మకానికి సిద్ధంగా కలవు. అన్ని సౌకర్యాలు కలవు.
-                </p>
+            {epaperLeftAd ? (
+              <div className="hidden xl:flex w-[160px] h-[600px] sticky top-32 bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden flex-col justify-between items-center select-none flex-shrink-0">
+                <a 
+                  href={epaperLeftAd.link} 
+                  target={epaperLeftAd.link === '#' ? '_self' : '_blank'} 
+                  rel="noopener noreferrer"
+                  onClick={(e) => { if (epaperLeftAd.link === '#') e.preventDefault(); }}
+                  className="w-full h-full relative block hover:opacity-95 transition-opacity"
+                >
+                  <span className="absolute top-1.5 left-2 bg-black/50 text-[#ffb3d1] text-[6.5px] font-black px-1.5 py-0.5 rounded leading-none uppercase tracking-wider font-sans z-10">AD</span>
+                  <img src={epaperLeftAd.image} alt="Left Ad" className="w-full h-full object-cover" />
+                </a>
               </div>
-              <div className="flex flex-col items-center gap-1.5 w-full">
-                <div className="h-px bg-gray-150 my-2 w-full" />
-                <span className="text-gray-400 text-[9px] font-bold">CALL NOW</span>
-                <span className="text-[#02599c] font-black text-sm block">📞 99999 88888</span>
-                <span className="text-[9px] text-gray-500 font-bold">SPECIAL OFFERS</span>
+            ) : (
+              <div className="hidden xl:flex w-[160px] h-[600px] sticky top-32 bg-white border border-gray-200 rounded-xl shadow-md p-4 flex-col justify-between items-center text-center select-none flex-shrink-0">
+                <div>
+                  <span className="bg-red-600 text-white font-bold text-[9px] px-2 py-0.5 rounded tracking-wide uppercase animate-pulse">AD</span>
+                  <h3 className="text-gray-900 font-extrabold text-sm telugu-text mt-4 leading-normal" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    స్వర్ణయుగం హౌసింగ్ వెంచర్స్
+                  </h3>
+                  <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mt-2">
+                    PREMIUM VENTURES
+                  </p>
+                  <div className="h-px bg-gray-150 my-4 w-full" />
+                  <p className="text-gray-700 text-[11px] telugu-text font-bold leading-relaxed" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    భవన నిర్మాణ ప్లాట్లు అమ్మకానికి సిద్ధంగా కలవు. అన్ని సౌకర్యాలు కలవు.
+                  </p>
+                </div>
+                <div className="flex flex-col items-center gap-1.5 w-full">
+                  <div className="h-px bg-gray-150 my-2 w-full" />
+                  <span className="text-gray-400 text-[9px] font-bold">CALL NOW</span>
+                  <span className="text-[#02599c] font-black text-sm block">📞 99999 88888</span>
+                  <span className="text-[9px] text-gray-500 font-bold">SPECIAL OFFERS</span>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Central Content Container */}
             <div className="flex-1 max-w-[1200px] flex flex-col gap-10 w-full min-w-0">
@@ -2115,26 +2196,41 @@ export default function EPaperReader() {
             </div>
 
             {/* Right Skyscraper Ad */}
-            <div className="hidden xl:flex w-[160px] h-[600px] sticky top-32 bg-[#0c4a80] border border-[#0a3f6d] rounded-xl shadow-md p-4 flex-col justify-between items-center text-center select-none text-white flex-shrink-0">
-              <div>
-                <span className="bg-yellow-500 text-gray-900 font-black text-[9px] px-2 py-0.5 rounded tracking-wide uppercase">PRIME AD</span>
-                <h3 className="text-yellow-400 font-black text-sm uppercase tracking-wider mt-4 leading-normal">
-                  High TV Digital
-                </h3>
-                <p className="text-gray-200 text-[11px] telugu-text mt-2 leading-relaxed" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  నేడే ప్రకటన ఇవ్వండి - మీ వ్యాపారాన్ని పదింతలు పెంచుకోండి.
-                </p>
-                <div className="h-px bg-white/10 my-4 w-full" />
-                <p className="text-gray-300 text-[10px] leading-normal font-semibold">
-                  Your best content deserves even more views. Connect with millions of active users daily!
-                </p>
+            {epaperRightAd ? (
+              <div className="hidden xl:flex w-[160px] h-[600px] sticky top-32 bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden flex-col justify-between items-center select-none flex-shrink-0">
+                <a 
+                  href={epaperRightAd.link} 
+                  target={epaperRightAd.link === '#' ? '_self' : '_blank'} 
+                  rel="noopener noreferrer"
+                  onClick={(e) => { if (epaperRightAd.link === '#') e.preventDefault(); }}
+                  className="w-full h-full relative block hover:opacity-95 transition-opacity"
+                >
+                  <span className="absolute top-1.5 left-2 bg-black/50 text-[#ffb3d1] text-[6.5px] font-black px-1.5 py-0.5 rounded leading-none uppercase tracking-wider font-sans z-10">AD</span>
+                  <img src={epaperRightAd.image} alt="Right Ad" className="w-full h-full object-cover" />
+                </a>
               </div>
-              <div className="flex flex-col items-center gap-1.5 w-full">
-                <div className="h-px bg-white/10 my-2 w-full" />
-                <span className="text-yellow-400 font-black text-xs font-mono tracking-widest">HIGH TV</span>
-                <span className="text-gray-300 text-[9px] font-bold">DIGITAL NETWORK</span>
+            ) : (
+              <div className="hidden xl:flex w-[160px] h-[600px] sticky top-32 bg-[#0c4a80] border border-[#0a3f6d] rounded-xl shadow-md p-4 flex-col justify-between items-center text-center select-none text-white flex-shrink-0">
+                <div>
+                  <span className="bg-yellow-500 text-gray-900 font-black text-[9px] px-2 py-0.5 rounded tracking-wide uppercase">PRIME AD</span>
+                  <h3 className="text-yellow-400 font-black text-sm uppercase tracking-wider mt-4 leading-normal">
+                    High TV Digital
+                  </h3>
+                  <p className="text-gray-200 text-[11px] telugu-text mt-2 leading-relaxed" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    నేడే ప్రకటన ఇవ్వండి - మీ వ్యాపారాన్ని పదింతలు పెంచుకోండి.
+                  </p>
+                  <div className="h-px bg-white/10 my-4 w-full" />
+                  <p className="text-gray-300 text-[10px] leading-normal font-semibold">
+                    Your best content deserves even more views. Connect with millions of active users daily!
+                  </p>
+                </div>
+                <div className="flex flex-col items-center gap-1.5 w-full">
+                  <div className="h-px bg-white/10 my-2 w-full" />
+                  <span className="text-yellow-400 font-black text-xs font-mono tracking-widest">HIGH TV</span>
+                  <span className="text-gray-300 text-[9px] font-bold">DIGITAL NETWORK</span>
+                </div>
               </div>
-            </div>
+            )}
 
           </div>
 

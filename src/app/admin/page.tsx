@@ -950,7 +950,7 @@ export default function AdminPage() {
 
   // Sidebar Ads Manager states
   const [adFormMode, setAdFormMode] = useState<'list' | 'add' | 'edit'>('list');
-  const [adActiveSubTab, setAdActiveSubTab] = useState<'category' | 'article-left' | 'article-right' | 'header-ad'>('category');
+  const [adActiveSubTab, setAdActiveSubTab] = useState<'category' | 'article-left' | 'article-right' | 'header-ad' | 'epaper-left' | 'epaper-right' | 'epaper-header'>('category');
   const [sidebarAds, setSidebarAds] = useState<any[]>([]);
   const [editingAd, setEditingAd] = useState<any | null>(null);
 
@@ -959,7 +959,7 @@ export default function AdminPage() {
   const [sidebarAdLink, setSidebarAdLink] = useState('');
   const [sidebarAdImage, setSidebarAdImage] = useState('');
   const [sidebarAdStatus, setSidebarAdStatus] = useState<'active' | 'inactive'>('active');
-  const [sidebarAdLocation, setSidebarAdLocation] = useState<'category' | 'article-left' | 'article-right' | 'both' | 'header-ad'>('category');
+  const [sidebarAdLocation, setSidebarAdLocation] = useState<'category' | 'article-left' | 'article-right' | 'both' | 'header-ad' | 'epaper-left' | 'epaper-right' | 'epaper-header'>('category');
   const [isSavingSidebarAd, setIsSavingSidebarAd] = useState(false);
 
   const fetchAdsData = () => {
@@ -968,11 +968,23 @@ export default function AdminPage() {
       fetch('/api/articles?category=sidebar-ad-article-left&limit=50&t=' + Date.now()).then(r => r.json()),
       fetch('/api/articles?category=sidebar-ad-article-right&limit=50&t=' + Date.now()).then(r => r.json()),
       fetch('/api/articles?category=sidebar-ad-both&limit=50&t=' + Date.now()).then(r => r.json()),
-      fetch('/api/articles?category=header-ad&limit=10&t=' + Date.now()).then(r => r.json())
+      fetch('/api/articles?category=header-ad&limit=10&t=' + Date.now()).then(r => r.json()),
+      fetch('/api/articles?category=sidebar-ad-epaper-left&limit=10&t=' + Date.now()).then(r => r.json()),
+      fetch('/api/articles?category=sidebar-ad-epaper-right&limit=10&t=' + Date.now()).then(r => r.json()),
+      fetch('/api/articles?category=sidebar-ad-epaper-header&limit=10&t=' + Date.now()).then(r => r.json())
     ])
-      .then(([catAds, leftAds, rightAds, bothAds, headerAds]) => {
-        if (Array.isArray(catAds) && Array.isArray(leftAds) && Array.isArray(rightAds) && Array.isArray(bothAds) && Array.isArray(headerAds)) {
-          setSidebarAds([...catAds, ...leftAds, ...rightAds, ...bothAds, ...headerAds]);
+      .then(([catAds, leftAds, rightAds, bothAds, headerAds, epaperLeftAds, epaperRightAds, epaperHeaderAds]) => {
+        if (
+          Array.isArray(catAds) && 
+          Array.isArray(leftAds) && 
+          Array.isArray(rightAds) && 
+          Array.isArray(bothAds) && 
+          Array.isArray(headerAds) &&
+          Array.isArray(epaperLeftAds) &&
+          Array.isArray(epaperRightAds) &&
+          Array.isArray(epaperHeaderAds)
+        ) {
+          setSidebarAds([...catAds, ...leftAds, ...rightAds, ...bothAds, ...headerAds, ...epaperLeftAds, ...epaperRightAds, ...epaperHeaderAds]);
         }
       })
       .catch(err => console.error('Error loading ads data:', err));
@@ -1017,7 +1029,13 @@ export default function AdminPage() {
           ? 'sidebar-ad-article-right'
           : sidebarAdLocation === 'header-ad'
             ? 'header-ad'
-            : 'sidebar-ad-both';
+            : sidebarAdLocation === 'epaper-left'
+              ? 'sidebar-ad-epaper-left'
+              : sidebarAdLocation === 'epaper-right'
+                ? 'sidebar-ad-epaper-right'
+                : sidebarAdLocation === 'epaper-header'
+                  ? 'sidebar-ad-epaper-header'
+                  : 'sidebar-ad-both';
     const cleanSlug = adFormMode === 'edit' && editingAd ? editingAd.slug : `ad-${catSlug.slice(-3)}-${Date.now().toString().slice(-6)}`;
     
     const adData = {
@@ -2537,7 +2555,10 @@ export default function AdminPage() {
       'sidebar-ad-article-left',
       'sidebar-ad-article-right',
       'sidebar-ad-both',
-      'header-ad'
+      'header-ad',
+      'sidebar-ad-epaper-left',
+      'sidebar-ad-epaper-right',
+      'sidebar-ad-epaper-header'
     ];
     return [...customNewsList]
       .filter((art) => !excludeCategories.includes(art.categorySlug))
@@ -9910,7 +9931,7 @@ export default function AdminPage() {
               {adFormMode === 'list' && (
                 <div className="flex flex-col gap-6">
                   {/* Tabs Toggle (Category vs Article Left vs Article Right vs Header Ads) */}
-                  <div className="flex flex-wrap bg-white border border-slate-200/60 rounded-2xl p-2 gap-2 shadow-sm max-w-3xl">
+                  <div className="flex flex-wrap bg-white border border-slate-200/60 rounded-2xl p-2 gap-2 shadow-sm max-w-5xl">
                     <button
                       onClick={() => setAdActiveSubTab('category')}
                       className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
@@ -9942,6 +9963,36 @@ export default function AdminPage() {
                       వార్తల కుడి సైడ్‌బార్ యాడ్స్
                     </button>
                     <button
+                      onClick={() => setAdActiveSubTab('epaper-left')}
+                      className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
+                        adActiveSubTab === 'epaper-left'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                      }`}
+                    >
+                      📰 ఈ-పేపర్ ఎడమ యాడ్
+                    </button>
+                    <button
+                      onClick={() => setAdActiveSubTab('epaper-right')}
+                      className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
+                        adActiveSubTab === 'epaper-right'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                      }`}
+                    >
+                      📰 ఈ-పేపర్ కుడి యాడ్
+                    </button>
+                    <button
+                      onClick={() => setAdActiveSubTab('epaper-header')}
+                      className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
+                        adActiveSubTab === 'epaper-header'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                      }`}
+                    >
+                      📰 ఈ-పేపర్ హెడర్ యాడ్
+                    </button>
+                    <button
                       onClick={() => setAdActiveSubTab('header-ad')}
                       className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
                         adActiveSubTab === 'header-ad'
@@ -9961,10 +10012,16 @@ export default function AdminPage() {
                         ? 'sidebar-ad-article-left'
                         : adActiveSubTab === 'article-right'
                           ? 'sidebar-ad-article-right'
-                          : 'header-ad';
+                          : adActiveSubTab === 'header-ad'
+                            ? 'header-ad'
+                            : adActiveSubTab === 'epaper-left'
+                              ? 'sidebar-ad-epaper-left'
+                              : adActiveSubTab === 'epaper-right'
+                                ? 'sidebar-ad-epaper-right'
+                                : 'sidebar-ad-epaper-header';
                     const activeAds = sidebarAds.filter(
-                      ad => adActiveSubTab === 'header-ad'
-                        ? ad.categorySlug === 'header-ad'
+                      ad => (adActiveSubTab === 'header-ad' || adActiveSubTab === 'epaper-left' || adActiveSubTab === 'epaper-right' || adActiveSubTab === 'epaper-header')
+                        ? ad.categorySlug === targetCategorySlug
                         : (ad.categorySlug === targetCategorySlug || ad.categorySlug === 'sidebar-ad-both')
                     );
 
@@ -10008,7 +10065,13 @@ export default function AdminPage() {
                                           ? 'Article Right Only'
                                           : ad.categorySlug === 'header-ad'
                                             ? '🏠 Header Banner'
-                                            : 'All Sidebars'}
+                                            : ad.categorySlug === 'sidebar-ad-epaper-left'
+                                              ? '📰 E-Paper Left'
+                                              : ad.categorySlug === 'sidebar-ad-epaper-right'
+                                                ? '📰 E-Paper Right'
+                                                : ad.categorySlug === 'sidebar-ad-epaper-header'
+                                                  ? '📰 E-Paper Header'
+                                                  : 'All Sidebars'}
                                   </span>
                                 </div>
                               </div>
@@ -10045,7 +10108,13 @@ export default function AdminPage() {
                                           ? 'article-right'
                                           : ad.categorySlug === 'header-ad'
                                             ? 'header-ad'
-                                            : 'both';
+                                            : ad.categorySlug === 'sidebar-ad-epaper-left'
+                                              ? 'epaper-left'
+                                              : ad.categorySlug === 'sidebar-ad-epaper-right'
+                                                ? 'epaper-right'
+                                                : ad.categorySlug === 'sidebar-ad-epaper-header'
+                                                  ? 'epaper-header'
+                                                  : 'both';
                                     setSidebarAdLocation(loc);
                                     setAdFormMode('edit');
                                   }}
@@ -10115,12 +10184,15 @@ export default function AdminPage() {
                       <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">యాడ్ ప్రదర్శన స్థలం (Display Location) <strong className="text-rose-500">*</strong></label>
                       <select
                         value={sidebarAdLocation}
-                        onChange={(e) => setSidebarAdLocation(e.target.value as 'category' | 'article-left' | 'article-right' | 'both' | 'header-ad')}
+                        onChange={(e) => setSidebarAdLocation(e.target.value as 'category' | 'article-left' | 'article-right' | 'both' | 'header-ad' | 'epaper-left' | 'epaper-right' | 'epaper-header')}
                         className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
                       >
                         <option value="category">కేటగిరీ సైడ్‌బార్ మాత్రమే (Category Pages Sidebar Only)</option>
                         <option value="article-left">వార్తల ఎడమ సైడ్‌బార్ మాత్రమే (Article Page Left Sidebar Only)</option>
                         <option value="article-right">వార్తల కుడి సైడ్‌బార్ మాత్రమే (Article Page Right Sidebar Only)</option>
+                        <option value="epaper-left">📰 ఈ-పేపర్ ఎడమ సైడ్ యాడ్ (E-Paper Left Side Ad)</option>
+                        <option value="epaper-right">📰 ఈ-పేపర్ కుడి సైడ్ యాడ్ (E-Paper Right Side Ad)</option>
+                        <option value="epaper-header">📰 ఈ-పేపర్ హెడర్ యాడ్ (E-Paper Header Ad)</option>
                         <option value="header-ad">🏠 హెడర్ బ్యానర్ (Header Banner — Top of Page)</option>
                         <option value="both">అన్ని సైడ్‌బార్లలోనూ (All Sidebars / Combined)</option>
                       </select>
