@@ -962,6 +962,7 @@ export default function AdminPage() {
   const [sidebarAdLocation, setSidebarAdLocation] = useState<'category' | 'article-left' | 'article-right' | 'both' | 'header-ad' | 'epaper-left' | 'epaper-right' | 'epaper-header' | 'epaper-mobile'>('category');
   const [isSavingSidebarAd, setIsSavingSidebarAd] = useState(false);
   const [sidebarAdTargetCategory, setSidebarAdTargetCategory] = useState('');
+  const [isTargetCatOpen, setIsTargetCatOpen] = useState(false);
 
   const fetchAdsData = () => {
     Promise.all([
@@ -4369,7 +4370,7 @@ export default function AdminPage() {
                         : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
                     }`}
                   >
-                    🩺 ஹெల్త్ హోమ్
+                    🩺 హెల్త్ హోమ్
                   </button>
                   <button
                     onClick={() => {
@@ -10819,27 +10820,80 @@ export default function AdminPage() {
                         <option value="epaper-right">📰 ఈ-పేపర్ కుడి సైడ్ యాడ్ (E-Paper Right Side Ad)</option>
                         <option value="epaper-header">📰 ఈ-పేపర్ హెడర్ యాడ్ (E-Paper Header Ad)</option>
                         <option value="epaper-mobile">📰 ఈ-పేపర్ మొబైల్ యాడ్ (E-Paper Mobile Ad)</option>
-                        <option value="header-ad">🏠 ஹெడర్ బ్యానర్ (Header Banner — Top of Page)</option>
+                        <option value="header-ad">🏠 హెడర్ బ్యానర్ (Header Banner — Top of Page)</option>
                       </select>
                     </div>
 
                     {(sidebarAdLocation === 'category' || sidebarAdLocation === 'article-left' || sidebarAdLocation === 'article-right') && (
-                      <div className="flex flex-col gap-1">
+                      <div className="flex flex-col gap-1 relative">
                         <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">టార్గెట్ కేటగిరీ (Target Category / Page)</label>
-                        <select
-                          value={sidebarAdTargetCategory}
-                          onChange={(e) => setSidebarAdTargetCategory(e.target.value)}
-                          className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
+                        <button
+                          type="button"
+                          onClick={() => setIsTargetCatOpen(!isTargetCatOpen)}
+                          className="w-full bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-3.5 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold text-left flex items-center justify-between cursor-pointer"
                         >
-                          <option value="">అన్ని పేజీలు / డిఫాల్ట్ (All Pages / Default)</option>
-                          <option value="telangana">తెలంగాణ (Telangana)</option>
-                          <option value="andhra-pradesh">ఆంధ్రప్రదేశ్ (Andhra Pradesh)</option>
-                          {MAIN_CATEGORIES_LIST.map((cat) => (
-                            <option key={cat.slug} value={cat.slug}>
-                              {cat.name}
-                            </option>
-                          ))}
-                        </select>
+                          <span>
+                            {sidebarAdTargetCategory
+                              ? sidebarAdTargetCategory === 'telangana'
+                                ? 'తెలంగాణ (Telangana)'
+                                : sidebarAdTargetCategory === 'andhra-pradesh'
+                                  ? 'ఆంధ్రప్రదేశ్ (Andhra Pradesh)'
+                                  : MAIN_CATEGORIES_LIST.find((c) => c.slug === sidebarAdTargetCategory)?.name || sidebarAdTargetCategory
+                              : 'అన్ని పేజీలు / డిఫాల్ట్ (All Pages / Default)'}
+                          </span>
+                          <ChevronDown className="w-4 h-4 text-slate-450" />
+                        </button>
+
+                        {isTargetCatOpen && (
+                          <>
+                            <div className="fixed inset-0 z-40" onClick={() => setIsTargetCatOpen(false)} />
+                            <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-48 overflow-y-auto z-50 py-1.5 flex flex-col gap-0.5">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSidebarAdTargetCategory('');
+                                  setIsTargetCatOpen(false);
+                                }}
+                                className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-50 text-slate-700 cursor-pointer"
+                              >
+                                అన్ని పేజీలు / డిఫాల్ట్ (All Pages / Default)
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSidebarAdTargetCategory('telangana');
+                                  setIsTargetCatOpen(false);
+                                }}
+                                className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-50 text-slate-700 cursor-pointer"
+                              >
+                                తెలంగాణ (Telangana)
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSidebarAdTargetCategory('andhra-pradesh');
+                                  setIsTargetCatOpen(false);
+                                }}
+                                className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-50 text-slate-700 cursor-pointer"
+                              >
+                                ఆంధ్రప్రదేశ్ (Andhra Pradesh)
+                              </button>
+                              {MAIN_CATEGORIES_LIST.map((cat) => (
+                                <button
+                                  key={cat.slug}
+                                  type="button"
+                                  onClick={() => {
+                                    setSidebarAdTargetCategory(cat.slug);
+                                    setIsTargetCatOpen(false);
+                                  }}
+                                  className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-50 text-slate-700 cursor-pointer"
+                                >
+                                  {cat.name}
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        )}
                       </div>
                     )}
 

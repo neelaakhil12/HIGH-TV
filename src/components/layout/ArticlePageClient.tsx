@@ -140,6 +140,8 @@ export default function ArticlePageClient({
   otherNews,
   englishCategories
 }: ArticlePageClientProps) {
+  const [article, setArticle] = useState(initialArticle);
+  const [reporter, setReporter] = useState(initialReporter);
   const searchParams = useSearchParams();
   const isCompact = searchParams?.get('compact') === '1';
   const [isExpanded, setIsExpanded] = useState(!isCompact);
@@ -267,9 +269,6 @@ export default function ArticlePageClient({
 
     return resolved;
   };
-
-  const [article, setArticle] = useState(initialArticle);
-  const [reporter, setReporter] = useState(initialReporter);
 
   useEffect(() => {
     setArticle(initialArticle);
