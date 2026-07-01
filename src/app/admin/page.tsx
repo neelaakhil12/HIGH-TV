@@ -581,6 +581,8 @@ export default function AdminPage() {
   const [tagInput, setTagInput] = useState('');
   const [allTagsSuggestions, setAllTagsSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [tagLinkingTargetName, setTagLinkingTargetName] = useState<string | null>(null);
+  const [tagLinkSearchQuery, setTagLinkSearchQuery] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
   const [newsAuthor, setNewsAuthor] = useState('హై టీవీ డెస్క్');
 
@@ -4543,32 +4545,98 @@ export default function AdminPage() {
                           {newsTags.map((tagObj, idx) => {
                             const name = typeof tagObj === 'string' ? tagObj : tagObj.name;
                             const linkedArticleSlug = typeof tagObj === 'string' ? null : (tagObj.linkedArticleSlug || null);
+                            const linkedArt = allArticles.find((a: any) => a.slug === linkedArticleSlug);
+                            
+                            const getCatLabel = (slug: string) => {
+                              const mappings: Record<string, string> = {
+                                'latest': 'Breaking News',
+                                'telangana': 'Telangana News',
+                                'andhra-pradesh': 'Andhra Pradesh News',
+                                'national': 'National News',
+                                'international': 'International News',
+                                'business': 'Business News',
+                                'politics': 'Politics News',
+                                'sports': 'Sports News',
+                                'entertainment': 'Entertainment News',
+                                'technology': 'Technology News',
+                                'health': 'Health News',
+                                'doctors-corner': "Doctor's Corner",
+                                'viral': 'Viral News',
+                                'rasipalalu': 'Astrology News',
+                                'photos': 'Photo Gallery',
+                                'shorts': 'Shorts News',
+                                'webstories': 'Web Stories',
+                                'antharmadanam': 'Opinion News',
+                                'adyathmikam': 'Devotional News',
+                                'sampadakiyam': 'Editorial News',
+                                'women': 'Women News',
+                                'lifestyle': 'Lifestyle News',
+                                'vidya': 'Education News',
+                                'admissions': 'Admissions News',
+                                'current-affairs': 'Current Affairs',
+                                'upadi': 'Employment News',
+                                'notification': 'Notification News',
+                                'citizen-reporter': 'Citizen Reporter',
+                                'weather': 'Weather News'
+                              };
+                              return mappings[slug] || slug;
+                            };
+                            
+                            const categoryLabel = linkedArt ? getCatLabel(linkedArt.categorySlug) : '';
+
                             return (
-                              <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white border border-slate-200/50 p-2.5 rounded-xl shadow-sm">
-                                <span className="bg-blue-50 text-[#02599c] text-xs font-bold px-2.5 py-1 rounded-lg select-none border border-blue-100/50 shrink-0">
-                                  #{name}
-                                </span>
-                                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                                  <span className="text-[10px] text-slate-400 font-medium shrink-0">Link target:</span>
-                                  <select
-                                    value={linkedArticleSlug || ''}
-                                    onChange={(e) => {
-                                      const val = e.target.value || null;
-                                      setNewsTags(newsTags.map(t => (typeof t === 'string' ? t : t.name) === name ? { name, linkedArticleSlug: val } : t));
+                              <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white border border-slate-200/50 p-3 rounded-2xl shadow-sm hover:shadow transition-shadow">
+                                <div className="flex items-center gap-2">
+                                  <span className="bg-blue-50 text-[#02599c] text-xs font-black px-3 py-1.5 rounded-xl border border-blue-100/50 select-none">
+                                    #{name}
+                                  </span>
+                                </div>
+                                <div className="flex items-center flex-wrap gap-2 w-full sm:w-auto justify-end">
+                                  <div className="text-[11px] text-slate-600 bg-slate-50 border border-slate-200/60 rounded-xl px-3 py-1.5 flex items-center gap-2 max-w-full sm:max-w-[320px]">
+                                    <span className="text-slate-400 shrink-0">Redirects to:</span>
+                                    {linkedArt ? (
+                                      <div className="flex items-center gap-1.5 min-w-0">
+                                        <span className="bg-rose-50 text-rose-600 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0">
+                                          {categoryLabel}
+                                        </span>
+                                        <span className="font-semibold text-slate-800 truncate telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                          {linkedArt.title.replace(/<[^>]*>/g, '')}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <span className="font-extrabold text-slate-400">Related News (Default)</span>
+                                    )}
+                                  </div>
+                                  
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setTagLinkingTargetName(name);
+                                      setTagLinkSearchQuery('');
                                     }}
-                                    className="text-[11px] bg-slate-50 border border-slate-200 hover:border-slate-350 focus:border-rose-400 focus:bg-white rounded-lg px-2 py-1 text-slate-700 outline-none w-full sm:w-[250px] transition-all cursor-pointer truncate"
+                                    className="bg-blue-50 hover:bg-blue-100 text-blue-750 text-[11px] font-extrabold px-3 py-1.5 rounded-xl transition-colors cursor-pointer flex items-center gap-1 shrink-0"
                                   >
-                                    <option value="">-- Related News (Default) --</option>
-                                    {allArticles.map((art: any) => (
-                                      <option key={art.id} value={art.slug}>
-                                        {art.title.replace(/<[^>]*>/g, '')}
-                                      </option>
-                                    ))}
-                                  </select>
+                                    <LinkIcon className="w-3.5 h-3.5" />
+                                    Choose Article
+                                  </button>
+                                  
+                                  {linkedArticleSlug && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setNewsTags(newsTags.map(t => (typeof t === 'string' ? t : t.name) === name ? { name, linkedArticleSlug: null } : t));
+                                      }}
+                                      className="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-extrabold px-3 py-1.5 rounded-xl transition-colors cursor-pointer shrink-0"
+                                      title="Clear Link"
+                                    >
+                                      Clear Link
+                                    </button>
+                                  )}
+                                  
                                   <button
                                     type="button"
                                     onClick={() => setNewsTags(newsTags.filter(t => (typeof t === 'string' ? t : t.name) !== name))}
-                                    className="text-slate-400 hover:text-rose-500 hover:bg-rose-50 font-bold w-6 h-6 rounded-lg flex items-center justify-center transition-colors text-xs shrink-0 cursor-pointer"
+                                    className="text-slate-400 hover:text-rose-500 hover:bg-rose-50 font-bold w-8 h-8 rounded-xl flex items-center justify-center transition-colors text-base shrink-0 cursor-pointer border border-transparent hover:border-rose-100"
                                     title="Remove Tag"
                                   >
                                     ✕
@@ -11861,6 +11929,125 @@ export default function AdminPage() {
                     </button>
                   </div>
                 ));
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Tag Link Article Picker Modal ── */}
+      {tagLinkingTargetName && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white border border-slate-200/80 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col overflow-hidden max-h-[85vh] animate-scale-up text-left">
+            
+            {/* Modal Header */}
+            <div className="bg-[#02599c] text-white p-5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <LinkIcon className="w-5 h-5" />
+                <h3 className="font-black text-sm select-none">Link Article to #{tagLinkingTargetName}</h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setTagLinkingTargetName(null)}
+                className="text-white/80 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer transition-colors text-base font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Search Bar */}
+            <div className="p-4 border-b border-slate-100 bg-slate-50/50">
+              <div className="relative">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  value={tagLinkSearchQuery}
+                  onChange={(e) => setTagLinkSearchQuery(e.target.value)}
+                  placeholder="Search articles by title, page name, category, or slug..."
+                  className="w-full pl-10 pr-4 py-2.5 text-xs bg-white border border-slate-250/70 focus:border-[#02599c] rounded-xl outline-none text-slate-800"
+                />
+              </div>
+            </div>
+
+            {/* Articles List */}
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-2 max-h-[400px]">
+              {(() => {
+                const searchStr = tagLinkSearchQuery.trim().toLowerCase();
+                const filtered = allArticles
+                  .filter((a) => !searchStr || a.title?.toLowerCase().includes(searchStr) || a.categorySlug?.toLowerCase().includes(searchStr) || a.category?.toLowerCase().includes(searchStr) || a.slug?.toLowerCase().includes(searchStr));
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="p-8 text-center text-slate-400 text-xs font-bold">
+                      No matching news articles found.
+                    </div>
+                  );
+                }
+
+                return filtered.slice(0, 30).map((art) => {
+                  const getCatLabel = (slug: string) => {
+                    const mappings: Record<string, string> = {
+                      'latest': 'Breaking News',
+                      'telangana': 'Telangana News',
+                      'andhra-pradesh': 'Andhra Pradesh News',
+                      'national': 'National News',
+                      'international': 'International News',
+                      'business': 'Business News',
+                      'politics': 'Politics News',
+                      'sports': 'Sports News',
+                      'entertainment': 'Entertainment News',
+                      'technology': 'Technology News',
+                      'health': 'Health News',
+                      'doctors-corner': "Doctor's Corner",
+                      'viral': 'Viral News',
+                      'rasipalalu': 'Astrology News',
+                      'photos': 'Photo Gallery',
+                      'shorts': 'Shorts News',
+                      'webstories': 'Web Stories',
+                      'antharmadanam': 'Opinion News',
+                      'adyathmikam': 'Devotional News',
+                      'sampadakiyam': 'Editorial News',
+                      'women': 'Women News',
+                      'lifestyle': 'Lifestyle News',
+                      'vidya': 'Education News',
+                      'admissions': 'Admissions News',
+                      'current-affairs': 'Current Affairs',
+                      'upadi': 'Employment News',
+                      'notification': 'Notification News',
+                      'citizen-reporter': 'Citizen Reporter',
+                      'weather': 'Weather News'
+                    };
+                    return mappings[slug] || slug;
+                  };
+
+                  return (
+                    <div key={art.id} className="p-3 flex items-center justify-between gap-4 hover:bg-slate-50 rounded-xl transition-colors">
+                      <div className="min-w-0 flex-1 flex items-center gap-3">
+                        <div className="w-14 h-9 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0">
+                          {art.image && <img src={art.image} alt={art.title ? art.title.replace(/<[^>]*>/g, '').trim() : ''} className="w-full h-full object-cover" />}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <span className="bg-rose-50 border border-rose-100 text-rose-600 text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider inline-block mb-1">
+                            {getCatLabel(art.categorySlug)}
+                          </span>
+                          <span className="text-xs font-extrabold text-slate-800 line-clamp-2 telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                            {art.title ? art.title.replace(/<[^>]*>/g, '').trim() : ''}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewsTags(newsTags.map(t => (typeof t === 'string' ? t : t.name) === tagLinkingTargetName ? { name: tagLinkingTargetName, linkedArticleSlug: art.slug } : t));
+                          setTagLinkingTargetName(null);
+                        }}
+                        className="bg-blue-50 hover:bg-blue-100 text-blue-750 font-extrabold text-[10px] py-2 px-3 rounded-lg cursor-pointer transition-colors shrink-0"
+                      >
+                        Link Tag
+                      </button>
+                    </div>
+                  );
+                });
               })()}
             </div>
           </div>
