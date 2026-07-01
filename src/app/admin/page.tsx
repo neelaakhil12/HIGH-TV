@@ -1342,6 +1342,7 @@ export default function AdminPage() {
 
   // General Banners / Ad configs
   const [customAds, setCustomAds] = useState<Record<string, { enabled: boolean; image: string; link: string }>>({});
+  const [mobileAdFormMode, setMobileAdFormMode] = useState<'list' | 'add' | 'edit'>('list');
   const [activeAdSpot, setActiveAdSpot] = useState<'leaderboard' | 'sidebar' | 'rectangle' | 'mobile_leaderboard' | 'mobile_sidebar' | 'mobile_rectangle'>('leaderboard');
   const [adSpotEnabled, setAdSpotEnabled] = useState(false);
   const [adSpotImage, setAdSpotImage] = useState('');
@@ -1651,10 +1652,6 @@ export default function AdminPage() {
           try {
             const parsedAds = JSON.parse(adsVal);
             setCustomAds(parsedAds);
-            const activeAd = parsedAds[activeAdSpot] || { enabled: false, image: '', link: '#' };
-            setAdSpotEnabled(activeAd.enabled);
-            setAdSpotImage(activeAd.image);
-            setAdSpotLink(activeAd.link);
           } catch {}
         } else {
           setCustomAds({});
@@ -1713,7 +1710,15 @@ export default function AdminPage() {
           .catch(err => console.error("Error fetching latest videos:", err));
       })
       .catch(err => console.error("Error loading unified settings:", err));
-  }, [isAuthenticated, popupScope, activeAdSpot, refreshCounter]);
+  }, [isAuthenticated, popupScope, refreshCounter]);
+
+  // Synchronize dynamic ad form fields locally when activeAdSpot or customAds changes
+  useEffect(() => {
+    const activeAd = customAds[activeAdSpot] || { enabled: false, image: '', link: '#' };
+    setAdSpotEnabled(activeAd.enabled);
+    setAdSpotImage(activeAd.image);
+    setAdSpotLink(activeAd.link);
+  }, [activeAdSpot, customAds]);
 
   // Initialize Horoscope Panchangam editor content when tab becomes active
   useEffect(() => {
@@ -3444,6 +3449,38 @@ export default function AdminPage() {
     };
     setCustomAds(parsedAds);
     localStorage.setItem('custom_ads_config', JSON.stringify(parsedAds));
+  };
+
+  const handleToggleMobileAdStatus = async () => {
+    const updated = {
+      ...customAds,
+      [activeAdSpot]: {
+        ...customAds[activeAdSpot],
+        enabled: !customAds[activeAdSpot]?.enabled
+      }
+    };
+    setCustomAds(updated);
+    localStorage.setItem('custom_ads_config', JSON.stringify(updated));
+    await fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ custom_ads_config: JSON.stringify(updated) }),
+    });
+    setRefreshCounter(prev => prev + 1);
+  };
+
+  const handleDeleteMobileAd = async () => {
+    if (!confirm('Are you sure you want to delete this ad?')) return;
+    const updated = { ...customAds };
+    delete updated[activeAdSpot];
+    setCustomAds(updated);
+    localStorage.setItem('custom_ads_config', JSON.stringify(updated));
+    await fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ custom_ads_config: JSON.stringify(updated) }),
+    });
+    setRefreshCounter(prev => prev + 1);
   };
 
   // E-Paper publishing
@@ -5740,7 +5777,6 @@ export default function AdminPage() {
                   return (
                     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-fade-in">
                       <div className="bg-white border border-slate-200/80 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col overflow-hidden max-h-[80vh] animate-scale-up text-left">
-                        {/* Modal Header */}
                         <div className="bg-amber-500 text-white p-5 flex items-center justify-between flex-shrink-0">
                           <div className="flex items-center gap-2">
                             <TrendingUp className="w-5 h-5" />
@@ -5752,8 +5788,6 @@ export default function AdminPage() {
                             className="text-white/80 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer transition-colors font-bold"
                           >✕</button>
                         </div>
-
-                        {/* Search */}
                         <div className="p-4 border-b border-slate-100 flex-shrink-0">
                           <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -5770,8 +5804,6 @@ export default function AdminPage() {
                             {filteredTrendingArticles.length} articles found. Click any article to set it as the redirect destination.
                           </p>
                         </div>
-
-                        {/* Articles List */}
                         <div className="overflow-y-auto flex-1 divide-y divide-slate-50">
                           {filteredTrendingArticles.length === 0 ? (
                             <div className="p-10 text-center text-slate-400 font-bold text-sm">No articles found.</div>
@@ -5824,6 +5856,7 @@ export default function AdminPage() {
                 })()}
 
                 {/* Grid Table lists */}
+
 
                 <div className="border border-slate-200/80 rounded-2xl overflow-hidden">
                   <table className="w-full text-left text-xs border-collapse">
