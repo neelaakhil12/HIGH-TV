@@ -182,22 +182,7 @@ export default function WebStoriesSection() {
 
   const activeStory = activeStoryIndex !== null ? activeStories[activeStoryIndex] : null;
 
-  // Dynamic Circle sizing calculations based on slide text length
-  const currentText = activeStory?.slides[currentSlideIndex]?.text || '';
-  const textLength = currentText.length;
 
-  // Mobile vs Desktop dynamic sizing
-  const circleSize = isMobile
-    ? Math.max(400, Math.min(450, 370 + textLength * 1.0))
-    : Math.max(460, Math.min(560, 420 + textLength * 2));
-
-  const bottomOffset = isMobile
-    ? -circleSize * 0.48
-    : -circleSize * 0.26;
-
-  const ptPadding = isMobile
-    ? Math.round(circleSize * 0.08)
-    : Math.round(circleSize * 0.06);
 
   return (
     <div className="mb-6 select-none">
@@ -263,22 +248,18 @@ export default function WebStoriesSection() {
           onClick={handleCloseStory}
         >
           <style dangerouslySetInnerHTML={{ __html: `
-            @keyframes storyCirclePop {
+            @keyframes storyPanelPop {
               0% {
                 opacity: 0;
-                transform: translate(-50%, 250px) scale(0.9);
-              }
-              70% {
-                opacity: 1;
-                transform: translate(-50%, -12px) scale(1.02);
+                transform: translateY(100%);
               }
               100% {
                 opacity: 1;
-                transform: translate(-50%, 0) scale(1);
+                transform: translateY(0);
               }
             }
-            .animate-story-circle-pop {
-              animation: storyCirclePop 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            .animate-story-panel-pop {
+              animation: storyPanelPop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             }
           `}} />
           {/* Main Story Container */}
@@ -351,18 +332,12 @@ export default function WebStoriesSection() {
               </div>
             </div>
 
-            {/* Slide Circle Text Overlay (Centered dome at the bottom, clips into a curved bottom block, sizes dynamically) */}
+            {/* Slide Text Panel (Fills the sides fully, spans the bottom of the container) */}
             <div 
-              style={{
-                width: `${circleSize}px`,
-                height: `${circleSize}px`,
-                bottom: `${bottomOffset}px`,
-                paddingTop: `${ptPadding}px`,
-              }}
-              className="absolute left-1/2 rounded-full bg-black/65 backdrop-blur-xs shadow-2xl z-20 pointer-events-none flex flex-col justify-start items-center px-6 text-center animate-story-circle-pop border border-white/10 transition-all duration-500 ease-in-out"
+              className="absolute inset-x-0 bottom-0 bg-black/65 backdrop-blur-md shadow-2xl z-20 pointer-events-none flex flex-col justify-start items-center pt-8 pb-12 px-6 text-center animate-story-panel-pop border-t border-white/10"
             >
               <h3
-                className="text-[17px] md:text-[22px] font-black leading-relaxed text-white telugu-text max-w-[240px] md:max-w-[270px] mx-auto pl-2.5"
+                className="text-[17px] md:text-[22px] font-black leading-relaxed text-white telugu-text max-w-xs md:max-w-md mx-auto pl-2.5"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 {typedText}
