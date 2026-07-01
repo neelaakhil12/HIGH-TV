@@ -993,22 +993,23 @@ export default function AdminPage() {
   };
 
   const fetchMobileAdsData = () => {
-    Promise.all([
-      fetch('/api/articles?category=mobile-ad-leaderboard&limit=50&t=' + Date.now()).then(r => r.json()),
-      fetch('/api/articles?category=mobile-ad-sidebar&limit=50&t=' + Date.now()).then(r => r.json()),
-      fetch('/api/articles?category=mobile-ad-rectangle&limit=50&t=' + Date.now()).then(r => r.json())
-    ])
-      .then(([leaderboardAds, sidebarAds, rectangleAds]) => {
-        if (
-          Array.isArray(leaderboardAds) &&
-          Array.isArray(sidebarAds) &&
-          Array.isArray(rectangleAds)
-        ) {
-          setMobileAdsList([...leaderboardAds, ...sidebarAds, ...rectangleAds]);
-        }
+    const slots = [
+      'mobile-ad-header',
+      'mobile-ad-slot-1', 'mobile-ad-slot-2', 'mobile-ad-slot-3', 'mobile-ad-slot-4', 'mobile-ad-slot-5',
+      'mobile-ad-slot-6', 'mobile-ad-slot-7', 'mobile-ad-slot-8', 'mobile-ad-slot-9', 'mobile-ad-slot-10',
+      'mobile-ad-slot-11', 'mobile-ad-slot-12', 'mobile-ad-slot-13', 'mobile-ad-slot-14', 'mobile-ad-slot-15',
+      'mobile-ad-slot-16'
+    ];
+    Promise.all(
+      slots.map(slot => fetch(`/api/articles?category=${slot}&limit=50&t=` + Date.now()).then(r => r.json()))
+    )
+      .then(results => {
+        const allAds = results.flat().filter(item => item && item.id);
+        setMobileAdsList(allAds);
       })
       .catch(err => console.error('Error loading mobile ads data:', err));
   };
+
 
   useEffect(() => {
     if (activeTab === 'sidebar-ads') {
@@ -1371,7 +1372,7 @@ export default function AdminPage() {
 
   // Mobile Ads Manager states
   const [mobileAdFormState, setMobileAdFormState] = useState<'list' | 'add' | 'edit'>('list');
-  const [mobileAdSubTab, setMobileAdSubTab] = useState<'mobile-ad-leaderboard' | 'mobile-ad-sidebar' | 'mobile-ad-rectangle'>('mobile-ad-leaderboard');
+  const [mobileAdSubTab, setMobileAdSubTab] = useState<string>('mobile-ad-header');
   const [mobileAdsList, setMobileAdsList] = useState<any[]>([]);
   const [editingMobileAdItem, setEditingMobileAdItem] = useState<any | null>(null);
 
@@ -1380,7 +1381,7 @@ export default function AdminPage() {
   const [mobileAdLinkInput, setMobileAdLinkInput] = useState('');
   const [mobileAdImageInput, setMobileAdImageInput] = useState('');
   const [mobileAdStatusInput, setMobileAdStatusInput] = useState<'active' | 'inactive'>('active');
-  const [mobileAdLocationInput, setMobileAdLocationInput] = useState<'mobile-ad-leaderboard' | 'mobile-ad-sidebar' | 'mobile-ad-rectangle'>('mobile-ad-leaderboard');
+  const [mobileAdLocationInput, setMobileAdLocationInput] = useState<string>('mobile-ad-header');
   const [isSavingMobileAd, setIsSavingMobileAd] = useState(false);
 
 
@@ -6059,323 +6060,315 @@ export default function AdminPage() {
 
           {/* ══════════════ VIEW: CATEGORIES & BANNERS ══════════════ */}
           {/* ══════════════ VIEW: MOBILE ADS MANAGER ══════════════ */}
-          {activeTab === 'mobile-ads' && (
-            <div className="flex flex-col gap-6 animate-fade-in text-left">
-              {/* Header */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl font-black text-slate-800">మొబైల్ యాడ్స్ మేనేజర్ (Mobile Ads Manager)</h2>
-                  <p className="text-slate-500 text-xs">ఇక్కడ మీరు మొబైల్ వ్యూలో వివిధ స్లాట్‌లలో ప్రదర్శించబడే ప్రకటనలను జోడించవచ్చు, సవరించవచ్చు లేదా తొలగించవచ్చు.</p>
-                </div>
-                {mobileAdFormState === 'list' && (
-                  <button
-                    onClick={() => {
-                      setMobileAdFormState('add');
-                      setEditingMobileAdItem(null);
-                      setMobileAdTitleInput('');
-                      setMobileAdLinkInput('');
-                      setMobileAdImageInput('');
-                      setMobileAdStatusInput('active');
-                      setMobileAdLocationInput(mobileAdSubTab);
-                    }}
-                    className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
-                  >
-                    <Plus className="w-4 h-4" />
-                    కొత్త యాడ్ చేర్చండి (Add Ad)
-                  </button>
-                )}
-              </div>
+          {activeTab === 'mobile-ads' && (() => {
+            const MOBILE_AD_SLOTS = [
+              { slug: 'mobile-ad-header', labelTelugu: 'మొబైల్ హెడర్ యాడ్ (Top Header Ad)', labelEnglish: 'Above Hero Slider' },
+              { slug: 'mobile-ad-slot-1', labelTelugu: 'స్లాట్ 1: స్లైడ్ బ్యానర్ల కింద (Below Slide Banners)', labelEnglish: 'Above Breaking News' },
+              { slug: 'mobile-ad-slot-2', labelTelugu: 'స్లాట్ 2: బ్రేకింగ్ వార్తల కింద (Below Breaking News)', labelEnglish: 'Above Web Stories' },
+              { slug: 'mobile-ad-slot-3', labelTelugu: 'స్లాట్ 3: వెబ్ స్టోరీస్ కింద (Below Web Stories)', labelEnglish: 'Above Tabbed News' },
+              { slug: 'mobile-ad-slot-4', labelTelugu: 'స్లాట్ 4: ట్యాబ్డ్ వార్తల కింద (Below Tabbed News)', labelEnglish: 'Above Weather Widget' },
+              { slug: 'mobile-ad-slot-5', labelTelugu: 'స్లాట్ 5: వాతావరణం కింద (Below Weather Widget)', labelEnglish: 'Above Trending News' },
+              { slug: 'mobile-ad-slot-6', labelTelugu: 'స్లాట్ 6: ట్రెండింగ్ వార్తల కింద (Below Trending News)', labelEnglish: 'Above Polls Section' },
+              { slug: 'mobile-ad-slot-7', labelTelugu: 'స్లాట్ 7: పోల్స్ కింద (Below Polls - Slot 1)', labelEnglish: 'Below Polls (Sidebar Ad)' },
+              { slug: 'mobile-ad-slot-8', labelTelugu: 'స్లాట్ 8: పోల్స్ కింద (Below Polls - Slot 2)', labelEnglish: 'Below Polls (Rectangle Ad)' },
+              { slug: 'mobile-ad-slot-9', labelTelugu: 'స్లాట్ 9: పోల్స్ కింద (Below Polls - Slot 3)', labelEnglish: 'Below Polls (Leaderboard Ad)' },
+              { slug: 'mobile-ad-slot-10', labelTelugu: 'స్లాట్ 10: పాలిటిక్స్ వార్తల కింద (Below Politics News)', labelEnglish: 'Above Film/Entertainment' },
+              { slug: 'mobile-ad-slot-11', labelTelugu: 'స్లాట్ 11: ఫిలిం వార్తల కింద (Below Film/Entertainment)', labelEnglish: 'Above Sports' },
+              { slug: 'mobile-ad-slot-12', labelTelugu: 'స్లాట్ 12: స్పోర్ట్స్ వార్తల కింద (Below Sports)', labelEnglish: 'Above Business/Technology' },
+              { slug: 'mobile-ad-slot-13', labelTelugu: 'స్లాట్ 13: బిజినెస్ & టెక్నాలజీ కింద (Below Business/Tech)', labelEnglish: 'Above Viral/Health' },
+              { slug: 'mobile-ad-slot-14', labelTelugu: 'స్లాట్ 14: వైరల్ & హెల్త్ వార్తల కింద (Below Viral/Health)', labelEnglish: 'Above Shorts/Videos' },
+              { slug: 'mobile-ad-slot-15', labelTelugu: 'స్లాట్ 15: షార్ట్స్ / వీడియోల కింద (Below Shorts/Videos)', labelEnglish: 'Above Photo Gallery' },
+              { slug: 'mobile-ad-slot-16', labelTelugu: 'స్లాట్ 16: ఫోటో గ్యాలరీ కింద (Below Photo Gallery)', labelEnglish: 'Bottom Footer Ad' }
+            ];
 
-              {/* LIST MODE */}
-              {mobileAdFormState === 'list' && (
-                <div className="flex flex-col gap-6">
-                  {/* Tabs Toggle (Leaderboard vs Sidebar vs Rectangle) */}
-                  <div className="flex flex-wrap bg-white border border-slate-200/60 rounded-2xl p-2 gap-2 shadow-sm max-w-2xl">
-                    <button
-                      onClick={() => setMobileAdSubTab('mobile-ad-leaderboard')}
-                      className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
-                        mobileAdSubTab === 'mobile-ad-leaderboard'
-                          ? 'bg-rose-600 text-white shadow-sm'
-                          : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-                      }`}
-                    >
-                      📱 లీడర్‌బోర్డ్ యాడ్స్
-                    </button>
-                    <button
-                      onClick={() => setMobileAdSubTab('mobile-ad-sidebar')}
-                      className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
-                        mobileAdSubTab === 'mobile-ad-sidebar'
-                          ? 'bg-rose-600 text-white shadow-sm'
-                          : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-                      }`}
-                    >
-                      🟦 సైడ్‌బార్ యాడ్స్
-                    </button>
-                    <button
-                      onClick={() => setMobileAdSubTab('mobile-ad-rectangle')}
-                      className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
-                        mobileAdSubTab === 'mobile-ad-rectangle'
-                          ? 'bg-rose-600 text-white shadow-sm'
-                          : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-                      }`}
-                    >
-                      🔲 రెక్టాంగిల్ యాడ్స్
-                    </button>
+            return (
+              <div className="flex flex-col gap-6 animate-fade-in text-left">
+                {/* Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800">మొబైల్ యాడ్స్ మేనేజర్ (Mobile Ads Manager)</h2>
+                    <p className="text-slate-500 text-xs">ఇక్కడ మీరు మొబైల్ వ్యూలో వివిధ స్లాట్‌లలో ప్రదర్శించబడే ప్రకటనలను జోడించవచ్చు, సవరించవచ్చు లేదా తొలగించవచ్చు.</p>
                   </div>
+                  {mobileAdFormState === 'list' && (
+                    <button
+                      onClick={() => {
+                        setMobileAdFormState('add');
+                        setEditingMobileAdItem(null);
+                        setMobileAdTitleInput('');
+                        setMobileAdLinkInput('');
+                        setMobileAdImageInput('');
+                        setMobileAdStatusInput('active');
+                        setMobileAdLocationInput(mobileAdSubTab);
+                      }}
+                      className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Plus className="w-4 h-4" />
+                      కొత్త యాడ్ చేర్చండి (Add Ad)
+                    </button>
+                  )}
+                </div>
 
-                  {/* Ads list grid */}
-                  {(() => {
-                    const activeAds = mobileAdsList.filter(ad => ad.categorySlug === mobileAdSubTab);
+                {/* LIST MODE */}
+                {mobileAdFormState === 'list' && (
+                  <div className="flex flex-col gap-6">
+                    {/* Dropdown Selector to switch slots */}
+                    <div className="flex flex-col gap-1.5 max-w-xl bg-white border border-slate-200/60 rounded-2xl p-4 shadow-sm">
+                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">యాడ్ స్లాట్ ఎంచుకోండి (Select Ad Slot)</label>
+                      <select
+                        value={mobileAdSubTab}
+                        onChange={(e) => setMobileAdSubTab(e.target.value)}
+                        className="bg-slate-50 border border-slate-200/80 focus:border-[#02599c] rounded-xl px-4 py-3 text-xs outline-none transition-colors text-slate-800 font-bold"
+                      >
+                        {MOBILE_AD_SLOTS.map((slot) => (
+                          <option key={slot.slug} value={slot.slug}>
+                            {slot.labelTelugu} — {slot.labelEnglish}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                    if (activeAds.length === 0) {
+                    {/* Ads list grid */}
+                    {(() => {
+                      const activeAds = mobileAdsList.filter(ad => ad.categorySlug === mobileAdSubTab);
+
+                      if (activeAds.length === 0) {
+                        return (
+                          <div className="bg-white border border-slate-200/60 rounded-3xl p-12 text-center shadow-sm flex flex-col items-center justify-center gap-3">
+                            <Megaphone className="w-12 h-12 text-slate-300" />
+                            <p className="text-slate-500 text-xs font-bold">ఈ సెక్షన్‌లో ఎటువంటి యాడ్‌లు లేవు (No ads in this section)</p>
+                            <button
+                              onClick={() => {
+                                setMobileAdFormState('add');
+                                setEditingMobileAdItem(null);
+                                setMobileAdTitleInput('');
+                                setMobileAdLinkInput('');
+                                setMobileAdImageInput('');
+                                setMobileAdStatusInput('active');
+                                setMobileAdLocationInput(mobileAdSubTab);
+                              }}
+                              className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-4 rounded-xl cursor-pointer transition-all shadow-sm flex items-center gap-1.5"
+                            >
+                              + యాడ్ జోడించండి
+                            </button>
+                          </div>
+                        );
+                      }
+
                       return (
-                        <div className="bg-white border border-slate-200/60 rounded-3xl p-12 text-center shadow-sm flex flex-col items-center justify-center gap-3">
-                          <Megaphone className="w-12 h-12 text-slate-300" />
-                          <p className="text-slate-500 text-xs font-bold">ఈ సెక్షన్‌లో ఎటువంటి యాడ్‌లు లేవు (No ads in this section)</p>
-                          <button
-                            onClick={() => {
-                              setMobileAdFormState('add');
-                              setEditingMobileAdItem(null);
-                              setMobileAdTitleInput('');
-                              setMobileAdLinkInput('');
-                              setMobileAdImageInput('');
-                              setMobileAdStatusInput('active');
-                              setMobileAdLocationInput(mobileAdSubTab);
-                            }}
-                            className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-4 rounded-xl cursor-pointer transition-all shadow-sm flex items-center gap-1.5"
-                          >
-                            + యాడ్ జోడించండి
-                          </button>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div className="flex flex-col gap-3">
-                        {activeAds.map((ad) => (
-                          <div key={ad.id} className="bg-white border border-slate-200/60 rounded-2xl p-3 flex items-center justify-between gap-4 shadow-sm hover:border-slate-300 transition-all">
-                            {/* Left: Thumbnail & Info */}
-                            <div className="flex items-center gap-3.5 min-w-0">
-                              {/* Thumbnail */}
-                              <div className="w-16 h-16 bg-slate-50 border border-slate-150 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center relative">
-                                <img src={ad.image} alt={ad.title} className="w-full h-full object-contain" />
+                        <div className="flex flex-col gap-3">
+                          {activeAds.map((ad) => (
+                            <div key={ad.id} className="bg-white border border-slate-200/60 rounded-2xl p-3 flex items-center justify-between gap-4 shadow-sm hover:border-slate-300 transition-all">
+                              {/* Left: Thumbnail & Info */}
+                              <div className="flex items-center gap-3.5 min-w-0">
+                                {/* Thumbnail */}
+                                <div className="w-16 h-16 bg-slate-50 border border-slate-150 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center relative">
+                                  <img src={ad.image} alt={ad.title} className="w-full h-full object-contain" />
+                                </div>
+                                {/* Info */}
+                                <div className="min-w-0 flex flex-col gap-0.5 text-left">
+                                  <h4 className="text-sm font-black text-slate-800 truncate">{ad.title}</h4>
+                                  <p className="text-[10px] text-slate-400 font-bold truncate">Link: {ad.body || 'No Redirect Link'}</p>
+                                  
+                                  {/* Badges */}
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase text-white ${
+                                      ad.category === 'active' ? 'bg-emerald-600' : 'bg-slate-400'
+                                    }`}>
+                                      {ad.category === 'active' ? 'Active' : 'Inactive'}
+                                    </span>
+                                    <span className="px-2 py-0.5 rounded text-[9px] font-black text-slate-500 bg-slate-100 border border-slate-200">
+                                      {MOBILE_AD_SLOTS.find(s => s.slug === ad.categorySlug)?.labelEnglish || ad.categorySlug}
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
-                              {/* Info */}
-                              <div className="min-w-0 flex flex-col gap-0.5 text-left">
-                                <h4 className="text-sm font-black text-slate-800 truncate">{ad.title}</h4>
-                                <p className="text-[10px] text-slate-400 font-bold truncate">Link: {ad.body || 'No Redirect Link'}</p>
-                                
-                                {/* Badges */}
-                                <div className="flex items-center gap-2 mt-1">
-                                  <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase text-white ${
-                                    ad.category === 'active' ? 'bg-emerald-600' : 'bg-slate-400'
-                                  }`}>
-                                    {ad.category === 'active' ? 'Active' : 'Inactive'}
-                                  </span>
-                                  <span className="px-2 py-0.5 rounded text-[9px] font-black text-slate-500 bg-slate-100 border border-slate-200">
-                                    {ad.categorySlug === 'mobile-ad-leaderboard' 
-                                      ? 'Leaderboard' 
-                                      : ad.categorySlug === 'mobile-ad-sidebar' 
-                                        ? 'Sidebar (Square)' 
-                                        : 'Rectangle (Feed)'}
-                                  </span>
+
+                              {/* Right: Actions */}
+                              <div className="flex items-center gap-3 flex-shrink-0">
+                                {/* Toggle Active Button */}
+                                <button
+                                  onClick={() => handleToggleMobileAdStatus(ad)}
+                                  className={`text-xs font-black py-1.5 px-3 rounded-lg border transition-all cursor-pointer ${
+                                    ad.category === 'active'
+                                      ? 'bg-emerald-50 text-emerald-600 border-emerald-250 hover:bg-emerald-100'
+                                      : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
+                                  }`}
+                                >
+                                  {ad.category === 'active' ? 'దాచండి' : 'ప్రదర్శించండి'}
+                                </button>
+
+                                {/* Action Buttons */}
+                                <div className="flex items-center gap-1.5 border-l border-slate-100 pl-3">
+                                  <button
+                                    onClick={() => {
+                                      setEditingMobileAdItem(ad);
+                                      setMobileAdTitleInput(ad.title);
+                                      setMobileAdLinkInput(ad.body || '');
+                                      setMobileAdImageInput(ad.image || '');
+                                      setMobileAdStatusInput(ad.category === 'active' ? 'active' : 'inactive');
+                                      setMobileAdLocationInput(ad.categorySlug);
+                                      setMobileAdFormState('edit');
+                                    }}
+                                    className="text-sky-600 hover:text-sky-700 bg-slate-50 border border-slate-200/50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                                    title="Edit Ad"
+                                  >
+                                    <Pencil className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteMobileAd(ad.id)}
+                                    className="text-rose-500 hover:text-rose-600 bg-slate-50 border border-slate-200/50 p-1.5 rounded-lg transition-colors cursor-pointer"
+                                    title="Delete Ad"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
                                 </div>
                               </div>
                             </div>
-
-                            {/* Right: Actions */}
-                            <div className="flex items-center gap-3 flex-shrink-0">
-                              {/* Toggle Active Button */}
-                              <button
-                                onClick={() => handleToggleMobileAdStatus(ad)}
-                                className={`text-xs font-black py-1.5 px-3 rounded-lg border transition-all cursor-pointer ${
-                                  ad.category === 'active'
-                                    ? 'bg-emerald-50 text-emerald-600 border-emerald-250 hover:bg-emerald-100'
-                                    : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
-                                }`}
-                              >
-                                {ad.category === 'active' ? 'దాచండి' : 'ప్రదర్శించండి'}
-                              </button>
-
-                              {/* Action Buttons */}
-                              <div className="flex items-center gap-1.5 border-l border-slate-100 pl-3">
-                                <button
-                                  onClick={() => {
-                                    setEditingMobileAdItem(ad);
-                                    setMobileAdTitleInput(ad.title);
-                                    setMobileAdLinkInput(ad.body || '');
-                                    setMobileAdImageInput(ad.image || '');
-                                    setMobileAdStatusInput(ad.category === 'active' ? 'active' : 'inactive');
-                                    setMobileAdLocationInput(ad.categorySlug);
-                                    setMobileAdFormState('edit');
-                                  }}
-                                  className="text-sky-600 hover:text-sky-700 bg-slate-50 border border-slate-200/50 p-1.5 rounded-lg transition-colors cursor-pointer"
-                                  title="Edit Ad"
-                                >
-                                  <Pencil className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteMobileAd(ad.id)}
-                                  className="text-rose-500 hover:text-rose-600 bg-slate-50 border border-slate-200/50 p-1.5 rounded-lg transition-colors cursor-pointer"
-                                  title="Delete Ad"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-
-              {/* ADD / EDIT AD FORM */}
-              {(mobileAdFormState === 'add' || mobileAdFormState === 'edit') && (
-                <div className="bg-white border border-slate-200/60 rounded-3xl p-6 flex flex-col gap-5 max-w-xl shadow-sm">
-                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                    <ArrowLeft 
-                      className="w-5 h-5 text-slate-500 hover:text-slate-800 cursor-pointer" 
-                      onClick={() => setMobileAdFormState('list')}
-                    />
-                    <h3 className="text-lg font-black text-slate-800">
-                      {mobileAdFormState === 'add' ? 'కొత్త మొబైల్ యాడ్ చేర్చండి (Add Mobile Ad)' : 'మొబైల్ యాడ్ సవరించండి (Edit Mobile Ad)'}
-                    </h3>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </div>
+                )}
 
-                  <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); handleSaveMobileAd(); }}>
-                    {/* Ad Title */}
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">యాడ్ పేరు (Ad Reference Title) <strong className="text-rose-500">*</strong></label>
-                      <input
-                        type="text"
-                        value={mobileAdTitleInput}
-                        onChange={(e) => setMobileAdTitleInput(e.target.value)}
-                        placeholder="e.g. Mobile Top Leaderboard Ad"
-                        required
-                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                {/* ADD / EDIT AD FORM */}
+                {(mobileAdFormState === 'add' || mobileAdFormState === 'edit') && (
+                  <div className="bg-white border border-slate-200/60 rounded-3xl p-6 flex flex-col gap-5 max-w-xl shadow-sm">
+                    <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                      <ArrowLeft 
+                        className="w-5 h-5 text-slate-500 hover:text-slate-800 cursor-pointer" 
+                        onClick={() => setMobileAdFormState('list')}
                       />
+                      <h3 className="text-lg font-black text-slate-800">
+                        {mobileAdFormState === 'add' ? 'కొత్త మొబైల్ యాడ్ చేర్చండి (Add Mobile Ad)' : 'మొబైల్ యాడ్ సవరించండి (Edit Mobile Ad)'}
+                      </h3>
                     </div>
 
-                    {/* Ad Link */}
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">రీడైరెక్ట్ లింక్ (Redirect Link / Click URL)</label>
-                      <input
-                        type="url"
-                        value={mobileAdLinkInput}
-                        onChange={(e) => setMobileAdLinkInput(e.target.value)}
-                        placeholder="https://example.com"
-                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
-                      />
-                    </div>
+                    <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); handleSaveMobileAd(); }}>
+                      {/* Ad Title */}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-slate-455 uppercase tracking-wide">యాడ్ పేరు (Ad Reference Title) <strong className="text-rose-500">*</strong></label>
+                        <input
+                          type="text"
+                          value={mobileAdTitleInput}
+                          onChange={(e) => setMobileAdTitleInput(e.target.value)}
+                          placeholder="e.g. Mobile Top Leaderboard Ad"
+                          required
+                          className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                        />
+                      </div>
 
-                    {/* Ad Location / Position */}
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">యాడ్ ప్రదర్శించే స్థానం (Ad Position) <strong className="text-rose-500">*</strong></label>
-                      <div className="flex gap-2">
-                        {[
-                          { key: 'mobile-ad-leaderboard', label: 'Leaderboard' },
-                          { key: 'mobile-ad-sidebar', label: 'Sidebar (Square)' },
-                          { key: 'mobile-ad-rectangle', label: 'Rectangle (Feed)' }
-                        ].map((loc) => (
+                      {/* Ad Link */}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-slate-455 uppercase tracking-wide">రీడైరెక్ట్ లింక్ (Redirect Link / Click URL)</label>
+                        <input
+                          type="url"
+                          value={mobileAdLinkInput}
+                          onChange={(e) => setMobileAdLinkInput(e.target.value)}
+                          placeholder="https://example.com"
+                          className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                        />
+                      </div>
+
+                      {/* Ad Location / Position */}
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] font-black text-slate-455 uppercase tracking-wide">యాడ్ ప్రదర్శించే స్థానం (Ad Position) <strong className="text-rose-500">*</strong></label>
+                        <select
+                          value={mobileAdLocationInput}
+                          onChange={(e) => setMobileAdLocationInput(e.target.value)}
+                          className="bg-slate-50 border border-slate-200/85 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-xs outline-none text-slate-800 font-bold"
+                        >
+                          {MOBILE_AD_SLOTS.map((slot) => (
+                            <option key={slot.slug} value={slot.slug}>
+                              {slot.labelTelugu}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Image Upload Box */}
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] font-black text-slate-455 uppercase tracking-wide">యాడ్ ఇమేజ్ (Ad Image Media) <strong className="text-rose-500">*</strong></label>
+                        <div className="border border-dashed border-slate-200 bg-white hover:border-[#02599c] rounded-xl p-4 text-center relative cursor-pointer min-h-[100px] flex items-center justify-center">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleMobileAdImageUpload}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          />
+                          {!mobileAdImageInput ? (
+                            <span className="text-xs text-slate-400 font-bold">ఇమేజ్ ఫైల్‌ను ఎంచుకోండి (Select Image)</span>
+                          ) : (
+                            <div className="relative max-w-[280px]">
+                              <img src={mobileAdImageInput} alt="ad upload preview" className="max-h-[120px] w-auto rounded border border-slate-200" />
+                              <button
+                                type="button"
+                                onClick={(e) => { e.preventDefault(); setMobileAdImageInput(''); }}
+                                className="absolute -top-2 -right-2 bg-black/60 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] cursor-pointer"
+                              >✕</button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Ad Status */}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-slate-455 uppercase tracking-wide">యాడ్ స్థితి (Ad Status)</label>
+                        <div className="flex gap-2">
                           <button
-                            key={loc.key}
                             type="button"
-                            onClick={() => setMobileAdLocationInput(loc.key as any)}
-                            className={`flex-1 py-2 px-3 text-[11px] font-black rounded-lg border transition-all cursor-pointer text-center ${
-                              mobileAdLocationInput === loc.key
-                                ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
-                                : 'bg-slate-50 text-slate-650 border-slate-200 hover:bg-slate-100'
+                            onClick={() => setMobileAdStatusInput('active')}
+                            className={`flex-1 py-2 text-[11px] font-black rounded-lg border transition-all cursor-pointer text-center ${
+                              mobileAdStatusInput === 'active'
+                                ? 'bg-emerald-600 text-white border-emerald-600'
+                                : 'bg-slate-50 text-slate-655 border-slate-200 hover:bg-slate-100'
                             }`}
                           >
-                            {loc.label}
+                            🟢 Active (ప్రదర్శించు)
                           </button>
-                        ))}
+                          <button
+                            type="button"
+                            onClick={() => setMobileAdStatusInput('inactive')}
+                            className={`flex-1 py-2 text-[11px] font-black rounded-lg border transition-all cursor-pointer text-center ${
+                              mobileAdStatusInput === 'inactive'
+                                ? 'bg-slate-400 text-white border-slate-450'
+                                : 'bg-slate-50 text-slate-655 border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            ⚫ Inactive (దాచు)
+                          </button>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Image Upload Box */}
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">యాడ్ ఇమేజ్ (Ad Image Media) <strong className="text-rose-500">*</strong></label>
-                      <div className="border border-dashed border-slate-200 bg-white hover:border-[#02599c] rounded-xl p-4 text-center relative cursor-pointer min-h-[100px] flex items-center justify-center">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleMobileAdImageUpload}
-                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                        />
-                        {!mobileAdImageInput ? (
-                          <span className="text-xs text-slate-400 font-bold">ఇమేజ్ ఫైల్‌ను ఎంచుకోండి (Select Image)</span>
-                        ) : (
-                          <div className="relative max-w-[280px]">
-                            <img src={mobileAdImageInput} alt="ad upload preview" className="max-h-[120px] w-auto rounded border border-slate-200" />
-                            <button
-                              type="button"
-                              onClick={(e) => { e.preventDefault(); setMobileAdImageInput(''); }}
-                              className="absolute -top-2 -right-2 bg-black/60 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] cursor-pointer"
-                            >✕</button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Ad Status */}
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-black text-slate-450 uppercase tracking-wide">యాడ్ స్థితి (Ad Status)</label>
-                      <div className="flex gap-2">
+                      {/* Form actions */}
+                      <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
                         <button
                           type="button"
-                          onClick={() => setMobileAdStatusInput('active')}
-                          className={`flex-1 py-2 text-[11px] font-black rounded-lg border transition-all cursor-pointer text-center ${
-                            mobileAdStatusInput === 'active'
-                              ? 'bg-emerald-600 text-white border-emerald-600'
-                              : 'bg-slate-50 text-slate-650 border-slate-200 hover:bg-slate-100'
-                          }`}
+                          onClick={() => setMobileAdFormState('list')}
+                          className="bg-slate-100 hover:bg-slate-200 text-slate-750 font-black text-xs py-2.5 px-6 rounded-xl cursor-pointer transition-all"
                         >
-                          🟢 Active (ప్రదర్శించు)
+                          రద్దు చేయి (Cancel)
                         </button>
                         <button
-                          type="button"
-                          onClick={() => setMobileAdStatusInput('inactive')}
-                          className={`flex-1 py-2 text-[11px] font-black rounded-lg border transition-all cursor-pointer text-center ${
-                            mobileAdStatusInput === 'inactive'
-                              ? 'bg-slate-400 text-white border-slate-450'
-                              : 'bg-slate-50 text-slate-655 border-slate-200 hover:bg-slate-100'
-                          }`}
+                          type="submit"
+                          disabled={isSavingMobileAd}
+                          className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-6 rounded-xl shadow-md transition-all cursor-pointer"
                         >
-                          ⚫ Inactive (దాచు)
+                          {isSavingMobileAd ? 'భద్రపరుస్తోంది...' : 'యాడ్ సేవ్ చేయి (Save Ad)'}
                         </button>
                       </div>
-                    </div>
+                    </form>
+                  </div>
+                )}
 
-                    {/* Form actions */}
-                    <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                      <button
-                        type="button"
-                        onClick={() => setMobileAdFormState('list')}
-                        className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs py-2.5 px-6 rounded-xl cursor-pointer transition-all"
-                      >
-                        రద్దు చేయి (Cancel)
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={isSavingMobileAd}
-                        className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-6 rounded-xl shadow-md transition-all cursor-pointer"
-                      >
-                        {isSavingMobileAd ? 'భద్రపరుస్తోంది...' : 'యాడ్ సేవ్ చేయి (Save Ad)'}
-                      </button>
-                    </div>
-                  </form>
+                {/* Info Note */}
+                <div className="bg-blue-50 border border-blue-200/60 rounded-xl p-4 text-xs text-blue-700 font-bold">
+                  💡 <strong>స్ట్రీమింగ్ ప్రకటనలు (Streaming Ads):</strong> ఒక మొబైల్ యాడ్ స్లాట్‌లో ఒకటి కంటే ఎక్కువ యాక్టివ్ యాడ్‌లను జోడిస్తే, వెబ్‌సైట్ వాటిని ప్రతి 2 సెకన్లకు ఒకసారి ఆటోమేటిక్‌గా మారుస్తూ ప్రదర్శిస్తుంది.
                 </div>
-              )}
-
-              {/* Info Note */}
-              <div className="bg-blue-50 border border-blue-200/60 rounded-xl p-4 text-xs text-blue-700 font-bold">
-                💡 <strong>స్ట్రీమింగ్ ప్రకటనలు (Streaming Ads):</strong> ఒక మొబైల్ యాడ్ స్లాట్‌లో (ఉదాహరణకు లీడర్‌బోర్డ్ స్లాట్) ఒకటి కంటే ఎక్కువ యాక్టివ్ యాడ్‌లను అప్‌లోడ్ చేస్తే, వెబ్దైట్ వాటిని ప్రతి 2 సెకన్లకు ఒకసారి ఆటోమేటిక్‌గా మారుస్తూ ప్రదర్శిస్తుంది.
               </div>
-            </div>
-          )}
+            );
+          })()}
+
 
 
           {/* ══════════════ VIEW: HIGH TV VIDEOS ══════════════ */}

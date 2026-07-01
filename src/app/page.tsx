@@ -414,7 +414,7 @@ export default function HomePage() {
 
             {/* Mobile Leaderboard Ad (between Flash News and HeroSlider) — UNTOUCHED */}
             <div className="block md:hidden mb-1">
-              <AdBanner position="leaderboard" />
+              <AdBanner position="mobile-ad-header" />
             </div>
 
             {/* Hero 2-column grid: Slider (col-7) + Videos (col-3) */}
@@ -499,7 +499,7 @@ export default function HomePage() {
 
             {/* ── MOBILE AD 1 (after slide banners) — sidebar slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="sidebar" />
+              <AdBanner position="mobile-ad-slot-1" />
             </div>
 
             {/* Breaking News */}
@@ -507,7 +507,7 @@ export default function HomePage() {
 
             {/* ── MOBILE AD 2 (after Breaking News) — rectangle slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="rectangle" />
+              <AdBanner position="mobile-ad-slot-2" />
             </div>
 
             {/* Web Stories Section */}
@@ -515,7 +515,7 @@ export default function HomePage() {
 
             {/* ── MOBILE AD 3 (after Web Stories) — leaderboard slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="leaderboard" />
+              <AdBanner position="mobile-ad-slot-3" />
             </div>
 
             {/* Dynamic Tabbed News Section */}
@@ -528,14 +528,14 @@ export default function HomePage() {
 
             {/* ── MOBILE AD 4 (after Tabbed News) — sidebar slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="sidebar" />
+              <AdBanner position="mobile-ad-slot-4" />
             </div>
 
             <WeatherWidget />
 
             {/* ── MOBILE AD 5 (after Weather) — rectangle slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="rectangle" />
+              <AdBanner position="mobile-ad-slot-5" />
             </div>
 
             {/* Trending వార్తలు */}
@@ -543,7 +543,7 @@ export default function HomePage() {
 
             {/* ── MOBILE AD 6 (after Trending, before Polls) — leaderboard slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="leaderboard" />
+              <AdBanner position="mobile-ad-slot-6" />
             </div>
 
             {/* ── POLLS SECTION (mobile only — same as sidebar widget) ── */}
@@ -553,38 +553,38 @@ export default function HomePage() {
 
             {/* ── MOBILE AD 6b (after Polls) — sidebar slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="sidebar" />
+              <AdBanner position="mobile-ad-slot-7" />
             </div>
 
             {/* ── MOBILE AD 6c (continuous after Polls) — rectangle slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="rectangle" />
+              <AdBanner position="mobile-ad-slot-8" />
             </div>
 
             {/* ── MOBILE AD 6d (continuous after Polls) — leaderboard slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="leaderboard" />
+              <AdBanner position="mobile-ad-slot-9" />
             </div>
 
             <NewsSection title="పాలిటిక్స్" titleTelugu="పాలిటిక్స్" articles={politicsList} viewAllLink="/category/politics" accentColor="#02599c" layout="featured-left" />
 
             {/* ── MOBILE AD 7 (after Politics) — sidebar slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="sidebar" />
+              <AdBanner position="mobile-ad-slot-10" />
             </div>
 
             <NewsSection title="Entertainment" titleTelugu="ఫిల్మ్" articles={entertainmentList} viewAllLink="/category/entertainment" accentColor="#db2777" layout="featured-left" />
 
             {/* ── MOBILE AD 8 (after Entertainment) — rectangle slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="rectangle" />
+              <AdBanner position="mobile-ad-slot-11" />
             </div>
 
             <NewsSection title="Sports" titleTelugu="స్పోర్ట్స్" articles={sportsList} viewAllLink="/category/sports" accentColor="#ea580c" layout="featured-left" />
 
             {/* ── MOBILE AD 9 (after Sports) — leaderboard slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="leaderboard" />
+              <AdBanner position="mobile-ad-slot-12" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -598,7 +598,7 @@ export default function HomePage() {
 
             {/* ── MOBILE AD 10 (after Business & Tech) — sidebar slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="sidebar" />
+              <AdBanner position="mobile-ad-slot-13" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -612,21 +612,21 @@ export default function HomePage() {
 
             {/* ── MOBILE AD 11 (after Viral & Health) — rectangle slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="rectangle" />
+              <AdBanner position="mobile-ad-slot-14" />
             </div>
 
             <VideoSection videos={homepageShorts} />
 
             {/* ── MOBILE AD 12 (after Videos) — leaderboard slot ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="leaderboard" />
+              <AdBanner position="mobile-ad-slot-15" />
             </div>
 
             <PhotoGallery photos={homepagePhotos} />
 
             {/* ── MOBILE AD 13 (after Photo Gallery) — sidebar slot — only 1 ad here ── */}
             <div className="block md:hidden my-3">
-              <AdBanner position="sidebar" />
+              <AdBanner position="mobile-ad-slot-16" />
             </div>
 
           </div>
