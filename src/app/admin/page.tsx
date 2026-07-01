@@ -12041,7 +12041,7 @@ export default function AdminPage() {
                           setNewsTags(newsTags.map(t => (typeof t === 'string' ? t : t.name) === tagLinkingTargetName ? { name: tagLinkingTargetName, linkedArticleSlug: art.slug } : t));
                           setTagLinkingTargetName(null);
                         }}
-                        className="bg-blue-50 hover:bg-blue-100 text-blue-750 font-extrabold text-[10px] py-2 px-3 rounded-lg cursor-pointer transition-colors shrink-0"
+                        className="bg-[#02599c] hover:bg-[#01477d] text-white font-extrabold text-[10px] py-2 px-3 rounded-lg cursor-pointer transition-colors shrink-0 shadow-sm"
                       >
                         Link Tag
                       </button>
