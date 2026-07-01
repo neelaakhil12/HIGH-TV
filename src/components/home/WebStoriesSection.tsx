@@ -251,11 +251,11 @@ export default function WebStoriesSection() {
             @keyframes storyPanelPop {
               0% {
                 opacity: 0;
-                transform: translate(-50%, 100%);
+                transform: translateY(100%);
               }
               100% {
                 opacity: 1;
-                transform: translate(-50%, 0);
+                transform: translateY(0);
               }
             }
             .animate-story-panel-pop {
@@ -304,7 +304,7 @@ export default function WebStoriesSection() {
               {/* Header Info */}
               <div className="flex items-center justify-between mt-1 text-white">
                 <div className="flex items-center gap-2">
-                  <img src="/logo.png" alt="హై టీవీ" className="h-5 w-auto object-contain brightness-0 invert" />
+                  <img src="/logo.png" alt="హై టీవీ" className="h-6 w-auto object-contain" />
                   <div className="h-3 w-[1px] bg-white/40" />
                   <span className="text-[10px] font-bold tracking-wider opacity-85 uppercase font-sans">hightv.in</span>
                 </div>
@@ -332,9 +332,9 @@ export default function WebStoriesSection() {
               </div>
             </div>
 
-            {/* Slide Text Panel (Elliptical dome format like ABN, centered, very light transparency) */}
+            {/* Slide Text Panel (Elliptical dome format like ABN, full width, very light transparency) */}
             <div 
-              className="absolute left-1/2 bottom-0 w-[85%] bg-black/25 backdrop-blur-[2.5px] shadow-2xl z-20 pointer-events-none flex flex-col justify-start items-center min-h-[160px] md:min-h-[200px] pt-16 md:pt-22 pb-6 px-6 text-center animate-story-panel-pop border-t border-x border-white/10 rounded-t-[50%_70px] md:rounded-t-[50%_90px]"
+              className="absolute inset-x-0 bottom-0 w-full bg-black/25 backdrop-blur-[2.5px] shadow-2xl z-20 pointer-events-none flex flex-col justify-start items-center min-h-[160px] md:min-h-[200px] pt-16 md:pt-22 pb-6 px-6 text-center animate-story-panel-pop border-t border-white/10 rounded-t-[50%_70px] md:rounded-t-[50%_90px]"
             >
               <h3
                 className="text-[17px] md:text-[22px] font-black leading-relaxed text-white telugu-text max-w-xs md:max-w-md mx-auto pl-2.5"
