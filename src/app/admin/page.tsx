@@ -3047,6 +3047,35 @@ export default function AdminPage() {
       
       if (response.ok) {
         setCustomNewsList(prev => prev.filter(art => art.id !== articleId));
+        
+        // Auto-cleanup deleted article ID from sidebar category pins configuration
+        setSidebarCategoryPins(prev => {
+          const updated = { ...prev };
+          let changed = false;
+          const artIdStr = String(articleId);
+          for (const cat in updated) {
+            const catPins = updated[cat] || { trending: [], breaking: [] };
+            const trending = catPins.trending || [];
+            const breaking = catPins.breaking || [];
+            if (trending.includes(artIdStr) || breaking.includes(artIdStr)) {
+              updated[cat] = {
+                trending: trending.filter((id: string) => String(id) !== artIdStr),
+                breaking: breaking.filter((id: string) => String(id) !== artIdStr)
+              };
+              changed = true;
+            }
+          }
+          if (changed) {
+            localStorage.setItem('sidebar_category_pins', JSON.stringify(updated));
+            fetch('/api/settings', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ sidebar_category_pins: JSON.stringify(updated) })
+            }).catch(err => console.error('Failed to sync sidebar category pins after deletion:', err));
+          }
+          return updated;
+        });
+
         alert('Article deleted successfully!');
       } else {
         alert('Failed to delete article.');
@@ -3056,6 +3085,7 @@ export default function AdminPage() {
       alert('Failed to delete article: ' + (e.message || String(e)));
     }
   };
+
 
   const resetWebStoryForm = () => {
     setWebStoryTitle('');

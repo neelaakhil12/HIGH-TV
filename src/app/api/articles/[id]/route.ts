@@ -16,7 +16,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
         }
       }
     });
-    if (!article) {
+    if (!article || article.isDeleted) {
       return new NextResponse(JSON.stringify({ error: 'Not found' }), {
         status: 404,
         headers: {
