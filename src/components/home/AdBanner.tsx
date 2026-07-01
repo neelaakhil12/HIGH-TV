@@ -294,7 +294,7 @@ export function CoachingAd() {
 }
 
 interface AdBannerProps {
-  position?: 'leaderboard' | 'sidebar' | 'rectangle' | 'holiday' | 'astrology' | 'skyscraper-left' | 'skyscraper-right' | 'gold-loan' | 'coaching' | 'avasa-estates' | 'lalitha-jewellery' | 'jiofiber' | 'ramraj' | 'sbi' | 'oneplus' | 'hdfc' | 'iphone' | 'pharmeasy' | 'dummy';
+  position?: string;
 }
 
 export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
@@ -304,8 +304,9 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
 
   useEffect(() => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-    if (isMobile && (position === 'leaderboard' || position === 'sidebar' || position === 'rectangle')) {
-      const categorySlug = `mobile-ad-${position}`;
+    const isMobileSlot = position.startsWith('mobile-ad-');
+    if (isMobile && (isMobileSlot || position === 'leaderboard' || position === 'sidebar' || position === 'rectangle')) {
+      const categorySlug = isMobileSlot ? position : `mobile-ad-${position}`;
       fetch(`/api/articles?category=${categorySlug}&t=${Date.now()}`)
         .then(res => res.ok ? res.json() : [])
         .then((data: any[]) => {
