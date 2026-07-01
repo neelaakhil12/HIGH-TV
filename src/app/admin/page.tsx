@@ -5916,111 +5916,259 @@ export default function AdminPage() {
 
           {/* ══════════════ VIEW: CATEGORIES & BANNERS ══════════════ */}
           {/* ══════════════ VIEW: MOBILE ADS MANAGER ══════════════ */}
-          {activeTab === 'mobile-ads' && (
-            <div className="flex flex-col gap-6 animate-fade-in text-left">
-              <div>
-                <h2 className="text-2xl font-black text-slate-800">మొబైల్ యాడ్స్ మేనేజర్ (Mobile Ads Manager)</h2>
-                <p className="text-slate-500 text-xs">వెబ్‌సైట్ మొబైల్ వ్యూ కోసం ప్రత్యేకంగా ప్రకటనలను ఇక్కడ జోడించండి (Configure mobile-specific leaderboard, square sidebar, and feed rectangle ads).</p>
-              </div>
+          {activeTab === 'mobile-ads' && (() => {
+            const MOBILE_SLOTS = [
+              { key: 'mobile_leaderboard', label: 'Leaderboard Ad', labelTelugu: 'లీడర్‌బోర్డ్ యాడ్', desc: 'Top banner — shown above and between sections on mobile home page', icon: '📱' },
+              { key: 'mobile_sidebar', label: 'Sidebar Ad', labelTelugu: 'సైడ్‌బార్ యాడ్', desc: 'Square/tall ad — shown between sections alternately', icon: '🟦' },
+              { key: 'mobile_rectangle', label: 'Rectangle Ad', labelTelugu: 'రెక్టాంగిల్ యాడ్', desc: 'Wide banner — shown between sections alternately', icon: '🔲' },
+            ];
 
-              <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 flex flex-col gap-4 shadow-sm mt-2">
-                <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5 flex items-center gap-2">
-                  📱 Select Mobile Banner Position
-                </h3>
-
-                <div className="flex bg-slate-100 p-1 rounded-xl gap-1.5 select-none w-full md:max-w-md">
-                  {[
-                    { key: 'mobile_leaderboard', label: 'Leaderboard (Top)' },
-                    { key: 'mobile_sidebar', label: 'Sidebar (Square)' },
-                    { key: 'mobile_rectangle', label: 'Rectangle (Feed)' }
-                  ].map((spot) => (
-                    <button
-                      key={spot.key}
-                      type="button"
-                      onClick={() => setActiveAdSpot(spot.key as any)}
-                      className={`flex-1 text-center py-2.5 text-xs font-black rounded-lg transition-all cursor-pointer ${
-                        activeAdSpot === spot.key ? 'bg-[#02599c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
-                      }`}
-                    >
-                      {spot.label}
-                    </button>
-                  ))}
+            return (
+              <div className="flex flex-col gap-6 animate-fade-in text-left">
+                {/* Header */}
+                <div>
+                  <h2 className="text-2xl font-black text-slate-800">మొబైల్ యాడ్స్ మేనేజర్ (Mobile Ads Manager)</h2>
+                  <p className="text-slate-500 text-xs mt-1">మొబైల్ వ్యూలో హోమ్ పేజీ సెక్షన్‌ల మధ్య కనిపించే 3 యాడ్ స్లాట్‌లను ఇక్కడ మేనేజ్ చేయండి. These 3 slots rotate alternately between every section on mobile.</p>
                 </div>
 
-                <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col gap-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-slate-850">Activate this custom mobile banner</span>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={adSpotEnabled}
-                        onChange={(e) => setAdSpotEnabled(e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-10 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#02599c]"></div>
-                    </label>
-                  </div>
+                {/* Slots List */}
+                <div className="flex flex-col gap-5">
+                  {MOBILE_SLOTS.map((slot) => {
+                    const adData = customAds[slot.key];
+                    const hasAd = adData && adData.image;
+                    const isEditing = activeAdSpot === slot.key && mobileAdFormMode === 'edit';
+                    const isAdding = activeAdSpot === slot.key && mobileAdFormMode === 'add';
 
-                  {adSpotEnabled && (
-                    <div className="space-y-4 animate-fade-in">
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Image Media</label>
-                        <div className="border border-dashed border-slate-200 bg-white hover:border-[#02599c] rounded-xl p-4 text-center relative cursor-pointer min-h-[100px] flex items-center justify-center">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleAdSpotImageUpload}
-                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                          />
-                          {!adSpotImage ? (
-                            <span className="text-xs text-slate-400 font-bold">Select image banner file</span>
+                    return (
+                      <div key={slot.key} className="bg-white border border-slate-200/70 rounded-2xl shadow-sm overflow-hidden">
+                        {/* Slot Header Row */}
+                        <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100">
+                          <span className="text-xl">{slot.icon}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-black text-slate-800">{slot.label}</p>
+                            <p className="text-[10px] text-slate-400 font-bold">{slot.desc}</p>
+                          </div>
+                          {/* Status Badge */}
+                          {hasAd ? (
+                            <span className={`text-[10px] font-black px-2.5 py-1 rounded-full shrink-0 ${adData.enabled ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                              {adData.enabled ? '🟢 Active' : '⚫ Inactive'}
+                            </span>
                           ) : (
-                            <div className="relative max-w-[280px]">
-                              <img src={adSpotImage} alt="ad" className="max-h-[120px] w-auto rounded border border-slate-200" />
+                            <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-amber-50 text-amber-600 shrink-0">
+                              ⚠️ No Ad Set
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Ad Content Area */}
+                        <div className="p-5 flex flex-col gap-4">
+                          {hasAd && !isEditing ? (
+                            /* ── LIST VIEW: Show existing ad ── */
+                            <div className="flex flex-col sm:flex-row gap-4">
+                              {/* Image Preview */}
+                              <div className="w-full sm:w-48 shrink-0 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center min-h-[80px]">
+                                <img
+                                  src={adData.image}
+                                  alt={slot.label}
+                                  className="w-full h-auto max-h-[160px] object-contain"
+                                />
+                              </div>
+                              {/* Details */}
+                              <div className="flex-1 flex flex-col gap-2 justify-center">
+                                <div>
+                                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Redirect URL</p>
+                                  <p className="text-xs font-mono text-slate-600 truncate max-w-xs">{adData.link || '#'}</p>
+                                </div>
+                                {/* Action Buttons */}
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                  {/* Toggle ON/OFF */}
+                                  <button
+                                    type="button"
+                                    onClick={async () => {
+                                      setActiveAdSpot(slot.key as any);
+                                      const updated = {
+                                        ...customAds,
+                                        [slot.key]: { ...customAds[slot.key], enabled: !customAds[slot.key]?.enabled }
+                                      };
+                                      setCustomAds(updated);
+                                      await fetch('/api/settings', {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ custom_ads_config: JSON.stringify(updated) }),
+                                      });
+                                      setRefreshCounter(prev => prev + 1);
+                                    }}
+                                    className={`text-[11px] font-black px-3 py-1.5 rounded-lg cursor-pointer transition-all flex items-center gap-1.5 ${
+                                      adData.enabled
+                                        ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                                        : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700'
+                                    }`}
+                                  >
+                                    {adData.enabled ? '⏸ Turn Off' : '▶ Turn On'}
+                                  </button>
+                                  {/* Edit */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setActiveAdSpot(slot.key as any);
+                                      setAdSpotEnabled(adData.enabled);
+                                      setAdSpotImage(adData.image);
+                                      setAdSpotLink(adData.link || '#');
+                                      setMobileAdFormMode('edit');
+                                    }}
+                                    className="text-[11px] font-black px-3 py-1.5 rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100 text-blue-700 transition-all flex items-center gap-1.5"
+                                  >
+                                    ✏️ Edit
+                                  </button>
+                                  {/* Delete */}
+                                  <button
+                                    type="button"
+                                    onClick={async () => {
+                                      if (!confirm(`Delete the ${slot.label}? This will remove it from mobile view.`)) return;
+                                      setActiveAdSpot(slot.key as any);
+                                      const updated = { ...customAds };
+                                      delete (updated as any)[slot.key];
+                                      setCustomAds(updated);
+                                      await fetch('/api/settings', {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ custom_ads_config: JSON.stringify(updated) }),
+                                      });
+                                      setRefreshCounter(prev => prev + 1);
+                                    }}
+                                    className="text-[11px] font-black px-3 py-1.5 rounded-lg cursor-pointer bg-red-50 hover:bg-red-100 text-red-600 transition-all flex items-center gap-1.5"
+                                  >
+                                    🗑️ Delete
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ) : !hasAd && !isAdding && !isEditing ? (
+                            /* ── EMPTY STATE ── */
+                            <div className="flex flex-col items-center justify-center py-6 gap-3 text-center">
+                              <p className="text-slate-400 font-bold text-xs">ఈ స్లాట్‌లో ఇంకా యాడ్ సెట్ చేయలేదు</p>
                               <button
                                 type="button"
-                                onClick={(e) => { e.preventDefault(); setAdSpotImage(''); }}
-                                className="absolute -top-2 -right-2 bg-black/60 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]"
-                              >✕</button>
+                                onClick={() => {
+                                  setActiveAdSpot(slot.key as any);
+                                  setAdSpotEnabled(true);
+                                  setAdSpotImage('');
+                                  setAdSpotLink('#');
+                                  setMobileAdFormMode('add');
+                                }}
+                                className="text-xs font-black px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl cursor-pointer transition-all shadow-sm flex items-center gap-2"
+                              >
+                                + యాడ్ జోడించండి
+                              </button>
+                            </div>
+                          ) : null}
+
+                          {/* ── INLINE EDIT / ADD FORM ── */}
+                          {(isEditing || isAdding) && (
+                            <div className="flex flex-col gap-4 animate-fade-in bg-slate-50 rounded-xl p-4 border border-slate-200">
+                              <p className="text-xs font-black text-slate-700">{isEditing ? '✏️ Edit Ad' : '➕ Add New Ad'} — {slot.label}</p>
+
+                              {/* Enable Toggle */}
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-black text-slate-700">Activate this ad on mobile</span>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={adSpotEnabled}
+                                    onChange={(e) => setAdSpotEnabled(e.target.checked)}
+                                    className="sr-only peer"
+                                  />
+                                  <div className="w-10 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#02599c]"></div>
+                                </label>
+                              </div>
+
+                              {/* Image Upload */}
+                              <div className="flex flex-col gap-1.5">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ad Image</label>
+                                <div className="border border-dashed border-slate-200 bg-white hover:border-[#02599c] rounded-xl p-4 text-center relative cursor-pointer min-h-[90px] flex items-center justify-center">
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAdSpotImageUpload}
+                                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                  />
+                                  {!adSpotImage ? (
+                                    <span className="text-xs text-slate-400 font-bold">Click to select image banner</span>
+                                  ) : (
+                                    <div className="relative max-w-[280px]">
+                                      <img src={adSpotImage} alt="ad preview" className="max-h-[140px] w-auto rounded border border-slate-200" />
+                                      <button
+                                        type="button"
+                                        onClick={(e) => { e.preventDefault(); setAdSpotImage(''); }}
+                                        className="absolute -top-2 -right-2 bg-black/60 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] cursor-pointer"
+                                      >✕</button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* URL Input */}
+                              <div className="flex flex-col gap-1">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Click URL</label>
+                                <input
+                                  type="text"
+                                  value={adSpotLink}
+                                  onChange={(e) => setAdSpotLink(e.target.value)}
+                                  placeholder="https://example.com"
+                                  className="bg-white border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2 text-xs font-mono outline-none text-slate-850"
+                                />
+                              </div>
+
+                              {/* Form Action Buttons */}
+                              <div className="flex gap-2 justify-end pt-2 border-t border-slate-200">
+                                <button
+                                  type="button"
+                                  onClick={() => setMobileAdFormMode('list')}
+                                  className="text-xs font-black px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl cursor-pointer transition-all"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    const updated = {
+                                      ...customAds,
+                                      [slot.key]: {
+                                        enabled: adSpotEnabled,
+                                        image: adSpotImage,
+                                        link: adSpotLink || '#',
+                                      }
+                                    };
+                                    setCustomAds(updated);
+                                    await fetch('/api/settings', {
+                                      method: 'PUT',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ custom_ads_config: JSON.stringify(updated) }),
+                                    });
+                                    setRefreshCounter(prev => prev + 1);
+                                    setMobileAdFormMode('list');
+                                  }}
+                                  className="text-xs font-black px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl cursor-pointer transition-all shadow-sm"
+                                >
+                                  💾 Save Ad
+                                </button>
+                              </div>
                             </div>
                           )}
                         </div>
                       </div>
+                    );
+                  })}
+                </div>
 
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Click URL Link</label>
-                        <input
-                          type="text"
-                          value={adSpotLink}
-                          onChange={(e) => setAdSpotLink(e.target.value)}
-                          placeholder="e.g. https://www.godaddy.com"
-                          className="bg-white border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2 text-xs font-mono outline-none text-slate-850"
-                        />
-                      </div>
-                    </div>
-                  )}
+                {/* Info Note */}
+                <div className="bg-blue-50 border border-blue-200/60 rounded-xl p-4 text-xs text-blue-700 font-bold">
+                  💡 <strong>ఎలా పని చేస్తుంది:</strong> ఈ 3 స్లాట్‌లు (Leaderboard → Sidebar → Rectangle) మొబైల్ హోమ్ పేజీలో సెక్షన్‌ల మధ్య alternately show అవుతాయి. ఒక స్లాట్‌ని Off చేస్తే అది ఆ స్లాట్ స్థానంలో show కాదు.
                 </div>
               </div>
+            );
+          })()}
 
-              {/* Actions submit buttons */}
-              <div className="flex justify-end pt-2 border-t border-slate-200">
-                <button
-                  onClick={handleSaveConfigs}
-                  disabled={saveStatus === 'saving'}
-                  className={`w-full md:w-auto font-black text-xs py-3 px-8 rounded-xl transition-all cursor-pointer shadow-md text-center flex items-center justify-center min-w-[150px] ${
-                    saveStatus === 'saved'
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-rose-600 hover:bg-rose-700 text-white'
-                  }`}
-                >
-                  {saveStatus === 'saving' && 'Saving configurations...'}
-                  {saveStatus === 'saved' && '✓ Configuration Saved!'}
-                  {saveStatus === 'idle' && 'Save Configurations'}
-                </button>
-              </div>
-
-            </div>
-          )}
 
           {/* ══════════════ VIEW: HIGH TV VIDEOS ══════════════ */}
           {activeTab === 'high-tv-videos' && (

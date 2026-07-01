@@ -489,7 +489,24 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
   }
 
   if (position === 'sidebar') {
-    return <SathyabamaAd />;
+    // On mobile show a responsive full-width fallback instead of the fixed-width desktop sidebar ad
+    return (
+      <div className="w-full flex flex-col items-center my-3 select-none md:hidden">
+        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 font-sans">ADVERTISEMENT</span>
+        <div className="w-full bg-gradient-to-r from-[#0f172a] to-[#1e3a5f] rounded-xl border border-blue-900/40 p-4 flex items-center gap-3 relative overflow-hidden shadow-sm">
+          <div className="absolute top-1 right-1 opacity-15">
+            <svg className="w-2.5 h-2.5 text-gray-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          </div>
+          <div className="w-10 h-10 rounded-full bg-blue-600/20 flex items-center justify-center flex-shrink-0">
+            <svg className="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M19 10.5h-5.5V5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v5.5H5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h5.5V19c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-5.5H19c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5z"/></svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-white font-extrabold text-sm font-sans">Apollo Hospitals</p>
+            <p className="text-blue-300 font-bold text-[10px] font-sans mt-0.5">24/7 Emergency Care • Call 1066</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (position === 'skyscraper-left' || position === 'skyscraper-right') {
@@ -548,90 +565,46 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
     return (
       <div className="w-full flex flex-col items-center my-3 select-none">
         <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 font-sans md:hidden">ADVERTISEMENT</span>
-        <div className="w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 h-auto min-h-[120px] py-4 bg-gradient-to-r from-[#4c0519] to-[#881337] border-y border-rose-900 md:border md:rounded-lg flex items-center justify-between p-3 md:p-4 relative overflow-hidden text-left shadow-sm group hover:border-rose-800 transition-colors">
-          {/* Ad label */}
-          <div className="absolute top-1.5 left-2 bg-black/40 text-rose-300 text-[6.5px] font-black px-1 py-0.5 rounded leading-none">
-            SPONSORED
+        <div className="w-full bg-gradient-to-r from-[#4c0519] to-[#881337] rounded-xl border border-rose-900/60 flex items-center gap-3 p-4 relative overflow-hidden text-left shadow-sm">
+          <div className="absolute top-1.5 left-2 bg-black/40 text-rose-300 text-[6.5px] font-black px-1 py-0.5 rounded leading-none">SPONSORED</div>
+          <div className="flex-1 flex flex-col justify-center z-10 min-w-0">
+            <span className="text-amber-300 font-black text-sm leading-snug tracking-tight font-sans uppercase">CMR Shopping Mall</span>
+            <span className="text-white font-bold text-[11px] leading-normal mt-0.5 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>పట్టు చీరల ప్రత్యేక సేకరణ!</span>
+            <span className="text-rose-200/80 font-medium text-[9px] mt-1 font-sans">Wedding Silks &amp; Fancy Sarees</span>
           </div>
-          
-          {/* Left side: text */}
-          <div className="flex-1 flex flex-col justify-center pr-3 z-10">
-            <span className="text-amber-300 font-black text-[13.5px] leading-snug tracking-tight font-sans uppercase">
-              CMR Shopping Mall
-            </span>
-            <span 
-              className="text-white font-bold text-[10.5px] leading-normal mt-0.5 telugu-text"
-              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-            >
-              పట్టు చీరల ప్రత్యేక సేకరణ!
-            </span>
-            <span className="text-rose-200/80 font-medium text-[8px] mt-1 font-sans">
-              Wedding Silks & Fancy Sarees Collection
-            </span>
+          <div className="w-12 h-12 rounded-lg overflow-hidden border border-rose-950 flex-shrink-0 z-10 shadow-md">
+            <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=100&h=100&fit=crop" alt="Silk Sarees" className="w-full h-full object-cover" />
           </div>
-
-          {/* Right side: Image thumbnail */}
-          <div className="w-14 h-14 rounded-lg overflow-hidden border border-rose-950 flex-shrink-0 z-10 shadow-md">
-            <img
-              src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=100&h=100&fit=crop"
-              alt="Silk Sarees"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-            />
-          </div>
-
-          {/* Adchoices badge */}
-          <div className="absolute top-1.5 right-1.5 opacity-20">
-            <svg className="w-2.5 h-2.5 text-gray-300" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-            </svg>
-          </div>
+          <div className="absolute top-1.5 right-1.5 opacity-20"><svg className="w-2.5 h-2.5 text-gray-300" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></div>
         </div>
       </div>
     );
   }
 
-  // default / leaderboard: Serene City Horizontal Leaderboard Ad
+  // default / leaderboard: Responsive full-width fallback
   return (
     <div className="w-full flex flex-col items-center my-3 select-none">
       <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 font-sans md:hidden">ADVERTISEMENT</span>
-      <div className="w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 h-auto min-h-[90px] py-2.5 bg-gradient-to-r from-[#022c22] via-[#047857] to-[#022c22] border-y border-emerald-800 md:border md:rounded-lg flex items-center justify-between px-5 relative overflow-hidden group shadow-sm">
-        
+      <div className="w-full bg-gradient-to-r from-[#022c22] via-[#047857] to-[#022c22] rounded-xl border border-emerald-800/60 flex items-center justify-between px-4 py-3 relative overflow-hidden shadow-sm">
         {/* Sponsored Badge */}
-        <div className="absolute top-1 left-2 bg-black/40 text-[#a3e635] text-[5.5px] font-black px-1.5 py-0.5 rounded leading-none">
-          SPONSORED
-        </div>
+        <div className="absolute top-1 left-2 bg-black/40 text-[#a3e635] text-[5.5px] font-black px-1.5 py-0.5 rounded leading-none">SPONSORED</div>
 
         {/* Left: Brand details */}
-        <div className="flex flex-col text-left justify-center pl-1">
-          <h4 className="text-amber-400 font-black text-[13px] font-sans tracking-widest uppercase leading-none">
-            SERENE CITY
-          </h4>
-          <p className="text-white font-extrabold text-[9px] font-sans tracking-wide mt-1 uppercase">
-            Luxury Gated Villas
-          </p>
+        <div className="flex flex-col text-left justify-center">
+          <h4 className="text-amber-400 font-black text-[13px] font-sans tracking-widest uppercase leading-none">SERENE CITY</h4>
+          <p className="text-white font-bold text-[9px] font-sans tracking-wide mt-1 uppercase">Luxury Gated Villas</p>
+          <span className="text-emerald-100 font-bold text-[8px] font-sans mt-0.5">📍 Kokapet, Hyderabad</span>
         </div>
 
-        {/* Center: Hero Message */}
-        <div className="hidden md:flex flex-col justify-center text-center px-4 leading-tight border-l border-r border-emerald-850/60 h-[50px] mx-4 flex-1">
-          <span className="text-white font-extrabold text-[10.5px] font-sans tracking-wider uppercase">
-            Exquisite 4 & 5 BHK Residences
-          </span>
-          <span className="text-emerald-100 font-bold text-[8.5px] font-sans tracking-wide mt-1 uppercase">
-            📍 Kokapet, Hyderabad • 10 Min to Gachibowli
-          </span>
-        </div>
-
-        {/* Right: Booking / Price / CTA */}
-        <div className="flex items-center gap-4 flex-shrink-0 text-right pr-1">
-          <div className="flex flex-col justify-center leading-tight">
-            <span className="text-[10px] text-emerald-100 font-bold font-sans">Villas from ₹4.5 Cr*</span>
-            <span className="text-[9px] text-amber-400 font-black font-sans mt-0.5">📞 1800-123-4567</span>
+        {/* Right: CTA */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex flex-col justify-center leading-tight text-right">
+            <span className="text-[9px] text-emerald-100 font-bold font-sans">from ₹4.5 Cr*</span>
+            <span className="text-[8px] text-amber-400 font-black font-sans mt-0.5 whitespace-nowrap">📞 1800-123-4567</span>
           </div>
-          <div>
-            <button className="bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black text-[9px] py-2 px-3 rounded-lg leading-none transition-colors uppercase font-sans tracking-wider shadow-md">
-              Explore
-            </button>
-          </div>
+          <button className="bg-amber-500 text-neutral-950 font-black text-[9px] py-2 px-2.5 rounded-lg leading-none uppercase font-sans tracking-wider shadow-md flex-shrink-0">
+            Explore
+          </button>
         </div>
       </div>
     </div>
