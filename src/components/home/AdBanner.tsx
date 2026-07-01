@@ -303,9 +303,8 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
 
   useEffect(() => {
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const isMobileSlot = position.startsWith('mobile-ad-');
-    if (isMobile && (isMobileSlot || position === 'leaderboard' || position === 'sidebar' || position === 'rectangle')) {
+    if (isMobileSlot || position === 'leaderboard' || position === 'sidebar' || position === 'rectangle') {
       const categorySlug = isMobileSlot ? position : `mobile-ad-${position}`;
       fetch(`/api/articles?category=${categorySlug}&t=${Date.now()}`)
         .then(res => res.ok ? res.json() : [])
