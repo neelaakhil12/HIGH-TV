@@ -3220,7 +3220,7 @@ export default function AdminPage() {
       } catch (err) {
         console.error("Failed to sync videos list to DB:", err);
       }
-    } else if (activeTab === 'categories') {
+    } else if (activeTab === 'categories' || activeTab === 'mobile-ads') {
       // Save General banners
       const updatedAds = {
         ...customAds,
@@ -3822,15 +3822,16 @@ export default function AdminPage() {
 
           <button
             onClick={() => {
-              setActiveTab('categories');
+              setActiveTab('mobile-ads');
+              setActiveAdSpot('mobile_leaderboard');
             }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'categories' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              activeTab === 'mobile-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
             }`}
           >
             <div className="flex items-center gap-2.5">
-              <ImageIcon className="w-4 h-4" />
-              <span>జనరల్ బ్యానర్లు (General Banners Override)</span>
+              <MonitorSmartphone className="w-4 h-4" />
+              <span>మొబైల్ యాడ్స్ (Mobile Ads Manager)</span>
             </div>
           </button>
 
@@ -5881,68 +5882,41 @@ export default function AdminPage() {
           )}
 
           {/* ══════════════ VIEW: CATEGORIES & BANNERS ══════════════ */}
-          {activeTab === 'categories' && (
+          {/* ══════════════ VIEW: MOBILE ADS MANAGER ══════════════ */}
+          {activeTab === 'mobile-ads' && (
             <div className="flex flex-col gap-6 animate-fade-in text-left">
               <div>
-                <h2 className="text-2xl font-black text-slate-800">Categories & Banners Override</h2>
-                <p className="text-slate-500 text-xs">Configure landing video embeds and category specific banner ads overrides.</p>
+                <h2 className="text-2xl font-black text-slate-800">మొబైల్ యాడ్స్ మేనేజర్ (Mobile Ads Manager)</h2>
+                <p className="text-slate-500 text-xs">వెబ్‌సైట్ మొబైల్ వ్యూ కోసం ప్రత్యేకంగా ప్రకటనలను ఇక్కడ జోడించండి (Configure mobile-specific leaderboard, square sidebar, and feed rectangle ads).</p>
               </div>
 
-              {/* 2. Global Ads layout banners */}
               <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 flex flex-col gap-4 shadow-sm mt-2">
-                <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5">
-                  🎁 Global Site Sponsor Advertisements
+                <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5 flex items-center gap-2">
+                  📱 Select Mobile Banner Position
                 </h3>
 
-                <div className="flex flex-col gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <span className="text-[10px] font-black text-slate-450 uppercase tracking-wider">🖥️ Desktop View Ads</span>
-                    <div className="flex bg-slate-100 p-1 rounded-xl gap-1.5 select-none w-full md:max-w-md">
-                      {[
-                        { key: 'leaderboard', label: 'Leaderboard (Top)' },
-                        { key: 'sidebar', label: 'Sidebar (Square)' },
-                        { key: 'rectangle', label: 'Rectangle (Feed)' }
-                      ].map((spot) => (
-                        <button
-                          key={spot.key}
-                          type="button"
-                          onClick={() => setActiveAdSpot(spot.key as any)}
-                          className={`flex-1 text-center py-2 text-xs font-black rounded-lg transition-all cursor-pointer ${
-                            activeAdSpot === spot.key ? 'bg-[#02599c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
-                          }`}
-                        >
-                          {spot.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <span className="text-[10px] font-black text-slate-450 uppercase tracking-wider">📱 Mobile View Ads</span>
-                    <div className="flex bg-slate-100 p-1 rounded-xl gap-1.5 select-none w-full md:max-w-md">
-                      {[
-                        { key: 'mobile_leaderboard', label: 'Leaderboard (Top)' },
-                        { key: 'mobile_sidebar', label: 'Sidebar (Square)' },
-                        { key: 'mobile_rectangle', label: 'Rectangle (Feed)' }
-                      ].map((spot) => (
-                        <button
-                          key={spot.key}
-                          type="button"
-                          onClick={() => setActiveAdSpot(spot.key as any)}
-                          className={`flex-1 text-center py-2 text-xs font-black rounded-lg transition-all cursor-pointer ${
-                            activeAdSpot === spot.key ? 'bg-[#02599c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
-                          }`}
-                        >
-                          {spot.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                <div className="flex bg-slate-100 p-1 rounded-xl gap-1.5 select-none w-full md:max-w-md">
+                  {[
+                    { key: 'mobile_leaderboard', label: 'Leaderboard (Top)' },
+                    { key: 'mobile_sidebar', label: 'Sidebar (Square)' },
+                    { key: 'mobile_rectangle', label: 'Rectangle (Feed)' }
+                  ].map((spot) => (
+                    <button
+                      key={spot.key}
+                      type="button"
+                      onClick={() => setActiveAdSpot(spot.key as any)}
+                      className={`flex-1 text-center py-2.5 text-xs font-black rounded-lg transition-all cursor-pointer ${
+                        activeAdSpot === spot.key ? 'bg-[#02599c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      {spot.label}
+                    </button>
+                  ))}
                 </div>
 
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col gap-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-slate-850">Activate this custom banner spot</span>
+                    <span className="text-xs font-black text-slate-850">Activate this custom mobile banner</span>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
@@ -5969,7 +5943,7 @@ export default function AdminPage() {
                             <span className="text-xs text-slate-400 font-bold">Select image banner file</span>
                           ) : (
                             <div className="relative max-w-[280px]">
-                              <img src={adSpotImage} alt="ad" className="max-h-[80px] w-auto rounded border border-slate-200" />
+                              <img src={adSpotImage} alt="ad" className="max-h-[120px] w-auto rounded border border-slate-200" />
                               <button
                                 type="button"
                                 onClick={(e) => { e.preventDefault(); setAdSpotImage(''); }}
@@ -5992,70 +5966,6 @@ export default function AdminPage() {
                       </div>
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* 3. Category specific ads settings */}
-              <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 flex flex-col gap-4 shadow-sm mt-2">
-                <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-2.5">
-                  🎯 Page specific Banners (Category overrides)
-                </h3>
-
-                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1 admin-scrollbar">
-                  {[
-                    { slug: 'politics', name: 'పాలిటిక్స్' },
-                    { slug: 'sports', name: 'స్పోర్ట్స్' },
-                    { slug: 'entertainment', name: 'ఫిల్మ్' },
-                    { slug: 'business', name: 'బిజినెస్' }
-                  ].map((cat) => {
-                    const leadKey = `${cat.slug}_leaderboard`;
-                    const catAd = customAds[leadKey] || { enabled: false, image: '', link: '#' };
-                    return (
-                      <div key={cat.slug} className="p-4 bg-slate-50 border border-slate-100 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
-                        <div className="flex flex-col min-w-0 self-start md:self-center">
-                          <span className="text-xs font-black text-slate-800 telugu-text">{cat.name} Page banner</span>
-                          <span className="text-[10px] text-slate-400 font-mono">Spot: {leadKey}</span>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-4">
-                          <label className="relative inline-flex items-center cursor-pointer scale-90">
-                            <input
-                              type="checkbox"
-                              checked={catAd.enabled}
-                              onChange={(e) => toggleCatAdBannerStatus(leadKey, e.target.checked)}
-                              className="sr-only peer"
-                            />
-                            <div className="w-10 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#02599c]"></div>
-                          </label>
-
-                          {catAd.enabled && (
-                            <div className="flex items-center gap-2 animate-fade-in">
-                              <div className="relative border border-dashed border-slate-200 bg-white hover:border-[#02599c] rounded-lg p-1.5 cursor-pointer max-w-[120px] text-center text-[10px]">
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) => handleCatAdBannerUpload(leadKey, e)}
-                                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                />
-                                {catAd.image ? (
-                                  <img src={catAd.image} alt="cat-ad" className="max-h-[30px] object-cover rounded block" />
-                                ) : (
-                                  <span className="font-bold text-slate-400">Upload banner</span>
-                                )}
-                              </div>
-                              <input
-                                type="text"
-                                value={catAd.link}
-                                onChange={(e) => handleCatAdBannerLinkChange(leadKey, e.target.value)}
-                                placeholder="Redirect link"
-                                className="bg-white border border-slate-200/60 focus:border-rose-500 rounded-lg px-2 py-1 text-[10px] outline-none text-slate-850 w-[140px]"
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
                 </div>
               </div>
 
