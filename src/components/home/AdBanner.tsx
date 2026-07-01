@@ -293,6 +293,47 @@ export function CoachingAd() {
   );
 }
 
+export function GoogleAdSenseBlock({ position }: { position: string }) {
+  useEffect(() => {
+    try {
+      // @ts-ignore
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+      // ignore
+    }
+  }, [position]);
+
+  let adFormat = 'auto';
+  let minHeight = '90px';
+  let width = '100%';
+
+  if (position.includes('skyscraper')) {
+    adFormat = 'vertical';
+    minHeight = '600px';
+    width = '120px';
+  } else if (position.includes('sidebar') || position.includes('rectangle')) {
+    adFormat = 'rectangle';
+    minHeight = '250px';
+  } else if (position.includes('leaderboard') || position.includes('header') || position.includes('slot')) {
+    adFormat = 'horizontal';
+    minHeight = '90px';
+  }
+
+  return (
+    <div 
+      className="w-full flex justify-center my-3 overflow-hidden select-none"
+      style={{ minHeight }}
+    >
+      <ins
+        className="adsbygoogle"
+        style={{ display: 'block', width: width, minHeight: minHeight, textAlign: 'center' }}
+        data-ad-format={adFormat}
+        data-full-width-responsive="true"
+      ></ins>
+    </div>
+  );
+}
+
 interface AdBannerProps {
   position?: string;
 }
@@ -493,193 +534,11 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
 
 
 
-  if (position === 'leaderboard') {
-    return (
-      <div className="w-full flex flex-col items-center mt-1 mb-1 md:my-3 select-none">
-        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1 font-sans md:hidden">ADVERTISEMENT</span>
-        <div className="w-[calc(100%+2rem)] -mx-4 md:w-full md:mx-0 h-auto min-h-[85px] py-2 bg-[#111113] border-y border-neutral-850 md:border md:rounded-lg flex items-center justify-between px-2 sm:px-3 md:px-4 relative overflow-hidden group shadow-sm">
-          {/* Adchoices icon */}
-          <div className="absolute top-1 right-1 opacity-20 hover:opacity-100 transition-opacity z-10">
-            <svg className="w-2.5 h-2.5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-            </svg>
-          </div>
-
-          {/* Left part: Building Image + "55 Floors" */}
-          <div className="flex items-center gap-2.5 h-full flex-shrink-0">
-            <div className="w-[45px] h-[45px] md:w-[70px] md:h-[70px] relative overflow-hidden rounded border border-neutral-800">
-              <img
-                src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=100&h=100&fit=crop"
-                alt="MSN Neopolis Tower"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex flex-col text-left justify-center leading-none">
-              <span className="text-white font-extrabold text-[15px] md:text-[18px] font-sans">55</span>
-              <span className="text-neutral-500 font-bold text-[7px] md:text-[8px] tracking-widest font-sans uppercase">FLOORS</span>
-            </div>
-          </div>
-
-          {/* Center part: "ONE OF A KIND" branding (hide on small screens, show on sm and up) */}
-          <div className="hidden sm:flex flex-1 flex-col justify-center text-center px-2 leading-tight">
-            <span className="text-amber-400 font-black text-[11px] md:text-[13px] font-sans tracking-widest uppercase">ONE OF A KIND</span>
-            <span className="text-white font-bold text-[8.5px] md:text-[10px] font-sans tracking-wide uppercase mt-0.5">EXPANSIVE 4 BHK RESIDENCES</span>
-            <span className="text-neutral-400 font-medium text-[7.5px] md:text-[8px] font-sans uppercase mt-0.5">📍 NEOPOLIS, HYDERABAD</span>
-          </div>
-
-          {/* Mobile-specific center text (visible only on small screen under sm) */}
-          <div className="flex sm:hidden flex-1 flex-col justify-center text-left px-3 leading-tight">
-            <span className="text-amber-400 font-black text-[10px] font-sans tracking-wider uppercase">MSN REALTY</span>
-            <span className="text-white font-extrabold text-[8.5px] font-sans uppercase mt-0.5">EXPANSIVE 4 BHK</span>
-            <span className="text-neutral-400 font-medium text-[7.5px] font-sans uppercase mt-0.5">📍 NEOPOLIS, HYD</span>
-          </div>
-
-          {/* Right part: MSN Logo / Phone / SFT */}
-          <div className="flex items-center gap-1.5 md:gap-3 flex-shrink min-w-0 border-l border-neutral-800/60 pl-1.5 md:pl-3 h-[45px] md:h-[60px] text-right">
-            <div className="flex flex-col justify-center leading-tight">
-              <span className="hidden min-[360px]:block text-[8.5px] md:text-[10px] text-neutral-300 font-bold font-sans">5250 - 7460 SFT</span>
-              <span className="text-[8px] md:text-[9.5px] text-amber-400 font-bold font-sans mt-0.5 whitespace-nowrap">📞 91426 45645</span>
-            </div>
-            <div className="hidden min-[380px]:flex flex-col justify-center leading-none text-left border-l border-neutral-800/60 pl-2">
-              <span className="text-[10px] md:text-[11px] text-amber-500 font-extrabold font-sans">MSN</span>
-              <span className="text-[6.5px] md:text-[7.5px] text-neutral-400 font-bold font-sans tracking-wider mt-0.5">REALTY</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-
   if (position === 'holiday') {
     return null;
   }
 
-  if (position === 'astrology') {
-    return <AstrologyAd />;
-  }
-
-  if (position === 'sidebar') {
-    // On mobile show a responsive full-width fallback instead of the fixed-width desktop sidebar ad
-    return (
-      <div className="w-full flex flex-col items-center my-3 select-none md:hidden">
-        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 font-sans">ADVERTISEMENT</span>
-        <div className="w-full bg-gradient-to-r from-[#0f172a] to-[#1e3a5f] rounded-xl border border-blue-900/40 p-4 flex items-center gap-3 relative overflow-hidden shadow-sm">
-          <div className="absolute top-1 right-1 opacity-15">
-            <svg className="w-2.5 h-2.5 text-gray-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-          </div>
-          <div className="w-10 h-10 rounded-full bg-blue-600/20 flex items-center justify-center flex-shrink-0">
-            <svg className="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M19 10.5h-5.5V5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v5.5H5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h5.5V19c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-5.5H19c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5z"/></svg>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-white font-extrabold text-sm font-sans">Apollo Hospitals</p>
-            <p className="text-blue-300 font-bold text-[10px] font-sans mt-0.5">24/7 Emergency Care • Call 1066</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (position === 'skyscraper-left' || position === 'skyscraper-right') {
-    return <GoogleAdSkyscraperPlaceholder />;
-  }
-
-  if (position === 'coaching') {
-    return <CoachingAd />;
-  }
-
-  if (position === 'avasa-estates') {
-    return <AvasaEstatesAd />;
-  }
-
-  if (position === 'jiofiber') {
-    return <JioFiberAd />;
-  }
-
-  if (position === 'ramraj') {
-    return <RamrajAd />;
-  }
-
-  if (position === 'sbi') {
-    return <SbiAd />;
-  }
-
-  if (position === 'oneplus') {
-    return <OnePlusAd />;
-  }
-
-  if (position === 'hdfc') {
-    return <HdfcAd />;
-  }
-
-  if (position === 'iphone') {
-    return <IphoneAd />;
-  }
-
-  if (position === 'pharmeasy') {
-    return <PharmEasyAd />;
-  }
-
-  if (position === 'dummy') {
-    return <DummyAdBox />;
-  }
-
-  if (position === 'lalitha-jewellery') {
-    return <LalithaJewelleryAd />;
-  }
-
-  if (position === 'gold-loan') {
-    return <GoldLoanAd />;
-  }
-
-  if (position === 'rectangle') {
-    return (
-      <div className="w-full flex flex-col items-center my-3 select-none">
-        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 font-sans md:hidden">ADVERTISEMENT</span>
-        <div className="w-full bg-gradient-to-r from-[#4c0519] to-[#881337] rounded-xl border border-rose-900/60 flex items-center gap-3 p-4 relative overflow-hidden text-left shadow-sm">
-          <div className="absolute top-1.5 left-2 bg-black/40 text-rose-300 text-[6.5px] font-black px-1 py-0.5 rounded leading-none">SPONSORED</div>
-          <div className="flex-1 flex flex-col justify-center z-10 min-w-0">
-            <span className="text-amber-300 font-black text-sm leading-snug tracking-tight font-sans uppercase">CMR Shopping Mall</span>
-            <span className="text-white font-bold text-[11px] leading-normal mt-0.5 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>పట్టు చీరల ప్రత్యేక సేకరణ!</span>
-            <span className="text-rose-200/80 font-medium text-[9px] mt-1 font-sans">Wedding Silks &amp; Fancy Sarees</span>
-          </div>
-          <div className="w-12 h-12 rounded-lg overflow-hidden border border-rose-950 flex-shrink-0 z-10 shadow-md">
-            <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=100&h=100&fit=crop" alt="Silk Sarees" className="w-full h-full object-cover" />
-          </div>
-          <div className="absolute top-1.5 right-1.5 opacity-20"><svg className="w-2.5 h-2.5 text-gray-300" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></div>
-        </div>
-      </div>
-    );
-  }
-
-  // default / leaderboard: Responsive full-width fallback
-  return (
-    <div className="w-full flex flex-col items-center my-3 select-none">
-      <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 font-sans md:hidden">ADVERTISEMENT</span>
-      <div className="w-full bg-gradient-to-r from-[#022c22] via-[#047857] to-[#022c22] rounded-xl border border-emerald-800/60 flex items-center justify-between px-4 py-3 relative overflow-hidden shadow-sm">
-        {/* Sponsored Badge */}
-        <div className="absolute top-1 left-2 bg-black/40 text-[#a3e635] text-[5.5px] font-black px-1.5 py-0.5 rounded leading-none">SPONSORED</div>
-
-        {/* Left: Brand details */}
-        <div className="flex flex-col text-left justify-center">
-          <h4 className="text-amber-400 font-black text-[13px] font-sans tracking-widest uppercase leading-none">SERENE CITY</h4>
-          <p className="text-white font-bold text-[9px] font-sans tracking-wide mt-1 uppercase">Luxury Gated Villas</p>
-          <span className="text-emerald-100 font-bold text-[8px] font-sans mt-0.5">📍 Kokapet, Hyderabad</span>
-        </div>
-
-        {/* Right: CTA */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <div className="flex flex-col justify-center leading-tight text-right">
-            <span className="text-[9px] text-emerald-100 font-bold font-sans">from ₹4.5 Cr*</span>
-            <span className="text-[8px] text-amber-400 font-black font-sans mt-0.5 whitespace-nowrap">📞 1800-123-4567</span>
-          </div>
-          <button className="bg-amber-500 text-neutral-950 font-black text-[9px] py-2 px-2.5 rounded-lg leading-none uppercase font-sans tracking-wider shadow-md flex-shrink-0">
-            Explore
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  return <GoogleAdSenseBlock position={position} />;
 }
 
 export function AvasaEstatesAd() {
