@@ -6,6 +6,7 @@ import Footer from '@/components/layout/Footer';
 import BackButton from '@/components/layout/BackButton';
 import RightSidebar from '@/components/layout/RightSidebar';
 import DistrictDropdown from '@/components/layout/DistrictDropdown';
+import AdBanner from '@/components/home/AdBanner';
 import { Home, ChevronRight, MapPin } from 'lucide-react';
 import {
   apDistricts,
@@ -119,7 +120,13 @@ export default async function DistrictPage({
     <div className="min-h-screen bg-[#f4f6f8] flex flex-col">
       <Header />
 
-      <main className="max-w-[1050px] mx-auto bg-white shadow-md border-x border-gray-200 px-4 py-5 flex-1 w-full text-left">
+      <div className="w-full flex justify-center items-start max-w-[1450px] mx-auto relative gap-5 px-4 overflow-visible">
+        {/* Left Skyscraper Ad */}
+        <div className="hidden xl:block w-[160px] sticky top-24 flex-shrink-0">
+          <AdBanner position="skyscraper-left" />
+        </div>
+
+        <main className="flex-1 max-w-[1050px] bg-white shadow-md border-x border-gray-200 px-4 py-5 text-left min-w-0">
         {/* Breadcrumb row with dropdown before back button */}
         <div className="flex items-center justify-between gap-4 mb-4 border-b border-gray-100 pb-3 overflow-visible">
           <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
@@ -217,7 +224,13 @@ export default async function DistrictPage({
         </div>
       </main>
 
-      <Footer />
+      {/* Right Skyscraper Ad */}
+      <div className="hidden xl:block w-[160px] sticky top-24 flex-shrink-0">
+        <AdBanner position="skyscraper-right" />
+      </div>
     </div>
+
+    <Footer />
+  </div>
   );
 }

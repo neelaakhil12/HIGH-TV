@@ -273,23 +273,29 @@ export default async function CategoryPage({
   const topRow = mappedDistrictArticles.slice(0, 3);
   const bottomRow = mappedDistrictArticles.slice(3, 12);
 
+  const isEpaper = category === 'epaper';
+
   return (
     <div className="min-h-screen bg-[#f4f6f8] flex flex-col">
-      {category !== 'epaper' && <Header />}
+      {!isEpaper && <Header />}
 
-      {category === 'live-updates' ? (
-        <main className="flex-1 w-full">
-          <LiveUpdatesPage />
-        </main>
-      ) : category === 'sampadakiyam' ? (
-        <main className="flex-1 w-full">
-          <EditorialPageClient allArticles={allArticlesList} />
-        </main>
-      ) : category === 'epaper' ? (
-        <main className="flex-1 w-full">
-          <EPaperReader />
-        </main>
-      ) : category === 'webstories' ? (
+      {!isEpaper ? (
+        <div className="w-full flex justify-center items-start max-w-[1450px] mx-auto relative gap-5 px-4 overflow-visible">
+          {/* Left Skyscraper Ad */}
+          <div className="hidden xl:block w-[160px] sticky top-24 flex-shrink-0">
+            <AdBanner position="skyscraper-left" />
+          </div>
+
+          <div className="flex-1 flex flex-col min-w-0">
+            {category === 'live-updates' ? (
+              <main className="flex-1 w-full">
+                <LiveUpdatesPage />
+              </main>
+            ) : category === 'sampadakiyam' ? (
+              <main className="flex-1 w-full">
+                <EditorialPageClient allArticles={allArticlesList} />
+              </main>
+            ) : category === 'webstories' ? (
         <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full text-left">
           {/* Breadcrumb Row with Back Button on the right */}
           <div className="flex items-center justify-between gap-4 mb-5 border-b border-gray-100 pb-3 overflow-hidden">
@@ -635,8 +641,20 @@ export default async function CategoryPage({
           )}
         </main>
       )}
+    </div>
 
-      {category !== 'epaper' && <Footer />}
+    {/* Right Skyscraper Ad */}
+    <div className="hidden xl:block w-[160px] sticky top-24 flex-shrink-0">
+      <AdBanner position="skyscraper-right" />
+    </div>
+  </div>
+) : (
+  <main className="flex-1 w-full">
+    <EPaperReader />
+  </main>
+)}
+
+      {!isEpaper && <Footer />}
     </div>
   );
 }

@@ -398,8 +398,14 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#f4f6f8]">
       <Header />
 
-      {/* Main Newspaper Centered Container */}
-      <main className="max-w-[1050px] mx-auto bg-white px-4 pt-1 md:pt-5 pb-5 shadow-md border-x border-gray-200 relative overflow-visible">
+      <div className="w-full flex justify-center items-start max-w-[1450px] mx-auto relative gap-5 px-4 overflow-visible">
+        {/* Left Skyscraper Ad */}
+        <div className="hidden xl:block w-[160px] sticky top-24 flex-shrink-0">
+          <AdBanner position="skyscraper-left" />
+        </div>
+
+        {/* Main Newspaper Centered Container */}
+        <main className="flex-1 max-w-[1050px] bg-white px-4 pt-1 md:pt-5 pb-5 shadow-md border-x border-gray-200 relative overflow-visible min-w-0">
         
         {/* Flash News Strip */}
         <div className="hidden md:block">
@@ -636,8 +642,13 @@ export default function HomePage() {
         </div>
       </main>
 
-
-      <Footer />
+      {/* Right Skyscraper Ad */}
+      <div className="hidden xl:block w-[160px] sticky top-24 flex-shrink-0">
+        <AdBanner position="skyscraper-right" />
+      </div>
     </div>
+
+    <Footer />
+  </div>
   );
 }

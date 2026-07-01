@@ -1108,7 +1108,6 @@ export default function AdminPage() {
       setIsSavingSidebarAd(false);
     }
   };
-
   const handleDeleteAd = async (id: string) => {
     if (!confirm('Are you sure you want to delete this ad?')) return;
     try {
@@ -1369,6 +1368,76 @@ export default function AdminPage() {
   const [adSpotEnabled, setAdSpotEnabled] = useState(false);
   const [adSpotImage, setAdSpotImage] = useState('');
   const [adSpotLink, setAdSpotLink] = useState('#');
+
+  // Skyscraper Ads States and Handlers
+  const [skyscraperAdPage, setSkyscraperAdPage] = useState('');
+  const [isSavingSkyscrapers, setIsSavingSkyscrapers] = useState(false);
+  const [skyscraperLeftImage, setSkyscraperLeftImage] = useState('');
+  const [skyscraperLeftLink, setSkyscraperLeftLink] = useState('');
+  const [skyscraperLeftEnabled, setSkyscraperLeftEnabled] = useState(false);
+  const [skyscraperRightImage, setSkyscraperRightImage] = useState('');
+  const [skyscraperRightLink, setSkyscraperRightLink] = useState('');
+  const [skyscraperRightEnabled, setSkyscraperRightEnabled] = useState(false);
+
+  useEffect(() => {
+    const leftKey = skyscraperAdPage ? `${skyscraperAdPage}_skyscraper-left` : 'skyscraper-left';
+    const rightKey = skyscraperAdPage ? `${skyscraperAdPage}_skyscraper-right` : 'skyscraper-right';
+
+    const leftAd = customAds[leftKey] || { enabled: false, image: '', link: '#' };
+    const rightAd = customAds[rightKey] || { enabled: false, image: '', link: '#' };
+
+    setSkyscraperLeftEnabled(leftAd.enabled);
+    setSkyscraperLeftImage(leftAd.image || '');
+    setSkyscraperLeftLink(leftAd.link || '');
+
+    setSkyscraperRightEnabled(rightAd.enabled);
+    setSkyscraperRightImage(rightAd.image || '');
+    setSkyscraperRightLink(rightAd.link || '');
+  }, [skyscraperAdPage, customAds]);
+
+  const handleSaveSkyscrapers = async () => {
+    setIsSavingSkyscrapers(true);
+    const leftKey = skyscraperAdPage ? `${skyscraperAdPage}_skyscraper-left` : 'skyscraper-left';
+    const rightKey = skyscraperAdPage ? `${skyscraperAdPage}_skyscraper-right` : 'skyscraper-right';
+
+    const updatedAds = {
+      ...customAds,
+      [leftKey]: {
+        enabled: skyscraperLeftEnabled,
+        image: skyscraperLeftImage,
+        link: skyscraperLeftLink.trim() || '#'
+      },
+      [rightKey]: {
+        enabled: skyscraperRightEnabled,
+        image: skyscraperRightImage,
+        link: skyscraperRightLink.trim() || '#'
+      }
+    };
+
+    setCustomAds(updatedAds);
+    localStorage.setItem('custom_ads_config', JSON.stringify(updatedAds));
+
+    const settingsObj: Record<string, string> = {};
+    settingsObj['custom_ads_config'] = JSON.stringify(updatedAds);
+
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settingsObj),
+      });
+      if (res.ok) {
+        alert('Skyscraper ads updated successfully!');
+      } else {
+        alert('Failed to save skyscraper ads.');
+      }
+    } catch (err) {
+      console.error("Failed to sync skyscraper settings to DB:", err);
+      alert('Failed to save skyscraper ads.');
+    } finally {
+      setIsSavingSkyscrapers(false);
+    }
+  };
 
   // Mobile Ads Manager states
   const [mobileAdFormState, setMobileAdFormState] = useState<'list' | 'add' | 'edit'>('list');
@@ -4016,6 +4085,21 @@ export default function AdminPage() {
             </div>
           </button>
 
+          <button
+            onClick={() => {
+              setActiveTab('skyscraper-ads');
+              setSkyscraperAdPage(''); // Home page by default
+            }}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+              activeTab === 'skyscraper-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Megaphone className="w-4 h-4" />
+              <span>స్కైస్క్రాపర్ యాడ్స్ (Skyscraper Ads Manager)</span>
+            </div>
+          </button>
+
 <button
             onClick={() => {
               setActiveTab('editorial');
@@ -6369,7 +6453,180 @@ export default function AdminPage() {
             );
           })()}
 
+          {/* ══════════════ VIEW: SKYSCRAPER ADS MANAGER ══════════════ */}
+          {activeTab === 'skyscraper-ads' && (
+            <div className="bg-white border border-slate-200/60 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col gap-6 animate-fade-in text-left">
+              <div>
+                <h2 className="text-xl md:text-2xl font-black text-[#02599c] tracking-tight">స్కైస్క్రాపర్ యాడ్స్ మేనేజర్ (Skyscraper Ads Manager)</h2>
+                <p className="text-slate-500 text-xs font-medium mt-1">ఇక్కడ మీరు వివిధ పేజీలలో ఎడమ మరియు కుడి వైపున ఉండే స్కైస్క్రాపర్ ప్రకటనలను కాన్ఫిగర్ చేయవచ్చు.</p>
+              </div>
 
+              {/* Page Selector Dropdown */}
+              <div className="flex flex-col gap-2 max-w-md">
+                <label className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">పేజీని ఎంచుకోండి (SELECT PAGE)</label>
+                <select
+                  value={skyscraperAdPage}
+                  onChange={(e) => setSkyscraperAdPage(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 text-xs font-bold focus:outline-hidden focus:ring-2 focus:ring-[#02599c]/20 focus:bg-white transition-all cursor-pointer"
+                >
+                  <option value="">హోమ్ పేజీ (Homepage)</option>
+                  <option value="business">బిజినెస్ (Business)</option>
+                  <option value="politics">పాలిటిక్స్ (Politics)</option>
+                  <option value="sports">స్పోర్ట్స్ (Sports)</option>
+                  <option value="entertainment">ఎంటర్‌టైన్‌మెంట్ (Entertainment)</option>
+                  <option value="technology">టెక్నాలజీ (Technology)</option>
+                  <option value="viral">వైరల్ (Viral)</option>
+                  <option value="health">హెల్త్ (Health)</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                {/* Left Skyscraper Column */}
+                <div className="border border-slate-200/60 rounded-2xl p-5 flex flex-col gap-4 bg-slate-50/50">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-800">ఎడమ స్కైస్క్రాపర్ యాడ్ (Left Skyscraper Ad)</h3>
+                    <label className="relative inline-flex items-center cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={skyscraperLeftEnabled}
+                        onChange={(e) => setSkyscraperLeftEnabled(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-9 h-5 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-350 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                      <span className="ml-2 text-[10px] font-black text-slate-700 uppercase">
+                        {skyscraperLeftEnabled ? 'Active' : 'Inactive'}
+                      </span>
+                    </label>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-black text-slate-600 uppercase tracking-wider">Redirect Link / Click URL</label>
+                      <input
+                        type="text"
+                        value={skyscraperLeftLink}
+                        onChange={(e) => setSkyscraperLeftLink(e.target.value)}
+                        placeholder="https://example.com"
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold focus:outline-hidden focus:ring-2 focus:ring-[#02599c]/20"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-black text-slate-600 uppercase tracking-wider">Ad Image Media</label>
+                      {skyscraperLeftImage ? (
+                        <div className="relative w-[120px] h-[300px] rounded-lg overflow-hidden border border-slate-200 bg-white mx-auto shadow-xs group">
+                          <img src={skyscraperLeftImage} alt="Left Skyscraper Preview" className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => setSkyscraperLeftImage('')}
+                            className="absolute top-1 right-1 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 transition-all cursor-pointer"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-full h-[150px] border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center gap-1.5 bg-white cursor-pointer hover:border-slate-350 transition-colors relative">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                handleCompressAndSetImage(file, (base64) => {
+                                  setSkyscraperLeftImage(base64);
+                                });
+                              }
+                            }}
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                          />
+                          <svg className="w-7 h-7 text-slate-350" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" /></svg>
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Upload 160x600 Banner</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Skyscraper Column */}
+                <div className="border border-slate-200/60 rounded-2xl p-5 flex flex-col gap-4 bg-slate-50/50">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-800">కుడి స్కైస్క్రాపర్ యాడ్ (Right Skyscraper Ad)</h3>
+                    <label className="relative inline-flex items-center cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={skyscraperRightEnabled}
+                        onChange={(e) => setSkyscraperRightEnabled(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-9 h-5 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-350 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                      <span className="ml-2 text-[10px] font-black text-slate-700 uppercase">
+                        {skyscraperRightEnabled ? 'Active' : 'Inactive'}
+                      </span>
+                    </label>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-black text-slate-600 uppercase tracking-wider">Redirect Link / Click URL</label>
+                      <input
+                        type="text"
+                        value={skyscraperRightLink}
+                        onChange={(e) => setSkyscraperRightLink(e.target.value)}
+                        placeholder="https://example.com"
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold focus:outline-hidden focus:ring-2 focus:ring-[#02599c]/20"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-black text-slate-600 uppercase tracking-wider">Ad Image Media</label>
+                      {skyscraperRightImage ? (
+                        <div className="relative w-[120px] h-[300px] rounded-lg overflow-hidden border border-slate-200 bg-white mx-auto shadow-xs group">
+                          <img src={skyscraperRightImage} alt="Right Skyscraper Preview" className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => setSkyscraperRightImage('')}
+                            className="absolute top-1 right-1 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 transition-all cursor-pointer"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-full h-[150px] border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center gap-1.5 bg-white cursor-pointer hover:border-slate-350 transition-colors relative">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                handleCompressAndSetImage(file, (base64) => {
+                                  setSkyscraperRightImage(base64);
+                                });
+                              }
+                            }}
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                          />
+                          <svg className="w-7 h-7 text-slate-350" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" /></svg>
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Upload 160x600 Banner</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 mt-4 border-t border-slate-100 pt-5">
+                <button
+                  type="button"
+                  disabled={isSavingSkyscrapers}
+                  onClick={handleSaveSkyscrapers}
+                  className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-3 px-6 rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  {isSavingSkyscrapers ? 'భద్రపరుస్తోంది...' : 'యాడ్స్ సేవ్ చేయి (Save Skyscraper Ads)'}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* ══════════════ VIEW: HIGH TV VIDEOS ══════════════ */}
           {activeTab === 'high-tv-videos' && (
