@@ -327,7 +327,7 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
     if (mobileAds.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentAdIndex(prev => (prev + 1) % mobileAds.length);
-    }, 2000); // cycle one ad per 2 seconds
+    }, 4000); // cycle one ad per 4 seconds
     return () => clearInterval(interval);
   }, [mobileAds]);
 
