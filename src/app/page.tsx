@@ -184,10 +184,17 @@ function LatestNewsFeed() {
       .then(dbArticles => {
         if (!Array.isArray(dbArticles)) return;
         
-        const mappedArticles = dbArticles.map((art: any) => ({
+        const filteredDb = dbArticles.filter((art: any) => 
+          !art.categorySlug.startsWith('sidebar-ad-') &&
+          !art.categorySlug.startsWith('mobile-ad-') &&
+          art.categorySlug !== 'header-ad'
+        );
+
+        const mappedArticles = filteredDb.map((art: any) => ({
           ...art,
           content: art.body || '',
         }));
+
 
         const getMergedList = (staticList: any[], categorySlug?: string) => {
           const dbFiltered = mappedArticles.filter(art => {
@@ -285,10 +292,17 @@ export default function HomePage() {
       .then(dbArticlesData => {
         if (!Array.isArray(dbArticlesData)) return;
         
-        const mappedArticles = dbArticlesData.map((art: any) => ({
+        const filteredDb = dbArticlesData.filter((art: any) => 
+          !art.categorySlug.startsWith('sidebar-ad-') &&
+          !art.categorySlug.startsWith('mobile-ad-') &&
+          art.categorySlug !== 'header-ad'
+        );
+
+        const mappedArticles = filteredDb.map((art: any) => ({
           ...art,
           content: art.body || '',
         }));
+
 
         setDbArticles(mappedArticles);
 

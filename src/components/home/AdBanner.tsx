@@ -299,6 +299,38 @@ interface AdBannerProps {
 
 export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
   const [customAd, setCustomAd] = useState<{ image: string; link: string } | null>(null);
+  const [mobileAds, setMobileAds] = useState<{ image: string; link: string }[]>([]);
+  const [currentAdIndex, setCurrentAdIndex] = useState(0);
+
+  useEffect(() => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    if (isMobile && (position === 'leaderboard' || position === 'sidebar' || position === 'rectangle')) {
+      const categorySlug = `mobile-ad-${position}`;
+      fetch(`/api/articles?category=${categorySlug}&t=${Date.now()}`)
+        .then(res => res.ok ? res.json() : [])
+        .then((data: any[]) => {
+          if (Array.isArray(data)) {
+            const activeAds = data
+              .filter(ad => ad.category === 'active' && ad.image)
+              .map(ad => ({
+                image: ad.image,
+                link: ad.body || '#'
+              }));
+            setMobileAds(activeAds);
+          }
+        })
+        .catch(err => console.error("Error fetching mobile ads in AdBanner:", err));
+    }
+  }, [position]);
+
+  useEffect(() => {
+    if (mobileAds.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentAdIndex(prev => (prev + 1) % mobileAds.length);
+    }, 2000); // cycle one ad per 2 seconds
+    return () => clearInterval(interval);
+  }, [mobileAds]);
+
 
   useEffect(() => {
     let adsDataCached: string | null = null;
@@ -385,6 +417,44 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
     return () => window.removeEventListener('resize', handleResolveAd);
   }, [position]);
 
+  if (mobileAds.length > 0) {
+    const activeAd = mobileAds[currentAdIndex] || mobileAds[0];
+    return (
+      <div className="w-full flex flex-col items-center select-none my-3">
+        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 font-sans md:hidden">ADVERTISEMENT</span>
+        <a
+          href={activeAd.link}
+          target={activeAd.link === '#' ? '_self' : '_blank'}
+          rel="noopener noreferrer"
+          onClick={(e) => {
+            if (activeAd.link === '#') e.preventDefault();
+          }}
+          className="relative block w-full rounded-lg border border-slate-200/30 overflow-hidden shadow-md group hover:border-[#02599c]/50 transition-colors bg-slate-50"
+        >
+          {/* Ad label */}
+          <div className="absolute top-1.5 left-2 bg-black/50 text-[#ffb3d1] text-[6.5px] font-black px-1.5 py-0.5 rounded leading-none uppercase tracking-wider font-sans z-10 font-bold">
+            Sponsor
+          </div>
+
+          {/* Image — natural size, no crop, no clip */}
+          <img
+            key={currentAdIndex}
+            src={activeAd.image}
+            alt="Advertisement"
+            className="w-full h-auto block group-hover:scale-[1.005] transition-transform duration-300 animate-fade-in"
+          />
+
+          {/* Adchoices badge */}
+          <div className="absolute top-1.5 right-1.5 opacity-35 z-10">
+            <svg className="w-2.5 h-2.5 text-white fill-current" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+          </div>
+        </a>
+      </div>
+    );
+  }
+
   if (customAd) {
     return (
       <div className="w-full flex flex-col items-center select-none my-3">
@@ -420,6 +490,7 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
       </div>
     );
   }
+
 
 
   if (position === 'leaderboard') {
