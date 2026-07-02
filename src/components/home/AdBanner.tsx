@@ -538,7 +538,7 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
     return null;
   }
 
-  return <GoogleAdSenseBlock position={position} />;
+  return null;
 }
 
 export function AvasaEstatesAd() {
