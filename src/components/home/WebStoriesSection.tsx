@@ -401,7 +401,8 @@ export default function WebStoriesSection() {
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
