@@ -683,4 +683,59 @@ body {
   font-weight: normal;
 }
 
+/* ==========================================
+   Inline Image Container & Caption styling
+   ========================================== */
+.inline-image-container {
+  display: table !important;
+  max-width: 100%;
+  margin-top: 16px !important;
+  margin-bottom: 16px !important;
+}
+
+/* Align inline-image-container based on parent/element text alignment */
+.inline-image-container[style*="text-align: center"],
+.inline-image-container[style*="text-align:center"],
+div[style*="text-align: center"] .inline-image-container,
+div[style*="text-align:center"] .inline-image-container {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.inline-image-container[style*="text-align: right"],
+.inline-image-container[style*="text-align:right"],
+div[style*="text-align: right"] .inline-image-container,
+div[style*="text-align:right"] .inline-image-container {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+
+.inline-image-container[style*="text-align: left"],
+.inline-image-container[style*="text-align:left"],
+div[style*="text-align: left"] .inline-image-container,
+div[style*="text-align:left"] .inline-image-container {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
+/* Ensure caption has the exact same styling as the main hero caption */
+.inline-image-container div.telugu-text,
+.inline-image-container .telugu-text {
+  border-bottom: 1px solid #e2e8f0 !important; /* border-b border-gray-200/gray-100 */
+  padding-bottom: 6px !important; /* pb-1.5 */
+  padding-top: 4px !important; /* pt-1 */
+  color: #4b5563 !important; /* text-gray-600 */
+  font-weight: 700 !important; /* font-bold */
+  margin-bottom: 16px !important; /* mb-4 */
+  font-size: 13px !important;
+  text-align: left !important; /* Always start from the left of the image */
+}
+
+@media (min-width: 768px) {
+  .inline-image-container div.telugu-text,
+  .inline-image-container .telugu-text {
+    font-size: 14px !important;
+  }
+}
+
 
