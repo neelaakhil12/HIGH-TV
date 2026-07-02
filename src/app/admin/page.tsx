@@ -2319,9 +2319,9 @@ export default function AdminPage() {
           
           let imgHTML = '';
           if (caption && caption.trim()) {
-            imgHTML = `<div class="my-4 inline-image-container text-left" style="text-align: left;">
-  <img src="${base64}" class="w-full h-auto rounded-xl block" alt="inline-img" />
-  <div class="mt-2 pl-1 text-[13.5px] md:text-[14.5px] font-bold text-gray-700 telugu-text leading-normal" style="font-family: 'Noto Sans Telugu, sans-serif';">
+            imgHTML = `<div class="my-4 inline-image-container" style="display: table; margin: 16px auto 16px 0; text-align: left; max-width: 100%;">
+  <img src="${base64}" class="w-full h-auto rounded-xl block" alt="inline-img" style="margin-bottom: 0;" />
+  <div class="mt-1.5 px-1 pb-1.5 pt-1 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100 mb-4" style="font-family: 'Noto Sans Telugu, sans-serif'; text-align: left;">
     ${caption.trim()}
   </div>
 </div>`;
@@ -5184,13 +5184,11 @@ export default function AdminPage() {
                                 const container = selectedImage.closest('.inline-image-container') as HTMLDivElement;
                                 if (container) {
                                   container.style.display = 'table';
-                                  container.style.marginLeft = '0';
-                                  container.style.marginRight = 'auto';
+                                  container.style.margin = '16px auto 16px 0';
                                   container.style.textAlign = 'left';
                                 } else {
                                   selectedImage.style.display = 'block';
-                                  selectedImage.style.marginLeft = '0';
-                                  selectedImage.style.marginRight = 'auto';
+                                  selectedImage.style.margin = '16px auto 16px 0';
                                 }
                                 const parent = (container || selectedImage).parentElement;
                                 if (parent) parent.style.textAlign = 'left';
@@ -5337,7 +5335,7 @@ export default function AdminPage() {
                                   if (caption.trim()) {
                                     if (!captionDiv) {
                                       captionDiv = document.createElement('div');
-                                      captionDiv.className = 'mt-2 pl-1 text-[13.5px] md:text-[14.5px] font-bold text-gray-700 telugu-text leading-normal';
+                                      captionDiv.className = 'mt-1.5 px-1 pb-1.5 pt-1 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100 mb-4';
                                       captionDiv.style.fontFamily = 'Noto Sans Telugu, sans-serif';
                                       container.appendChild(captionDiv);
                                     }
@@ -5349,14 +5347,11 @@ export default function AdminPage() {
                                   if (caption.trim()) {
                                     const parent = selectedImage.parentNode;
                                     if (parent) {
-                                      const wrapper = document.createElement('div');
-                                      wrapper.className = 'my-4 inline-image-container text-left';
-                                      wrapper.style.textAlign = 'left';
-                                      parent.insertBefore(wrapper, selectedImage);
+                                      const wrapper = document.createElement('div'); wrapper.className = 'my-4 inline-image-container'; wrapper.style.display = 'table'; wrapper.style.margin = '16px auto 16px 0'; wrapper.style.textAlign = 'left'; wrapper.style.maxWidth = '100%'; parent.insertBefore(wrapper, selectedImage);
                                       wrapper.appendChild(selectedImage);
 
                                       const captionDiv = document.createElement('div');
-                                      captionDiv.className = 'mt-2 pl-1 text-[13.5px] md:text-[14.5px] font-bold text-gray-700 telugu-text leading-normal';
+                                      captionDiv.className = 'mt-1.5 px-1 pb-1.5 pt-1 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100 mb-4';
                                       captionDiv.style.fontFamily = 'Noto Sans Telugu, sans-serif';
                                       captionDiv.textContent = caption.trim();
                                       wrapper.appendChild(captionDiv);
@@ -13106,4 +13101,6 @@ export default function AdminPage() {
     </div>
   );
 }
+
+
 

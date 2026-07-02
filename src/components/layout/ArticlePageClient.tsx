@@ -917,7 +917,7 @@ export default function ArticlePageClient({
               />
 
               {/* Hero Image */}
-              <div className="overflow-hidden mb-1 w-full">
+              <div className="overflow-hidden mb-0 w-full">
                 <FallbackImage
                   src={article.image}
                   alt={article.title?.replace(/<[^>]*>/g, '')}
@@ -930,7 +930,7 @@ export default function ArticlePageClient({
               </div>
               {article.imageCaption && (
                 <div 
-                  className="mb-5 px-1 py-1.5 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100" 
+                  className="mb-5 px-1 pb-1.5 pt-1 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100" 
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   dangerouslySetInnerHTML={{ __html: article.imageCaption }}
                 />
@@ -1456,7 +1456,7 @@ export default function ArticlePageClient({
           </div>
           {article.imageCaption && (
             <div 
-              className="px-1 py-1.5 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100" 
+              className="px-1 pb-1.5 pt-1 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100" 
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               dangerouslySetInnerHTML={{ __html: article.imageCaption }}
             />
