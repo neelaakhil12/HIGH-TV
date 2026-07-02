@@ -738,4 +738,9 @@ div[style*="text-align:left"] .inline-image-container {
   }
 }
 
+/* Hide the mobile bottom navigation bar when webstories are active */
+body.stories-active #mobile-bottom-nav-bar {
+  display: none !important;
+}
+
 

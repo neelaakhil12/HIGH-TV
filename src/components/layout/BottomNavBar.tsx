@@ -124,7 +124,7 @@ export default function BottomNavBar() {
       </div>
 
       {/* ── Persistent Bottom Navigation Bar ─────────────────────────── */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[120] bg-[#025390] border-t border-[#013d6e] shadow-[0_-2px_10px_rgba(0,0,0,0.15)] h-14 flex items-center justify-around px-2 pb-safe">
+      <div id="mobile-bottom-nav-bar" className="md:hidden fixed bottom-0 left-0 right-0 z-[120] bg-[#025390] border-t border-[#013d6e] shadow-[0_-2px_10px_rgba(0,0,0,0.15)] h-14 flex items-center justify-around px-2 pb-safe">
         {/* Menu Tab */}
         <button
           onClick={() => setIsOpen(!isOpen)}

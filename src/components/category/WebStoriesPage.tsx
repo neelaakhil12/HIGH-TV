@@ -230,14 +230,15 @@ export default function WebStoriesPage() {
       {/* WhatsApp Status Modal Player */}
       {mounted && typeof window !== 'undefined' && activeStory && createPortal(
         <div
-          className="fixed inset-0 z-[99999] bg-black/95 flex items-center justify-center backdrop-blur-xs p-0 md:p-4 animate-fade-in"
+          className="fixed inset-0 z-[99999] flex items-center justify-center backdrop-blur-xs p-0 md:p-4 animate-fade-in"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.95)' }}
           onClick={handleCloseStory}
         >
           <style dangerouslySetInnerHTML={{ __html: `
             @keyframes storyPanelPop {
               0% {
                 opacity: 0;
-                transform: translateY(100%);
+                transform: translateY(20%);
               }
               100% {
                 opacity: 1;
@@ -245,12 +246,13 @@ export default function WebStoriesPage() {
               }
             }
             .animate-story-panel-pop {
-              animation: storyPanelPop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+              animation: storyPanelPop 0.3s ease-out forwards;
             }
           `}} />
           {/* Main Story Container */}
           <div
-            className="relative w-full h-[100dvh] md:h-auto md:max-w-sm md:aspect-[9/16] bg-neutral-950 rounded-none md:rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between"
+            className="relative w-full h-[100dvh] md:h-auto md:max-w-sm md:aspect-[9/16] rounded-none md:rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between"
+            style={{ backgroundColor: '#0a0a0a' }}
             onClick={(e) => e.stopPropagation()}
             onMouseDown={() => setIsPaused(true)}
             onMouseUp={() => setIsPaused(false)}
@@ -263,9 +265,8 @@ export default function WebStoriesPage() {
               alt=""
               className="absolute inset-0 w-full h-full object-cover pointer-events-none"
             />
-            {/* Black-to-transparent gradient shadow mask for readability */}
-            <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/60 to-transparent pointer-events-none z-10" />
-            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/45 to-transparent pointer-events-none z-10" />
+            {/* Black-to-transparent gradient shadow mask for readability (top header only) */}
+            <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/80 to-transparent pointer-events-none z-10" />
 
             {/* Top Bar Container */}
             <div className="absolute top-0 inset-x-0 z-30 flex flex-col gap-2 p-3">
@@ -318,13 +319,16 @@ export default function WebStoriesPage() {
               </div>
             </div>
 
-            {/* Slide Text Panel (Elliptical dome format like ABN, full width, very light transparency) */}
+            {/* Slide Text Panel (Gradient overlay with white text matching the reference) */}
             <div 
-              className="absolute inset-x-0 bottom-0 w-full bg-black/25 backdrop-blur-[2.5px] shadow-2xl z-20 pointer-events-none flex flex-col justify-start items-center min-h-[160px] md:min-h-[200px] pt-16 md:pt-22 pb-6 px-6 text-center animate-story-panel-pop border-t border-white/10 rounded-t-[50%_70px] md:rounded-t-[50%_90px]"
+              className="absolute inset-x-0 bottom-0 w-full bg-gradient-to-t from-black/95 via-black/70 to-transparent pt-32 pb-16 px-6 z-20 pointer-events-none flex flex-col justify-end items-center text-center animate-story-panel-pop"
             >
               <h3
-                className="text-[17px] md:text-[22px] font-black leading-relaxed text-white telugu-text max-w-xs md:max-w-md mx-auto pl-2.5"
-                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                className="text-[16px] sm:text-[18px] md:text-[20px] font-bold leading-relaxed text-white telugu-text max-w-xs md:max-w-md mx-auto"
+                style={{
+                  fontFamily: 'Noto Sans Telugu, sans-serif',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                }}
               >
                 {typedText}
               </h3>
