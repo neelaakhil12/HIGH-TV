@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Play, Pause, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
 import { storiesData } from '@/lib/webstoriesData';
 
@@ -12,6 +13,11 @@ export default function WebStoriesPage() {
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [typedText, setTypedText] = useState('');
   const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -222,9 +228,9 @@ export default function WebStoriesPage() {
       </div>
 
       {/* WhatsApp Status Modal Player */}
-      {activeStory && (
+      {mounted && typeof window !== 'undefined' && activeStory && createPortal(
         <div
-          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center backdrop-blur-xs p-0 md:p-4 animate-fade-in"
+          className="fixed inset-0 z-[99999] bg-black/95 flex items-center justify-center backdrop-blur-xs p-0 md:p-4 animate-fade-in"
           onClick={handleCloseStory}
         >
           <style dangerouslySetInnerHTML={{ __html: `
@@ -244,7 +250,7 @@ export default function WebStoriesPage() {
           `}} />
           {/* Main Story Container */}
           <div
-            className="relative w-full h-full md:h-auto md:max-w-sm md:aspect-[9/16] bg-neutral-950 rounded-none md:rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between"
+            className="relative w-full h-[100dvh] md:h-auto md:max-w-sm md:aspect-[9/16] bg-neutral-950 rounded-none md:rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between"
             onClick={(e) => e.stopPropagation()}
             onMouseDown={() => setIsPaused(true)}
             onMouseUp={() => setIsPaused(false)}
@@ -368,7 +374,8 @@ export default function WebStoriesPage() {
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
