@@ -2314,8 +2314,21 @@ export default function AdminPage() {
           mediaLibrary[mediaPath] = base64;
           localStorage.setItem('custom_media_library', JSON.stringify(mediaLibrary));
           
-          // Insert actual HTML image element in editor with raw base64 as src
-          const imgHTML = `<img src="${base64}" class="w-full h-auto rounded-xl my-4 block" alt="inline-img" />`;
+          // Ask user for a caption for this inline image
+          const caption = prompt('Enter a caption for this inline image (optional):');
+          
+          let imgHTML = '';
+          if (caption && caption.trim()) {
+            imgHTML = `<div class="my-4 inline-image-container text-left" style="text-align: left;">
+  <img src="${base64}" class="w-full h-auto rounded-xl block" alt="inline-img" />
+  <div class="mt-2 pl-1 text-[13.5px] md:text-[14.5px] font-bold text-gray-700 telugu-text leading-normal" style="font-family: 'Noto Sans Telugu, sans-serif';">
+    ${caption.trim()}
+  </div>
+</div>`;
+          } else {
+            imgHTML = `<img src="${base64}" class="w-full h-auto rounded-xl my-4 block" alt="inline-img" />`;
+          }
+          
           insertElementAtCursor(imgHTML);
         } catch {
           alert('Local media library is full! Compress your image or clear browser history.');

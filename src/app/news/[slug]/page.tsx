@@ -215,6 +215,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
            description: true,
           metaDescription: true,
           image: true,
+          imageCaption: true,
           tags: {
             select: { name: true, linkedArticleSlug: true }
           },
