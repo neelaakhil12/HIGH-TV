@@ -240,7 +240,7 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
                               categorySlug?.startsWith('district-');
 
   return (
-    <aside className="w-full lg:col-span-3 flex flex-col gap-4 select-none">
+    <aside className="hidden lg:flex w-full lg:col-span-3 flex-col gap-4 select-none">
       
       {/* District Selector */}
       {showDistrictSelector && (
