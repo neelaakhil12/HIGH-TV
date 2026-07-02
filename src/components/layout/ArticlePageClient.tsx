@@ -941,8 +941,15 @@ export default function ArticlePageClient({
               <div className="telugu-text text-gray-800 article-body" style={{ fontFamily: 'Mandali, "Noto Sans Telugu", sans-serif', lineHeight: '1.85' }}>
                 {article.body ? (
                   (() => {
-                    // Normalize: ensure img/video/headings are on their own lines
-                    const normalized = article.body
+                    // Extract inline-image-containers to prevent them from being split/broken by newline parser
+                    const placeholders: string[] = [];
+                    let normalized = article.body.replace(/(<div\b[^>]*\binline-image-container[\s\S]*?<\/div>\s*<\/div>)/gi, (match) => {
+                      placeholders.push(match);
+                      return `\n__INLINE_IMAGE_CONTAINER_PLACEHOLDER_${placeholders.length - 1}__\n`;
+                    });
+
+                    // Normalize other media elements
+                    normalized = normalized
                       .replace(/(<img\b[^>]*\/?>)/gi, '\n$1\n')
                       .replace(/(<video\b[\s\S]*?<\/video>)/gi, '\n$1\n')
                       .replace(/(<h[1-6]>[\s\S]*?<\/h[1-6]>)/gi, '\n$1\n');
@@ -956,6 +963,15 @@ export default function ArticlePageClient({
                       const trimmed = para.trim();
                       if (trimmed === '') {
                         elements.push(<div key={`empty-${idx}`} style={{ height: '0.7em' }} />);
+                        return;
+                      }
+
+                      // Check if it is a placeholder for inline image container
+                      const placeholderMatch = trimmed.match(/__INLINE_IMAGE_CONTAINER_PLACEHOLDER_(\d+)__/);
+                      if (placeholderMatch) {
+                        const index = parseInt(placeholderMatch[1], 10);
+                        const originalHTML = placeholders[index];
+                        elements.push(<div key={`tag-${idx}`} dangerouslySetInnerHTML={{ __html: resolveMediaPlaceholders(originalHTML) }} />);
                         return;
                       }
 
