@@ -289,7 +289,10 @@ export default function WebStoriesSection() {
               className="absolute inset-0 w-full h-full object-cover pointer-events-none"
             />
             {/* Black-to-transparent gradient shadow mask for readability (top header only) */}
-            <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/80 to-transparent pointer-events-none z-10" />
+            <div 
+              className="absolute inset-x-0 top-0 h-28 pointer-events-none z-10" 
+              style={{ background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%)' }}
+            />
 
             {/* Top Bar Container */}
             <div className="absolute top-0 inset-x-0 z-30 flex flex-col gap-2 p-3">
@@ -344,7 +347,8 @@ export default function WebStoriesSection() {
 
             {/* Slide Text Panel (Gradient overlay with white text matching the reference) */}
             <div 
-              className="absolute inset-x-0 bottom-0 w-full bg-gradient-to-t from-black/95 via-black/70 to-transparent pt-32 pb-16 px-6 z-20 pointer-events-none flex flex-col justify-end items-center text-center animate-story-panel-pop"
+              className="absolute inset-x-0 bottom-0 w-full pt-48 pb-16 px-6 z-20 pointer-events-none flex flex-col justify-end items-center text-center animate-story-panel-pop"
+              style={{ background: 'linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 40%, rgba(0, 0, 0, 0.3) 70%, rgba(0, 0, 0, 0) 100%)' }}
             >
               <h3
                 className="text-[16px] sm:text-[18px] md:text-[20px] font-bold leading-relaxed text-white telugu-text max-w-xs md:max-w-md mx-auto"
