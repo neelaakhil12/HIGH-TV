@@ -54,6 +54,7 @@ export async function GET(req: NextRequest) {
       description: true,
       metaDescription: true,
       image: true,
+      imageCaption: true,
       tags: {
         select: {
           name: true,

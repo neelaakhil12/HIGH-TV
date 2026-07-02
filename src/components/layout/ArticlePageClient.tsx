@@ -917,7 +917,7 @@ export default function ArticlePageClient({
               />
 
               {/* Hero Image */}
-              <div className="overflow-hidden mb-5 w-full">
+              <div className="overflow-hidden mb-1 w-full">
                 <FallbackImage
                   src={article.image}
                   alt={article.title?.replace(/<[^>]*>/g, '')}
@@ -928,6 +928,12 @@ export default function ArticlePageClient({
                   style={{ display: 'block', width: '100%', height: 'auto' }}
                 />
               </div>
+              {article.imageCaption && (
+                <div className="mb-5 px-1 py-1.5 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                  {article.imageCaption}
+                </div>
+              )}
+              {!article.imageCaption && <div className="mb-4" />}
 
               {/* Full Article Body */}
               <div className="telugu-text text-gray-800 article-body" style={{ fontFamily: 'Mandali, "Noto Sans Telugu", sans-serif', lineHeight: '1.85' }}>
@@ -955,6 +961,14 @@ export default function ArticlePageClient({
 
                       if (isTag) {
                         elements.push(<div key={`tag-${idx}`} dangerouslySetInnerHTML={{ __html: resolveMediaPlaceholders(trimmed) }} />);
+                        // Add caption below inline images
+                        if (/^<img\b/i.test(trimmed) && article.imageCaption) {
+                          elements.push(
+                            <div key={`cap-${idx}`} className="px-1 py-1 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100 mb-3" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                              {article.imageCaption}
+                            </div>
+                          );
+                        }
                       } else {
                         // It is a text paragraph
                         elements.push(<p key={`para-${idx}`} style={{ margin: '0 0 0.6em 0' }} dangerouslySetInnerHTML={{ __html: resolveMediaPlaceholders(para) }} />);
@@ -1446,6 +1460,11 @@ export default function ArticlePageClient({
               style={{ display: 'block', width: '100%', height: 'auto' }}
             />
           </div>
+          {article.imageCaption && (
+            <div className="px-1 py-1.5 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              {article.imageCaption}
+            </div>
+          )}
 
         </div>
 

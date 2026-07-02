@@ -590,6 +590,7 @@ export default function AdminPage() {
 
   const [newsPublishedDate, setNewsPublishedDate] = useState('');
   const [newsImage, setNewsImage] = useState('');
+  const [newsImageCaption, setNewsImageCaption] = useState('');
   const [newsVideo, setNewsVideo] = useState('');
 
   // Story placement flag checkboxes
@@ -1829,6 +1830,7 @@ export default function AdminPage() {
       setNewsTags([]);
       setMetaDescription('');
       setNewsImage('');
+      setNewsImageCaption('');
       setNewsVideo('');
       setEditingArticle(null);
       
@@ -2975,6 +2977,7 @@ export default function AdminPage() {
       metaDescription: metaDescription.trim(),
       body: cleanBodyHTML,
       image: newsImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop',
+      imageCaption: newsImageCaption.trim() || null,
       tags: newsTags,
       isBreaking: isBreakingChecked,
       isTrending: isTrendingChecked,
@@ -3059,6 +3062,7 @@ export default function AdminPage() {
     };
     setNewsPublishedDate(art.publishedAt ? getLocalDatetimeString(art.publishedAt) : getLocalDatetimeString(new Date()));
     setNewsImage(art.image || '');
+    setNewsImageCaption(art.imageCaption || '');
     
     // Resolve short video
     if (art.categorySlug === 'shorts' && art.body) {
@@ -5585,6 +5589,20 @@ export default function AdminPage() {
                     </div>
                   </div>
 
+                  {/* Image Caption / Photo Write-up */}
+                  <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-2">
+                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">📝 Photo Caption / Write-up</label>
+                    <input
+                      type="text"
+                      value={newsImageCaption}
+                      onChange={(e) => setNewsImageCaption(e.target.value)}
+                      placeholder="e.g. మాట్లాడుతున్న ఎమ్మెల్సీ దువ్వాడ శ్రీనివాస్"
+                      className="bg-white border border-slate-200/60 focus:border-[#02599c] rounded-xl px-3 py-2.5 text-xs outline-none text-slate-850 font-bold telugu-text"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    />
+                    <span className="text-[9px] text-slate-400">This caption appears below the main article image and all inline images.</span>
+                  </div>
+
                   {/* Short Video File Box (Only for Shorts category) */}
                   {selectedCategories.includes('shorts') && (
                     <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
@@ -7845,6 +7863,19 @@ export default function AdminPage() {
                             </div>
                           )}
                         </div>
+                      </div>
+
+                      {/* Image Caption / Photo Write-up */}
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">📝 Photo Caption</label>
+                        <input
+                          type="text"
+                          value={newsImageCaption}
+                          onChange={(e) => setNewsImageCaption(e.target.value)}
+                          placeholder="e.g. మాట్లాడుతున్న ఎమ్మెల్సీ దువ్వాడ శ్రీనివాస్"
+                          className="bg-white border border-slate-200/60 focus:border-[#02599c] rounded-xl px-3 py-2 text-xs outline-none text-slate-850 font-bold telugu-text"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        />
                       </div>
 
                       {/* Article Body */}

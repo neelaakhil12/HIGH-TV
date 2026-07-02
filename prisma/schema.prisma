@@ -22,6 +22,7 @@ model Article {
   metaDescription String?  @db.Text
   body            String?  @db.LongText
   image           String?  @db.LongText
+  imageCaption    String?  @db.Text
   tags            Tag[]
   views           Int      @default(0)
   isBreaking      Boolean  @default(false)
