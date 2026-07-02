@@ -929,9 +929,11 @@ export default function ArticlePageClient({
                 />
               </div>
               {article.imageCaption && (
-                <div className="mb-5 px-1 py-1.5 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                  {article.imageCaption}
-                </div>
+                <div 
+                  className="mb-5 px-1 py-1.5 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100" 
+                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                  dangerouslySetInnerHTML={{ __html: article.imageCaption }}
+                />
               )}
               {!article.imageCaption && <div className="mb-4" />}
 
@@ -1453,9 +1455,11 @@ export default function ArticlePageClient({
             />
           </div>
           {article.imageCaption && (
-            <div className="px-1 py-1.5 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-              {article.imageCaption}
-            </div>
+            <div 
+              className="px-1 py-1.5 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100" 
+              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+              dangerouslySetInnerHTML={{ __html: article.imageCaption }}
+            />
           )}
 
         </div>

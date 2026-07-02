@@ -5181,15 +5181,19 @@ export default function AdminPage() {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 if (!selectedImage) return;
-                                const parent = selectedImage.parentElement;
-                                if (parent && (parent.dataset.imgAlign === 'true')) {
-                                  parent.style.textAlign = 'left';
+                                const container = selectedImage.closest('.inline-image-container') as HTMLDivElement;
+                                if (container) {
+                                  container.style.display = 'table';
+                                  container.style.marginLeft = '0';
+                                  container.style.marginRight = 'auto';
+                                  container.style.textAlign = 'left';
                                 } else {
                                   selectedImage.style.display = 'block';
                                   selectedImage.style.marginLeft = '0';
                                   selectedImage.style.marginRight = 'auto';
-                                  if (parent) { parent.style.textAlign = 'left'; }
                                 }
+                                const parent = (container || selectedImage).parentElement;
+                                if (parent) parent.style.textAlign = 'left';
                                 updateResizerPosition(selectedImage);
                               }}
                               style={{
@@ -5212,10 +5216,18 @@ export default function AdminPage() {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 if (!selectedImage) return;
-                                selectedImage.style.display = 'block';
-                                selectedImage.style.marginLeft = 'auto';
-                                selectedImage.style.marginRight = 'auto';
-                                const parent = selectedImage.parentElement;
+                                const container = selectedImage.closest('.inline-image-container') as HTMLDivElement;
+                                if (container) {
+                                  container.style.display = 'table';
+                                  container.style.marginLeft = 'auto';
+                                  container.style.marginRight = 'auto';
+                                  container.style.textAlign = 'center';
+                                } else {
+                                  selectedImage.style.display = 'block';
+                                  selectedImage.style.marginLeft = 'auto';
+                                  selectedImage.style.marginRight = 'auto';
+                                }
+                                const parent = (container || selectedImage).parentElement;
                                 if (parent) parent.style.textAlign = 'center';
                                 updateResizerPosition(selectedImage);
                               }}
@@ -5239,10 +5251,18 @@ export default function AdminPage() {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 if (!selectedImage) return;
-                                selectedImage.style.display = 'block';
-                                selectedImage.style.marginLeft = 'auto';
-                                selectedImage.style.marginRight = '0';
-                                const parent = selectedImage.parentElement;
+                                const container = selectedImage.closest('.inline-image-container') as HTMLDivElement;
+                                if (container) {
+                                  container.style.display = 'table';
+                                  container.style.marginLeft = 'auto';
+                                  container.style.marginRight = '0';
+                                  container.style.textAlign = 'right';
+                                } else {
+                                  selectedImage.style.display = 'block';
+                                  selectedImage.style.marginLeft = 'auto';
+                                  selectedImage.style.marginRight = '0';
+                                }
+                                const parent = (container || selectedImage).parentElement;
                                 if (parent) parent.style.textAlign = 'right';
                                 updateResizerPosition(selectedImage);
                               }}
@@ -5266,6 +5286,14 @@ export default function AdminPage() {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 if (!selectedImage) return;
+                                const container = selectedImage.closest('.inline-image-container') as HTMLDivElement;
+                                if (container) {
+                                  container.style.width = '100%';
+                                  container.style.display = 'block';
+                                  container.style.marginLeft = '0';
+                                  container.style.marginRight = '0';
+                                  container.style.textAlign = 'left';
+                                }
                                 selectedImage.style.width = '100%';
                                 selectedImage.style.height = 'auto';
                                 selectedImage.style.display = 'block';
@@ -5681,17 +5709,30 @@ export default function AdminPage() {
                       <div className="w-px h-5 bg-slate-300" />
                       {/* Font Size */}
                       <select
-                        onChange={(e) => { document.execCommand('fontSize', false, e.target.value); e.target.value = ''; }}
+                        onChange={(e) => {
+                          const size = e.target.value;
+                          if (!size) return;
+                          const editorEl = document.getElementById('caption-editor-main') as HTMLDivElement;
+                          applySelectedFontSize(editorEl, size);
+                          e.target.value = '';
+                          if (editorEl) {
+                            setNewsImageCaption(editorEl.innerHTML);
+                          }
+                        }}
                         defaultValue=""
                         className="text-[11px] font-bold text-slate-600 bg-transparent border-none outline-none cursor-pointer px-1"
                       >
                         <option value="" disabled>Size</option>
-                        <option value="1">Tiny</option>
-                        <option value="2">Small</option>
-                        <option value="3">Normal</option>
-                        <option value="4">Medium</option>
-                        <option value="5">Large</option>
-                        <option value="6">X-Large</option>
+                        <option value="12px">12 px</option>
+                        <option value="14px">14 px</option>
+                        <option value="16px">16 px</option>
+                        <option value="18px">18 px</option>
+                        <option value="20px">20 px</option>
+                        <option value="22px">22 px</option>
+                        <option value="24px">24 px</option>
+                        <option value="28px">28 px</option>
+                        <option value="32px">32 px</option>
+                        <option value="36px">36 px</option>
                       </select>
                       <div className="w-px h-5 bg-slate-300" />
                       {/* Color Swatches */}
@@ -7998,16 +8039,30 @@ export default function AdminPage() {
                           </button>
                           <div className="w-px h-4 bg-slate-300" />
                           <select
-                            onChange={(e) => { document.execCommand('fontSize', false, e.target.value); e.target.value = ''; }}
+                            onChange={(e) => {
+                              const size = e.target.value;
+                              if (!size) return;
+                              const editorEl = document.getElementById('caption-editor-compact') as HTMLDivElement;
+                              applySelectedFontSize(editorEl, size);
+                              e.target.value = '';
+                              if (editorEl) {
+                                setNewsImageCaption(editorEl.innerHTML);
+                              }
+                            }}
                             defaultValue=""
                             className="text-[10px] font-bold text-slate-600 bg-transparent border-none outline-none cursor-pointer px-0.5"
                           >
                             <option value="" disabled>Size</option>
-                            <option value="1">Tiny</option>
-                            <option value="2">Small</option>
-                            <option value="3">Normal</option>
-                            <option value="4">Medium</option>
-                            <option value="5">Large</option>
+                            <option value="12px">12 px</option>
+                            <option value="14px">14 px</option>
+                            <option value="16px">16 px</option>
+                            <option value="18px">18 px</option>
+                            <option value="20px">20 px</option>
+                            <option value="22px">22 px</option>
+                            <option value="24px">24 px</option>
+                            <option value="28px">28 px</option>
+                            <option value="32px">32 px</option>
+                            <option value="36px">36 px</option>
                           </select>
                           <div className="w-px h-4 bg-slate-300" />
                           {['#111827','#6b7280','#e60000','#2563eb','#16a34a','#d97706'].map(col => (
