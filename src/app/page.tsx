@@ -552,11 +552,6 @@ export default function HomePage() {
               <AdBanner position="mobile-ad-slot-6" />
             </div>
 
-            {/* ── POLLS SECTION (mobile only — same as sidebar widget) ── */}
-            <div className="block md:hidden my-4">
-              <PollWidget scope="general" />
-            </div>
-
             {/* ── MOBILE AD 6b (after Polls) — sidebar slot ── */}
             <div className="block md:hidden my-3">
               <AdBanner position="mobile-ad-slot-7" />
