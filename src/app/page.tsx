@@ -547,24 +547,9 @@ export default function HomePage() {
             {/* Trending వార్తలు */}
             <NewsSection title="Trending" titleTelugu="ట్రెండింగ్ వార్తలు" articles={trendingList} viewAllLink="/category/trending" accentColor="#ea580c" layout="featured-left" />
 
-            {/* ── MOBILE AD 6 (after Trending, before Polls) — leaderboard slot ── */}
+            {/* ── MOBILE AD 6 (after Trending, before Politics) ── */}
             <div className="block md:hidden my-3">
               <AdBanner position="mobile-ad-slot-6" />
-            </div>
-
-            {/* ── MOBILE AD 6b (after Polls) — sidebar slot ── */}
-            <div className="block md:hidden my-3">
-              <AdBanner position="mobile-ad-slot-7" />
-            </div>
-
-            {/* ── MOBILE AD 6c (continuous after Polls) — rectangle slot ── */}
-            <div className="block md:hidden my-3">
-              <AdBanner position="mobile-ad-slot-8" />
-            </div>
-
-            {/* ── MOBILE AD 6d (continuous after Polls) — leaderboard slot ── */}
-            <div className="block md:hidden my-3">
-              <AdBanner position="mobile-ad-slot-9" />
             </div>
 
             <NewsSection title="పాలిటిక్స్" titleTelugu="పాలిటిక్స్" articles={politicsList} viewAllLink="/category/politics" accentColor="#02599c" layout="featured-left" />
