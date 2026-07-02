@@ -978,19 +978,12 @@ export default function AdminPage() {
   };
 
   const fetchMobileAdsData = () => {
-    const slots = [
-      'mobile-ad-header',
-      'mobile-ad-slot-1', 'mobile-ad-slot-2', 'mobile-ad-slot-3', 'mobile-ad-slot-4', 'mobile-ad-slot-5',
-      'mobile-ad-slot-6', 'mobile-ad-slot-7', 'mobile-ad-slot-8', 'mobile-ad-slot-9', 'mobile-ad-slot-10',
-      'mobile-ad-slot-11', 'mobile-ad-slot-12', 'mobile-ad-slot-13', 'mobile-ad-slot-14', 'mobile-ad-slot-15',
-      'mobile-ad-slot-16'
-    ];
-    Promise.all(
-      slots.map(slot => fetch(`/api/articles?category=${slot}&limit=50&t=` + Date.now()).then(r => r.json()))
-    )
-      .then(results => {
-        const allAds = results.flat().filter(item => item && item.id);
-        setMobileAdsList(allAds);
+    fetch(`/api/articles?category=mobile-ad-*&limit=500&t=` + Date.now())
+      .then(res => res.ok ? res.json() : [])
+      .then(data => {
+        if (Array.isArray(data)) {
+          setMobileAdsList(data);
+        }
       })
       .catch(err => console.error('Error loading mobile ads data:', err));
   };
@@ -6137,23 +6130,74 @@ export default function AdminPage() {
           {/* ══════════════ VIEW: MOBILE ADS MANAGER ══════════════ */}
           {activeTab === 'mobile-ads' && (() => {
             const MOBILE_AD_SLOTS = [
-              { slug: 'mobile-ad-header', labelTelugu: 'మొబైల్ హెడర్ యాడ్ (Top Header Ad)', labelEnglish: 'Above Hero Slider' },
-              { slug: 'mobile-ad-slot-1', labelTelugu: 'స్లాట్ 1: స్లైడ్ బ్యానర్ల కింద (Below Slide Banners)', labelEnglish: 'Above Breaking News' },
-              { slug: 'mobile-ad-slot-2', labelTelugu: 'స్లాట్ 2: బ్రేకింగ్ వార్తల కింద (Below Breaking News)', labelEnglish: 'Above Web Stories' },
-              { slug: 'mobile-ad-slot-3', labelTelugu: 'స్లాట్ 3: వెబ్ స్టోరీస్ కింద (Below Web Stories)', labelEnglish: 'Above Tabbed News' },
-              { slug: 'mobile-ad-slot-4', labelTelugu: 'స్లాట్ 4: ట్యాబ్డ్ వార్తల కింద (Below Tabbed News)', labelEnglish: 'Above Weather Widget' },
-              { slug: 'mobile-ad-slot-5', labelTelugu: 'స్లాట్ 5: వాతావరణం కింద (Below Weather Widget)', labelEnglish: 'Above Trending News' },
-              { slug: 'mobile-ad-slot-6', labelTelugu: 'స్లాట్ 6: ట్రెండింగ్ వార్తల కింద (Below Trending News)', labelEnglish: 'Above Polls Section' },
-              { slug: 'mobile-ad-slot-7', labelTelugu: 'స్లాట్ 7: పోల్స్ కింద (Below Polls - Slot 1)', labelEnglish: 'Below Polls (Sidebar Ad)' },
-              { slug: 'mobile-ad-slot-8', labelTelugu: 'స్లాట్ 8: పోల్స్ కింద (Below Polls - Slot 2)', labelEnglish: 'Below Polls (Rectangle Ad)' },
-              { slug: 'mobile-ad-slot-9', labelTelugu: 'స్లాట్ 9: పోల్స్ కింద (Below Polls - Slot 3)', labelEnglish: 'Below Polls (Leaderboard Ad)' },
-              { slug: 'mobile-ad-slot-10', labelTelugu: 'స్లాట్ 10: పాలిటిక్స్ వార్తల కింద (Below Politics News)', labelEnglish: 'Above Film/Entertainment' },
-              { slug: 'mobile-ad-slot-11', labelTelugu: 'స్లాట్ 11: ఫిలిం వార్తల కింద (Below Film/Entertainment)', labelEnglish: 'Above Sports' },
-              { slug: 'mobile-ad-slot-12', labelTelugu: 'స్లాట్ 12: స్పోర్ట్స్ వార్తల కింద (Below Sports)', labelEnglish: 'Above Business/Technology' },
-              { slug: 'mobile-ad-slot-13', labelTelugu: 'స్లాట్ 13: బిజినెస్ & టెక్నాలజీ కింద (Below Business/Tech)', labelEnglish: 'Above Viral/Health' },
-              { slug: 'mobile-ad-slot-14', labelTelugu: 'స్లాట్ 14: వైరల్ & హెల్త్ వార్తల కింద (Below Viral/Health)', labelEnglish: 'Above Shorts/Videos' },
-              { slug: 'mobile-ad-slot-15', labelTelugu: 'స్లాట్ 15: షార్ట్స్ / వీడియోల కింద (Below Shorts/Videos)', labelEnglish: 'Above Photo Gallery' },
-              { slug: 'mobile-ad-slot-16', labelTelugu: 'స్లాట్ 16: ఫోటో గ్యాలరీ కింద (Below Photo Gallery)', labelEnglish: 'Bottom Footer Ad' }
+              // --- HOME / GENERAL SLOTS ---
+              { slug: 'mobile-ad-header', labelTelugu: 'హోమ్: హెడర్ యాడ్ (Top Header Ad)', labelEnglish: 'Above Hero Slider' },
+              { slug: 'mobile-ad-slot-1', labelTelugu: 'హోమ్: స్లాట్ 1 (Below Slide Banners)', labelEnglish: 'Above Breaking News' },
+              { slug: 'mobile-ad-slot-2', labelTelugu: 'హోమ్: స్లాట్ 2 (Below Breaking News)', labelEnglish: 'Above Web Stories' },
+              { slug: 'mobile-ad-slot-3', labelTelugu: 'హోమ్: స్లాట్ 3 (Below Web Stories)', labelEnglish: 'Above Tabbed News' },
+              { slug: 'mobile-ad-slot-4', labelTelugu: 'హోమ్: స్లాట్ 4 (Below Tabbed News)', labelEnglish: 'Above Weather Widget' },
+              { slug: 'mobile-ad-slot-5', labelTelugu: 'హోమ్: స్లాట్ 5 (Below Weather Widget)', labelEnglish: 'Above Trending News' },
+              { slug: 'mobile-ad-slot-6', labelTelugu: 'హోమ్: స్లాట్ 6 (Below Trending News)', labelEnglish: 'Above Polls Section' },
+              { slug: 'mobile-ad-slot-7', labelTelugu: 'హోమ్: స్లాట్ 7 (Below Polls - Slot 1)', labelEnglish: 'Below Polls (Sidebar Ad)' },
+              { slug: 'mobile-ad-slot-8', labelTelugu: 'హోమ్: స్లాట్ 8 (Below Polls - Slot 2)', labelEnglish: 'Below Polls (Rectangle Ad)' },
+              { slug: 'mobile-ad-slot-9', labelTelugu: 'హోమ్: స్లాట్ 9 (Below Polls - Slot 3)', labelEnglish: 'Below Polls (Leaderboard Ad)' },
+              { slug: 'mobile-ad-slot-10', labelTelugu: 'హోమ్: స్లాట్ 10 (Below Politics News)', labelEnglish: 'Above Film/Entertainment' },
+              { slug: 'mobile-ad-slot-11', labelTelugu: 'హోమ్: స్లాట్ 11 (Below Film/Entertainment)', labelEnglish: 'Above Sports' },
+              { slug: 'mobile-ad-slot-12', labelTelugu: 'హోమ్: స్లాట్ 12 (Below Sports)', labelEnglish: 'Above Business/Technology' },
+              { slug: 'mobile-ad-slot-13', labelTelugu: 'హోమ్: స్లాట్ 13 (Below Business/Tech)', labelEnglish: 'Above Viral/Health' },
+              { slug: 'mobile-ad-slot-14', labelTelugu: 'హోమ్: స్లాట్ 14 (Below Viral/Health)', labelEnglish: 'Above Shorts/Videos' },
+              { slug: 'mobile-ad-slot-15', labelTelugu: 'హోమ్: స్లాట్ 15 (Below Shorts/Videos)', labelEnglish: 'Above Photo Gallery' },
+              { slug: 'mobile-ad-slot-16', labelTelugu: 'హోమ్: స్లాట్ 16 (Below Photo Gallery)', labelEnglish: 'Bottom Footer Ad' },
+
+              // --- CATEGORY PAGES MOBILE ADS (After Polls Section) ---
+              { slug: 'mobile-ad-cat-latest', labelTelugu: 'కేటగిరీ పేజీ: బ్రేకింగ్ వార్తలు (Breaking News)', labelEnglish: 'Category Page: Breaking News' },
+              { slug: 'mobile-ad-cat-politics', labelTelugu: 'కేటగిరీ పేజీ: పాలిటిక్స్ (Politics)', labelEnglish: 'Category Page: Politics' },
+              { slug: 'mobile-ad-cat-national', labelTelugu: 'కేటగిరీ పేజీ: నేషనల్ (National)', labelEnglish: 'Category Page: National' },
+              { slug: 'mobile-ad-cat-international', labelTelugu: 'కేటగిరీ పేజీ: అంతర్జాతీయం (International)', labelEnglish: 'Category Page: International' },
+              { slug: 'mobile-ad-cat-business', labelTelugu: 'కేటగిరీ పేజీ: బిజినెస్ (Business)', labelEnglish: 'Category Page: Business' },
+              { slug: 'mobile-ad-cat-entertainment', labelTelugu: 'కేటగిరీ పేజీ: ఫిల్మ్/ఎంటర్టైన్మెంట్ (Entertainment)', labelEnglish: 'Category Page: Entertainment' },
+              { slug: 'mobile-ad-cat-sports', labelTelugu: 'కేటగిరీ పేజీ: స్పోర్ట్స్ (Sports)', labelEnglish: 'Category Page: Sports' },
+              { slug: 'mobile-ad-cat-technology', labelTelugu: 'కేటగిరీ పేజీ: టెక్నాలజీ (Technology)', labelEnglish: 'Category Page: Technology' },
+              { slug: 'mobile-ad-cat-health', labelTelugu: 'కేటగిరీ పేజీ: ఆరోగ్యం (Health)', labelEnglish: 'Category Page: Health' },
+              { slug: 'mobile-ad-cat-viral', labelTelugu: 'కేటగిరీ పేజీ: వైరల్ (Viral)', labelEnglish: 'Category Page: Viral' },
+              { slug: 'mobile-ad-cat-telangana', labelTelugu: 'కేటగిరీ పేజీ: తెలంగాణ (Telangana)', labelEnglish: 'Category Page: Telangana' },
+              { slug: 'mobile-ad-cat-andhra-pradesh', labelTelugu: 'కేటగిరీ పేజీ: ఆంధ్రప్రదేశ్ (Andhra Pradesh)', labelEnglish: 'Category Page: Andhra Pradesh' },
+              { slug: 'mobile-ad-cat-lifestyle', labelTelugu: 'కేటగిరీ పేజీ: లైఫ్‌స్టైల్ (Lifestyle)', labelEnglish: 'Category Page: Lifestyle' },
+              { slug: 'mobile-ad-cat-women', labelTelugu: 'కేటగిరీ పేజీ: ఆమె/మహిళ (Women)', labelEnglish: 'Category Page: Women' },
+              { slug: 'mobile-ad-cat-rasipalalu', labelTelugu: 'కేటగిరీ పేజీ: శుభఫలాలు/రాశిఫలాలు (Astrology)', labelEnglish: 'Category Page: Astrology' },
+              { slug: 'mobile-ad-cat-adyathmikam', labelTelugu: 'కేటగిరీ పేజీ: దైవం/ఆధ్యాత్మికం (Devotional)', labelEnglish: 'Category Page: Devotional' },
+              { slug: 'mobile-ad-cat-sampadakiyam', labelTelugu: 'కేటగిరీ పేజీ: సంపాదకీయం (Editorial)', labelEnglish: 'Category Page: Editorial' },
+              { slug: 'mobile-ad-cat-citizen-reporter', labelTelugu: 'కేటగిరీ పేజీ: సిటిజన్ రిపోర్టర్ (Citizen Reporter)', labelEnglish: 'Category Page: Citizen Reporter' },
+              { slug: 'mobile-ad-cat-weather', labelTelugu: 'కేటగిరీ పేజీ: వాతావరణం (Weather)', labelEnglish: 'Category Page: Weather' },
+
+              // --- ARTICLE PAGES MOBILE ADS (Top rotating / bottom continuous) ---
+              { slug: 'mobile-ad-article-top-global', labelTelugu: 'వ్యాసం పేజీ: గ్లోబల్ టాప్ యాడ్ (Global Top Rotating Ad)', labelEnglish: 'Article Page: Global Top' },
+              { slug: 'mobile-ad-article-top-latest', labelTelugu: 'వ్యాసం పేజీ: బ్రేకింగ్ వార్తలు టాప్ (Top of Breaking News)', labelEnglish: 'Article Page: Top Breaking' },
+              { slug: 'mobile-ad-article-top-politics', labelTelugu: 'వ్యాసం పేజీ: పాలిటిక్స్ టాప్ (Top of Politics)', labelEnglish: 'Article Page: Top Politics' },
+              { slug: 'mobile-ad-article-top-national', labelTelugu: 'వ్యాసం పేజీ: నేషనల్ టాప్ (Top of National)', labelEnglish: 'Article Page: Top National' },
+              { slug: 'mobile-ad-article-top-international', labelTelugu: 'వ్యాసం పేజీ: అంతర్జాతీయం టాప్ (Top of International)', labelEnglish: 'Article Page: Top International' },
+              { slug: 'mobile-ad-article-top-business', labelTelugu: 'వ్యాసం పేజీ: బిజినెస్ టాప్ (Top of Business Articles)', labelEnglish: 'Article Page: Top Business' },
+              { slug: 'mobile-ad-article-top-entertainment', labelTelugu: 'వ్యాసం పేజీ: ఎంటర్టైన్మెంట్ టాప్ (Top of Film/Ent.)', labelEnglish: 'Article Page: Top Entertainment' },
+              { slug: 'mobile-ad-article-top-sports', labelTelugu: 'వ్యాసం పేజీ: స్పోర్ట్స్ టాప్ (Top of Sports)', labelEnglish: 'Article Page: Top Sports' },
+              { slug: 'mobile-ad-article-top-technology', labelTelugu: 'వ్యాసం పేజీ: టెక్నాలజీ టాప్ (Top of Technology)', labelEnglish: 'Article Page: Top Technology' },
+              { slug: 'mobile-ad-article-top-health', labelTelugu: 'వ్యాసం పేజీ: ఆరోగ్యం టాప్ (Top of Health)', labelEnglish: 'Article Page: Top Health' },
+              { slug: 'mobile-ad-article-top-viral', labelTelugu: 'వ్యాసం పేజీ: వైరల్ టాప్ (Top of Viral)', labelEnglish: 'Article Page: Top Viral' },
+              { slug: 'mobile-ad-article-top-telangana', labelTelugu: 'వ్యాసం పేజీ: తెలంగాణ టాప్ (Top of Telangana)', labelEnglish: 'Article Page: Top Telangana' },
+              { slug: 'mobile-ad-article-top-andhra-pradesh', labelTelugu: 'వ్యాసం పేజీ: ఆంధ్రప్రదేశ్ టాప్ (Top of AP)', labelEnglish: 'Article Page: Top Andhra Pradesh' },
+
+              { slug: 'mobile-ad-article-bottom-global', labelTelugu: 'వ్యాసం పేజీ: గ్లోబల్ బాటమ్ యాడ్ (Global Bottom Ad)', labelEnglish: 'Article Page: Global Bottom' },
+              { slug: 'mobile-ad-article-bottom-latest', labelTelugu: 'వ్యాసం పేజీ: బ్రేకింగ్ వార్తలు బాటమ్ (Bottom of Breaking News)', labelEnglish: 'Article Page: Bottom Breaking' },
+              { slug: 'mobile-ad-article-bottom-politics', labelTelugu: 'వ్యాసం పేజీ: పాలిటిక్స్ బాటమ్ (Bottom of Politics)', labelEnglish: 'Article Page: Bottom Politics' },
+              { slug: 'mobile-ad-article-bottom-national', labelTelugu: 'వ్యాసం పేజీ: నేషనల్ బాటమ్ (Bottom of National)', labelEnglish: 'Article Page: Bottom National' },
+              { slug: 'mobile-ad-article-bottom-international', labelTelugu: 'వ్యాసం పేజీ: అంతర్జాతీయం బాటమ్ (Bottom of International)', labelEnglish: 'Article Page: Bottom International' },
+              { slug: 'mobile-ad-article-bottom-business', labelTelugu: 'వ్యాసం పేజీ: బిజినెస్ బాటమ్ (Bottom of Business)', labelEnglish: 'Article Page: Bottom Business' },
+              { slug: 'mobile-ad-article-bottom-entertainment', labelTelugu: 'వ్యాసం పేజీ: ఎంటర్టైన్మెంట్ బాటమ్ (Bottom of Film/Ent.)', labelEnglish: 'Article Page: Bottom Entertainment' },
+              { slug: 'mobile-ad-article-bottom-sports', labelTelugu: 'వ్యాసం పేజీ: స్పోర్ట్స్ బాటమ్ (Bottom of Sports)', labelEnglish: 'Article Page: Bottom Sports' },
+              { slug: 'mobile-ad-article-bottom-technology', labelTelugu: 'వ్యాసం పేజీ: టెక్నాలజీ బాటమ్ (Bottom of Technology)', labelEnglish: 'Article Page: Bottom Technology' },
+              { slug: 'mobile-ad-article-bottom-health', labelTelugu: 'వ్యాసం పేజీ: ఆరోగ్యం బాటమ్ (Bottom of Health)', labelEnglish: 'Article Page: Bottom Health' },
+              { slug: 'mobile-ad-article-bottom-viral', labelTelugu: 'వ్యాసం పేజీ: వైరల్ బాటమ్ (Bottom of Viral)', labelEnglish: 'Article Page: Bottom Viral' },
+              { slug: 'mobile-ad-article-bottom-telangana', labelTelugu: 'వ్యాసం పేజీ: తెలంగాణ బాటమ్ (Bottom of Telangana)', labelEnglish: 'Article Page: Bottom Telangana' },
+              { slug: 'mobile-ad-article-bottom-andhra-pradesh', labelTelugu: 'వ్యాసం పేజీ: ఆంధ్రప్రదేశ్ బాటమ్ (Bottom of AP)', labelEnglish: 'Article Page: Bottom Andhra Pradesh' }
             ];
 
             return (

@@ -119,6 +119,197 @@ function getCategoryLinkInfo(article: any, englishCategories: Record<string, str
   };
 }
 
+function MobileArticleTopAd({ categorySlug }: { categorySlug: string }) {
+  const [ads, setAds] = useState<any[]>([]);
+  const [currentAdIndex, setCurrentAdIndex] = useState(0);
+
+  useEffect(() => {
+    const categoryKey = `mobile-ad-article-top-${categorySlug}`;
+    const globalKey = `mobile-ad-article-top-global`;
+    
+    Promise.all([
+      fetch(`/api/articles?category=${categoryKey}&t=${Date.now()}`).then(res => res.ok ? res.json() : []),
+      fetch(`/api/articles?category=${globalKey}&t=${Date.now()}`).then(res => res.ok ? res.json() : [])
+    ])
+      .then(([catAds, globAds]) => {
+        const activeCat = Array.isArray(catAds) ? catAds.filter(ad => ad.category === 'active' && ad.image) : [];
+        const activeGlob = Array.isArray(globAds) ? globAds.filter(ad => ad.category === 'active' && ad.image) : [];
+        const combined = activeCat.length > 0 ? activeCat : activeGlob;
+        setAds(combined);
+      })
+      .catch(err => console.error("Error loading article top ads:", err));
+  }, [categorySlug]);
+
+  useEffect(() => {
+    if (ads.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentAdIndex(prev => (prev + 1) % ads.length);
+    }, 2000); // 2 seconds per ad
+    return () => clearInterval(interval);
+  }, [ads]);
+
+  if (ads.length === 0) return null;
+
+  const currentAd = ads[currentAdIndex];
+
+  return (
+    <div className="md:hidden mb-3 w-full max-w-[360px] mx-auto text-left">
+      <div className="bg-gray-100 text-[9px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider rounded-t border-t border-x border-gray-200">
+        Advertisement
+      </div>
+      <a
+        href={currentAd.body || '#'}
+        target={currentAd.body ? '_blank' : '_self'}
+        rel="noopener noreferrer"
+        onClick={(e) => {
+          if (!currentAd.body) e.preventDefault();
+        }}
+        className="block bg-slate-50 border-b border-x border-gray-200 rounded-b overflow-hidden shadow-sm relative"
+      >
+        <img
+          src={currentAd.image}
+          alt={currentAd.title}
+          className="w-full h-auto block object-cover"
+        />
+        <div className="absolute top-1.5 left-2 bg-black/50 text-[#ffb3d1] text-[6.5px] font-black px-1.5 py-0.5 rounded leading-none uppercase tracking-wider font-sans z-10 font-bold">
+          Sponsor
+        </div>
+      </a>
+    </div>
+  );
+}
+
+function MobileArticleFooter({
+  categorySlug,
+  displayTrending,
+  displayLatest,
+  apNewsList,
+  tgNewsList
+}: {
+  categorySlug: string;
+  displayTrending: any[];
+  displayLatest: any[];
+  apNewsList: any[];
+  tgNewsList: any[];
+}) {
+  const [ads, setAds] = useState<any[]>([]);
+
+  useEffect(() => {
+    const categoryKey = `mobile-ad-article-bottom-${categorySlug}`;
+    const globalKey = `mobile-ad-article-bottom-global`;
+
+    Promise.all([
+      fetch(`/api/articles?category=${categoryKey}&t=${Date.now()}`).then(res => res.ok ? res.json() : []),
+      fetch(`/api/articles?category=${globalKey}&t=${Date.now()}`).then(res => res.ok ? res.json() : [])
+    ])
+      .then(([catAds, globAds]) => {
+        const activeCat = Array.isArray(catAds) ? catAds.filter(ad => ad.category === 'active' && ad.image) : [];
+        const activeGlob = Array.isArray(globAds) ? globAds.filter(ad => ad.category === 'active' && ad.image) : [];
+        const combined = activeCat.length > 0 ? activeCat : activeGlob;
+        setAds(combined);
+      })
+      .catch(err => console.error("Error loading article bottom ads:", err));
+  }, [categorySlug]);
+
+  return (
+    <div className="md:hidden w-full flex flex-col gap-6 mt-6 pt-6 border-t border-gray-150 text-left">
+      {/* 1. Trending News */}
+      {displayTrending && displayTrending.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+          <div className="flex items-center gap-2 bg-[#025390] text-white px-4 py-3">
+            <TrendingUp size={16} />
+            <span className="font-black text-[16px] telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              ట్రెండింగ్ వార్తలు
+            </span>
+          </div>
+          <ul className="divide-y divide-gray-100">
+            {displayTrending.slice(0, 8).map((item) => (
+              <li key={item.id}>
+                <Link
+                  href={`/news/${item.slug}`}
+                  className="flex items-start gap-3 px-4 py-3.5 hover:bg-blue-50/50 transition-colors group"
+                >
+                  <span className="w-2 h-2 bg-[#025390] mt-2 flex-shrink-0 rounded-[1px]"></span>
+                  <p
+                    className="flex-1 min-w-0 text-[14.5px] font-semibold text-gray-700 group-hover:text-[#025390] line-clamp-2 telugu-text pl-0.5"
+                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.7' }}
+                  >
+                    {item.title}
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* 2. Breaking News */}
+      {displayLatest && displayLatest.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+          <div className="bg-[#e60000] text-white px-4 py-3">
+            <span className="font-black text-[16px] telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              బ్రేకింగ్ న్యూస్
+            </span>
+          </div>
+          <ul className="divide-y divide-gray-100">
+            {displayLatest.slice(0, 8).map((item) => (
+              <li key={item.id}>
+                <Link
+                  href={`/news/${item.slug}`}
+                  className="flex items-start gap-3 px-4 py-3.5 hover:bg-red-50/50 transition-colors group"
+                >
+                  <span className="w-2 h-2 bg-[#e60000] mt-2 flex-shrink-0 rounded-[1px]"></span>
+                  <p
+                    className="flex-1 min-w-0 text-[14.5px] font-semibold text-gray-700 group-hover:text-[#e60000] line-clamp-2 telugu-text pl-0.5"
+                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif', lineHeight: '1.7' }}
+                  >
+                    {item.title}
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* 3. Telangana & Andhra Pradesh Jilla Varthalu (District News) */}
+      <div className="bg-white border border-gray-200 rounded-xl p-1.5 shadow-sm">
+        <DistrictNewsTabs apNews={apNewsList} tgNews={tgNewsList} />
+      </div>
+
+      {/* 4. Polls Section */}
+      <div className="w-full">
+        <PollWidget scope="article" />
+      </div>
+
+      {/* 5. Continuous bottom ads */}
+      {ads.length > 0 && (
+        <div className="flex flex-col gap-3 mt-2">
+          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest text-center font-sans">ADVERTISEMENT</span>
+          {ads.map((ad) => (
+            <a
+              key={ad.id}
+              href={ad.body || '#'}
+              target={ad.body ? '_blank' : '_self'}
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                if (!ad.body) e.preventDefault();
+              }}
+              className="w-full overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200 block bg-slate-50"
+            >
+              <img
+                src={ad.image}
+                alt={ad.title}
+                className="w-full h-auto object-cover block"
+              />
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface ArticlePageClientProps {
   article: any;
   reporter: any;
@@ -544,23 +735,8 @@ export default function ArticlePageClient({
     // ═══ FULL 3-COLUMN LAYOUT "LIKE BEFORE" ═══
     return (
       <main className="max-w-[1050px] mx-auto bg-white shadow-md border-x border-gray-200 px-2.5 py-4 md:px-4">
-        {/* Mobile-only Ad — square, above breadcrumb */}
-        <div className="md:hidden mb-3 max-w-[280px] mx-auto w-full">
-          <div className="bg-gray-100 text-[9px] text-gray-400 font-bold text-center py-0.5 uppercase tracking-wider rounded-t border-t border-x border-gray-200">
-            Advertisement
-          </div>
-          <div className="bg-gradient-to-br from-[#7b2d00] to-[#c0392b] rounded-b overflow-hidden flex flex-col items-center justify-center p-3 gap-2.5 text-white text-center border-b border-x border-gray-200 shadow-sm">
-            <div className="text-3xl">💍</div>
-            <div className="text-base font-black leading-tight">CMR జ్యువెల్లరీ</div>
-            <div className="text-[11px] font-bold opacity-90">Gold &amp; Diamond Sale</div>
-            <div className="text-[11px] opacity-80 telugu-text leading-tight" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-              వేసవి ఆఫర్లు — 30% వరకు తగ్గింపు
-            </div>
-            <a href="#" className="mt-1 bg-yellow-400 text-[#7b2d00] rounded-full px-4 py-1 text-xs font-black hover:bg-yellow-300 transition-colors shadow-xs">
-              Shop Now →
-            </a>
-          </div>
-        </div>
+        {/* Mobile-only Ad — top rotating banner */}
+        <MobileArticleTopAd categorySlug={currentCategorySlug} />
 
         {/* Breadcrumb & Back Button */}
 
@@ -1054,6 +1230,15 @@ export default function ArticlePageClient({
                   </div>
                 </div>
               </div>
+
+              {/* Mobile-only Sidebar components (Trending, Breaking, District News, Poll, Ads) */}
+              <MobileArticleFooter
+                categorySlug={currentCategorySlug}
+                displayTrending={displayTrending}
+                displayLatest={displayLatest}
+                apNewsList={apNewsList}
+                tgNewsList={tgNewsList}
+              />
             </div>
           </article>
 
@@ -1210,6 +1395,9 @@ export default function ArticlePageClient({
   // ═══ COMPACT LAYOUT (DEFAULT VIEW) ═══
   return (
     <main className="max-w-[1050px] mx-auto bg-white shadow-md border-x border-gray-200 px-2.5 py-4 md:px-4">
+      {/* Mobile-only Ad — top rotating banner */}
+      <MobileArticleTopAd categorySlug={currentCategorySlug} />
+
       {/* Breadcrumb & Back Button */}
       <div className="flex items-center justify-between gap-4 mb-4 border-b border-gray-100 pb-3 overflow-hidden">
         <div className="flex items-center gap-1 md:gap-2 text-[13px] md:text-[17.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
@@ -1374,6 +1562,15 @@ export default function ArticlePageClient({
           </div>
         </div>
       </div>
+
+      {/* Mobile-only Sidebar components (Trending, Breaking, District News, Poll, Ads) */}
+      <MobileArticleFooter
+        categorySlug={currentCategorySlug}
+        displayTrending={displayTrending}
+        displayLatest={displayLatest}
+        apNewsList={apNewsList}
+        tgNewsList={tgNewsList}
+      />
     </main>
   );
 }

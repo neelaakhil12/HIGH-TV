@@ -3,12 +3,63 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AdBanner from '@/components/home/AdBanner';
+import PollWidget from '@/components/home/PollWidget';
 import { getMergedArticles } from '@/lib/mockData';
 
 interface CategoryArticlesFeedProps {
   initialArticles: any[];
   categorySlug: string;
   districtSlug?: string;
+}
+
+function MobileCategoryFooter({ categorySlug }: { categorySlug: string }) {
+  const [ads, setAds] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/articles?category=mobile-ad-cat-${categorySlug}&t=${Date.now()}`)
+      .then(res => res.ok ? res.json() : [])
+      .then((data: any[]) => {
+        if (Array.isArray(data)) {
+          const activeAds = data.filter(ad => ad.category === 'active' && ad.image);
+          setAds(activeAds);
+        }
+      })
+      .catch(err => console.error("Error fetching mobile category ads:", err));
+  }, [categorySlug]);
+
+  return (
+    <div className="col-span-1 sm:col-span-2 lg:hidden w-full flex flex-col gap-4 mt-6">
+      {/* Polls Section */}
+      <div className="w-full">
+        <PollWidget scope="general" />
+      </div>
+
+      {/* Continuous Ads */}
+      {ads.length > 0 && (
+        <div className="flex flex-col gap-3 mt-4">
+          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest text-center font-sans">ADVERTISEMENT</span>
+          {ads.map((ad) => (
+            <a
+              key={ad.id}
+              href={ad.body || '#'}
+              target={ad.body ? '_blank' : '_self'}
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                if (!ad.body) e.preventDefault();
+              }}
+              className="w-full overflow-hidden rounded-xl border border-slate-200/80 hover:shadow transition-shadow duration-200 block bg-slate-50"
+            >
+              <img
+                src={ad.image}
+                alt={ad.title}
+                className="w-full h-auto object-cover block"
+              />
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function CategoryArticlesFeed({
@@ -83,13 +134,6 @@ export default function CategoryArticlesFeed({
                   />
                 </div>
               </div>
-              
-              {/* Mobile-only inline ad after the 4th article */}
-              {index === 3 && (
-                <div className="col-span-1 sm:col-span-2 lg:hidden mt-2 mb-3">
-                  <AdBanner position="gold-loan" />
-                </div>
-              )}
             </div>
           );
         }
@@ -116,19 +160,12 @@ export default function CategoryArticlesFeed({
                   dangerouslySetInnerHTML={{ __html: article.title }}
                 />
                 <p
-                  className={`${summaryClass} text-gray-500 mt-1 line-clamp-2 telugu-text pl-2.5`}
+                  className={`${summaryClass} text-gray-550 mt-1 line-clamp-2 telugu-text pl-2.5`}
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                   dangerouslySetInnerHTML={{ __html: article.description }}
                 />
               </div>
             </Link>
-
-            {/* Mobile-only inline ad after the 4th article */}
-            {index === 3 && (
-              <div className="col-span-1 sm:col-span-2 lg:hidden mt-2 mb-3 text-center w-full">
-                <AdBanner position="gold-loan" />
-              </div>
-            )}
           </div>
         );
       })}
@@ -145,6 +182,9 @@ export default function CategoryArticlesFeed({
           </button>
         </div>
       )}
+
+      {/* Mobile-only Polls and Continuous Ads */}
+      <MobileCategoryFooter categorySlug={categorySlug} />
     </div>
   );
 }
