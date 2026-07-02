@@ -365,9 +365,6 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
         </a>
       ))}
 
-      {/* Poll Widget */}
-      <PollWidget scope="general" />
-
       {/* Ads after Polls (Remaining ads continuously) */}
       {customSidebarAds.slice(4).map((ad) => (
         <a
@@ -387,6 +384,9 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
           />
         </a>
       ))}
+
+      {/* Poll Widget at the end */}
+      <PollWidget scope="general" />
 
     </aside>
   );

@@ -277,11 +277,6 @@ function MobileArticleFooter({
         <DistrictNewsTabs apNews={apNewsList} tgNews={tgNewsList} />
       </div>
 
-      {/* 4. Polls Section */}
-      <div className="w-full">
-        <PollWidget scope="article" />
-      </div>
-
       {/* 5. Continuous bottom ads */}
       {ads.length > 0 && (
         <div className="flex flex-col gap-3 mt-2">
@@ -306,6 +301,11 @@ function MobileArticleFooter({
           ))}
         </div>
       )}
+
+      {/* 4. Polls Section (At the absolute end) */}
+      <div className="w-full">
+        <PollWidget scope="article" />
+      </div>
     </div>
   );
 }
