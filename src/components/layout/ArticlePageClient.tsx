@@ -961,14 +961,6 @@ export default function ArticlePageClient({
 
                       if (isTag) {
                         elements.push(<div key={`tag-${idx}`} dangerouslySetInnerHTML={{ __html: resolveMediaPlaceholders(trimmed) }} />);
-                        // Add caption below inline images
-                        if (/^<img\b/i.test(trimmed) && article.imageCaption) {
-                          elements.push(
-                            <div key={`cap-${idx}`} className="px-1 py-1 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100 mb-3" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                              {article.imageCaption}
-                            </div>
-                          );
-                        }
                       } else {
                         // It is a text paragraph
                         elements.push(<p key={`para-${idx}`} style={{ margin: '0 0 0.6em 0' }} dangerouslySetInnerHTML={{ __html: resolveMediaPlaceholders(para) }} />);

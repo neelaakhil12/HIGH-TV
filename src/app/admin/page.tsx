@@ -5285,6 +5285,70 @@ export default function AdminPage() {
 
                             <div style={{ width: 1, height: 18, background: '#334155' }} />
 
+                            {/* Image Caption */}
+                            <button
+                              type="button"
+                              title="Add/Edit Caption"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!selectedImage) return;
+
+                                const container = selectedImage.closest('.inline-image-container');
+                                let currentCaption = '';
+                                if (container) {
+                                  const capDiv = container.querySelector('.telugu-text');
+                                  if (capDiv) currentCaption = capDiv.textContent || '';
+                                }
+
+                                const caption = prompt('Enter caption for this image:', currentCaption);
+                                if (caption === null) return;
+
+                                if (container) {
+                                  let captionDiv = container.querySelector('.telugu-text');
+                                  if (caption.trim()) {
+                                    if (!captionDiv) {
+                                      captionDiv = document.createElement('div');
+                                      captionDiv.className = 'mt-2 pl-1 text-[13.5px] md:text-[14.5px] font-bold text-gray-700 telugu-text leading-normal';
+                                      captionDiv.style.fontFamily = 'Noto Sans Telugu, sans-serif';
+                                      container.appendChild(captionDiv);
+                                    }
+                                    captionDiv.textContent = caption.trim();
+                                  } else {
+                                    if (captionDiv) captionDiv.remove();
+                                  }
+                                } else {
+                                  if (caption.trim()) {
+                                    const parent = selectedImage.parentNode;
+                                    if (parent) {
+                                      const wrapper = document.createElement('div');
+                                      wrapper.className = 'my-4 inline-image-container text-left';
+                                      wrapper.style.textAlign = 'left';
+                                      parent.insertBefore(wrapper, selectedImage);
+                                      wrapper.appendChild(selectedImage);
+
+                                      const captionDiv = document.createElement('div');
+                                      captionDiv.className = 'mt-2 pl-1 text-[13.5px] md:text-[14.5px] font-bold text-gray-700 telugu-text leading-normal';
+                                      captionDiv.style.fontFamily = 'Noto Sans Telugu, sans-serif';
+                                      captionDiv.textContent = caption.trim();
+                                      wrapper.appendChild(captionDiv);
+                                    }
+                                  }
+                                }
+                                updateResizerPosition(selectedImage);
+                              }}
+                              style={{
+                                background: 'transparent', border: 'none', cursor: 'pointer',
+                                color: '#34d399', padding: '2px 6px', borderRadius: 4,
+                                fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3,
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                              Caption
+                            </button>
+
+                            <div style={{ width: 1, height: 18, background: '#334155' }} />
+
                             {/* Deselect / Close */}
                             <button
                               type="button"
@@ -5605,15 +5669,59 @@ export default function AdminPage() {
                   {/* Image Caption / Photo Write-up */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-2">
                     <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">📝 Photo Caption / Write-up</label>
-                    <input
-                      type="text"
-                      value={newsImageCaption}
-                      onChange={(e) => setNewsImageCaption(e.target.value)}
-                      placeholder="e.g. మాట్లాడుతున్న ఎమ్మెల్సీ దువ్వాడ శ్రీనివాస్"
-                      className="bg-white border border-slate-200/60 focus:border-[#02599c] rounded-xl px-3 py-2.5 text-xs outline-none text-slate-850 font-bold telugu-text"
+
+                    {/* Caption Formatting Toolbar */}
+                    <div className="flex items-center gap-1 flex-wrap border border-slate-200 rounded-xl px-2 py-1.5 bg-slate-50">
+                      {/* Bold */}
+                      <button type="button" title="Bold"
+                        onMouseDown={(e) => { e.preventDefault(); document.execCommand('bold'); }}
+                        className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-700 font-black text-sm transition-colors" style={{ minWidth: 28 }}>
+                        <b>B</b>
+                      </button>
+                      <div className="w-px h-5 bg-slate-300" />
+                      {/* Font Size */}
+                      <select
+                        onChange={(e) => { document.execCommand('fontSize', false, e.target.value); e.target.value = ''; }}
+                        defaultValue=""
+                        className="text-[11px] font-bold text-slate-600 bg-transparent border-none outline-none cursor-pointer px-1"
+                      >
+                        <option value="" disabled>Size</option>
+                        <option value="1">Tiny</option>
+                        <option value="2">Small</option>
+                        <option value="3">Normal</option>
+                        <option value="4">Medium</option>
+                        <option value="5">Large</option>
+                        <option value="6">X-Large</option>
+                      </select>
+                      <div className="w-px h-5 bg-slate-300" />
+                      {/* Color Swatches */}
+                      {['#111827','#6b7280','#e60000','#2563eb','#16a34a','#d97706','#7c3aed'].map(col => (
+                        <button key={col} type="button" title={col}
+                          onMouseDown={(e) => { e.preventDefault(); document.execCommand('foreColor', false, col); }}
+                          className="w-5 h-5 rounded-full border-2 border-white shadow-sm hover:scale-110 transition-transform"
+                          style={{ background: col }} />
+                      ))}
+                    </div>
+
+                    {/* Caption contentEditable */}
+                    <div
+                      contentEditable
+                      suppressContentEditableWarning
+                      id="caption-editor-main"
+                      onInput={(e) => setNewsImageCaption((e.target as HTMLDivElement).innerHTML)}
+                      data-placeholder="e.g. మాట్లాడుతున్న ఎమ్మెల్సీ దువ్వాడ శ్రీనివాస్"
+                      className="bg-white border border-slate-200/60 focus:border-[#02599c] rounded-xl px-3 py-2.5 text-sm outline-none text-slate-800 telugu-text min-h-[40px] empty-placeholder"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      dangerouslySetInnerHTML={{ __html: newsImageCaption }}
                     />
-                    <span className="text-[9px] text-slate-400">This caption appears below the main article image and all inline images.</span>
+                    <style>{`
+                      .empty-placeholder:empty:before {
+                        content: attr(data-placeholder);
+                        color: #94a3b8;
+                        pointer-events: none;
+                      }
+                    `}</style>
+                    <span className="text-[9px] text-slate-400">This caption appears below the main article image only.</span>
                   </div>
 
                   {/* Short Video File Box (Only for Shorts category) */}
@@ -7881,13 +7989,43 @@ export default function AdminPage() {
                       {/* Image Caption / Photo Write-up */}
                       <div className="flex flex-col gap-1">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">📝 Photo Caption</label>
-                        <input
-                          type="text"
-                          value={newsImageCaption}
-                          onChange={(e) => setNewsImageCaption(e.target.value)}
-                          placeholder="e.g. మాట్లాడుతున్న ఎమ్మెల్సీ దువ్వాడ శ్రీనివాస్"
-                          className="bg-white border border-slate-200/60 focus:border-[#02599c] rounded-xl px-3 py-2 text-xs outline-none text-slate-850 font-bold telugu-text"
+                        {/* Caption Toolbar */}
+                        <div className="flex items-center gap-1 flex-wrap border border-slate-200 rounded-lg px-1.5 py-1 bg-slate-50">
+                          <button type="button" title="Bold"
+                            onMouseDown={(e) => { e.preventDefault(); document.execCommand('bold'); }}
+                            className="p-1 rounded hover:bg-slate-200 text-slate-700 font-black text-xs transition-colors">
+                            <b>B</b>
+                          </button>
+                          <div className="w-px h-4 bg-slate-300" />
+                          <select
+                            onChange={(e) => { document.execCommand('fontSize', false, e.target.value); e.target.value = ''; }}
+                            defaultValue=""
+                            className="text-[10px] font-bold text-slate-600 bg-transparent border-none outline-none cursor-pointer px-0.5"
+                          >
+                            <option value="" disabled>Size</option>
+                            <option value="1">Tiny</option>
+                            <option value="2">Small</option>
+                            <option value="3">Normal</option>
+                            <option value="4">Medium</option>
+                            <option value="5">Large</option>
+                          </select>
+                          <div className="w-px h-4 bg-slate-300" />
+                          {['#111827','#6b7280','#e60000','#2563eb','#16a34a','#d97706'].map(col => (
+                            <button key={col} type="button" title={col}
+                              onMouseDown={(e) => { e.preventDefault(); document.execCommand('foreColor', false, col); }}
+                              className="w-4 h-4 rounded-full border-2 border-white shadow-sm hover:scale-110 transition-transform"
+                              style={{ background: col }} />
+                          ))}
+                        </div>
+                        <div
+                          contentEditable
+                          suppressContentEditableWarning
+                          id="caption-editor-compact"
+                          onInput={(e) => setNewsImageCaption((e.target as HTMLDivElement).innerHTML)}
+                          data-placeholder="e.g. మాట్లాడుతున్న ఎమ్మెల్సీ దువ్వాడ శ్రీనివాస్"
+                          className="bg-white border border-slate-200/60 focus:border-[#02599c] rounded-xl px-3 py-2 text-xs outline-none text-slate-800 telugu-text min-h-[36px] empty-placeholder"
                           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          dangerouslySetInnerHTML={{ __html: newsImageCaption }}
                         />
                       </div>
 
