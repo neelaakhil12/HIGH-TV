@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AdBanner from '@/components/home/AdBanner';
-import PollWidget from '@/components/home/PollWidget';
 import { getMergedArticles } from '@/lib/mockData';
 
 interface CategoryArticlesFeedProps {
@@ -29,11 +28,6 @@ function MobileCategoryFooter({ categorySlug }: { categorySlug: string }) {
 
   return (
     <div className="col-span-1 sm:col-span-2 lg:hidden w-full flex flex-col gap-4 mt-6">
-      {/* Polls Section */}
-      <div className="w-full">
-        <PollWidget scope="general" />
-      </div>
-
       {/* Continuous Ads */}
       {ads.length > 0 && (
         <div className="flex flex-col gap-3 mt-4">
