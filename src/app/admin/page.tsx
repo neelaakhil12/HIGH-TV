@@ -13162,11 +13162,16 @@ export default function AdminPage() {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-black text-slate-800">మెంబర్స్ (Manage Employees)</h2>
-              <p className="text-slate-500 text-xs">ఇక్కడ నుండి మీరు మా టీమ్ సభ్యుల (రిపోర్టర్లు/ఉద్యోగులు) లాగిన్ వివరాలను మరియు కేటగిరీల అనుమతులను నిర్వహించవచ్చు.</p>
+              <h2 className="text-2xl font-black text-slate-800 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                మెంబర్స్ (Manage Employees)
+              </h2>
+              <p className="text-slate-500 text-xs mt-0.5">
+                ఇక్కడ నుండి మీరు మా టీమ్ సభ్యుల (రిపోర్టర్లు/ఉద్యోగులు) లాగిన్ వివరాలను మరియు కేటగిరీల అనుమతులను నిర్వహించవచ్చు.
+              </p>
             </div>
             {employeeFormMode === 'list' && (
               <button
+                type="button"
                 onClick={() => {
                   setEmployeeFormMode('add');
                   setEditingEmployee(null);
@@ -13175,10 +13180,10 @@ export default function AdminPage() {
                   setEmployeePassword('');
                   setEmployeeCategories([]);
                 }}
-                className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+                className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-3 px-5 rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-2 self-start md:self-auto hover:scale-[1.01]"
               >
                 <Plus className="w-4 h-4" />
-                రిపోర్టర్‌ను చేర్చండి (Add Reporter)
+                <span>+ రిపోర్టర్ను చేర్చండి (Add Reporter)</span>
               </button>
             )}
           </div>
