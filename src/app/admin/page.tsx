@@ -3432,7 +3432,11 @@ export default function AdminPage() {
       'doctors-corner',
       'admissions',
       'current-affairs',
-      'notification'
+      'notification',
+      'trending',
+      'featured',
+      'antharmadanam',
+      'citizen-reporter'
     ];
     setEmployeeCategories(allSlugs);
   };
@@ -3449,7 +3453,11 @@ export default function AdminPage() {
         'doctors-corner',
         'admissions',
         'current-affairs',
-        'notification'
+        'notification',
+        'trending',
+        'featured',
+        'antharmadanam',
+        'citizen-reporter'
       ];
     }
     setEmployeeCategories(prev => {
@@ -3470,7 +3478,11 @@ export default function AdminPage() {
         'doctors-corner',
         'admissions',
         'current-affairs',
-        'notification'
+        'notification',
+        'trending',
+        'featured',
+        'antharmadanam',
+        'citizen-reporter'
       ];
     }
     setEmployeeCategories(prev => prev.filter(c => !slugs.includes(c)));
@@ -13390,6 +13402,10 @@ export default function AdminPage() {
                         { slug: 'admissions', name: "అడ్మిషన్స్ (Admissions)" },
                         { slug: 'current-affairs', name: "కరెంట్ అఫైర్స్ (Current Affairs)" },
                         { slug: 'notification', name: "నోటిఫికేషన్స్ (Notification)" },
+                        { slug: 'trending', name: "ట్రెండింగ్ వార్తలు (Trending)" },
+                        { slug: 'featured', name: "ముఖ్య వార్తలు (Featured)" },
+                        { slug: 'antharmadanam', name: "వ్యక్తిత్వ వికాసం (Opinion)" },
+                        { slug: 'citizen-reporter', name: "సిటిజన్ రిపోర్టర్ (Citizen Reporter)" },
                       ];
                       return [...baseCategories, ...extraSubcategories].map((cat) => {
                         const isSelected = employeeCategories.includes(cat.slug);
@@ -13480,7 +13496,11 @@ export default function AdminPage() {
                                       (c === 'doctors-corner' ? "డాక్టర్స్ కార్నర్ (Doctor's Corner)" :
                                        c === 'admissions' ? "అడ్మిషన్స్ (Admissions)" :
                                        c === 'current-affairs' ? "కరెంట్ అఫైర్స్ (Current Affairs)" :
-                                       c === 'notification' ? "నోటిఫికేషన్స్ (Notification)" : c);
+                                       c === 'notification' ? "నోటిఫికేషన్స్ (Notification)" :
+                                       c === 'trending' ? "ట్రెండింగ్ వార్తలు (Trending)" :
+                                       c === 'featured' ? "ముఖ్య వార్తలు (Featured)" :
+                                       c === 'antharmadanam' ? "వ్యక్తిత్వ వికాసం (Opinion)" :
+                                       c === 'citizen-reporter' ? "సిటిజన్ రిపోర్టర్ (Citizen Reporter)" : c);
                                     return (
                                       <span key={c} className="bg-slate-100 text-slate-600 text-[10px] font-bold py-0.5 px-2 rounded-md">
                                         {resolvedName}
