@@ -3428,7 +3428,11 @@ export default function AdminPage() {
     const allSlugs = [
       ...tgDistricts.map(d => d.slug),
       ...apDistricts.map(d => d.slug),
-      ...SIDEBAR_CATEGORIES.filter(c => c.slug !== 'home' && c.slug !== 'telangana-districts' && c.slug !== 'andhra-pradesh-districts').map(c => c.slug)
+      ...SIDEBAR_CATEGORIES.filter(c => c.slug !== 'home' && c.slug !== 'telangana-districts' && c.slug !== 'andhra-pradesh-districts').map(c => c.slug),
+      'doctors-corner',
+      'admissions',
+      'current-affairs',
+      'notification'
     ];
     setEmployeeCategories(allSlugs);
   };
@@ -3440,7 +3444,13 @@ export default function AdminPage() {
     } else if (group === 'ap') {
       slugs = apDistricts.map(d => d.slug);
     } else {
-      slugs = SIDEBAR_CATEGORIES.filter(c => c.slug !== 'home' && c.slug !== 'telangana-districts' && c.slug !== 'andhra-pradesh-districts').map(c => c.slug);
+      slugs = [
+        ...SIDEBAR_CATEGORIES.filter(c => c.slug !== 'home' && c.slug !== 'telangana-districts' && c.slug !== 'andhra-pradesh-districts').map(c => c.slug),
+        'doctors-corner',
+        'admissions',
+        'current-affairs',
+        'notification'
+      ];
     }
     setEmployeeCategories(prev => {
       const rest = prev.filter(c => !slugs.includes(c));
@@ -3455,7 +3465,13 @@ export default function AdminPage() {
     } else if (group === 'ap') {
       slugs = apDistricts.map(d => d.slug);
     } else {
-      slugs = SIDEBAR_CATEGORIES.filter(c => c.slug !== 'home' && c.slug !== 'telangana-districts' && c.slug !== 'andhra-pradesh-districts').map(c => c.slug);
+      slugs = [
+        ...SIDEBAR_CATEGORIES.filter(c => c.slug !== 'home' && c.slug !== 'telangana-districts' && c.slug !== 'andhra-pradesh-districts').map(c => c.slug),
+        'doctors-corner',
+        'admissions',
+        'current-affairs',
+        'notification'
+      ];
     }
     setEmployeeCategories(prev => prev.filter(c => !slugs.includes(c)));
   };
@@ -13362,27 +13378,36 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-                    {SIDEBAR_CATEGORIES.filter(
-                      (c) =>
-                        c.slug !== 'home' &&
-                        c.slug !== 'telangana-districts' &&
-                        c.slug !== 'andhra-pradesh-districts'
-                    ).map((cat) => {
-                      const isSelected = employeeCategories.includes(cat.slug);
-                      return (
-                        <label
-                          key={cat.slug}
-                          onClick={() => toggleEmployeeCategory(cat.slug)}
-                          className={`flex items-center justify-center py-2 px-3 rounded-xl border text-[11px] font-bold cursor-pointer transition-all select-none text-center active:scale-[0.98] ${
-                            isSelected
-                              ? 'bg-rose-50 border-rose-300 text-rose-700 shadow-3xs font-extrabold'
-                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                          }`}
-                        >
-                          {cat.name}
-                        </label>
+                    {(() => {
+                      const baseCategories = SIDEBAR_CATEGORIES.filter(
+                        (c) =>
+                          c.slug !== 'home' &&
+                          c.slug !== 'telangana-districts' &&
+                          c.slug !== 'andhra-pradesh-districts'
                       );
-                    })}
+                      const extraSubcategories = [
+                        { slug: 'doctors-corner', name: "డాక్టర్స్ కార్నర్ (Doctor's Corner)" },
+                        { slug: 'admissions', name: "అడ్మిషన్స్ (Admissions)" },
+                        { slug: 'current-affairs', name: "కరెంట్ అఫైర్స్ (Current Affairs)" },
+                        { slug: 'notification', name: "నోటిఫికేషన్స్ (Notification)" },
+                      ];
+                      return [...baseCategories, ...extraSubcategories].map((cat) => {
+                        const isSelected = employeeCategories.includes(cat.slug);
+                        return (
+                          <label
+                            key={cat.slug}
+                            onClick={() => toggleEmployeeCategory(cat.slug)}
+                            className={`flex items-center justify-center py-2 px-3 rounded-xl border text-[11px] font-bold cursor-pointer transition-all select-none text-center active:scale-[0.98] ${
+                              isSelected
+                                ? 'bg-rose-50 border-rose-300 text-rose-700 shadow-3xs font-extrabold'
+                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                            }`}
+                          >
+                            {cat.name}
+                          </label>
+                        );
+                      });
+                    })()}
                   </div>
                 </div>
               </div>
@@ -13452,7 +13477,10 @@ export default function AdminPage() {
                                       tgDistricts.find(d => d.slug === c)?.name || 
                                       apDistricts.find(d => d.slug === c)?.name || 
                                       SIDEBAR_CATEGORIES.find(cat => cat.slug === c)?.name || 
-                                      c;
+                                      (c === 'doctors-corner' ? "డాక్టర్స్ కార్నర్ (Doctor's Corner)" :
+                                       c === 'admissions' ? "అడ్మిషన్స్ (Admissions)" :
+                                       c === 'current-affairs' ? "కరెంట్ అఫైర్స్ (Current Affairs)" :
+                                       c === 'notification' ? "నోటిఫికేషన్స్ (Notification)" : c);
                                     return (
                                       <span key={c} className="bg-slate-100 text-slate-600 text-[10px] font-bold py-0.5 px-2 rounded-md">
                                         {resolvedName}
