@@ -4413,7 +4413,8 @@ export default function AdminPage() {
       <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden min-w-0 bg-[#f8fafc] text-slate-700">
         
         {/* Workspace Top Header (Navy Blue Category Navigation Bar) */}
-        <div className="flex bg-[#0b1329] border-b border-slate-900 select-none z-30 relative items-center justify-between py-3 px-6 md:px-8 flex-wrap gap-4" ref={dropdownRef}>
+        {activeTab === 'news' && newsViewMode === 'list' && (
+          <div className="flex bg-[#0b1329] border-b border-slate-900 select-none z-30 relative items-center justify-between py-3 px-6 md:px-8 flex-wrap gap-4" ref={dropdownRef}>
           
           {/* Left: Website Pages Navigation */}
           <div className="flex items-center gap-2 md:gap-3 flex-wrap">
@@ -4774,6 +4775,7 @@ export default function AdminPage() {
           </div>
           
         </div>
+        )}
 
         {/* Scrollable Workspace Container */}
         <div className="flex-1 p-6 md:p-8 max-w-[1440px] w-full min-w-0 mx-auto">
