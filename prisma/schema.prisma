@@ -85,6 +85,16 @@ model AdminSession {
   createdAt DateTime @default(now())
 }
 
+model EmployeeAdmin {
+  id          String   @id @default(cuid())
+  name        String   @db.VarChar(200)
+  email       String   @unique @db.VarChar(255)
+  password    String   @db.VarChar(255)
+  categories  String   @db.LongText // JSON array of allowed category/district slugs
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model EpaperSection {
   id        String   @id @default(cuid())
   name      String   @unique @db.VarChar(100)

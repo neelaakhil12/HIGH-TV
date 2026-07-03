@@ -18,18 +18,44 @@ export default function SuperAdminLoginPage() {
     }
   }, [router]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
 
-    // Hardcoded credentials for super admin login
+    // 1. Hardcoded credentials for super admin login
     if (username === 'admin' && password === 'admin123') {
       localStorage.setItem('high_tv_admin_session', 'authenticated');
+      localStorage.setItem('high_tv_admin_role', 'super-admin');
+      localStorage.removeItem('high_tv_employee_info');
       router.push('/admin');
     } else {
-      setError('Invalid username or password. Please try again.');
-      setIsSubmitting(false);
+      // 2. Dynamic employee login check via API
+      try {
+        const response = await fetch('/api/employees/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: username, password }),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.employee) {
+            localStorage.setItem('high_tv_admin_session', 'authenticated');
+            localStorage.setItem('high_tv_admin_role', 'employee');
+            localStorage.setItem('high_tv_employee_info', JSON.stringify(data.employee));
+            router.push('/admin');
+            return;
+          }
+        }
+        
+        setError('Invalid username or password. Please try again.');
+      } catch (err) {
+        console.error('Login error:', err);
+        setError('Server communication failure. Please check your network.');
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 

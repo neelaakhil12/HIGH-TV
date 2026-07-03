@@ -20,6 +20,7 @@ import {
   Calendar,
   User,
   Users,
+  UserCheck,
   Eye,
   CheckCircle,
   ChevronDown,
@@ -520,6 +521,12 @@ const DEFAULT_EDITORIAL_SECTIONS = [
 export default function AdminPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  const isSlugAllowed = (slug: string) => {
+    if (userRole === 'super-admin') return true;
+    if (!employeeInfo || !employeeInfo.categories) return false;
+    return employeeInfo.categories.includes(slug);
+  };
   
   // Dashboard navigation tab: 'dashboard', 'news', 'breaking', 'categories', 'overlays', 'epaper', 'editorial'
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -1295,6 +1302,20 @@ export default function AdminPage() {
   const [webStoryCoverStyle, setWebStoryCoverStyle] = useState<'red-white' | 'white-black'>('red-white');
   const [webStorySlides, setWebStorySlides] = useState<any[]>([{ image: '', text: '', textStyle: 'red-white', showOverlay: true }]);
 
+  // User Role and Employee states
+  const [userRole, setUserRole] = useState<'super-admin' | 'employee'>('super-admin');
+  const [employeeInfo, setEmployeeInfo] = useState<any | null>(null);
+
+  // Employees tab states
+  const [employeesList, setEmployeesList] = useState<any[]>([]);
+  const [employeeFormMode, setEmployeeFormMode] = useState<'list' | 'add' | 'edit'>('list');
+  const [editingEmployee, setEditingEmployee] = useState<any | null>(null);
+  const [employeeName, setEmployeeName] = useState('');
+  const [employeeEmail, setEmployeeEmail] = useState('');
+  const [employeePassword, setEmployeePassword] = useState('');
+  const [employeeCategories, setEmployeeCategories] = useState<string[]>([]);
+
+
   // ── Editorial Page Manager states ──────────────────────────────────────────
   const [editorialSections, setEditorialSections] = useState<{ id: string; title: string; slug: string }[]>(DEFAULT_EDITORIAL_SECTIONS);
   const [editorialActiveSection, setEditorialActiveSection] = useState<string>('sampadakiyam');
@@ -1564,7 +1585,10 @@ export default function AdminPage() {
       fetchEpapersData();
       fetchEpaperSections();
     }
-  }, [activeTab]);
+    if (activeTab === 'employees' && userRole === 'super-admin') {
+      fetchEmployees();
+    }
+  }, [activeTab, userRole]);
 
   // Authorization Check
   useEffect(() => {
@@ -1573,6 +1597,20 @@ export default function AdminPage() {
       router.push('/superadminlogin');
     } else {
       setIsAuthenticated(true);
+      const role = (localStorage.getItem('high_tv_admin_role') || 'super-admin') as 'super-admin' | 'employee';
+      setUserRole(role);
+      
+      // If role is employee, fetch employeeInfo from local storage
+      if (role === 'employee') {
+        const info = localStorage.getItem('high_tv_employee_info');
+        if (info) {
+          try {
+            setEmployeeInfo(JSON.parse(info));
+          } catch (e) {
+            console.error('Failed to parse employee info:', e);
+          }
+        }
+      }
     }
   }, [router]);
 
@@ -1851,7 +1889,11 @@ export default function AdminPage() {
       ) {
         setSelectedCategories([filterCategory]);
       } else {
-        setSelectedCategories([]);
+        if (userRole === 'employee' && employeeInfo && employeeInfo.categories && employeeInfo.categories.length > 0) {
+          setSelectedCategories([employeeInfo.categories[0]]);
+        } else {
+          setSelectedCategories([]);
+        }
       }
       setTimeout(() => {
         if (editorRef.current) editorRef.current.innerHTML = '';
@@ -2675,10 +2717,19 @@ export default function AdminPage() {
       'sidebar-ad-epaper-header',
       'sidebar-ad-epaper-mobile'
     ];
-    return [...customNewsList]
-      .filter((art) => !excludeCategories.includes(art.categorySlug))
-      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-  }, [customNewsList]);
+    let list = [...customNewsList].filter((art) => !excludeCategories.includes(art.categorySlug));
+
+    // Apply employee restrictions
+    if (userRole === 'employee' && employeeInfo && employeeInfo.categories) {
+      list = list.filter((art) => {
+        const catAllowed = employeeInfo.categories.includes(art.categorySlug);
+        const distAllowed = art.districtSlug ? employeeInfo.categories.includes(art.districtSlug) : false;
+        return catAllowed || distAllowed;
+      });
+    }
+
+    return list.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  }, [customNewsList, userRole, employeeInfo]);
 
 
 
@@ -2948,6 +2999,17 @@ export default function AdminPage() {
 
     // Resolve Telugu category name
     const resolvedCat = MAIN_CATEGORIES_LIST.find(c => c.slug === categorySlug)?.name.split(' ')[0] || categorySlug;
+
+    // Verify employee category permission
+    if (userRole === 'employee' && employeeInfo && employeeInfo.categories) {
+      const isCatAllowed = employeeInfo.categories.includes(categorySlug);
+      const isDistAllowed = districtSlug ? employeeInfo.categories.includes(districtSlug) : false;
+      if (!isCatAllowed && !isDistAllowed) {
+        alert('You do not have permission to publish or edit articles in this category / district!');
+        setIsSavingArticle(false);
+        return;
+      }
+    }
 
     // Save the raw HTML directly — base64 images are stored as-is in the DB
     // (No placeholder conversion: images display reliably without localStorage dependency)
@@ -3265,6 +3327,139 @@ export default function AdminPage() {
     }).catch(err => console.error('Failed to sync web stories:', err));
     alert('Web Story deleted successfully!');
   };
+
+  const fetchEmployees = async () => {
+    try {
+      const res = await fetch('/api/employees?t=' + Date.now());
+      if (res.ok) {
+        const data = await res.json();
+        setEmployeesList(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch employees:', err);
+    }
+  };
+
+  const handleSaveEmployee = async () => {
+    if (!employeeName.trim() || !employeeEmail.trim()) {
+      alert('Name and Email are required!');
+      return;
+    }
+    if (employeeFormMode === 'add' && !employeePassword) {
+      alert('Password is required for new employee!');
+      return;
+    }
+
+    const payload = {
+      id: editingEmployee?.id,
+      name: employeeName.trim(),
+      email: employeeEmail.trim(),
+      password: employeePassword,
+      categories: employeeCategories,
+    };
+
+    try {
+      const url = '/api/employees';
+      const method = employeeFormMode === 'edit' ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        alert(employeeFormMode === 'edit' ? 'Employee updated successfully!' : 'Employee created successfully!');
+        setEmployeeFormMode('list');
+        setEmployeeName('');
+        setEmployeeEmail('');
+        setEmployeePassword('');
+        setEmployeeCategories([]);
+        setEditingEmployee(null);
+        fetchEmployees();
+      } else {
+        const errData = await res.json();
+        alert('Error saving employee: ' + (errData.error || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Failed to save employee:', err);
+      alert('Failed to save employee.');
+    }
+  };
+
+  const handleDeleteEmployee = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this employee?')) return;
+    try {
+      const res = await fetch(`/api/employees?id=${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        alert('Employee deleted successfully!');
+        fetchEmployees();
+      } else {
+        alert('Failed to delete employee.');
+      }
+    } catch (err) {
+      console.error('Failed to delete employee:', err);
+    }
+  };
+
+  const handleStartEditEmployee = (emp: any) => {
+    setEditingEmployee(emp);
+    setEmployeeName(emp.name || '');
+    setEmployeeEmail(emp.email || '');
+    setEmployeePassword('');
+    let cats = [];
+    try {
+      cats = JSON.parse(emp.categories);
+    } catch {
+      cats = [];
+    }
+    setEmployeeCategories(cats);
+    setEmployeeFormMode('edit');
+  };
+
+  const toggleEmployeeCategory = (slug: string) => {
+    setEmployeeCategories(prev => 
+      prev.includes(slug) ? prev.filter(c => c !== slug) : [...prev, slug]
+    );
+  };
+
+  const selectAllCategories = () => {
+    const allSlugs = [
+      ...tgDistricts.map(d => d.slug),
+      ...apDistricts.map(d => d.slug),
+      ...SIDEBAR_CATEGORIES.filter(c => c.slug !== 'home' && c.slug !== 'telangana-districts' && c.slug !== 'andhra-pradesh-districts').map(c => c.slug)
+    ];
+    setEmployeeCategories(allSlugs);
+  };
+
+  const selectGroupCategories = (group: 'tg' | 'ap' | 'general') => {
+    let slugs: string[] = [];
+    if (group === 'tg') {
+      slugs = tgDistricts.map(d => d.slug);
+    } else if (group === 'ap') {
+      slugs = apDistricts.map(d => d.slug);
+    } else {
+      slugs = SIDEBAR_CATEGORIES.filter(c => c.slug !== 'home' && c.slug !== 'telangana-districts' && c.slug !== 'andhra-pradesh-districts').map(c => c.slug);
+    }
+    setEmployeeCategories(prev => {
+      const rest = prev.filter(c => !slugs.includes(c));
+      return [...rest, ...slugs];
+    });
+  };
+
+  const clearGroupCategories = (group: 'tg' | 'ap' | 'general') => {
+    let slugs: string[] = [];
+    if (group === 'tg') {
+      slugs = tgDistricts.map(d => d.slug);
+    } else if (group === 'ap') {
+      slugs = apDistricts.map(d => d.slug);
+    } else {
+      slugs = SIDEBAR_CATEGORIES.filter(c => c.slug !== 'home' && c.slug !== 'telangana-districts' && c.slug !== 'andhra-pradesh-districts').map(c => c.slug);
+    }
+    setEmployeeCategories(prev => prev.filter(c => !slugs.includes(c)));
+  };
+
 
   const handleStartEditWebStory = (story: any) => {
     setEditingWebStory(story);
@@ -3882,7 +4077,9 @@ export default function AdminPage() {
             </div>
           </button>
 
-          <button
+          {userRole === 'super-admin' && (
+            <>
+              <button
             onClick={() => { setActiveTab('breaking'); }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
               activeTab === 'breaking' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
@@ -4167,7 +4364,22 @@ export default function AdminPage() {
             </div>
           </button>
 
-
+              <button
+                onClick={() => {
+                  setActiveTab('employees');
+                  setEmployeeFormMode('list');
+                }}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                  activeTab === 'employees' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <UserCheck className="w-4 h-4" />
+                  <span>మెంబర్స్ (Manage Employees)</span>
+                </div>
+              </button>
+            </>
+          )}
 
         </nav>
 
@@ -4175,11 +4387,15 @@ export default function AdminPage() {
         <div className="p-4 border-t border-slate-900 bg-slate-950/40 shrink-0 space-y-3">
           <div className="flex items-center gap-3 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
             <div className="w-8 h-8 rounded-full bg-rose-600 flex items-center justify-center text-white text-xs font-black">
-              S
+              {userRole === 'employee' && employeeInfo ? employeeInfo.name.charAt(0).toUpperCase() : 'S'}
             </div>
             <div className="flex flex-col min-w-0">
-              <span className="text-xs font-black text-white truncate">Super Admin</span>
-              <span className="text-[10px] text-slate-500 truncate">admin@hightv.in</span>
+              <span className="text-xs font-black text-white truncate">
+                {userRole === 'employee' && employeeInfo ? employeeInfo.name : 'Super Admin'}
+              </span>
+              <span className="text-[10px] text-slate-500 truncate">
+                {userRole === 'employee' && employeeInfo ? employeeInfo.email : 'admin@hightv.in'}
+              </span>
             </div>
           </div>
           <button
@@ -4221,6 +4437,7 @@ export default function AdminPage() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-[300px] overflow-y-auto admin-scrollbar">
                     {MAIN_CATEGORIES_LIST
                       .filter((cat) => cat.slug !== 'rasipalalu' && cat.slug !== 'weather' && cat.slug !== 'webstories')
+                      .filter((cat) => isSlugAllowed(cat.slug))
                       .map((cat) => (
                         <button
                           key={cat.slug}
@@ -4245,274 +4462,302 @@ export default function AdminPage() {
             </div>
 
             {/* 2. Andhra Pradesh Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'ap' ? null : 'ap')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
-                  activeTab === 'news' && (filterCategory === 'andhra-pradesh' || apDistricts.some(d => d.slug === filterCategory))
-                    ? 'bg-rose-600 border-rose-500 text-white font-black'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
-                }`}
-              >
-                <span>ఆంధ్రప్రదేశ్ (AP News)</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'ap' ? 'rotate-180' : ''}`} />
-              </button>
-              {activeHeaderDropdown === 'ap' && (
-                <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-2xl shadow-2xl p-4 w-[320px]">
-                  <div className="grid grid-cols-2 gap-1.5 max-h-[300px] overflow-y-auto admin-scrollbar">
-                    <button
-                      onClick={() => {
-                        setActiveTab('news');
-                        setFilterCategory('andhra-pradesh');
-                        setNewsViewMode('list');
-                        setActiveHeaderDropdown(null);
-                      }}
-                      className={`col-span-2 text-left py-2 px-2.5 rounded-lg text-[13px] font-extrabold transition-all border-b border-slate-800/60 pb-1.5 ${
-                        activeTab === 'news' && filterCategory === 'andhra-pradesh'
-                          ? 'bg-rose-950/50 text-white border-l-2 border-rose-600'
-                          : 'text-amber-400 hover:text-white hover:bg-slate-900/50'
-                      }`}
-                    >
-                      🌅 ఏపీ హోమ్ (AP State)
-                    </button>
-                    {apDistricts.map((dist) => (
-                      <button
-                        key={dist.slug}
-                        onClick={() => {
-                          setActiveTab('news');
-                          setFilterCategory(dist.slug);
-                          setNewsViewMode('list');
-                          setActiveHeaderDropdown(null);
-                        }}
-                        className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all telugu-text truncate ${
-                          activeTab === 'news' && filterCategory === dist.slug
-                            ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
-                            : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
-                        }`}
-                      >
-                        {dist.name}
-                      </button>
-                    ))}
+            {(isSlugAllowed('andhra-pradesh') || apDistricts.some(d => isSlugAllowed(d.slug))) && (
+              <div className="relative">
+                <button
+                  onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'ap' ? null : 'ap')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
+                    activeTab === 'news' && (filterCategory === 'andhra-pradesh' || apDistricts.some(d => d.slug === filterCategory))
+                      ? 'bg-rose-600 border-rose-500 text-white font-black'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
+                  }`}
+                >
+                  <span>ఆంధ్రప్రదేశ్ (AP News)</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'ap' ? 'rotate-180' : ''}`} />
+                </button>
+                {activeHeaderDropdown === 'ap' && (
+                  <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-2xl shadow-2xl p-4 w-[320px]">
+                    <div className="grid grid-cols-2 gap-1.5 max-h-[300px] overflow-y-auto admin-scrollbar">
+                      {isSlugAllowed('andhra-pradesh') && (
+                        <button
+                          onClick={() => {
+                            setActiveTab('news');
+                            setFilterCategory('andhra-pradesh');
+                            setNewsViewMode('list');
+                            setActiveHeaderDropdown(null);
+                          }}
+                          className={`col-span-2 text-left py-2 px-2.5 rounded-lg text-[13px] font-extrabold transition-all border-b border-slate-800/60 pb-1.5 ${
+                            activeTab === 'news' && filterCategory === 'andhra-pradesh'
+                              ? 'bg-rose-950/50 text-white border-l-2 border-rose-600'
+                              : 'text-amber-400 hover:text-white hover:bg-slate-900/50'
+                          }`}
+                        >
+                          🌅 ఏపీ హోమ్ (AP State)
+                        </button>
+                      )}
+                      {apDistricts.filter(d => isSlugAllowed(d.slug)).map((dist) => (
+                        <button
+                          key={dist.slug}
+                          onClick={() => {
+                            setActiveTab('news');
+                            setFilterCategory(dist.slug);
+                            setNewsViewMode('list');
+                            setActiveHeaderDropdown(null);
+                          }}
+                          className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all telugu-text truncate ${
+                            activeTab === 'news' && filterCategory === dist.slug
+                              ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                              : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                          }`}
+                        >
+                          {dist.name}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             {/* 3. Telangana Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'telangana' ? null : 'telangana')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
-                  activeTab === 'news' && (filterCategory === 'telangana' || tgDistricts.some(d => d.slug === filterCategory))
-                    ? 'bg-rose-600 border-rose-500 text-white font-black'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
-                }`}
-              >
-                <span>తెలంగాణ (Telangana News)</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'telangana' ? 'rotate-180' : ''}`} />
-              </button>
-              {activeHeaderDropdown === 'telangana' && (
-                <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-2xl shadow-2xl p-4 w-[320px]">
-                  <div className="grid grid-cols-2 gap-1.5 max-h-[300px] overflow-y-auto admin-scrollbar">
-                    <button
-                      onClick={() => {
-                        setActiveTab('news');
-                        setFilterCategory('telangana');
-                        setNewsViewMode('list');
-                        setActiveHeaderDropdown(null);
-                      }}
-                      className={`col-span-2 text-left py-2 px-2.5 rounded-lg text-[13px] font-extrabold transition-all border-b border-slate-800/60 pb-1.5 ${
-                        activeTab === 'news' && filterCategory === 'telangana'
-                          ? 'bg-rose-950/50 text-white border-l-2 border-rose-600'
-                          : 'text-amber-400 hover:text-white hover:bg-slate-900/50'
-                      }`}
-                    >
-                      🍇 తెలంగాణ హోమ్ (TG State)
-                    </button>
-                    {tgDistricts.map((dist) => (
+            {(isSlugAllowed('telangana') || tgDistricts.some(d => isSlugAllowed(d.slug))) && (
+              <div className="relative">
+                <button
+                  onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'telangana' ? null : 'telangana')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
+                    activeTab === 'news' && (filterCategory === 'telangana' || tgDistricts.some(d => d.slug === filterCategory))
+                      ? 'bg-rose-600 border-rose-500 text-white font-black'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
+                  }`}
+                >
+                  <span>తెలంగాణ (Telangana News)</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'telangana' ? 'rotate-180' : ''}`} />
+                </button>
+                {activeHeaderDropdown === 'telangana' && (
+                  <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-2xl shadow-2xl p-4 w-[320px]">
+                    <div className="grid grid-cols-2 gap-1.5 max-h-[300px] overflow-y-auto admin-scrollbar">
+                      {isSlugAllowed('telangana') && (
+                        <button
+                          onClick={() => {
+                            setActiveTab('news');
+                            setFilterCategory('telangana');
+                            setNewsViewMode('list');
+                            setActiveHeaderDropdown(null);
+                          }}
+                          className={`col-span-2 text-left py-2 px-2.5 rounded-lg text-[13px] font-extrabold transition-all border-b border-slate-800/60 pb-1.5 ${
+                            activeTab === 'news' && filterCategory === 'telangana'
+                              ? 'bg-rose-950/50 text-white border-l-2 border-rose-600'
+                              : 'text-amber-400 hover:text-white hover:bg-slate-900/50'
+                          }`}
+                        >
+                          🍇 తెలంగాణ హోమ్ (TG State)
+                        </button>
+                      )}
+                      {tgDistricts.filter(d => isSlugAllowed(d.slug)).map((dist) => (
+                        <button
+                          key={dist.slug}
+                          onClick={() => {
+                            setActiveTab('news');
+                            setFilterCategory(dist.slug);
+                            setNewsViewMode('list');
+                            setActiveHeaderDropdown(null);
+                          }}
+                          className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all telugu-text truncate ${
+                            activeTab === 'news' && filterCategory === dist.slug
+                              ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                              : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                          }`}
+                        >
+                          {dist.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 4. Health Dropdown */}
+            {(isSlugAllowed('health') || isSlugAllowed('doctors-corner')) && (
+              <div className="relative">
+                <button
+                  onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'health' ? null : 'health')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
+                    activeTab === 'news' && (filterCategory === 'health' || filterCategory === 'doctors-corner')
+                      ? 'bg-rose-600 border-rose-500 text-white font-black'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
+                  }`}
+                >
+                  <span>హెల్త్ (Health)</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'health' ? 'rotate-180' : ''}`} />
+                </button>
+                {activeHeaderDropdown === 'health' && (
+                  <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
+                    {isSlugAllowed('health') && (
                       <button
-                        key={dist.slug}
                         onClick={() => {
                           setActiveTab('news');
-                          setFilterCategory(dist.slug);
+                          setFilterCategory('health');
                           setNewsViewMode('list');
                           setActiveHeaderDropdown(null);
                         }}
-                        className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all telugu-text truncate ${
-                          activeTab === 'news' && filterCategory === dist.slug
+                        className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                          activeTab === 'news' && filterCategory === 'health'
                             ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
                             : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
                         }`}
                       >
-                        {dist.name}
+                        🩺 హెల్త్ హోమ్
                       </button>
-                    ))}
+                    )}
+                    {isSlugAllowed('doctors-corner') && (
+                      <button
+                        onClick={() => {
+                          setActiveTab('news');
+                          setFilterCategory('doctors-corner');
+                          setNewsViewMode('list');
+                          setActiveHeaderDropdown(null);
+                        }}
+                        className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                          activeTab === 'news' && filterCategory === 'doctors-corner'
+                            ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                        }`}
+                      >
+                        🥼 డాక్టర్స్ కార్నర్
+                      </button>
+                    )}
                   </div>
-                </div>
-              )}
-            </div>
-
-            {/* 4. Health Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'health' ? null : 'health')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
-                  activeTab === 'news' && (filterCategory === 'health' || filterCategory === 'doctors-corner')
-                    ? 'bg-rose-600 border-rose-500 text-white font-black'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
-                }`}
-              >
-                <span>హెల్త్ (Health)</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'health' ? 'rotate-180' : ''}`} />
-              </button>
-              {activeHeaderDropdown === 'health' && (
-                <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
-                  <button
-                    onClick={() => {
-                      setActiveTab('news');
-                      setFilterCategory('health');
-                      setNewsViewMode('list');
-                      setActiveHeaderDropdown(null);
-                    }}
-                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
-                      activeTab === 'news' && filterCategory === 'health'
-                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
-                    }`}
-                  >
-                    🩺 హెల్త్ హోమ్
-                  </button>
-                  <button
-                    onClick={() => {
-                      setActiveTab('news');
-                      setFilterCategory('doctors-corner');
-                      setNewsViewMode('list');
-                      setActiveHeaderDropdown(null);
-                    }}
-                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
-                      activeTab === 'news' && filterCategory === 'doctors-corner'
-                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
-                    }`}
-                  >
-                    🥼 డాక్టర్స్ కార్నర్
-                  </button>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             {/* 5. Education Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'education' ? null : 'education')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
-                  activeTab === 'news' && (filterCategory === 'vidya' || filterCategory === 'admissions' || filterCategory === 'current-affairs')
-                    ? 'bg-rose-600 border-rose-500 text-white font-black'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
-                }`}
-              >
-                <span>విద్య (Education)</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'education' ? 'rotate-180' : ''}`} />
-              </button>
-              {activeHeaderDropdown === 'education' && (
-                <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
-                  <button
-                    onClick={() => {
-                      setActiveTab('news');
-                      setFilterCategory('vidya');
-                      setNewsViewMode('list');
-                      setActiveHeaderDropdown(null);
-                    }}
-                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
-                      activeTab === 'news' && filterCategory === 'vidya'
-                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
-                    }`}
-                  >
-                    🎓 విద్య హోమ్
-                  </button>
-                  <button
-                    onClick={() => {
-                      setActiveTab('news');
-                      setFilterCategory('admissions');
-                      setNewsViewMode('list');
-                      setActiveHeaderDropdown(null);
-                    }}
-                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
-                      activeTab === 'news' && filterCategory === 'admissions'
-                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
-                    }`}
-                  >
-                    🏫 అడ్మిషన్స్
-                  </button>
-                  <button
-                    onClick={() => {
-                      setActiveTab('news');
-                      setFilterCategory('current-affairs');
-                      setNewsViewMode('list');
-                      setActiveHeaderDropdown(null);
-                    }}
-                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
-                      activeTab === 'news' && filterCategory === 'current-affairs'
-                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
-                    }`}
-                  >
-                    📖 కరెంట్ అఫైర్స్
-                  </button>
-                </div>
-              )}
-            </div>
+            {(isSlugAllowed('vidya') || isSlugAllowed('admissions') || isSlugAllowed('current-affairs')) && (
+              <div className="relative">
+                <button
+                  onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'education' ? null : 'education')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
+                    activeTab === 'news' && (filterCategory === 'vidya' || filterCategory === 'admissions' || filterCategory === 'current-affairs')
+                      ? 'bg-rose-600 border-rose-500 text-white font-black'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
+                  }`}
+                >
+                  <span>విద్య (Education)</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'education' ? 'rotate-180' : ''}`} />
+                </button>
+                {activeHeaderDropdown === 'education' && (
+                  <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
+                    {isSlugAllowed('vidya') && (
+                      <button
+                        onClick={() => {
+                          setActiveTab('news');
+                          setFilterCategory('vidya');
+                          setNewsViewMode('list');
+                          setActiveHeaderDropdown(null);
+                        }}
+                        className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                          activeTab === 'news' && filterCategory === 'vidya'
+                            ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                        }`}
+                      >
+                        🎓 విద్య హోమ్
+                      </button>
+                    )}
+                    {isSlugAllowed('admissions') && (
+                      <button
+                        onClick={() => {
+                          setActiveTab('news');
+                          setFilterCategory('admissions');
+                          setNewsViewMode('list');
+                          setActiveHeaderDropdown(null);
+                        }}
+                        className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                          activeTab === 'news' && filterCategory === 'admissions'
+                            ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                        }`}
+                      >
+                        🏫 అడ్మిషన్స్
+                      </button>
+                    )}
+                    {isSlugAllowed('current-affairs') && (
+                      <button
+                        onClick={() => {
+                          setActiveTab('news');
+                          setFilterCategory('current-affairs');
+                          setNewsViewMode('list');
+                          setActiveHeaderDropdown(null);
+                        }}
+                        className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                          activeTab === 'news' && filterCategory === 'current-affairs'
+                            ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                        }`}
+                      >
+                        📖 కరెంట్ అఫైర్స్
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* 6. Career Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'career' ? null : 'career')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
-                  activeTab === 'news' && (filterCategory === 'upadi' || filterCategory === 'notification')
-                    ? 'bg-rose-600 border-rose-500 text-white font-black'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
-                }`}
-              >
-                <span>ఉపాధి (Career)</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'career' ? 'rotate-180' : ''}`} />
-              </button>
-              {activeHeaderDropdown === 'career' && (
-                <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
-                  <button
-                    onClick={() => {
-                      setActiveTab('news');
-                      setFilterCategory('upadi');
-                      setNewsViewMode('list');
-                      setActiveHeaderDropdown(null);
-                    }}
-                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
-                      activeTab === 'news' && filterCategory === 'upadi'
-                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
-                    }`}
-                  >
-                    👔 ఉపాధి హోమ్
-                  </button>
-                  <button
-                    onClick={() => {
-                      setActiveTab('news');
-                      setFilterCategory('notification');
-                      setNewsViewMode('list');
-                      setActiveHeaderDropdown(null);
-                    }}
-                    className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
-                      activeTab === 'news' && filterCategory === 'notification'
-                        ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
-                    }`}
-                  >
-                    📢 నోటిఫికేషన్స్
-                  </button>
-                </div>
-              )}
-            </div>
+            {(isSlugAllowed('upadi') || isSlugAllowed('notification')) && (
+              <div className="relative">
+                <button
+                  onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'career' ? null : 'career')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
+                    activeTab === 'news' && (filterCategory === 'upadi' || filterCategory === 'notification')
+                      ? 'bg-rose-600 border-rose-500 text-white font-black'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
+                  }`}
+                >
+                  <span>ఉపాధి (Career)</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'career' ? 'rotate-180' : ''}`} />
+                </button>
+                {activeHeaderDropdown === 'career' && (
+                  <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
+                    {isSlugAllowed('upadi') && (
+                      <button
+                        onClick={() => {
+                          setActiveTab('news');
+                          setFilterCategory('upadi');
+                          setNewsViewMode('list');
+                          setActiveHeaderDropdown(null);
+                        }}
+                        className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                          activeTab === 'news' && filterCategory === 'upadi'
+                            ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                        }`}
+                      >
+                        👔 ఉపాధి హోమ్
+                      </button>
+                    )}
+                    {isSlugAllowed('notification') && (
+                      <button
+                        onClick={() => {
+                          setActiveTab('news');
+                          setFilterCategory('notification');
+                          setNewsViewMode('list');
+                          setActiveHeaderDropdown(null);
+                        }}
+                        className={`text-left py-2 px-2.5 rounded-lg text-[13px] font-bold transition-all ${
+                          activeTab === 'news' && filterCategory === 'notification'
+                            ? 'bg-rose-950/50 text-white font-extrabold border-l-2 border-rose-600'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-900/50'
+                        }`}
+                      >
+                        📢 నోటిఫికేషన్స్
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
           </div>
 
@@ -5331,7 +5576,7 @@ export default function AdminPage() {
                                 if (caption === null) return;
 
                                 if (container) {
-                                  let captionDiv = container.querySelector('.telugu-text');
+                                  let captionDiv = container.querySelector('.telugu-text') as HTMLElement | null;
                                   if (caption.trim()) {
                                     if (!captionDiv) {
                                       captionDiv = document.createElement('div');
@@ -12908,6 +13153,340 @@ export default function AdminPage() {
             </div>
 
           </div>
+        </div>
+      )}
+
+      {/* ══════════════ VIEW: EMPLOYEES MANAGEMENT ══════════════ */}
+      {activeTab === 'employees' && userRole === 'super-admin' && (
+        <div className="flex flex-col gap-6 animate-fade-in text-left">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-black text-slate-800">మెంబర్స్ (Manage Employees)</h2>
+              <p className="text-slate-500 text-xs">ఇక్కడ నుండి మీరు మా టీమ్ సభ్యుల (రిపోర్టర్లు/ఉద్యోగులు) లాగిన్ వివరాలను మరియు కేటగిరీల అనుమతులను నిర్వహించవచ్చు.</p>
+            </div>
+            {employeeFormMode === 'list' && (
+              <button
+                onClick={() => {
+                  setEmployeeFormMode('add');
+                  setEditingEmployee(null);
+                  setEmployeeName('');
+                  setEmployeeEmail('');
+                  setEmployeePassword('');
+                  setEmployeeCategories([]);
+                }}
+                className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" />
+                రిపోర్టర్‌ను చేర్చండి (Add Reporter)
+              </button>
+            )}
+          </div>
+
+          {/* Form View: Add or Edit */}
+          {(employeeFormMode === 'add' || employeeFormMode === 'edit') ? (
+            <div className="bg-white border border-slate-200/60 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col gap-6">
+              {/* Form Actions */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                <button
+                  type="button"
+                  onClick={() => setEmployeeFormMode('list')}
+                  className="flex items-center gap-2 text-slate-500 hover:text-slate-800 text-xs font-black cursor-pointer bg-white border border-slate-200/60 rounded-xl px-3.5 py-2 transition-all shadow-3xs"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Back to list</span>
+                </button>
+                <h3 className="text-sm font-black text-slate-800">
+                  {employeeFormMode === 'add' ? 'రిపోర్టర్ సృష్టి (Add Reporter)' : 'రిపోర్టర్ సవరణ (Edit Reporter)'}
+                </h3>
+              </div>
+
+              {/* Input Credentials */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Full Name (రిపోర్టర్ పేరు)</label>
+                  <input
+                    type="text"
+                    value={employeeName}
+                    onChange={(e) => setEmployeeName(e.target.value)}
+                    placeholder="e.g. రమేష్ కుమార్"
+                    className="bg-slate-50 border border-slate-200 focus:border-rose-500 focus:bg-white rounded-xl px-4 py-2.5 text-xs outline-none text-slate-800 font-bold transition-all"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email Address / Username</label>
+                  <input
+                    type="email"
+                    value={employeeEmail}
+                    onChange={(e) => setEmployeeEmail(e.target.value)}
+                    placeholder="e.g. ramesh@hightv.in"
+                    className="bg-slate-50 border border-slate-200 focus:border-rose-500 focus:bg-white rounded-xl px-4 py-2.5 text-xs outline-none text-slate-800 font-bold transition-all"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Password {employeeFormMode === 'edit' && '(Leave blank to keep current)'}
+                  </label>
+                  <input
+                    type="password"
+                    value={employeePassword}
+                    onChange={(e) => setEmployeePassword(e.target.value)}
+                    placeholder="Password string"
+                    className="bg-slate-50 border border-slate-200 focus:border-rose-500 focus:bg-white rounded-xl px-4 py-2.5 text-xs outline-none text-slate-800 font-bold transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Category Assignment Section */}
+              <div className="flex flex-col gap-4 border-t border-slate-100 pt-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h4 className="text-base font-black text-slate-800">గ్రూప్ వైజ్ కేటగిరీ అసైన్‌మెంట్ (Group Wise Category Assignment)</h4>
+                    <p className="text-slate-500 text-[11px] mt-0.5">రిపోర్టర్ యాక్సెస్ చేయగల జిల్లాలు మరియు కేటగిరీలను ఇక్కడ ఎంచుకోండి.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={selectAllCategories}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] py-1.5 px-3 rounded-lg transition-all cursor-pointer"
+                  >
+                    Select All Categories
+                  </button>
+                </div>
+
+                {/* TG Districts Group */}
+                <div className="border border-slate-200/60 rounded-2xl p-5 flex flex-col gap-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <span className="text-xs font-black text-rose-600 uppercase tracking-wider">తెలంగాణ జిల్లాలు (Telangana Districts)</span>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => selectGroupCategories('tg')}
+                        className="text-[10px] font-bold text-rose-600 hover:underline"
+                      >
+                        Select Group
+                      </button>
+                      <span className="text-slate-300">|</span>
+                      <button
+                        type="button"
+                        onClick={() => clearGroupCategories('tg')}
+                        className="text-[10px] font-bold text-slate-500 hover:underline"
+                      >
+                        Clear Group
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                    {tgDistricts.map((d) => {
+                      const isSelected = employeeCategories.includes(d.slug);
+                      return (
+                        <label
+                          key={d.slug}
+                          onClick={() => toggleEmployeeCategory(d.slug)}
+                          className={`flex items-center justify-center py-2 px-3 rounded-xl border text-[11px] font-bold cursor-pointer transition-all select-none text-center active:scale-[0.98] ${
+                            isSelected
+                              ? 'bg-rose-50 border-rose-300 text-rose-700 shadow-3xs font-extrabold'
+                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                          }`}
+                        >
+                          {d.name}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* AP Districts Group */}
+                <div className="border border-slate-200/60 rounded-2xl p-5 flex flex-col gap-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <span className="text-xs font-black text-rose-600 uppercase tracking-wider">ఆంధ్రప్రదేశ్ జిల్లాలు (Andhra Pradesh Districts)</span>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => selectGroupCategories('ap')}
+                        className="text-[10px] font-bold text-rose-600 hover:underline"
+                      >
+                        Select Group
+                      </button>
+                      <span className="text-slate-300">|</span>
+                      <button
+                        type="button"
+                        onClick={() => clearGroupCategories('ap')}
+                        className="text-[10px] font-bold text-slate-500 hover:underline"
+                      >
+                        Clear Group
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                    {apDistricts.map((d) => {
+                      const isSelected = employeeCategories.includes(d.slug);
+                      return (
+                        <label
+                          key={d.slug}
+                          onClick={() => toggleEmployeeCategory(d.slug)}
+                          className={`flex items-center justify-center py-2 px-3 rounded-xl border text-[11px] font-bold cursor-pointer transition-all select-none text-center active:scale-[0.98] ${
+                            isSelected
+                              ? 'bg-rose-50 border-rose-300 text-rose-700 shadow-3xs font-extrabold'
+                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                          }`}
+                        >
+                          {d.name}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* General Categories Group */}
+                <div className="border border-slate-200/60 rounded-2xl p-5 flex flex-col gap-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <span className="text-xs font-black text-rose-600 uppercase tracking-wider">సాధారణ కేటగిరీలు (General Categories)</span>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => selectGroupCategories('general')}
+                        className="text-[10px] font-bold text-rose-600 hover:underline"
+                      >
+                        Select Group
+                      </button>
+                      <span className="text-slate-300">|</span>
+                      <button
+                        type="button"
+                        onClick={() => clearGroupCategories('general')}
+                        className="text-[10px] font-bold text-slate-500 hover:underline"
+                      >
+                        Clear Group
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                    {SIDEBAR_CATEGORIES.filter(
+                      (c) =>
+                        c.slug !== 'home' &&
+                        c.slug !== 'telangana-districts' &&
+                        c.slug !== 'andhra-pradesh-districts'
+                    ).map((cat) => {
+                      const isSelected = employeeCategories.includes(cat.slug);
+                      return (
+                        <label
+                          key={cat.slug}
+                          onClick={() => toggleEmployeeCategory(cat.slug)}
+                          className={`flex items-center justify-center py-2 px-3 rounded-xl border text-[11px] font-bold cursor-pointer transition-all select-none text-center active:scale-[0.98] ${
+                            isSelected
+                              ? 'bg-rose-50 border-rose-300 text-rose-700 shadow-3xs font-extrabold'
+                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                          }`}
+                        >
+                          {cat.name}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Bar */}
+              <div className="flex justify-end gap-3 border-t border-slate-100 pt-6">
+                <button
+                  type="button"
+                  onClick={() => setEmployeeFormMode('list')}
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveEmployee}
+                  className="px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black transition-all shadow-md cursor-pointer"
+                >
+                  {employeeFormMode === 'add' ? 'సృష్టించండి (Create Member)' : 'నవీకరించండి (Save Changes)'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* List View */
+            <div className="bg-white border border-slate-200/60 rounded-3xl overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-100">
+                      <th className="py-4 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">పేరు (Reporter Name)</th>
+                      <th className="py-4 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">ఈమెయిల్ (Email / Username)</th>
+                      <th className="py-4 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">అనుమతించిన విభాగాలు (Categories)</th>
+                      <th className="py-4 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">చర్యలు (Actions)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {employeesList.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="py-8 px-6 text-center text-slate-400 text-xs font-bold">
+                          రిపోర్టర్లు ఎవరూ లేరు. ఒకరిని జోడించడానికి పైన ఉన్న బటన్ క్లిక్ చేయండి.
+                        </td>
+                      </tr>
+                    ) : (
+                      employeesList.map((emp) => {
+                        let parsedCats = [];
+                        try {
+                          parsedCats = JSON.parse(emp.categories);
+                        } catch {
+                          parsedCats = [];
+                        }
+                        return (
+                          <tr key={emp.id} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="py-4 px-6">
+                              <div className="font-extrabold text-slate-800 text-xs telugu-text">{emp.name}</div>
+                            </td>
+                            <td className="py-4 px-6">
+                              <div className="font-mono text-[11px] text-slate-500">{emp.email}</div>
+                            </td>
+                            <td className="py-4 px-6">
+                              <div className="flex flex-wrap gap-1 max-w-[500px]">
+                                {parsedCats.length === 0 ? (
+                                  <span className="text-[10px] text-slate-400 italic">None</span>
+                                ) : (
+                                  parsedCats.map((c: string) => {
+                                    // Resolve Name
+                                    const resolvedName = 
+                                      tgDistricts.find(d => d.slug === c)?.name || 
+                                      apDistricts.find(d => d.slug === c)?.name || 
+                                      SIDEBAR_CATEGORIES.find(cat => cat.slug === c)?.name || 
+                                      c;
+                                    return (
+                                      <span key={c} className="bg-slate-100 text-slate-600 text-[10px] font-bold py-0.5 px-2 rounded-md">
+                                        {resolvedName}
+                                      </span>
+                                    );
+                                  })
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-4 px-6 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => handleStartEditEmployee(emp)}
+                                  className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+                                  title="Edit reporter"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteEmployee(emp.id)}
+                                  className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors cursor-pointer"
+                                  title="Delete reporter"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

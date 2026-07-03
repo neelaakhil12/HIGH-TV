@@ -943,7 +943,7 @@ export default function ArticlePageClient({
                   (() => {
                     // Extract inline-image-containers to prevent them from being split/broken by newline parser
                     const placeholders: string[] = [];
-                    let normalized = article.body.replace(/(<div\b[^>]*\binline-image-container[\s\S]*?<\/div>\s*<\/div>)/gi, (match) => {
+                    let normalized = article.body.replace(/(<div\b[^>]*\binline-image-container[\s\S]*?<\/div>\s*<\/div>)/gi, (match: string) => {
                       placeholders.push(match);
                       return `\n__INLINE_IMAGE_CONTAINER_PLACEHOLDER_${placeholders.length - 1}__\n`;
                     });
