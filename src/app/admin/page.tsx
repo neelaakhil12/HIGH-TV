@@ -3434,9 +3434,13 @@ export default function AdminPage() {
       'current-affairs',
       'notification',
       'trending',
-      'featured',
       'antharmadanam',
-      'citizen-reporter'
+      'webstories',
+      'live-updates',
+      'epaper',
+      'shorts-videos',
+      'hightv-videos',
+      'photos'
     ];
     setEmployeeCategories(allSlugs);
   };
@@ -3455,9 +3459,13 @@ export default function AdminPage() {
         'current-affairs',
         'notification',
         'trending',
-        'featured',
         'antharmadanam',
-        'citizen-reporter'
+        'webstories',
+        'live-updates',
+        'epaper',
+        'shorts-videos',
+        'hightv-videos',
+        'photos'
       ];
     }
     setEmployeeCategories(prev => {
@@ -3480,9 +3488,13 @@ export default function AdminPage() {
         'current-affairs',
         'notification',
         'trending',
-        'featured',
         'antharmadanam',
-        'citizen-reporter'
+        'webstories',
+        'live-updates',
+        'epaper',
+        'shorts-videos',
+        'hightv-videos',
+        'photos'
       ];
     }
     setEmployeeCategories(prev => prev.filter(c => !slugs.includes(c)));
@@ -13403,9 +13415,13 @@ export default function AdminPage() {
                         { slug: 'current-affairs', name: "కరెంట్ అఫైర్స్ (Current Affairs)" },
                         { slug: 'notification', name: "నోటిఫికేషన్స్ (Notification)" },
                         { slug: 'trending', name: "ట్రెండింగ్ వార్తలు (Trending)" },
-                        { slug: 'featured', name: "ముఖ్య వార్తలు (Featured)" },
                         { slug: 'antharmadanam', name: "వ్యక్తిత్వ వికాసం (Opinion)" },
-                        { slug: 'citizen-reporter', name: "సిటిజన్ రిపోర్టర్ (Citizen Reporter)" },
+                        { slug: 'webstories', name: "వెబ్ స్టోరీస్ (Web Stories)" },
+                        { slug: 'live-updates', name: "లైవ్ అప్డేట్స్ (Live Updates)" },
+                        { slug: 'epaper', name: "ఈ-పేపర్ (E-Paper)" },
+                        { slug: 'shorts-videos', name: "షార్ట్స్ వీడియోలు (Shorts Videos)" },
+                        { slug: 'hightv-videos', name: "హై టీవీ వీడియోలు (HighTV Videos)" },
+                        { slug: 'photos', name: "ఫోటో గ్యాలరీ (Photo Gallery)" },
                       ];
                       return [...baseCategories, ...extraSubcategories].map((cat) => {
                         const isSelected = employeeCategories.includes(cat.slug);
@@ -13498,9 +13514,13 @@ export default function AdminPage() {
                                        c === 'current-affairs' ? "కరెంట్ అఫైర్స్ (Current Affairs)" :
                                        c === 'notification' ? "నోటిఫికేషన్స్ (Notification)" :
                                        c === 'trending' ? "ట్రెండింగ్ వార్తలు (Trending)" :
-                                       c === 'featured' ? "ముఖ్య వార్తలు (Featured)" :
                                        c === 'antharmadanam' ? "వ్యక్తిత్వ వికాసం (Opinion)" :
-                                       c === 'citizen-reporter' ? "సిటిజన్ రిపోర్టర్ (Citizen Reporter)" : c);
+                                       c === 'webstories' ? "వెబ్ స్టోరీస్ (Web Stories)" :
+                                       c === 'live-updates' ? "లైవ్ అప్డేట్స్ (Live Updates)" :
+                                       c === 'epaper' ? "ఈ-పేపర్ (E-Paper)" :
+                                       c === 'shorts-videos' ? "షార్ట్స్ వీడియోలు (Shorts Videos)" :
+                                       c === 'hightv-videos' ? "హై టీవీ వీడియోలు (HighTV Videos)" :
+                                       c === 'photos' ? "ఫోటో గ్యాలరీ (Photo Gallery)" : c);
                                     return (
                                       <span key={c} className="bg-slate-100 text-slate-600 text-[10px] font-bold py-0.5 px-2 rounded-md">
                                         {resolvedName}
