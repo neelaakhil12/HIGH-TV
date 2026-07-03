@@ -2,6 +2,7 @@ export interface StorySlide {
   image: string;
   text: string;
   textStyle: 'red-white' | 'white-black';
+  showOverlay?: boolean;
 }
 
 export interface WebStory {

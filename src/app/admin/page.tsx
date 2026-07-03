@@ -1293,7 +1293,7 @@ export default function AdminPage() {
   const [webStoryCoverImage, setWebStoryCoverImage] = useState('');
   const [webStoryCoverTitle, setWebStoryCoverTitle] = useState('');
   const [webStoryCoverStyle, setWebStoryCoverStyle] = useState<'red-white' | 'white-black'>('red-white');
-  const [webStorySlides, setWebStorySlides] = useState<any[]>([{ image: '', text: '', textStyle: 'red-white' }]);
+  const [webStorySlides, setWebStorySlides] = useState<any[]>([{ image: '', text: '', textStyle: 'red-white', showOverlay: true }]);
 
   // ── Editorial Page Manager states ──────────────────────────────────────────
   const [editorialSections, setEditorialSections] = useState<{ id: string; title: string; slug: string }[]>(DEFAULT_EDITORIAL_SECTIONS);
@@ -3199,7 +3199,7 @@ export default function AdminPage() {
     setWebStoryCoverImage('');
     setWebStoryCoverTitle('');
     setWebStoryCoverStyle('red-white');
-    setWebStorySlides([{ image: '', text: '', textStyle: 'red-white' }]);
+    setWebStorySlides([{ image: '', text: '', textStyle: 'red-white', showOverlay: true }]);
     setEditingWebStory(null);
   };
 
@@ -3272,7 +3272,7 @@ export default function AdminPage() {
     setWebStoryCoverImage(story.coverImage || '');
     setWebStoryCoverTitle(story.coverTitle || '');
     setWebStoryCoverStyle(story.coverStyle || 'red-white');
-    setWebStorySlides(story.slides && story.slides.length > 0 ? story.slides : [{ image: '', text: '', textStyle: 'red-white' }]);
+    setWebStorySlides(story.slides && story.slides.length > 0 ? story.slides.map((s: any) => ({ showOverlay: s.showOverlay !== false, ...s })) : [{ image: '', text: '', textStyle: 'red-white', showOverlay: true }]);
     setWebStoryFormMode('edit');
   };
 
@@ -9302,7 +9302,7 @@ export default function AdminPage() {
                           <button
                             type="button"
                             onClick={() => {
-                              setWebStorySlides([...webStorySlides, { image: '', text: '', textStyle: 'red-white' }]);
+                              setWebStorySlides([...webStorySlides, { image: '', text: '', textStyle: 'red-white', showOverlay: true }]);
                             }}
                             className="bg-slate-100 hover:bg-slate-200 text-[#02599c] font-black text-xs py-1.5 px-3.5 rounded-lg border border-slate-200 transition-all cursor-pointer flex items-center gap-1"
                           >
@@ -9357,7 +9357,7 @@ export default function AdminPage() {
                                     type="button"
                                     onClick={() => {
                                       const updated = webStorySlides.filter((_, i) => i !== sIdx);
-                                      setWebStorySlides(updated.length > 0 ? updated : [{ image: '', text: '', textStyle: 'red-white' }]);
+                                      setWebStorySlides(updated.length > 0 ? updated : [{ image: '', text: '', textStyle: 'red-white', showOverlay: true }]);
                                     }}
                                     className="p-1 rounded hover:bg-rose-100 text-rose-500 transition-colors cursor-pointer"
                                     title="Delete Slide"
@@ -9401,6 +9401,23 @@ export default function AdminPage() {
                                       <option value="red-white">ఎరుపు అక్షరాలు + వైట్ అవుట్‌లైన్</option>
                                       <option value="white-black">తెలుపు అక్షరాలు + బ్లాక్ అవుట్‌లైన్</option>
                                     </select>
+                                  </div>
+
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <input
+                                      type="checkbox"
+                                      id={`slide-overlay-${sIdx}`}
+                                      checked={slide.showOverlay !== false}
+                                      onChange={(e) => {
+                                        const updated = [...webStorySlides];
+                                        updated[sIdx].showOverlay = e.target.checked;
+                                        setWebStorySlides(updated);
+                                      }}
+                                      className="w-4 h-4 text-[#02599c] border-slate-350 rounded focus:ring-[#02599c] cursor-pointer"
+                                    />
+                                    <label htmlFor={`slide-overlay-${sIdx}`} className="text-xs font-black text-slate-700 cursor-pointer select-none">
+                                      బ్లాక్ సర్కిల్ ఓవర్‌లేను చూపించు (Show black circle overlay on image)
+                                    </label>
                                   </div>
                                 </div>
 

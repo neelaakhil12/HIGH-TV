@@ -346,10 +346,12 @@ export default function WebStoriesSection() {
             </div>
 
             {/* Curved dome background for text overlay */}
-            <div 
-              className="absolute bottom-0 left-1/2 w-[140%] aspect-square rounded-full bg-black/70 z-20 pointer-events-none"
-              style={{ transform: 'translate(-50%, 55%)' }}
-            />
+            {activeStory.slides[currentSlideIndex].showOverlay !== false && (
+              <div 
+                className="absolute bottom-0 left-1/2 w-[140%] aspect-square rounded-full bg-black/70 z-20 pointer-events-none"
+                style={{ transform: 'translate(-50%, 55%)' }}
+              />
+            )}
 
             {/* Slide Text Panel (White text matching the reference) */}
             <div 
