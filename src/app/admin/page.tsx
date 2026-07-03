@@ -13029,9 +13029,6 @@ export default function AdminPage() {
         </div>
       )}
 
-</div>
-      </main>
-
       {/* ── Related News Promos Inserter Modal ── */}
       {showPromoLinkModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-fade-in">
@@ -13494,6 +13491,9 @@ export default function AdminPage() {
           )}
         </div>
       )}
+
+        </div>
+      </main>
 
       {/* ── Editorial Article Picker Modal ── */}
       {showEditorialArticlePicker && (
