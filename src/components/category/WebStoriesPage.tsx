@@ -322,10 +322,15 @@ export default function WebStoriesPage() {
               </div>
             </div>
 
-            {/* Slide Text Panel (Gradient overlay with white text matching the reference) */}
+            {/* Curved dome background for text overlay */}
             <div 
-              className="absolute inset-x-0 bottom-0 w-full pt-48 pb-16 px-6 z-20 pointer-events-none flex flex-col justify-end items-center text-center animate-story-panel-pop"
-              style={{ background: 'linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 40%, rgba(0, 0, 0, 0.3) 70%, rgba(0, 0, 0, 0) 100%)' }}
+              className="absolute bottom-0 left-1/2 w-[140%] aspect-square rounded-full bg-black/70 z-20 pointer-events-none"
+              style={{ transform: 'translate(-50%, 55%)' }}
+            />
+
+            {/* Slide Text Panel (White text matching the reference) */}
+            <div 
+              className="absolute inset-x-0 bottom-0 w-full pt-48 pb-14 px-6 z-20 pointer-events-none flex flex-col justify-end items-center text-center animate-story-panel-pop"
             >
               <h3
                 className="text-[16px] sm:text-[18px] md:text-[20px] font-bold leading-relaxed text-white telugu-text max-w-xs md:max-w-md mx-auto"
