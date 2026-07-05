@@ -1633,7 +1633,22 @@ export default function AdminPage() {
         const info = localStorage.getItem('high_tv_employee_info');
         if (info) {
           try {
-            setEmployeeInfo(JSON.parse(info));
+            const parsed = JSON.parse(info);
+            setEmployeeInfo(parsed);
+
+            // Fetch fresh details from database to keep autoPublish and categories synchronized!
+            fetch('/api/employees?t=' + Date.now())
+              .then(res => res.json())
+              .then(employeesList => {
+                if (Array.isArray(employeesList)) {
+                  const freshRecord = employeesList.find((emp: any) => emp.id === parsed.id);
+                  if (freshRecord) {
+                    setEmployeeInfo(freshRecord);
+                    localStorage.setItem('high_tv_employee_info', JSON.stringify(freshRecord));
+                  }
+                }
+              })
+              .catch(err => console.error('Failed to sync employee info from database:', err));
           } catch (e) {
             console.error('Failed to parse employee info:', e);
           }
@@ -3098,6 +3113,31 @@ export default function AdminPage() {
       return (base || 'article') + '-' + Date.now().toString().slice(-4);
     })();
 
+    // Fetch fresh autoPublish value directly from the database right before save!
+    let finalAutoPublish = false;
+    if (userRole === 'employee' && employeeInfo) {
+      try {
+        const empRes = await fetch('/api/employees?t=' + Date.now());
+        if (empRes.ok) {
+          const empList = await empRes.json();
+          const fresh = empList.find((emp: any) => emp.id === employeeInfo.id);
+          if (fresh) {
+            finalAutoPublish = fresh.autoPublish;
+            // Sync local state & storage
+            setEmployeeInfo(fresh);
+            localStorage.setItem('high_tv_employee_info', JSON.stringify(fresh));
+          } else {
+            finalAutoPublish = employeeInfo.autoPublish ?? false;
+          }
+        } else {
+          finalAutoPublish = employeeInfo.autoPublish ?? false;
+        }
+      } catch (err) {
+        console.error('Error fetching employee configs before save:', err);
+        finalAutoPublish = employeeInfo.autoPublish ?? false;
+      }
+    }
+
     const articleData = {
       title: titlePlainText,
       slug: slugToUse,
@@ -3119,7 +3159,7 @@ export default function AdminPage() {
       isBreaking: isBreakingChecked,
       isTrending: isTrendingChecked,
       isFeatured: isFeaturedChecked,
-      isApproved: userRole === 'super-admin' ? true : (employeeInfo?.autoPublish ?? false)
+      isApproved: userRole === 'super-admin' ? true : finalAutoPublish
     };
 
     if (newsViewMode === 'add') {
