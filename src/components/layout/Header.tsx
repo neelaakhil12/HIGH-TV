@@ -486,13 +486,14 @@ export default function Header() {
 
               {/* విద్య Dropdown */}
               <div className="relative group border-r border-white/20 h-full flex-shrink-0">
-                <button 
+                <Link 
+                  href="/category/vidya"
                   className={`px-3 h-full flex items-center gap-1 hover:bg-black/15 transition-colors cursor-pointer ${pathname.startsWith('/category/vidya') || pathname.startsWith('/category/admissions') || pathname.startsWith('/category/current-affairs') ? 'text-[#ffb3d1]' : 'text-white'}`} 
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   విద్య
                   <ChevronDown size={11} className="text-[#ffb3d1] transition-transform duration-200 group-hover:rotate-180" />
-                </button>
+                </Link>
                 <div className="absolute top-full left-0 hidden group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-2.5 w-52 z-50 animate-fade-in border-t-2 border-[#025390]">
                   <div className="flex flex-col gap-0.5 text-left">
                     <Link onClick={closeAllDropdowns} href="/category/admissions" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>అడ్మిషన్స్</Link>
@@ -503,13 +504,14 @@ export default function Header() {
 
               {/* ఉపాధి Dropdown */}
               <div className="relative group border-r border-white/20 h-full flex-shrink-0">
-                <button 
+                <Link 
+                  href="/category/upadi"
                   className={`px-3 h-full flex items-center gap-1 hover:bg-black/15 transition-colors cursor-pointer ${pathname.startsWith('/category/upadi') || pathname.startsWith('/category/notification') ? 'text-[#ffb3d1]' : 'text-white'}`} 
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
                   ఉపాధి
                   <ChevronDown size={11} className="text-[#ffb3d1] transition-transform duration-200 group-hover:rotate-180" />
-                </button>
+                </Link>
                 <div className="absolute top-full left-0 hidden group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-2.5 w-52 z-50 animate-fade-in border-t-2 border-[#025390]">
                   <div className="flex flex-col gap-0.5 text-left">
                     <Link onClick={closeAllDropdowns} href="/category/notification" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>నోటిఫికేషన్స్</Link>
@@ -822,6 +824,14 @@ function MobileSubNav({
       {isVidyaMobileExpanded && (
         <div className="md:hidden w-full bg-[#013d6e] border-t border-[#012f5c] text-[13.5px] font-extrabold text-white telugu-text flex items-center justify-around py-2 shadow-xs">
           <Link 
+            href="/category/vidya" 
+            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/vidya' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            విద్య హోమ్
+          </Link>
+          <div className="h-4 w-[1px] bg-white/20" />
+          <Link 
             href="/category/admissions" 
             className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/admissions' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
@@ -842,6 +852,14 @@ function MobileSubNav({
       {/* Mobile Sub-pages strip for Upadi */}
       {isUpadiMobileExpanded && (
         <div className="md:hidden w-full bg-[#013d6e] border-t border-[#012f5c] text-[13.5px] font-extrabold text-white telugu-text flex items-center justify-around py-2 shadow-xs">
+          <Link 
+            href="/category/upadi" 
+            className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/upadi' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
+            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+          >
+            ఉపాధి హోమ్
+          </Link>
+          <div className="h-4 w-[1px] bg-white/20" />
           <Link 
             href="/category/notification" 
             className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/notification' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
