@@ -113,6 +113,27 @@ const MAIN_CATEGORIES_LIST = [
   { slug: 'epaper', name: 'ఈ-పేపర్' },
 ];
 
+const getCategoryDisplayName = (slug: string) => {
+  const cat = MAIN_CATEGORIES_LIST.find((c) => c.slug === slug);
+  if (cat) return cat.name;
+
+  const apDist = apDistricts.find((d) => d.slug === slug);
+  if (apDist) return apDist.name;
+
+  const tgDist = tgDistricts.find((d) => d.slug === slug);
+  if (tgDist) return tgDist.name;
+
+  if (slug === 'sampadakiyam' || slug === 'editorial') return 'సంపాదకీయం (Editorial)';
+  if (slug === 'vidya') return 'విద్య (Education)';
+  if (slug === 'admissions') return 'అడ్మిషన్స్ (Admissions)';
+  if (slug === 'current-affairs') return 'కరెంట్ అఫైర్స్';
+  if (slug === 'upadi') return 'ఉపాధి (Jobs)';
+  if (slug === 'notification') return 'నోటిఫికేషన్స్';
+  if (slug === 'live-updates') return 'లైవ్ అప్‌డేట్స్';
+
+  return slug;
+};
+
 function MiniWysiwygToolbar({ editorRef }: { editorRef: React.RefObject<HTMLDivElement | null> }) {
   const savedRangeRef = useRef<Range | null>(null);
 
@@ -1885,6 +1906,11 @@ export default function AdminPage() {
       setNewsImageCaption('');
       setNewsVideo('');
       setEditingArticle(null);
+      if (userRole === 'employee' && employeeInfo) {
+        setNewsAuthor(employeeInfo.name);
+      } else {
+        setNewsAuthor('హై టీవీ డెస్క్');
+      }
       
       // Auto-check Target Placement based on current sidebar filterCategory
       setIsBreakingChecked(filterCategory === 'latest');
@@ -2735,11 +2761,28 @@ export default function AdminPage() {
     let list = [...customNewsList].filter((art) => !excludeCategories.includes(art.categorySlug));
 
     // Apply employee restrictions
-    if (userRole === 'employee' && employeeInfo && employeeInfo.categories) {
+    if (userRole === 'employee' && employeeInfo) {
+      const empName = employeeInfo.name?.toLowerCase().trim();
+      let allowedCats: string[] = [];
+      if (employeeInfo.categories) {
+        try {
+          allowedCats = typeof employeeInfo.categories === 'string'
+            ? JSON.parse(employeeInfo.categories)
+            : employeeInfo.categories;
+        } catch {
+          allowedCats = [];
+        }
+      }
       list = list.filter((art) => {
-        const catAllowed = employeeInfo.categories.includes(art.categorySlug);
-        const distAllowed = art.districtSlug ? employeeInfo.categories.includes(art.districtSlug) : false;
-        return catAllowed || distAllowed;
+        const isAuthored = art.author?.toLowerCase().trim() === empName;
+        if (!isAuthored) return false;
+
+        if (allowedCats.length > 0) {
+          const catAllowed = allowedCats.includes(art.categorySlug);
+          const distAllowed = art.districtSlug ? allowedCats.includes(art.districtSlug) : false;
+          return catAllowed || distAllowed;
+        }
+        return true;
       });
     }
 
@@ -4140,6 +4183,42 @@ export default function AdminPage() {
             </div>
           </button>
 
+          {userRole === 'employee' && employeeInfo && employeeInfo.categories && (
+            <div className="ml-4 pl-3.5 border-l border-slate-800 flex flex-col gap-1 mt-1">
+              {(() => {
+                let parsed = [];
+                try {
+                  parsed = typeof employeeInfo.categories === 'string'
+                    ? JSON.parse(employeeInfo.categories)
+                    : employeeInfo.categories;
+                } catch {
+                  parsed = [];
+                }
+                if (!Array.isArray(parsed)) parsed = [];
+                return parsed.map((slug) => {
+                  const displayName = getCategoryDisplayName(slug);
+                  return (
+                    <button
+                      key={slug}
+                      onClick={() => {
+                        setActiveTab('news');
+                        setFilterCategory(slug);
+                        setNewsViewMode('list');
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-[11px] font-black cursor-pointer transition-all telugu-text truncate ${
+                        activeTab === 'news' && filterCategory === slug
+                          ? 'bg-rose-600/20 text-rose-455 border border-rose-500/30'
+                          : 'text-slate-450 hover:text-white hover:bg-slate-900/40'
+                      }`}
+                    >
+                      📁 {displayName}
+                    </button>
+                  );
+                });
+              })()}
+            </div>
+          )}
+
           {userRole === 'super-admin' && (
             <>
               <button
@@ -4496,7 +4575,8 @@ export default function AdminPage() {
         <div className="flex bg-[#0b1329] border-b border-slate-900 select-none z-30 relative items-center justify-between py-3 px-6 md:px-8 flex-wrap gap-4" ref={dropdownRef}>
           
           {/* Left: Website Pages Navigation */}
-          <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+          {userRole !== 'employee' && (
+            <div className="flex items-center gap-2 md:gap-3 flex-wrap">
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2">Website Pages:</span>
             
             {/* 1. Main Categories Dropdown */}
@@ -4839,7 +4919,8 @@ export default function AdminPage() {
               </div>
             )}
 
-          </div>
+            </div>
+          )}
 
           {/* Right: Visit Live Website link */}
           <div className="flex items-center shrink-0">
@@ -4867,45 +4948,73 @@ export default function AdminPage() {
               </div>
 
               {/* Stats Counters Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white border border-slate-200/60 p-5 rounded-2xl flex flex-col gap-1 shadow-sm">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Articles</span>
-                  <span className="text-2xl font-bold text-slate-800">{allArticles.length}</span>
-                  <span className="text-[10px] text-[#02599c] font-bold mt-1">Staged in CMS</span>
+              {userRole === 'employee' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white border border-slate-200/60 p-5 rounded-2xl flex flex-col gap-1 shadow-sm">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Website Articles (వెబ్‌సైట్ ఆర్టికల్స్)</span>
+                    <span className="text-2xl font-bold text-slate-800">
+                      {customNewsList.filter(art => {
+                        const excludeCategories = [
+                          'team-member', 'team-section', 'sidebar-ad-category',
+                          'sidebar-ad-article-left', 'sidebar-ad-article-right', 'sidebar-ad-both',
+                          'header-ad', 'sidebar-ad-epaper-left', 'sidebar-ad-epaper-right',
+                          'sidebar-ad-epaper-header', 'sidebar-ad-epaper-mobile', 'polls'
+                        ];
+                        return !excludeCategories.includes(art.categorySlug) && art.isApproved !== false && art.isDeleted === false;
+                      }).length}
+                    </span>
+                    <span className="text-[10px] text-emerald-600 font-bold mt-1">Live approved articles</span>
+                  </div>
+                  <div className="bg-white border border-slate-200/60 p-5 rounded-2xl flex flex-col gap-1 shadow-sm">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Your Uploaded Articles (మీరు అప్‌లోడ్ చేసిన ఆర్టికల్స్)</span>
+                    <span className="text-2xl font-bold text-slate-800">{allArticles.length}</span>
+                    <span className="text-[10px] text-[#02599c] font-bold mt-1">Uploaded by you</span>
+                  </div>
                 </div>
-                <div className="bg-white border border-slate-200/60 p-5 rounded-2xl flex flex-col gap-1 shadow-sm">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ticker Headlines</span>
-                  <span className="text-2xl font-bold text-slate-800">{flashNewsList.length}</span>
-                  <span className="text-[10px] text-[#02599c] font-bold mt-1">Marquee tickers</span>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-white border border-slate-200/60 p-5 rounded-2xl flex flex-col gap-1 shadow-sm">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Articles</span>
+                    <span className="text-2xl font-bold text-slate-800">{allArticles.length}</span>
+                    <span className="text-[10px] text-[#02599c] font-bold mt-1">Staged in CMS</span>
+                  </div>
+                  <div className="bg-white border border-slate-200/60 p-5 rounded-2xl flex flex-col gap-1 shadow-sm">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ticker Headlines</span>
+                    <span className="text-2xl font-bold text-slate-800">{flashNewsList.length}</span>
+                    <span className="text-[10px] text-[#02599c] font-bold mt-1">Marquee tickers</span>
+                  </div>
+                  <div className="bg-white border border-slate-200/60 p-5 rounded-2xl flex flex-col gap-1 shadow-sm">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">E-Paper Editions</span>
+                    <span className="text-2xl font-bold text-slate-800">{epapersList.length}</span>
+                    <span className="text-[10px] text-[#02599c] font-bold mt-1">PDFs uploaded</span>
+                  </div>
+                  <div className="bg-white border border-slate-200/60 p-5 rounded-2xl flex flex-col gap-1 shadow-sm">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">General Advertisements</span>
+                    <span className="text-2xl font-bold text-slate-800">
+                      {Object.values(customAds).filter((ad: any) => ad?.enabled).length}
+                    </span>
+                    <span className="text-[10px] text-[#02599c] font-bold mt-1">Active banners</span>
+                  </div>
                 </div>
-                <div className="bg-white border border-slate-200/60 p-5 rounded-2xl flex flex-col gap-1 shadow-sm">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">E-Paper Editions</span>
-                  <span className="text-2xl font-bold text-slate-800">{epapersList.length}</span>
-                  <span className="text-[10px] text-[#02599c] font-bold mt-1">PDFs uploaded</span>
-                </div>
-                <div className="bg-white border border-slate-200/60 p-5 rounded-2xl flex flex-col gap-1 shadow-sm">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">General Advertisements</span>
-                  <span className="text-2xl font-bold text-slate-800">
-                    {Object.values(customAds).filter((ad: any) => ad?.enabled).length}
-                  </span>
-                  <span className="text-[10px] text-[#02599c] font-bold mt-1">Active banners</span>
-                </div>
-              </div>
+              )}
 
               {/* Overview instruction helper */}
               <div className="bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
                 <h3 className="text-base font-black text-slate-800 flex items-center gap-2">
                   <Info className="w-5 h-5 text-rose-600" />
-                  <span>Welcome to Super Admin Dashboard</span>
+                  <span>{userRole === 'employee' ? 'Welcome to Reporter Dashboard' : 'Welcome to Super Admin Dashboard'}</span>
                 </h3>
                 <p className="text-slate-600 text-xs leading-relaxed max-w-2xl">
-                  Use the left sidebar navigation to select any tab or subpage to update its content, upload custom news articles, or configure page-specific ad banner overrides. All changes are stored locally and will reflect immediately across your navigation panels and article views.
+                  {userRole === 'employee'
+                    ? 'ఇక్కడ నుండి మీరు మీ కేటగిరీలకు సంబంధించిన వార్తలను సృష్టించవచ్చు, సవరించవచ్చు మరియు నిర్వహించవచ్చు. ఆటో పబ్లిష్ అనుమతి లేని వార్తలు ప్రచురణకు ముందు సూపర్ అడ్మిన్ ఆమోదం కోసం పంపబడతాయి.'
+                    : 'Use the left sidebar navigation to select any tab or subpage to update its content, upload custom news articles, or configure page-specific ad banner overrides. All changes are stored locally and will reflect immediately across your navigation panels and article views.'
+                  }
                 </p>
                 <div className="h-px bg-slate-100" />
                 <div className="flex flex-wrap gap-4 text-[11px] text-slate-500">
                   <div className="flex items-center gap-1.5">
                     <CheckCircle className="w-4 h-4 text-emerald-500" />
-                    <span>22 Collapsible Pages Configured</span>
+                    <span>{userRole === 'employee' ? 'Reporter Account Active' : '22 Collapsible Pages Configured'}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <CheckCircle className="w-4 h-4 text-emerald-500" />
