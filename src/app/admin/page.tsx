@@ -28,6 +28,7 @@ import {
   Pencil,
   ArrowLeft,
   Search,
+  BookOpen,
   Bold,
   Italic,
   Underline,
@@ -1336,6 +1337,7 @@ export default function AdminPage() {
   const [employeePassword, setEmployeePassword] = useState('');
   const [employeeCategories, setEmployeeCategories] = useState<string[]>([]);
   const [employeeAutoPublish, setEmployeeAutoPublish] = useState(false);
+  const [selectedEmpForPosts, setSelectedEmpForPosts] = useState<any | null>(null);
 
 
   // ── Editorial Page Manager states ──────────────────────────────────────────
@@ -4671,6 +4673,22 @@ export default function AdminPage() {
                 <div className="flex items-center gap-2.5">
                   <UserCheck className="w-4 h-4" />
                   <span>మెంబర్స్ (Manage Employees)</span>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('employee-posts-tracker');
+                  setSelectedEmpForPosts(null);
+                  fetchEmployees();
+                }}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                  activeTab === 'employee-posts-tracker' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <BookOpen className="w-4 h-4" />
+                  <span>రిపోర్టర్ ఆర్టికల్స్ (Reporter Posts)</span>
                 </div>
               </button>
             </>
@@ -13892,6 +13910,206 @@ export default function AdminPage() {
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'employee-posts-tracker' && userRole === 'super-admin' && (
+        <div className="flex flex-col gap-6 animate-fade-in text-left">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-black text-slate-800 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                రిపోర్టర్ ఆర్టికల్స్ ట్రాకర్ (Reporter Posts Tracker)
+              </h2>
+              <p className="text-slate-500 text-xs mt-0.5">
+                రిపోర్టర్లు అప్‌లోడ్ చేసిన ఆర్టికల్స్, వాటి ప్రచురణ మరియు సవరణ (అప్‌డేట్) తేదీల సమాచారాన్ని ఇక్కడ చూడవచ్చు.
+              </p>
+            </div>
+            {selectedEmpForPosts && (
+              <button
+                type="button"
+                onClick={() => setSelectedEmpForPosts(null)}
+                className="flex items-center gap-2 text-slate-500 hover:text-slate-800 text-xs font-black cursor-pointer bg-white border border-slate-200/60 rounded-xl px-3.5 py-2 transition-all shadow-3xs"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to Reporter List</span>
+              </button>
+            )}
+          </div>
+
+          {selectedEmpForPosts ? (
+            /* Selected Employee Article List */
+            <div className="flex flex-col gap-4">
+              <div className="bg-white border border-slate-200/60 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <span className="text-[10px] font-black text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded uppercase tracking-wider">
+                    ఎంచుకున్న రిపోర్టర్
+                  </span>
+                  <h3 className="text-lg font-black text-slate-850 mt-1 telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                    {selectedEmpForPosts.name} ({selectedEmpForPosts.email})
+                  </h3>
+                </div>
+                <div className="bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-200/60 flex flex-col">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Articles</span>
+                  <span className="text-xl font-bold text-slate-850">
+                    {customNewsList.filter((art) => art.author?.toLowerCase().trim() === selectedEmpForPosts.name?.toLowerCase().trim() && !art.isDeleted).length}
+                  </span>
+                </div>
+              </div>
+
+              <div className="bg-white border border-slate-200/60 rounded-3xl overflow-hidden shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        <th className="py-4 px-6 w-12 text-center">#</th>
+                        <th className="py-4 px-6">శీర్షిక (Article Title)</th>
+                        <th className="py-4 px-6 w-40">విభాగం (Category)</th>
+                        <th className="py-4 px-6 w-48">ప్రచురించిన సమయం (Published At)</th>
+                        <th className="py-4 px-6 w-48">చివరిగా సవరించిన సమయం (Updated At)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-xs text-slate-700 font-medium">
+                      {(() => {
+                        const empArticles = customNewsList.filter(
+                          (art) =>
+                            art.author?.toLowerCase().trim() === selectedEmpForPosts.name?.toLowerCase().trim() &&
+                            !art.isDeleted
+                        );
+
+                        if (empArticles.length === 0) {
+                          return (
+                            <tr>
+                              <td colSpan={5} className="py-12 px-6 text-center text-slate-400 text-xs font-bold">
+                                ఈ రిపోర్టర్ ఇంకా ఎలాంటి వార్తా కథనాలను ప్రచురించలేదు.
+                              </td>
+                            </tr>
+                          );
+                        }
+
+                        const formatDateTime = (dateStr: any) => {
+                          if (!dateStr) return '-';
+                          const d = new Date(dateStr);
+                          if (isNaN(d.getTime())) return '-';
+                          const day = String(d.getDate()).padStart(2, '0');
+                          const month = String(d.getMonth() + 1).padStart(2, '0');
+                          const year = d.getFullYear();
+                          let hours = d.getHours();
+                          const minutes = String(d.getMinutes()).padStart(2, '0');
+                          const ampm = hours >= 12 ? 'PM' : 'AM';
+                          hours = hours % 12;
+                          hours = hours ? hours : 12;
+                          return `${day}-${month}-${year} ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+                        };
+
+                        return empArticles.map((art, idx) => {
+                          const pubTime = art.publishedAt;
+                          const updTime = art.updatedAt;
+                          
+                          // Convert formats to string for check
+                          const isEdited = updTime && pubTime && new Date(updTime).getTime() - new Date(pubTime).getTime() > 2000;
+                          
+                          return (
+                            <tr key={art.id} className="hover:bg-slate-50/50 transition-colors">
+                              <td className="py-3 px-6 text-center font-bold text-slate-400">
+                                {idx + 1}
+                              </td>
+                              <td className="py-3 px-6">
+                                <Link
+                                  href={`/news/${art.slug}`}
+                                  target="_blank"
+                                  className="font-extrabold text-slate-800 hover:text-rose-600 transition-colors telugu-text line-clamp-1 leading-relaxed"
+                                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                                >
+                                  {art.title}
+                                </Link>
+                              </td>
+                              <td className="py-3 px-6">
+                                <span className="bg-slate-100 text-slate-600 text-[10px] font-black px-2 py-0.5 rounded-md uppercase">
+                                  {getArticleCategoryName(art)}
+                                </span>
+                              </td>
+                              <td className="py-3 px-6 font-mono text-[11px] text-slate-500">
+                                {formatDateTime(pubTime)}
+                              </td>
+                              <td className="py-3 px-6 font-mono text-[11px]">
+                                {isEdited ? (
+                                  <div className="flex flex-col">
+                                    <span className="text-amber-600 font-extrabold">{formatDateTime(updTime)}</span>
+                                    <span className="text-[9px] text-slate-450 font-bold bg-amber-50 border border-amber-100 px-1 py-0.2 rounded w-max mt-0.5">Edited</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-slate-500">{formatDateTime(pubTime)}</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        });
+                      })()}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Employee/Reporter List View with Post Counts */
+            <div className="bg-white border border-slate-200/60 rounded-3xl overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      <th className="py-4 px-6">రిపోర్టర్ పేరు (Reporter Name)</th>
+                      <th className="py-4 px-6">ఈమెయిల్ (Email)</th>
+                      <th className="py-4 px-6 text-center">మొత్తం పోస్టులు (Total Posts)</th>
+                      <th className="py-4 px-6 text-right w-36">చర్యలు (Actions)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {employeesList.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="py-12 px-6 text-center text-slate-400 text-xs font-bold">
+                          మెంబర్స్ ఎవరూ లేరు.
+                        </td>
+                      </tr>
+                    ) : (
+                      employeesList.map((emp) => {
+                        const postsCount = customNewsList.filter(
+                          (art) => art.author?.toLowerCase().trim() === emp.name?.toLowerCase().trim() && !art.isDeleted
+                        ).length;
+
+                        return (
+                          <tr key={emp.id} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="py-4 px-6">
+                              <span className="font-extrabold text-slate-800 text-xs telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                                {emp.name}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6">
+                              <span className="font-mono text-[11px] text-slate-500">{emp.email}</span>
+                            </td>
+                            <td className="py-4 px-6 text-center font-bold text-slate-800">
+                              <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-extrabold border border-slate-200/40">
+                                {postsCount}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6 text-right">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedEmpForPosts(emp)}
+                                className="bg-[#02599c] hover:bg-[#024a82] text-white text-[10px] font-black py-2 px-4 rounded-xl transition-all cursor-pointer shadow-3xs"
+                              >
+                                View Posts
+                              </button>
                             </td>
                           </tr>
                         );
