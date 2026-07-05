@@ -6604,14 +6604,27 @@ export default function AdminPage() {
                           </button>
                         </div>
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => { setShowFlashArticlePicker(true); setFlashArticleSearch(''); }}
-                          className="flex-1 bg-white border border-dashed border-slate-300 hover:border-[#02599c] hover:bg-blue-50 text-slate-500 hover:text-[#02599c] font-bold text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
-                        >
-                          <FileText className="w-4 h-4 flex-shrink-0" />
-                          <span>Select Article to Link</span>
-                        </button>
+                        <div className="flex-1 flex flex-col sm:flex-row gap-2 w-full">
+                          {/* Pick Article Button */}
+                          <button
+                            type="button"
+                            onClick={() => { setShowFlashArticlePicker(true); setFlashArticleSearch(''); }}
+                            className="flex-1 bg-white border border-dashed border-slate-300 hover:border-[#02599c] hover:bg-blue-50 text-slate-500 hover:text-[#02599c] font-bold text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
+                          >
+                            <FileText className="w-4 h-4 flex-shrink-0" />
+                            <span>Select Article to Link</span>
+                          </button>
+
+                          {/* Quick Link Shubhapalalu Button */}
+                          <button
+                            type="button"
+                            onClick={() => setNewNewsLink('/category/rasipalalu')}
+                            className="bg-amber-50 border border-amber-200 hover:border-amber-500 hover:bg-amber-100 text-amber-800 font-bold text-xs py-2.5 px-4 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0"
+                          >
+                            <Sparkles className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                            <span className="telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>లింక్: శుభఫలాలు</span>
+                          </button>
+                        </div>
                       )}
                     </div>
 
