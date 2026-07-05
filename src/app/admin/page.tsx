@@ -115,24 +115,42 @@ const MAIN_CATEGORIES_LIST = [
 ];
 
 const getCategoryDisplayName = (slug: string) => {
-  const cat = MAIN_CATEGORIES_LIST.find((c) => c.slug === slug);
+  if (!slug) return '';
+  const cleanSlug = slug.toLowerCase().trim();
+  if (cleanSlug === 'andhra-pradesh') return 'ఆంధ్రప్రదేశ్ వార్తలు (Andhra Pradesh News)';
+  if (cleanSlug === 'telangana') return 'తెలంగాణ వార్తలు (Telangana News)';
+  if (cleanSlug === 'home') return 'హోమ్ (Home)';
+  if (cleanSlug === 'doctors-corner') return "డాక్టర్స్ కార్నర్ (Doctor's Corner)";
+  if (cleanSlug === 'admissions') return 'అడ్మిషన్స్ (Admissions)';
+  if (cleanSlug === 'current-affairs') return 'కరెంట్ అఫైర్స్ (Current Affairs)';
+  if (cleanSlug === 'notification') return 'నోటిఫికేషన్స్ (Notifications)';
+  if (cleanSlug === 'trending') return 'ట్రెండింగ్ వార్తలు (Trending)';
+  if (cleanSlug === 'antharmadanam') return 'వ్యక్తిత్వ వికాసం (Opinion)';
+  if (cleanSlug === 'webstories') return 'వెబ్ స్టోరీస్ (Web Stories)';
+  if (cleanSlug === 'live-updates') return 'లైవ్ అప్‌డేట్స్ (Live Updates)';
+  if (cleanSlug === 'epaper') return 'ఈ-పేపర్ (E-Paper)';
+  if (cleanSlug === 'shorts-videos' || cleanSlug === 'shorts') return 'షార్ట్స్ వీడియోలు (Shorts Videos)';
+  if (cleanSlug === 'hightv-videos') return 'హై టీవీ వీడియోలు (HighTV Videos)';
+  if (cleanSlug === 'photos' || cleanSlug === 'photos-gallery') return 'ఫోటో గ్యాలరీ (Photo Gallery)';
+
+  const cat = MAIN_CATEGORIES_LIST.find((c) => c.slug === cleanSlug);
   if (cat) return cat.name;
 
-  const apDist = apDistricts.find((d) => d.slug === slug);
+  const apDist = apDistricts.find((d) => d.slug === cleanSlug);
   if (apDist) return apDist.name;
 
-  const tgDist = tgDistricts.find((d) => d.slug === slug);
+  const tgDist = tgDistricts.find((d) => d.slug === cleanSlug);
   if (tgDist) return tgDist.name;
 
-  if (slug === 'sampadakiyam' || slug === 'editorial') return 'సంపాదకీయం (Editorial)';
-  if (slug === 'vidya') return 'విద్య (Education)';
-  if (slug === 'admissions') return 'అడ్మిషన్స్ (Admissions)';
-  if (slug === 'current-affairs') return 'కరెంట్ అఫైర్స్';
-  if (slug === 'upadi') return 'ఉపాధి (Jobs)';
-  if (slug === 'notification') return 'నోటిఫికేషన్స్';
-  if (slug === 'live-updates') return 'లైవ్ అప్‌డేట్స్';
+  if (cleanSlug === 'sampadakiyam' || cleanSlug === 'editorial') return 'సంపాదకీయం (Editorial)';
+  if (cleanSlug === 'vidya') return 'విద్య (Education)';
+  if (cleanSlug === 'upadi') return 'ఉపాధి (Jobs)';
 
-  return slug;
+  // Fallback: split by '-' and capitalize first letters
+  return cleanSlug
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 };
 
 function MiniWysiwygToolbar({ editorRef }: { editorRef: React.RefObject<HTMLDivElement | null> }) {
@@ -504,13 +522,10 @@ const getArticleCategoryName = (art: any) => {
   if (art.districtSlug) {
     const allDist = [...tgDistricts, ...apDistricts];
     const dist = allDist.find(d => d.slug === art.districtSlug);
-    const engName = art.districtSlug
-      .split('-')
-      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-    return dist ? `${engName} (${dist.name})` : engName;
+    if (dist) return `${getCategoryDisplayName(art.districtSlug)} (${dist.name})`;
+    return getCategoryDisplayName(art.districtSlug);
   }
-  return art.category || art.categorySlug || 'News';
+  return getCategoryDisplayName(art.categorySlug || art.category);
 };
 
 const formatTeluguDate = (dateStr: string) => {
@@ -5198,7 +5213,7 @@ export default function AdminPage() {
                         if (filterCategory === 'andhra-pradesh') return 'ఆంధ్రప్రదేశ్ వార్తలు (Andhra Pradesh News)';
                         if (filterCategory === 'telangana') return 'తెలంగాణ వార్తలు (Telangana News)';
                         const name = getCategoryDisplayName(filterCategory);
-                        return name.charAt(0).toUpperCase() + name.slice(1);
+                        return name;
                       })()}
                     </h2>
                     <span className="bg-rose-50 text-rose-700 text-xs font-black px-3 py-1 rounded-full border border-rose-100 shadow-sm flex items-center gap-1">
@@ -5244,7 +5259,17 @@ export default function AdminPage() {
                 
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-500 bg-slate-50 border border-slate-200/60 rounded-xl px-3 py-2 shrink-0">
                   <span>Filtering:</span>
-                  <span className="text-[#02599c] capitalize">{filterCategory.replace('-', ' ')}</span>
+                  <span className="text-[#02599c] font-black">
+                    {(() => {
+                      if (filterCategory === 'all') return 'All Articles';
+                      if (filterCategory === 'pending') return 'Pending Approval';
+                      if (filterCategory === 'andhra-pradesh') return 'Andhra Pradesh';
+                      if (filterCategory === 'telangana') return 'Telangana';
+                      const name = getCategoryDisplayName(filterCategory);
+                      const match = name.match(/\(([^)]+)\)/);
+                      return match ? match[1] : name;
+                    })()}
+                  </span>
                 </div>
               </div>
 
@@ -5294,20 +5319,12 @@ export default function AdminPage() {
                                 </div>
                               </div>
                             </td>
-                            <td className="p-4 capitalize">
+                            <td className="p-4">
                               <span className="px-2.5 py-1 rounded-md text-[10px] font-black bg-slate-100 text-slate-500 border border-slate-200/50">
-                                {art.districtSlug
-                                  ? getArticleCategoryName(art)
-                                  : (filterCategory === 'latest' 
-                                      ? 'Breaking News' 
-                                      : filterCategory === 'trending' 
-                                        ? 'Trending News' 
-                                        : filterCategory === 'featured' 
-                                          ? 'Featured News' 
-                                          : (art.category || art.categorySlug))}
+                                {getArticleCategoryName(art)}
                               </span>
                             </td>
-                            <td className="p-4 text-slate-500 font-bold capitalize">
+                            <td className="p-4 text-slate-500 font-bold">
                               {art.author}
                             </td>
                             <td className="p-4 text-center">
