@@ -1594,8 +1594,14 @@ export default function AdminPage() {
   // Authorization Check
   useEffect(() => {
     const authSession = localStorage.getItem('high_tv_admin_session');
+    const pathname = window.location.pathname;
+
     if (authSession !== 'authenticated') {
-      router.push('/superadminlogin');
+      if (pathname.startsWith('/employee')) {
+        router.push('/employee/login');
+      } else {
+        router.push('/superadminlogin');
+      }
     } else {
       setIsAuthenticated(true);
       const role = (localStorage.getItem('high_tv_admin_role') || 'super-admin') as 'super-admin' | 'employee';
@@ -1610,6 +1616,13 @@ export default function AdminPage() {
           } catch (e) {
             console.error('Failed to parse employee info:', e);
           }
+        }
+        if (pathname === '/admin') {
+          router.push('/employee/admin');
+        }
+      } else if (role === 'super-admin') {
+        if (pathname.startsWith('/employee')) {
+          router.push('/admin');
         }
       }
     }

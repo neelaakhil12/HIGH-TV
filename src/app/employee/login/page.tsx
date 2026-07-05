@@ -14,7 +14,7 @@ export default function EmployeeLoginPage() {
   useEffect(() => {
     const session = localStorage.getItem('high_tv_admin_session');
     if (session === 'authenticated') {
-      router.push('/admin');
+      router.push('/employee/admin');
     }
   }, [router]);
 
@@ -36,7 +36,7 @@ export default function EmployeeLoginPage() {
           localStorage.setItem('high_tv_admin_session', 'authenticated');
           localStorage.setItem('high_tv_admin_role', 'employee');
           localStorage.setItem('high_tv_employee_info', JSON.stringify(data.employee));
-          router.push('/admin');
+          router.push('/employee/admin');
           return;
         }
       }
