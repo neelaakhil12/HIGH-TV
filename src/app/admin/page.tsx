@@ -4213,7 +4213,7 @@ export default function AdminPage() {
                             setFilterCategory(slug);
                             setNewsViewMode('list');
                           }}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-[11px] font-black cursor-pointer transition-all telugu-text truncate ${
+                          className={`w-full text-left px-3 py-2 rounded-lg text-[13px] font-black cursor-pointer transition-all telugu-text truncate ${
                             activeTab === 'news' && filterCategory === slug
                               ? 'bg-rose-600/20 text-rose-455 border border-rose-500/30'
                               : 'text-slate-450 hover:text-white hover:bg-slate-900/40'
@@ -4229,7 +4229,7 @@ export default function AdminPage() {
                       <div className="flex flex-col gap-0.5 mt-1">
                         <button
                           onClick={() => toggleSidebarGroup('empAp')}
-                          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[11px] font-black cursor-pointer transition-all text-slate-450 hover:text-white hover:bg-slate-900/40"
+                          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13px] font-black cursor-pointer transition-all text-slate-450 hover:text-white hover:bg-slate-900/40"
                         >
                           <div className="flex items-center gap-1.5 telugu-text">
                             <span>🗺️ ఆంధ్రప్రదేశ్ జిల్లాలు</span>
@@ -4252,7 +4252,7 @@ export default function AdminPage() {
                                     setFilterCategory(slug);
                                     setNewsViewMode('list');
                                   }}
-                                  className={`w-full text-left px-3 py-1.5 rounded-lg text-[11px] font-black cursor-pointer transition-all telugu-text truncate ${
+                                  className={`w-full text-left px-3 py-1.5 rounded-lg text-[13px] font-black cursor-pointer transition-all telugu-text truncate ${
                                     activeTab === 'news' && filterCategory === slug
                                       ? 'bg-rose-600/20 text-rose-455 border border-rose-500/30'
                                       : 'text-slate-450 hover:text-white hover:bg-slate-900/40'
@@ -4272,7 +4272,7 @@ export default function AdminPage() {
                       <div className="flex flex-col gap-0.5 mt-1">
                         <button
                           onClick={() => toggleSidebarGroup('empTg')}
-                          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[11px] font-black cursor-pointer transition-all text-slate-450 hover:text-white hover:bg-slate-900/40"
+                          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13px] font-black cursor-pointer transition-all text-slate-450 hover:text-white hover:bg-slate-900/40"
                         >
                           <div className="flex items-center gap-1.5 telugu-text">
                             <span>🗺️ తెలంగాణ జిల్లాలు</span>
@@ -4295,7 +4295,7 @@ export default function AdminPage() {
                                     setFilterCategory(slug);
                                     setNewsViewMode('list');
                                   }}
-                                  className={`w-full text-left px-3 py-1.5 rounded-lg text-[11px] font-black cursor-pointer transition-all telugu-text truncate ${
+                                  className={`w-full text-left px-3 py-1.5 rounded-lg text-[13px] font-black cursor-pointer transition-all telugu-text truncate ${
                                     activeTab === 'news' && filterCategory === slug
                                       ? 'bg-rose-600/20 text-rose-455 border border-rose-500/30'
                                       : 'text-slate-450 hover:text-white hover:bg-slate-900/40'
