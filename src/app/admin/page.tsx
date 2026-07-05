@@ -1386,7 +1386,8 @@ export default function AdminPage() {
   const [webStoryCoverImage, setWebStoryCoverImage] = useState('');
   const [webStoryCoverTitle, setWebStoryCoverTitle] = useState('');
   const [webStoryCoverStyle, setWebStoryCoverStyle] = useState<'red-white' | 'white-black'>('red-white');
-  const [webStorySlides, setWebStorySlides] = useState<any[]>([{ image: '', text: '', textStyle: 'red-white', showOverlay: true }]);
+  const [webStoryCoverTitleSize, setWebStoryCoverTitleSize] = useState<number>(22);
+  const [webStorySlides, setWebStorySlides] = useState<any[]>([{ image: '', text: '', textStyle: 'red-white', showOverlay: true, textSize: 18 }]);
 
   // User Role and Employee states
   const [userRole, setUserRole] = useState<'super-admin' | 'employee'>('super-admin');
@@ -3430,7 +3431,8 @@ export default function AdminPage() {
     setWebStoryCoverImage('');
     setWebStoryCoverTitle('');
     setWebStoryCoverStyle('red-white');
-    setWebStorySlides([{ image: '', text: '', textStyle: 'red-white', showOverlay: true }]);
+    setWebStoryCoverTitleSize(22);
+    setWebStorySlides([{ image: '', text: '', textStyle: 'red-white', showOverlay: true, textSize: 18 }]);
     setEditingWebStory(null);
   };
 
@@ -3440,7 +3442,15 @@ export default function AdminPage() {
       return;
     }
     // Check if slides are populated
-    const validSlides = webStorySlides.filter(s => s.image && s.text.trim());
+    const validSlides = webStorySlides
+      .filter(s => s.image && s.text.trim())
+      .map(s => ({ 
+        image: s.image, 
+        text: s.text.trim(), 
+        textStyle: s.textStyle || 'red-white', 
+        showOverlay: s.showOverlay !== false,
+        textSize: Number(s.textSize) || 18
+      }));
     if (validSlides.length === 0) {
       alert('At least one valid slide with an image and text description is required!');
       return;
@@ -3456,6 +3466,7 @@ export default function AdminPage() {
           coverImage: webStoryCoverImage,
           coverTitle: webStoryCoverTitle.trim(),
           coverStyle: webStoryCoverStyle,
+          coverTitleSize: Number(webStoryCoverTitleSize) || 22,
           slides: validSlides
         };
       }
@@ -3467,6 +3478,7 @@ export default function AdminPage() {
         coverImage: webStoryCoverImage,
         coverTitle: webStoryCoverTitle.trim(),
         coverStyle: webStoryCoverStyle,
+        coverTitleSize: Number(webStoryCoverTitleSize) || 22,
         slides: validSlides
       };
       updatedList = [newStory, ...updatedList];
@@ -3679,7 +3691,14 @@ export default function AdminPage() {
     setWebStoryCoverImage(story.coverImage || '');
     setWebStoryCoverTitle(story.coverTitle || '');
     setWebStoryCoverStyle(story.coverStyle || 'red-white');
-    setWebStorySlides(story.slides && story.slides.length > 0 ? story.slides.map((s: any) => ({ showOverlay: s.showOverlay !== false, ...s })) : [{ image: '', text: '', textStyle: 'red-white', showOverlay: true }]);
+    setWebStoryCoverTitleSize(story.coverTitleSize || 22);
+    setWebStorySlides(story.slides && story.slides.length > 0 
+      ? story.slides.map((s: any) => ({ 
+          showOverlay: s.showOverlay !== false, 
+          textSize: s.textSize || 18,
+          ...s 
+        })) 
+      : [{ image: '', text: '', textStyle: 'red-white', showOverlay: true, textSize: 18 }]);
     setWebStoryFormMode('edit');
   };
 
@@ -10009,9 +10028,9 @@ export default function AdminPage() {
                           />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-black text-slate-450 uppercase tracking-widest">Cover Title text on image (కవర్ శీర్షిక)</label>
+                            <label className="text-[10px] font-black text-slate-455 uppercase tracking-widest">Cover Title text on image (కవర్ శీర్షిక)</label>
                             <input
                               type="text"
                               value={webStoryCoverTitle}
@@ -10032,6 +10051,18 @@ export default function AdminPage() {
                               <option value="red-white">ఎరుపు అక్షరాలు + వైట్ అవుట్‌లైన్ (Red text / White shadow)</option>
                               <option value="white-black">తెలుపు అక్షరాలు + బ్లాక్ అవుట్‌లైన్ (White text / Black shadow)</option>
                             </select>
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-slate-455 uppercase tracking-widest">Cover Text Size (అక్షరాల పరిమాణం - px)</label>
+                            <input
+                              type="number"
+                              value={webStoryCoverTitleSize}
+                              onChange={(e) => setWebStoryCoverTitleSize(Number(e.target.value) || 22)}
+                              min={12}
+                              max={50}
+                              className="bg-white border border-slate-200/80 focus:border-[#02599c] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                            />
                           </div>
                         </div>
                       </div>
@@ -10130,20 +10161,37 @@ export default function AdminPage() {
                                     />
                                   </div>
 
-                                  <div className="flex flex-col gap-1">
-                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Text Style theme (అక్షరాల శైలి)</label>
-                                    <select
-                                      value={slide.textStyle}
-                                      onChange={(e) => {
-                                        const updated = [...webStorySlides];
-                                        updated[sIdx].textStyle = e.target.value as 'red-white' | 'white-black';
-                                        setWebStorySlides(updated);
-                                      }}
-                                      className="bg-white border border-slate-200/80 focus:border-[#02599c] rounded-xl px-3 py-1.5 text-xs outline-none text-slate-800 font-bold cursor-pointer"
-                                    >
-                                      <option value="red-white">ఎరుపు అక్షరాలు + వైట్ అవుట్‌లైన్</option>
-                                      <option value="white-black">తెలుపు అక్షరాలు + బ్లాక్ అవుట్‌లైన్</option>
-                                    </select>
+                                  <div className="grid grid-cols-2 gap-3">
+                                    <div className="flex flex-col gap-1">
+                                      <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Text Style theme (అక్షరాల శైలి)</label>
+                                      <select
+                                        value={slide.textStyle}
+                                        onChange={(e) => {
+                                          const updated = [...webStorySlides];
+                                          updated[sIdx].textStyle = e.target.value as 'red-white' | 'white-black';
+                                          setWebStorySlides(updated);
+                                        }}
+                                        className="bg-white border border-slate-200/80 focus:border-[#02599c] rounded-xl px-3 py-1.5 text-xs outline-none text-slate-800 font-bold cursor-pointer w-full"
+                                      >
+                                        <option value="red-white">ఎరుపు అక్షరాలు + వైట్ అవుట్‌లైన్</option>
+                                        <option value="white-black">తెలుపు అక్షరాలు + బ్లాక్ అవుట్‌లైన్</option>
+                                      </select>
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                      <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Text Size (అక్షరాల పరిమాణం - px)</label>
+                                      <input
+                                        type="number"
+                                        value={slide.textSize || 18}
+                                        onChange={(e) => {
+                                          const updated = [...webStorySlides];
+                                          updated[sIdx].textSize = Number(e.target.value) || 18;
+                                          setWebStorySlides(updated);
+                                        }}
+                                        min={12}
+                                        max={40}
+                                        className="bg-white border border-slate-200/80 focus:border-[#02599c] rounded-xl px-3 py-1.5 text-xs outline-none text-slate-800 font-bold w-full"
+                                      />
+                                    </div>
                                   </div>
 
                                   <div className="flex items-center gap-2 mt-1">

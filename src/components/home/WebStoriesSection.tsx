@@ -231,7 +231,7 @@ export default function WebStoriesSection() {
               <div className="absolute top-[15%] left-0 right-0 px-5 md:px-6 text-center">
                 <span
                   className="text-[18px] md:text-[22px] font-black leading-relaxed block break-words pl-2.5"
-                  style={getTextStyle(story.coverStyle)}
+                  style={{ ...getTextStyle(story.coverStyle), fontSize: story.coverTitleSize ? `${story.coverTitleSize}px` : undefined }}
                 >
                   {story.coverTitle}
                 </span>
@@ -361,7 +361,8 @@ export default function WebStoriesSection() {
                 className="text-[16px] sm:text-[18px] md:text-[20px] font-bold leading-relaxed text-white telugu-text max-w-xs md:max-w-md mx-auto"
                 style={{
                   fontFamily: 'Noto Sans Telugu, sans-serif',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                  textShadow: '0 2px 4px rgba(0,0,0,0.8)',
+                  fontSize: activeStory.slides[currentSlideIndex].textSize ? `${activeStory.slides[currentSlideIndex].textSize}px` : undefined
                 }}
               >
                 {typedText}
