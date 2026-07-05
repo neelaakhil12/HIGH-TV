@@ -972,7 +972,7 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    if (activeTab === 'team-manager' || activeTab === 'news' || activeTab === 'weather') {
+    if (activeTab === 'team-manager' || activeTab === 'news' || activeTab === 'weather' || activeTab === 'employees') {
       fetchTeamData();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -6181,80 +6181,91 @@ export default function AdminPage() {
 
                   {/* Metadata fields (Author and date) */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Select Author Section */}
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Author Section / Category</label>
-                      <select
-                        value={selectedAuthorSection}
-                        onChange={(e) => {
-                          const sec = e.target.value;
-                          setSelectedAuthorSection(sec);
-                          if (sec === 'custom') {
-                            setNewsAuthor('హై టీవీ డెస్క్');
-                            setSelectedReporterId('');
-                          } else {
-                            // Automatically select first reporter in this section if available
-                            const members = teamMembers.filter(m => (m.body || 'reporters') === sec);
-                            if (members.length > 0) {
-                              setSelectedReporterId(members[0].title);
-                              setNewsAuthor(members[0].title);
-                            } else {
-                              setSelectedReporterId('');
-                              setNewsAuthor('');
-                            }
-                          }
-                        }}
-                        className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
-                      >
-                        <option value="custom">Default / Custom (మ్యాన్యువల్)</option>
-                        {(() => {
-                          const sections = teamSections.length > 0
-                            ? teamSections.map(s => ({ id: s.slug, name: s.title }))
-                            : [
-                                { id: 'reporters', name: 'HighTV Reporters' },
-                                { id: 'desk', name: 'HighTV Desk' }
-                              ];
-                          return sections.map(s => (
-                            <option key={s.id} value={s.id}>{s.name}</option>
-                          ));
-                        })()}
-                      </select>
-                    </div>
-
-                    {/* Dependent Author Name Input or Dropdown */}
-                    {selectedAuthorSection === 'custom' ? (
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Reporter / Author Name</label>
-                        <input
-                          type="text"
-                          value={newsAuthor}
-                          onChange={(e) => setNewsAuthor(e.target.value)}
-                          placeholder="Reporter name"
-                          className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
-                          style={{ textIndent: '6px' }}
-                        />
+                    {userRole === 'employee' ? (
+                      <div className="flex flex-col gap-1 md:col-span-2">
+                        <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Reporter / Author</label>
+                        <div className="bg-slate-100 border border-slate-200/60 rounded-xl px-4 py-2.5 text-xs text-slate-700 font-extrabold select-none">
+                          👤 {employeeInfo?.name}
+                        </div>
                       </div>
                     ) : (
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Select Team Member / Reporter</label>
-                        <select
-                          value={selectedReporterId}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setSelectedReporterId(val);
-                            setNewsAuthor(val);
-                          }}
-                          className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
-                        >
-                          <option value="">-- రిపోర్టర్ ని ఎంచుకోండి --</option>
-                          {teamMembers
-                            .filter(m => (m.body || 'reporters') === selectedAuthorSection)
-                            .map(m => (
-                              <option key={m.id} value={m.title}>{m.title}</option>
-                            ))
-                          }
-                        </select>
-                      </div>
+                      <>
+                        {/* Select Author Section */}
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Author Section / Category</label>
+                          <select
+                            value={selectedAuthorSection}
+                            onChange={(e) => {
+                              const sec = e.target.value;
+                              setSelectedAuthorSection(sec);
+                              if (sec === 'custom') {
+                                setNewsAuthor('హై టీవీ డెస్క్');
+                                setSelectedReporterId('');
+                              } else {
+                                // Automatically select first reporter in this section if available
+                                const members = teamMembers.filter(m => (m.body || 'reporters') === sec);
+                                if (members.length > 0) {
+                                  setSelectedReporterId(members[0].title);
+                                  setNewsAuthor(members[0].title);
+                                } else {
+                                  setSelectedReporterId('');
+                                  setNewsAuthor('');
+                                }
+                              }
+                            }}
+                            className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
+                          >
+                            <option value="custom">Default / Custom (మ్యాన్యువల్)</option>
+                            {(() => {
+                              const sections = teamSections.length > 0
+                                ? teamSections.map(s => ({ id: s.slug, name: s.title }))
+                                : [
+                                    { id: 'reporters', name: 'HighTV Reporters' },
+                                    { id: 'desk', name: 'HighTV Desk' }
+                                  ];
+                              return sections.map(s => (
+                                <option key={s.id} value={s.id}>{s.name}</option>
+                              ));
+                            })()}
+                          </select>
+                        </div>
+
+                        {/* Dependent Author Name Input or Dropdown */}
+                        {selectedAuthorSection === 'custom' ? (
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Reporter / Author Name</label>
+                            <input
+                              type="text"
+                              value={newsAuthor}
+                              onChange={(e) => setNewsAuthor(e.target.value)}
+                              placeholder="Reporter name"
+                              className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                              style={{ textIndent: '6px' }}
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Select Team Member / Reporter</label>
+                            <select
+                              value={selectedReporterId}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setSelectedReporterId(val);
+                                setNewsAuthor(val);
+                              }}
+                              className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
+                            >
+                              <option value="">-- రిపోర్టర్ ని ఎంచుకోండి --</option>
+                              {teamMembers
+                                .filter(m => (m.body || 'reporters') === selectedAuthorSection)
+                                .map(m => (
+                                  <option key={m.id} value={m.title}>{m.title}</option>
+                                ))
+                              }
+                            </select>
+                          </div>
+                        )}
+                      </>
                     )}
 
                     {/* Published Date (Auto-managed) */}
@@ -8486,7 +8497,7 @@ export default function AdminPage() {
                           setNewsTags([]);
                           setMetaDescription('');
                           setNewsImage('');
-                          setNewsAuthor('హై టీవీ డెస్క్');
+                          setNewsAuthor(userRole === 'employee' && employeeInfo ? employeeInfo.name : 'హై టీవీ డెస్క్');
                           setIsBreakingChecked(false);
                           setIsTrendingChecked(false);
                           setIsFeaturedChecked(false);
@@ -8745,79 +8756,90 @@ export default function AdminPage() {
                       </div>
 
                       {/* Author */}
-                      {/* Select Author Section */}
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Author Section / Category</label>
-                        <select
-                          value={selectedAuthorSection}
-                          onChange={(e) => {
-                            const sec = e.target.value;
-                            setSelectedAuthorSection(sec);
-                            if (sec === 'custom') {
-                              setNewsAuthor('హై టీవీ డెస్క్');
-                              setSelectedReporterId('');
-                            } else {
-                              // Automatically select first reporter in this section if available
-                              const members = teamMembers.filter(m => (m.body || 'reporters') === sec);
-                              if (members.length > 0) {
-                                setSelectedReporterId(members[0].title);
-                                setNewsAuthor(members[0].title);
-                              } else {
-                                setSelectedReporterId('');
-                                setNewsAuthor('');
-                              }
-                            }
-                          }}
-                          className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
-                        >
-                          <option value="custom">Default / Custom (మ్యాన్యువల్)</option>
-                          {(() => {
-                            const sections = teamSections.length > 0
-                              ? teamSections.map(s => ({ id: s.slug, name: s.title }))
-                              : [
-                                  { id: 'reporters', name: 'HighTV Reporters' },
-                                  { id: 'desk', name: 'HighTV Desk' }
-                                ];
-                            return sections.map(s => (
-                              <option key={s.id} value={s.id}>{s.name}</option>
-                            ));
-                          })()}
-                        </select>
-                      </div>
-
-                      {/* Dependent Author Name Input or Dropdown */}
-                      {selectedAuthorSection === 'custom' ? (
+                      {userRole === 'employee' ? (
                         <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Reporter / Author Name</label>
-                          <input
-                            type="text"
-                            value={newsAuthor}
-                            onChange={(e) => setNewsAuthor(e.target.value)}
-                            placeholder="Reporter name"
-                            className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
-                          />
+                          <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Reporter / Author</label>
+                          <div className="bg-slate-100 border border-slate-200/60 rounded-xl px-4 py-2.5 text-xs text-slate-700 font-extrabold select-none">
+                            👤 {employeeInfo?.name}
+                          </div>
                         </div>
                       ) : (
-                        <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Select Team Member / Reporter</label>
-                          <select
-                            value={selectedReporterId}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setSelectedReporterId(val);
-                              setNewsAuthor(val);
-                            }}
-                            className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
-                          >
-                            <option value="">-- రిపోర్టర్ ని ఎంచుకోండి --</option>
-                            {teamMembers
-                              .filter(m => (m.body || 'reporters') === selectedAuthorSection)
-                              .map(m => (
-                                <option key={m.id} value={m.title}>{m.title}</option>
-                              ))
-                            }
-                          </select>
-                        </div>
+                        <>
+                          {/* Select Author Section */}
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Author Section / Category</label>
+                            <select
+                              value={selectedAuthorSection}
+                              onChange={(e) => {
+                                const sec = e.target.value;
+                                setSelectedAuthorSection(sec);
+                                if (sec === 'custom') {
+                                  setNewsAuthor('హై టీవీ డెస్క్');
+                                  setSelectedReporterId('');
+                                } else {
+                                  // Automatically select first reporter in this section if available
+                                  const members = teamMembers.filter(m => (m.body || 'reporters') === sec);
+                                  if (members.length > 0) {
+                                    setSelectedReporterId(members[0].title);
+                                    setNewsAuthor(members[0].title);
+                                  } else {
+                                    setSelectedReporterId('');
+                                    setNewsAuthor('');
+                                  }
+                                }
+                              }}
+                              className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
+                            >
+                              <option value="custom">Default / Custom (మ్యాన్యువల్)</option>
+                              {(() => {
+                                const sections = teamSections.length > 0
+                                  ? teamSections.map(s => ({ id: s.slug, name: s.title }))
+                                  : [
+                                      { id: 'reporters', name: 'HighTV Reporters' },
+                                      { id: 'desk', name: 'HighTV Desk' }
+                                    ];
+                                return sections.map(s => (
+                                  <option key={s.id} value={s.id}>{s.name}</option>
+                                ));
+                              })()}
+                            </select>
+                          </div>
+
+                          {/* Dependent Author Name Input or Dropdown */}
+                          {selectedAuthorSection === 'custom' ? (
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Reporter / Author Name</label>
+                              <input
+                                type="text"
+                                value={newsAuthor}
+                                onChange={(e) => setNewsAuthor(e.target.value)}
+                                placeholder="Reporter name"
+                                className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Select Team Member / Reporter</label>
+                              <select
+                                value={selectedReporterId}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setSelectedReporterId(val);
+                                  setNewsAuthor(val);
+                                }}
+                                className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
+                              >
+                                <option value="">-- రిపోర్టర్ ని ఎంచుకోండి --</option>
+                                {teamMembers
+                                  .filter(m => (m.body || 'reporters') === selectedAuthorSection)
+                                  .map(m => (
+                                    <option key={m.id} value={m.title}>{m.title}</option>
+                                  ))
+                                }
+                              </select>
+                            </div>
+                          )}
+                        </>
                       )}
 
                       {/* Target Placements */}
@@ -13583,6 +13605,47 @@ export default function AdminPage() {
                 <h3 className="text-sm font-black text-slate-800">
                   {employeeFormMode === 'add' ? 'రిపోర్టర్ సృష్టి (Add Reporter)' : 'రిపోర్టర్ సవరణ (Edit Reporter)'}
                 </h3>
+              </div>
+
+              {/* Select Team Member to fill Name */}
+              <div className="flex flex-col gap-1.5 bg-slate-50/50 border border-slate-200/50 p-4 rounded-2xl">
+                <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest flex items-center gap-1">
+                  <span>👥 Select Team Member from Team Page (టీమ్ పేజీ నుండి రిపోర్టర్/రచయితను ఎంచుకోండి)</span>
+                  <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full uppercase">Optional</span>
+                </label>
+                <select
+                  onChange={(e) => {
+                    const selectedName = e.target.value;
+                    if (selectedName) {
+                      setEmployeeName(selectedName);
+                    }
+                  }}
+                  value={teamMembers.some(m => m.title === employeeName) ? employeeName : ""}
+                  className="bg-white border border-slate-200 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none text-slate-800 font-bold transition-all cursor-pointer"
+                >
+                  <option value="">-- Choose existing reporter/columnist --</option>
+                  {(() => {
+                    const sections = teamSections.length > 0
+                      ? teamSections.map(s => ({ id: s.slug, name: s.title }))
+                      : [
+                          { id: 'reporters', name: 'HighTV Reporters' },
+                          { id: 'desk', name: 'HighTV Desk' }
+                        ];
+                    return sections.map(sec => {
+                      const members = teamMembers.filter(m => (m.body || 'reporters') === sec.id);
+                      if (members.length === 0) return null;
+                      return (
+                        <optgroup key={sec.id} label={sec.name}>
+                          {members.map(m => (
+                            <option key={m.id} value={m.title}>
+                              {m.title} ({m.category || 'Reporter'})
+                            </option>
+                          ))}
+                        </optgroup>
+                      );
+                    });
+                  })()}
+                </select>
               </div>
 
               {/* Input Credentials */}
