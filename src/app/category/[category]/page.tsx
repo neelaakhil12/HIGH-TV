@@ -210,9 +210,6 @@ export default async function CategoryPage({
     }
   } else if (category === 'trending') {
     articles = allArticlesList.filter((n) => n.isTrending);
-    if (articles.length === 0) {
-      articles = allArticlesList.slice(0, 12);
-    }
   } else if (category === 'featured') {
     articles = allArticlesList.filter((n) => n.isFeatured);
     if (articles.length === 0) {
