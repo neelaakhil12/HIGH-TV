@@ -386,12 +386,12 @@ export default function HoroscopePageClient() {
             <div className="space-y-6 animate-fade-in">
 
               {/* Panchangam banner */}
-              <div className="bg-gradient-to-r from-slate-900 to-indigo-950 border border-slate-800 rounded-2xl shadow-xl overflow-hidden p-5 flex flex-col gap-4 relative">
-                <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+              <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden p-5 flex flex-col gap-4 relative">
+                <div className="absolute inset-0 opacity-30 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
                 <div className="flex items-center gap-4 z-10">
-                  <div className="w-[110px] h-[110px] shrink-0 relative flex items-center justify-center bg-black/35 rounded-full border border-indigo-500/20 shadow-inner overflow-hidden">
-                    <div className="absolute w-[80%] h-[80%] border border-dashed border-indigo-500/30 rounded-full animate-spin" style={{ animationDuration: '40s' }} />
-                    <div className="absolute w-[60%] h-[60%] border border-dashed border-purple-500/20 rounded-full animate-spin" style={{ animationDuration: '25s', animationDirection: 'reverse' }} />
+                  <div className="w-[110px] h-[110px] shrink-0 relative flex items-center justify-center bg-slate-50 rounded-full border border-indigo-500/10 shadow-inner overflow-hidden">
+                    <div className="absolute w-[80%] h-[80%] border border-dashed border-indigo-500/20 rounded-full animate-spin" style={{ animationDuration: '40s' }} />
+                    <div className="absolute w-[60%] h-[60%] border border-dashed border-purple-500/15 rounded-full animate-spin" style={{ animationDuration: '25s', animationDirection: 'reverse' }} />
                     <div className="absolute w-6 h-6 rounded-full bg-gradient-to-br from-yellow-300 to-amber-500 shadow-[0_0_20px_#f59e0b] animate-pulse" />
                     <div className="absolute w-full h-full animate-spin" style={{ animationDuration: '15s' }}>
                       <div className="absolute top-2 left-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-gradient-to-tr from-sky-400 to-blue-600 shadow-sm" />
@@ -400,27 +400,27 @@ export default function HoroscopePageClient() {
                   <div className="flex flex-col gap-2">
                     {panchangamItems[0] && (
                       <p 
-                        className="text-amber-400 font-extrabold text-[14px] md:text-[16px] telugu-text leading-snug" 
+                        className="text-indigo-950 font-extrabold text-[14px] md:text-[16px] telugu-text leading-snug" 
                         style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                         dangerouslySetInnerHTML={{ __html: panchangamItems[0] }}
                       />
                     )}
                     {horoscopeDate && (
-                      <span className="bg-rose-600/15 border border-rose-500/30 text-rose-400 text-xs font-black px-3 py-1.5 rounded-xl self-start">
+                      <span className="bg-rose-50 border border-rose-200 text-rose-700 text-xs font-black px-3 py-1.5 rounded-xl self-start">
                         {horoscopeDate}
                       </span>
                     )}
                   </div>
                 </div>
                 {panchangamItems.length > 1 && (
-                  <div className="flex flex-wrap gap-1.5 z-10 pt-1 border-t border-white/10">
+                  <div className="flex flex-wrap gap-1.5 z-10 pt-1 border-t border-slate-100">
                     {panchangamItems.slice(1).map((item, idx) => {
                       const plainText = item.replace(/<[^>]*>/g, '');
                       const isTiming = plainText.includes('నుంచి') || plainText.includes('వరకు') || plainText.includes(':') || plainText.includes('ఉ.') || plainText.includes('సా.') || plainText.includes('మ.');
                       return (
                         <span
                           key={idx}
-                          className={`px-2.5 py-1 rounded-lg border font-semibold text-[11px] md:text-[12.5px] telugu-text ${isTiming ? 'bg-indigo-950/40 border-indigo-500/20 text-indigo-300' : 'bg-slate-900/60 border-slate-800 text-gray-300'}`}
+                          className={`px-2.5 py-1 rounded-lg border font-semibold text-[11px] md:text-[12.5px] telugu-text ${isTiming ? 'bg-indigo-50 border-indigo-100 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-700'}`}
                           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                           dangerouslySetInnerHTML={{ __html: item }}
                         />
