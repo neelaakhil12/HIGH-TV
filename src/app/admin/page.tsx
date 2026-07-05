@@ -4186,35 +4186,131 @@ export default function AdminPage() {
           {userRole === 'employee' && employeeInfo && employeeInfo.categories && (
             <div className="ml-4 pl-3.5 border-l border-slate-800 flex flex-col gap-1 mt-1">
               {(() => {
-                let parsed = [];
+                let parsedSlugs: string[] = [];
                 try {
-                  parsed = typeof employeeInfo.categories === 'string'
+                  parsedSlugs = typeof employeeInfo.categories === 'string'
                     ? JSON.parse(employeeInfo.categories)
                     : employeeInfo.categories;
                 } catch {
-                  parsed = [];
+                  parsedSlugs = [];
                 }
-                if (!Array.isArray(parsed)) parsed = [];
-                return parsed.map((slug) => {
-                  const displayName = getCategoryDisplayName(slug);
-                  return (
-                    <button
-                      key={slug}
-                      onClick={() => {
-                        setActiveTab('news');
-                        setFilterCategory(slug);
-                        setNewsViewMode('list');
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-[11px] font-black cursor-pointer transition-all telugu-text truncate ${
-                        activeTab === 'news' && filterCategory === slug
-                          ? 'bg-rose-600/20 text-rose-455 border border-rose-500/30'
-                          : 'text-slate-450 hover:text-white hover:bg-slate-900/40'
-                      }`}
-                    >
-                      📁 {displayName}
-                    </button>
-                  );
-                });
+                if (!Array.isArray(parsedSlugs)) parsedSlugs = [];
+
+                const regularCats = parsedSlugs.filter(slug => !apDistricts.some(d => d.slug === slug) && !tgDistricts.some(d => d.slug === slug));
+                const assignedApDists = parsedSlugs.filter(slug => apDistricts.some(d => d.slug === slug));
+                const assignedTgDists = parsedSlugs.filter(slug => tgDistricts.some(d => d.slug === slug));
+
+                return (
+                  <>
+                    {/* 1. Regular Categories */}
+                    {regularCats.map((slug) => {
+                      const displayName = getCategoryDisplayName(slug);
+                      return (
+                        <button
+                          key={slug}
+                          onClick={() => {
+                            setActiveTab('news');
+                            setFilterCategory(slug);
+                            setNewsViewMode('list');
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-[11px] font-black cursor-pointer transition-all telugu-text truncate ${
+                            activeTab === 'news' && filterCategory === slug
+                              ? 'bg-rose-600/20 text-rose-455 border border-rose-500/30'
+                              : 'text-slate-450 hover:text-white hover:bg-slate-900/40'
+                          }`}
+                        >
+                          📁 {displayName}
+                        </button>
+                      );
+                    })}
+
+                    {/* 2. AP Districts Dropdown */}
+                    {assignedApDists.length > 0 && (
+                      <div className="flex flex-col gap-0.5 mt-1">
+                        <button
+                          onClick={() => toggleSidebarGroup('empAp')}
+                          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[11px] font-black cursor-pointer transition-all text-slate-450 hover:text-white hover:bg-slate-900/40"
+                        >
+                          <div className="flex items-center gap-1.5 telugu-text">
+                            <span>🗺️ ఆంధ్రప్రదేశ్ జిల్లాలు</span>
+                          </div>
+                          {expandedSidebar.empAp ? (
+                            <ChevronDown className="w-3.5 h-3.5" />
+                          ) : (
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                        {expandedSidebar.empAp && (
+                          <div className="ml-3 pl-2.5 border-l border-slate-800/80 flex flex-col gap-0.5 mt-0.5">
+                            {assignedApDists.map((slug) => {
+                              const displayName = getCategoryDisplayName(slug);
+                              return (
+                                <button
+                                  key={slug}
+                                  onClick={() => {
+                                    setActiveTab('news');
+                                    setFilterCategory(slug);
+                                    setNewsViewMode('list');
+                                  }}
+                                  className={`w-full text-left px-3 py-1.5 rounded-lg text-[11px] font-black cursor-pointer transition-all telugu-text truncate ${
+                                    activeTab === 'news' && filterCategory === slug
+                                      ? 'bg-rose-600/20 text-rose-455 border border-rose-500/30'
+                                      : 'text-slate-450 hover:text-white hover:bg-slate-900/40'
+                                  }`}
+                                >
+                                  📍 {displayName}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* 3. TG Districts Dropdown */}
+                    {assignedTgDists.length > 0 && (
+                      <div className="flex flex-col gap-0.5 mt-1">
+                        <button
+                          onClick={() => toggleSidebarGroup('empTg')}
+                          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[11px] font-black cursor-pointer transition-all text-slate-450 hover:text-white hover:bg-slate-900/40"
+                        >
+                          <div className="flex items-center gap-1.5 telugu-text">
+                            <span>🗺️ తెలంగాణ జిల్లాలు</span>
+                          </div>
+                          {expandedSidebar.empTg ? (
+                            <ChevronDown className="w-3.5 h-3.5" />
+                          ) : (
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                        {expandedSidebar.empTg && (
+                          <div className="ml-3 pl-2.5 border-l border-slate-800/80 flex flex-col gap-0.5 mt-0.5">
+                            {assignedTgDists.map((slug) => {
+                              const displayName = getCategoryDisplayName(slug);
+                              return (
+                                <button
+                                  key={slug}
+                                  onClick={() => {
+                                    setActiveTab('news');
+                                    setFilterCategory(slug);
+                                    setNewsViewMode('list');
+                                  }}
+                                  className={`w-full text-left px-3 py-1.5 rounded-lg text-[11px] font-black cursor-pointer transition-all telugu-text truncate ${
+                                    activeTab === 'news' && filterCategory === slug
+                                      ? 'bg-rose-600/20 text-rose-455 border border-rose-500/30'
+                                      : 'text-slate-450 hover:text-white hover:bg-slate-900/40'
+                                  }`}
+                                >
+                                  📍 {displayName}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                );
               })()}
             </div>
           )}
