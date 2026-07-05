@@ -1246,7 +1246,7 @@ export default function AdminPage() {
     const sSlug = sectionSlug.trim() || `section-${Date.now().toString().slice(-6)}`;
     const sectionData = {
       title: sectionName.trim(),
-      slug: (teamFormMode === 'edit-section' && editingSection) ? editingSection.id : sSlug,
+      slug: sSlug,
       categorySlug: 'team-section',
       author: 'హై టీవీ డెస్క్',
       isBreaking: false,
@@ -1263,6 +1263,55 @@ export default function AdminPage() {
           body: JSON.stringify(sectionData),
         });
         if (response.ok) {
+          // Cascade updates if slug has changed
+          const isSlugChanged = editingSection.id !== sSlug;
+          if (isSlugChanged) {
+            // 1. Update associated team members
+            const membersToUpdate = teamMembers.filter(m => (m.body || 'reporters') === editingSection.id);
+            for (const m of membersToUpdate) {
+              try {
+                await fetch(`/api/articles/${m.id}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ body: sSlug }),
+                });
+              } catch (e) {
+                console.error(`Failed to update team member ${m.id} to new section slug`, e);
+              }
+            }
+
+            // 2. Update associated employee accounts
+            try {
+              const empRes = await fetch('/api/employees');
+              if (empRes.ok) {
+                const employeesList = await empRes.json();
+                for (const emp of employeesList) {
+                  let parsedCats = [];
+                  try {
+                    parsedCats = typeof emp.categories === 'string' ? JSON.parse(emp.categories) : emp.categories;
+                  } catch (e) {
+                    parsedCats = Array.isArray(emp.categories) ? emp.categories : [];
+                  }
+                  if (Array.isArray(parsedCats) && parsedCats.includes(editingSection.id)) {
+                    const updatedCats = parsedCats.map(c => c === editingSection.id ? sSlug : c);
+                    await fetch('/api/employees', {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        id: emp.id,
+                        name: emp.name,
+                        email: emp.email,
+                        categories: updatedCats,
+                        autoPublish: emp.autoPublish
+                      })
+                    });
+                  }
+                }
+              }
+            } catch (e) {
+              console.error('Failed to update employee section access', e);
+            }
+          }
           alert('Section updated successfully!');
         } else {
           alert('Failed to update section.');
@@ -12360,9 +12409,8 @@ export default function AdminPage() {
                         value={sectionSlug}
                         onChange={(e) => setSectionSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
                         placeholder="digital-team"
-                        disabled={teamFormMode === 'edit-section'}
                         required
-                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold disabled:bg-slate-100 disabled:cursor-not-allowed"
+                        className="bg-white border border-slate-200/80 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
                       />
                     </div>
 

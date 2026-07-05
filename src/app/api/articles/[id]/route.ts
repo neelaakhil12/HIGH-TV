@@ -55,35 +55,40 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (data.image) {
       data.image = await resolveArticleImage(data.image, data.slug) ?? data.image;
     }
+    const hasTags = 'tags' in data;
     const tagsInput: (string | { name: string, linkedArticleSlug?: string | null })[] = data.tags || [];
     delete data.tags;
     
-    const tagConnects: { id: string }[] = [];
-    for (const t of tagsInput) {
-      const name = typeof t === 'string' ? t : t.name;
-      const linkedArticleSlug = typeof t === 'string' ? null : (t.linkedArticleSlug || null);
-      
-      const tag = await prisma.tag.upsert({
-        where: { name },
-        update: {
-          ...(typeof t !== 'string' ? { linkedArticleSlug } : {})
-        },
-        create: {
-          name,
-          linkedArticleSlug
-        }
-      });
-      tagConnects.push({ id: tag.id });
+    let tagsUpdate: any = undefined;
+    if (hasTags) {
+      const tagConnects: { id: string }[] = [];
+      for (const t of tagsInput) {
+        const name = typeof t === 'string' ? t : t.name;
+        const linkedArticleSlug = typeof t === 'string' ? null : (t.linkedArticleSlug || null);
+        
+        const tag = await prisma.tag.upsert({
+          where: { name },
+          update: {
+            ...(typeof t !== 'string' ? { linkedArticleSlug } : {})
+          },
+          create: {
+            name,
+            linkedArticleSlug
+          }
+        });
+        tagConnects.push({ id: tag.id });
+      }
+      tagsUpdate = {
+        set: [],
+        connect: tagConnects
+      };
     }
     
     const article = await prisma.article.update({
       where: { id },
       data: {
         ...data,
-        tags: {
-          set: [],
-          connect: tagConnects
-        }
+        ...(hasTags ? { tags: tagsUpdate } : {})
       },
       include: {
         tags: {
