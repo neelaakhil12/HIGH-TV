@@ -14,6 +14,7 @@ import WebStoriesPage from '@/components/category/WebStoriesPage';
 import ShortsPage from '@/components/category/ShortsPage';
 import PhotosPage from '@/components/category/PhotosPage';
 import CitizenReporterForm from '@/components/category/CitizenReporterForm';
+import CitizenReporterPageClient from '@/components/category/CitizenReporterPageClient';
 import LiveUpdatesPage from '@/components/category/LiveUpdatesPage';
 import MultiDistrictFeed from '@/components/category/MultiDistrictFeed';
 import EditorialPageClient from '@/components/category/EditorialPageClient';
@@ -407,34 +408,11 @@ export default async function CategoryPage({
           </div>
         </main>
       ) : category === 'citizen-reporter' ? (
-        <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full text-left">
-          {/* Breadcrumb Row with Back Button on the right */}
-          <div className="flex items-center justify-between gap-4 mb-5 border-b border-gray-100 pb-3 overflow-hidden">
-            <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
-              <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
-                <Home className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" /> Home
-              </Link>
-              <ChevronRight className="w-3 h-3 md:w-3.5 md:h-3.5 text-gray-400 flex-shrink-0" />
-              <span className="text-gray-800 font-bold flex-shrink-0">
-                Citizen Reporter
-              </span>
-            </div>
-            <div className="flex-shrink-0 pb-0.5">
-              <BackButton />
-            </div>
-          </div>
-          
-          {/* 70% Left and 30% Right Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 mt-4">
-            <div className="w-full lg:col-span-7">
-              <CitizenReporterForm />
-            </div>
-            {/* Right Sidebar Column (30%) with Ads */}
-            <div className="w-full lg:col-span-3">
-              <RightSidebar categorySlug={category} />
-            </div>
-          </div>
-        </main>
+        <CitizenReporterPageClient
+          allArticles={allArticles}
+          category={category}
+          districtSlug={districtSlug}
+        />
       ) : (
         <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
 
