@@ -21,7 +21,7 @@ export default function WebStoriesPage() {
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const SLIDE_DURATION = 8000; // 8 seconds per slide
+  const SLIDE_DURATION = 12000; // 12 seconds per slide
 
   // Load custom stories on mount
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function WebStoriesPage() {
     setTypedText('');
     
     let currentIdx = 0;
-    const intervalTime = 45; // 45ms per character
+    const intervalTime = 65; // 65ms per character
     
     const charInterval = setInterval(() => {
       if (currentIdx < fullText.length) {
