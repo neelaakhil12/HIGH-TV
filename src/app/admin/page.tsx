@@ -4899,6 +4899,15 @@ export default function AdminPage() {
                   </div>
                   <p className="text-slate-500 text-xs">Review and manage all news articles.</p>
                 </div>
+                {filterCategory !== 'all' && (
+                  <button
+                    onClick={() => setNewsViewMode('add')}
+                    className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-3 px-5 rounded-xl transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 self-start md:self-auto hover:scale-[1.01]"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>New Article</span>
+                  </button>
+                )}
               </div>
 
               {/* Search & filter area */}
