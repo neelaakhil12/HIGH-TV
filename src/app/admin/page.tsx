@@ -5191,7 +5191,16 @@ export default function AdminPage() {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-3">
-                    <h2 className="text-2xl font-black text-slate-800">News Management</h2>
+                    <h2 className="text-2xl font-black text-slate-800">
+                      {(() => {
+                        if (filterCategory === 'all') return 'News Management';
+                        if (filterCategory === 'pending') return 'Pending Approval';
+                        if (filterCategory === 'andhra-pradesh') return 'ఆంధ్రప్రదేశ్ వార్తలు (Andhra Pradesh News)';
+                        if (filterCategory === 'telangana') return 'తెలంగాణ వార్తలు (Telangana News)';
+                        const name = getCategoryDisplayName(filterCategory);
+                        return name.charAt(0).toUpperCase() + name.slice(1);
+                      })()}
+                    </h2>
                     <span className="bg-rose-50 text-rose-700 text-xs font-black px-3 py-1 rounded-full border border-rose-100 shadow-sm flex items-center gap-1">
                       <span>{filteredArticles.length}</span>
                       {filteredArticles.length !== allArticles.length && (
@@ -5200,7 +5209,14 @@ export default function AdminPage() {
                       <span className="text-[10px] text-rose-450 uppercase tracking-wider ml-0.5">Articles</span>
                     </span>
                   </div>
-                  <p className="text-slate-500 text-xs">Review and manage all news articles.</p>
+                  <p className="text-slate-500 text-xs">
+                    {filterCategory === 'all' 
+                      ? 'Review and manage all news articles.' 
+                      : filterCategory === 'pending'
+                      ? 'Approve or reject pending reporter submissions.'
+                      : `Review and manage articles under this category.`
+                    }
+                  </p>
                 </div>
                 {filterCategory !== 'all' && filterCategory !== 'pending' && (
                   <button
