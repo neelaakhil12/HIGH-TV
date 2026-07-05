@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
         name: employee.name,
         email: employee.email,
         categories: parsedCategories,
+        autoPublish: employee.autoPublish,
       },
     });
   } catch (error) {

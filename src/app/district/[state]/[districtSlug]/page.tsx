@@ -73,7 +73,7 @@ export default async function DistrictPage({
   try {
     [dbArticles, deletedArticles] = await Promise.all([
       prisma.article.findMany({
-        where: { isDeleted: false },
+        where: { isDeleted: false, isApproved: true },
         orderBy: { publishedAt: 'desc' },
         take: 100
       }),

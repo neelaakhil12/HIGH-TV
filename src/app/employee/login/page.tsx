@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { KeyRound, ShieldAlert, LogIn } from 'lucide-react';
 
-export default function SuperAdminLoginPage() {
+export default function EmployeeLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,14 +23,29 @@ export default function SuperAdminLoginPage() {
     setIsSubmitting(true);
     setError('');
 
-    // 1. Hardcoded credentials for super admin login
-    if (username === 'admin' && password === 'admin123') {
-      localStorage.setItem('high_tv_admin_session', 'authenticated');
-      localStorage.setItem('high_tv_admin_role', 'super-admin');
-      localStorage.removeItem('high_tv_employee_info');
-      router.push('/admin');
-    } else {
-      setError('Invalid username or password. Please try again.');
+    try {
+      const response = await fetch('/api/employees/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.employee) {
+          localStorage.setItem('high_tv_admin_session', 'authenticated');
+          localStorage.setItem('high_tv_admin_role', 'employee');
+          localStorage.setItem('high_tv_employee_info', JSON.stringify(data.employee));
+          router.push('/admin');
+          return;
+        }
+      }
+      
+      setError('Invalid email address or password. Please try again.');
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Server communication failure. Please check your network.');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -39,14 +54,14 @@ export default function SuperAdminLoginPage() {
     <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
       <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6 shadow-2xl relative overflow-hidden">
         {/* Top styling elements */}
-        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-red-600 via-rose-500 to-[#02599c]" />
+        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-green-600 via-emerald-500 to-[#02599c]" />
         
         <div className="text-center space-y-2">
-          <div className="inline-flex p-3 bg-red-500/10 rounded-2xl text-red-500 border border-red-500/20 mb-2">
-            <ShieldAlert className="w-8 h-8" />
+          <div className="inline-flex p-3 bg-green-500/10 rounded-2xl text-green-500 border border-green-500/20 mb-2">
+            <LogIn className="w-8 h-8" />
           </div>
           <h1 className="text-2xl font-black tracking-tight text-white telugu-text">హై టీవీ CMS</h1>
-          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Super Admin Control Center</p>
+          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Reporter / Employee Login</p>
         </div>
 
         {error && (
@@ -58,15 +73,15 @@ export default function SuperAdminLoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Username</label>
+            <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Email Address / Username</label>
             <div className="relative">
               <input
-                type="text"
+                type="email"
                 required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
-                className="w-full bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-3 text-sm outline-none transition-colors text-white"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter email address"
+                className="w-full bg-slate-950 border border-slate-800 focus:border-green-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors text-white"
               />
             </div>
           </div>
@@ -80,7 +95,7 @@ export default function SuperAdminLoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
-                className="w-full bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-3 text-sm outline-none transition-colors text-white"
+                className="w-full bg-slate-950 border border-slate-800 focus:border-green-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors text-white"
               />
             </div>
           </div>
@@ -88,16 +103,11 @@ export default function SuperAdminLoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-[#02599c] hover:bg-[#024a82] disabled:bg-slate-800 text-white rounded-xl py-3 text-sm font-black transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-black text-xs py-3.5 px-4 rounded-xl transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2"
           >
-            <LogIn className="w-4 h-4" />
-            <span>{isSubmitting ? 'Authenticating...' : 'Sign In to Dashboard'}</span>
+            <span>{isSubmitting ? 'Verifying...' : 'Sign In'}</span>
           </button>
         </form>
-
-        <div className="text-center text-[10px] text-slate-500 font-mono">
-          High TV CMS v2.0 • Secured Authority Gate
-        </div>
       </div>
     </div>
   );

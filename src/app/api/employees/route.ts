@@ -24,7 +24,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, password, categories } = body;
+    const { name, email, password, categories, autoPublish } = body;
 
     if (!name || !email || !password || !categories) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
         email,
         password, // stored plain text to align with the current superadmin plain text setup
         categories: categoriesStr,
+        autoPublish: !!autoPublish,
       },
     });
 
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id, name, email, password, categories } = body;
+    const { id, name, email, password, categories, autoPublish } = body;
 
     if (!id || !name || !email || !categories) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -84,6 +85,7 @@ export async function PUT(req: NextRequest) {
       name,
       email,
       categories: categoriesStr,
+      autoPublish: !!autoPublish,
     };
 
     if (password && password.trim() !== '') {

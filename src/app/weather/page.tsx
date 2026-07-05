@@ -16,6 +16,7 @@ export default async function WeatherPage() {
       where: {
         categorySlug: 'weather',
         isDeleted: false,
+        isApproved: true,
       },
       orderBy: {
         publishedAt: 'desc',

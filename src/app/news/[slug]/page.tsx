@@ -104,7 +104,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     where: { slug: decodedSlug }
   });
 
-  if (article && article.isDeleted) {
+  if (article && (article.isDeleted || !article.isApproved)) {
     article = null;
   }
 
@@ -163,7 +163,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
 
-  // Check if article is deleted in DB
+  // Check if article is deleted or unapproved in DB
   const dbArticle = await prisma.article.findFirst({
     where: { slug: decodedSlug }
   });
@@ -172,7 +172,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     where: { slug: decodedSlug, isDeleted: true }
   });
 
-  if ((dbArticle && dbArticle.isDeleted) || isStaticDeleted) {
+  if ((dbArticle && (dbArticle.isDeleted || !dbArticle.isApproved)) || isStaticDeleted) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <Header />
@@ -200,7 +200,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   try {
     [dbArticles, deletedArticles] = await Promise.all([
       prisma.article.findMany({
-        where: { isDeleted: false },
+        where: { isDeleted: false, isApproved: true },
         orderBy: { publishedAt: 'desc' },
         take: 100,
         select: {

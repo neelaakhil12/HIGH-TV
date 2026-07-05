@@ -12,8 +12,12 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get('search');
     const limit = parseInt(searchParams.get('limit') || '100');
     const excludeBody = searchParams.get('excludeBody') === 'true';
+    const showUnapproved = searchParams.get('showUnapproved') === 'true';
 
     const where: any = { isDeleted: false };
+    if (!showUnapproved) {
+      where.isApproved = true;
+    }
 
     const tag = searchParams.get('tag');
 
@@ -65,6 +69,7 @@ export async function GET(req: NextRequest) {
       isBreaking: true,
       isTrending: true,
       isFeatured: true,
+      isApproved: true,
     };
 
     if (!excludeBody) {

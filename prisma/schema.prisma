@@ -29,6 +29,7 @@ model Article {
   isTrending   Boolean  @default(false)
   isFeatured   Boolean  @default(false)
   isDeleted    Boolean  @default(false)
+  isApproved   Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -91,6 +92,7 @@ model EmployeeAdmin {
   email       String   @unique @db.VarChar(255)
   password    String   @db.VarChar(255)
   categories  String   @db.LongText // JSON array of allowed category/district slugs
+  autoPublish Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

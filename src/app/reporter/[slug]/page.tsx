@@ -91,7 +91,7 @@ export default async function ReporterPage({ params }: { params: Promise<{ slug:
   
   // Find all articles written by this reporter in database
   const dbArticles = await prisma.article.findMany({
-    where: { isDeleted: false },
+    where: { isDeleted: false, isApproved: true },
     orderBy: { publishedAt: 'desc' },
   });
 

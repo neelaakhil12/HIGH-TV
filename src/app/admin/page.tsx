@@ -1314,6 +1314,7 @@ export default function AdminPage() {
   const [employeeEmail, setEmployeeEmail] = useState('');
   const [employeePassword, setEmployeePassword] = useState('');
   const [employeeCategories, setEmployeeCategories] = useState<string[]>([]);
+  const [employeeAutoPublish, setEmployeeAutoPublish] = useState(false);
 
 
   // ── Editorial Page Manager states ──────────────────────────────────────────
@@ -1619,7 +1620,7 @@ export default function AdminPage() {
     if (!isAuthenticated) return;
 
     // Load Custom News Articles from Database API
-    fetch('/api/articles?limit=500&t=' + Date.now())
+    fetch('/api/articles?limit=500&showUnapproved=true&t=' + Date.now())
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -1885,7 +1886,8 @@ export default function AdminPage() {
         filterCategory !== 'all' && 
         filterCategory !== 'latest' && 
         filterCategory !== 'trending' && 
-        filterCategory !== 'featured'
+        filterCategory !== 'featured' &&
+        filterCategory !== 'pending'
       ) {
         setSelectedCategories([filterCategory]);
       } else {
@@ -2739,6 +2741,10 @@ export default function AdminPage() {
     let result = allArticles.filter((art) => art.categorySlug !== 'polls');
 
     // Filter by category
+    if (filterCategory === 'pending') {
+      return result.filter((art) => art.isApproved === false);
+    }
+
     if (filterCategory !== 'all') {
       result = result.filter((art) => {
         if (filterCategory === 'latest') {
@@ -3056,7 +3062,8 @@ export default function AdminPage() {
       tags: newsTags,
       isBreaking: isBreakingChecked,
       isTrending: isTrendingChecked,
-      isFeatured: isFeaturedChecked
+      isFeatured: isFeaturedChecked,
+      isApproved: userRole === 'super-admin' ? true : (employeeInfo?.autoPublish ?? false)
     };
 
     if (newsViewMode === 'add') {
@@ -3356,6 +3363,7 @@ export default function AdminPage() {
       email: employeeEmail.trim(),
       password: employeePassword,
       categories: employeeCategories,
+      autoPublish: employeeAutoPublish,
     };
 
     try {
@@ -3374,6 +3382,7 @@ export default function AdminPage() {
         setEmployeeEmail('');
         setEmployeePassword('');
         setEmployeeCategories([]);
+        setEmployeeAutoPublish(false);
         setEditingEmployee(null);
         fetchEmployees();
       } else {
@@ -3415,6 +3424,7 @@ export default function AdminPage() {
       cats = [];
     }
     setEmployeeCategories(cats);
+    setEmployeeAutoPublish(emp.autoPublish || false);
     setEmployeeFormMode('edit');
   };
 
@@ -4119,6 +4129,23 @@ export default function AdminPage() {
 
           {userRole === 'super-admin' && (
             <>
+              <button
+                onClick={() => { setActiveTab('news'); setNewsViewMode('list'); setFilterCategory('pending'); }}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                  activeTab === 'news' && filterCategory === 'pending' ? 'bg-amber-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <UserCheck className="w-4 h-4" />
+                  <span>Pending Approval</span>
+                </div>
+                {customNewsList.filter((a) => a.isApproved === false).length > 0 && (
+                  <span className="bg-amber-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">
+                    {customNewsList.filter((a) => a.isApproved === false).length}
+                  </span>
+                )}
+              </button>
+
               <button
             onClick={() => { setActiveTab('breaking'); }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
@@ -4899,7 +4926,7 @@ export default function AdminPage() {
                   </div>
                   <p className="text-slate-500 text-xs">Review and manage all news articles.</p>
                 </div>
-                {filterCategory !== 'all' && (
+                {filterCategory !== 'all' && filterCategory !== 'pending' && (
                   <button
                     onClick={() => setNewsViewMode('add')}
                     className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-3 px-5 rounded-xl transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 self-start md:self-auto hover:scale-[1.01]"
@@ -4962,9 +4989,16 @@ export default function AdminPage() {
                                   <span className="text-xs font-black text-slate-800 telugu-text truncate" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
                                     {art.title ? art.title.replace(/<[^>]*>/g, '').trim() : ''}
                                   </span>
-                                  <span className="text-[10px] text-slate-400 font-mono">
-                                    {new Date(art.publishedAt).toLocaleDateString()} at {new Date(art.publishedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                  </span>
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="text-[10px] text-slate-400 font-mono">
+                                      {new Date(art.publishedAt).toLocaleDateString()} at {new Date(art.publishedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                    {art.isApproved === false && (
+                                      <span className="bg-amber-55 text-amber-700 border border-amber-200 text-[9px] font-black px-1.5 py-0.5 rounded">
+                                        Pending Approval
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </td>
@@ -4986,6 +5020,35 @@ export default function AdminPage() {
                             </td>
                             <td className="p-4 text-center">
                               <div className="flex items-center justify-center gap-1">
+                                {userRole === 'super-admin' && art.isApproved === false && (
+                                  <button
+                                    type="button"
+                                    onClick={async () => {
+                                      if (confirm('Are you sure you want to approve and publish this article?')) {
+                                        try {
+                                          const response = await fetch(`/api/articles/${art.id}`, {
+                                            method: 'PUT',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ isApproved: true })
+                                          });
+                                          if (response.ok) {
+                                            setCustomNewsList(prev => prev.map(a => a.id === art.id ? { ...a, isApproved: true } : a));
+                                            alert('Article approved and published successfully!');
+                                          } else {
+                                            alert('Failed to approve article.');
+                                          }
+                                        } catch (err) {
+                                          console.error(err);
+                                          alert('Error approving article.');
+                                        }
+                                      }
+                                    }}
+                                    className="text-emerald-600 hover:text-emerald-800 p-2 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-emerald-50"
+                                    title="Approve Article"
+                                  >
+                                    <CheckCircle className="w-4 h-4" />
+                                  </button>
+                                )}
                                 <Link
                                   href={`/news/${art.slug}`}
                                   target="_blank"
@@ -13218,6 +13281,7 @@ export default function AdminPage() {
                   setEmployeeEmail('');
                   setEmployeePassword('');
                   setEmployeeCategories([]);
+                  setEmployeeAutoPublish(false);
                 }}
                 className="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs py-3 px-5 rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-2 self-start md:self-auto hover:scale-[1.01]"
               >
@@ -13279,6 +13343,20 @@ export default function AdminPage() {
                     className="bg-slate-50 border border-slate-200 focus:border-rose-500 focus:bg-white rounded-xl px-4 py-2.5 text-xs outline-none text-slate-800 font-bold transition-all"
                   />
                 </div>
+              </div>
+
+              {/* Auto Publish Toggle */}
+              <div className="flex items-center gap-2 border-t border-slate-150 pt-4">
+                <input
+                  type="checkbox"
+                  id="autoPublishCheckbox"
+                  checked={employeeAutoPublish}
+                  onChange={(e) => setEmployeeAutoPublish(e.target.checked)}
+                  className="w-4 h-4 text-rose-650 border-slate-300 rounded focus:ring-rose-500 cursor-pointer"
+                />
+                <label htmlFor="autoPublishCheckbox" className="text-xs font-black text-slate-700 cursor-pointer select-none">
+                  ⚡ Publish Automatically (ఆటో పబ్లిష్ - No super admin approval required)
+                </label>
               </div>
 
               {/* Category Assignment Section */}
@@ -13495,7 +13573,14 @@ export default function AdminPage() {
                         return (
                           <tr key={emp.id} className="hover:bg-slate-50/50 transition-colors">
                             <td className="py-4 px-6">
-                              <div className="font-extrabold text-slate-800 text-xs telugu-text">{emp.name}</div>
+                              <div className="font-extrabold text-slate-800 text-xs telugu-text flex items-center gap-2">
+                                <span>{emp.name}</span>
+                                {emp.autoPublish && (
+                                  <span className="bg-emerald-50 text-emerald-700 text-[9px] font-black px-1.5 py-0.5 rounded-full border border-emerald-200">
+                                    ⚡ Auto Publish
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             <td className="py-4 px-6">
                               <div className="font-mono text-[11px] text-slate-500">{emp.email}</div>
