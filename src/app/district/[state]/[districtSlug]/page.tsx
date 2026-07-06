@@ -49,9 +49,14 @@ export async function generateMetadata({
   const allDistricts = [...tgDistricts, ...apDistricts];
   const district = allDistricts.find((d) => d.slug === districtSlug);
   const stateName = state === 'telangana' ? 'తెలంగాణ' : 'ఆంధ్రప్రదేశ్';
+  const capitalize = (s: string) => {
+    return s.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+  const englishDistrict = district?.slug ? capitalize(district.slug) : capitalize(districtSlug);
+  const englishState = state === 'telangana' ? 'Telangana' : 'Andhra Pradesh';
   return {
-    title: `${district?.name || districtSlug} వార్తలు | High TV`,
-    description: `${district?.name || districtSlug}, ${stateName} తాజా వార్తలు - High TV`,
+    title: `${englishDistrict} News | High TV`,
+    description: `${englishDistrict} News, Latest ${englishState} updates - High TV`,
   };
 }
 

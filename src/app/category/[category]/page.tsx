@@ -66,12 +66,12 @@ const allNews = [
 const englishCategories: Record<string, string> = {
   'latest': 'Breaking News',
   'live-updates': 'Live Updates',
-  'telangana': 'Telangana',
-  'andhra-pradesh': 'Andhra Pradesh',
+  'telangana': 'Telangana News',
+  'andhra-pradesh': 'Andhra Pradesh News',
   'national': 'National',
   'international': 'International',
   'business': 'Business',
-  'politics': 'పాలిటిక్స్',
+  'politics': 'Politics',
   'sports': 'Sports',
   'entertainment': 'Entertainment',
   'technology': 'Technology',
@@ -93,7 +93,9 @@ const englishCategories: Record<string, string> = {
   'current-affairs': 'Current Affairs',
   'upadi': 'Upadi',
   'notification': 'Notification',
-  'citizen-reporter': 'Citizen Reporter'
+  'citizen-reporter': 'Citizen Reporter',
+  'weather': 'Weather',
+  'trending': 'Trending'
 };
 
 export async function generateStaticParams() {
@@ -112,15 +114,20 @@ export async function generateMetadata({
   const viewType = sParams?.view;
   
   const cat = categories.find((c) => c.slug === category);
-  let titleName = cat?.name || category;
+  const englishName = englishCategories[category];
+  let titleName = englishName || cat?.name || category;
 
   if (category === 'andhra-pradesh' || category === 'telangana') {
-    const stateName = category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్' : 'తెలంగాణ';
+    const stateName = category === 'andhra-pradesh' ? 'Andhra Pradesh' : 'Telangana';
     if (viewType === 'districts') {
-      titleName = `${stateName} జిల్లా వార్తలు`;
+      titleName = `${stateName} District News`;
     } else {
-      titleName = `${stateName} వార్తలు`;
+      titleName = `${stateName} News`;
     }
+  } else if (category === 'telangana-districts') {
+    titleName = 'Telangana District News';
+  } else if (category === 'andhra-pradesh-districts') {
+    titleName = 'Andhra Pradesh District News';
   }
 
   return {

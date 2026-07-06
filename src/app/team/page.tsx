@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 
 export const metadata: Metadata = {
-  title: 'మా టీమ్ - మా వార్తా బృందం | High TV',
+  title: 'Our Team - Editorial & Reporting Staff | High TV',
   description: 'హై టీవీ డిజిటల్ నెట్వర్క్ ప్రతినిధులు మరియు సంపాదక బృందం వివరాలు. నిజాయితీతో కూడిన జర్నలిజం అందించే మా ప్రతినిధులు.',
 };
 
