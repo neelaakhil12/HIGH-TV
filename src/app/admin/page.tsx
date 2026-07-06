@@ -7066,8 +7066,8 @@ export default function AdminPage() {
               { slug: 'mobile-ad-slot-10', labelTelugu: 'హోమ్: స్లాట్ 10 (Below Politics News)', labelEnglish: 'Above Film/Entertainment' },
               { slug: 'mobile-ad-slot-11', labelTelugu: 'హోమ్: స్లాట్ 11 (Below Film/Entertainment)', labelEnglish: 'Above Sports' },
               { slug: 'mobile-ad-slot-12', labelTelugu: 'హోమ్: స్లాట్ 12 (Below Sports)', labelEnglish: 'Above Business/Technology' },
-              { slug: 'mobile-ad-slot-13', labelTelugu: 'హోమ్: స్లాట్ 13 (Below Business/Tech)', labelEnglish: 'Above Viral/Health' },
-              { slug: 'mobile-ad-slot-14', labelTelugu: 'హోమ్: స్లాట్ 14 (Below Viral/Health)', labelEnglish: 'Above Shorts/Videos' },
+              { slug: 'mobile-ad-slot-13', labelTelugu: 'హోమ్: స్లాట్ 13 (Below Business/Tech)', labelEnglish: 'Above Upadi/Health' },
+              { slug: 'mobile-ad-slot-14', labelTelugu: 'హోమ్: స్లాట్ 14 (Below Upadi/Health)', labelEnglish: 'Above Shorts/Videos' },
               { slug: 'mobile-ad-slot-15', labelTelugu: 'హోమ్: స్లాట్ 15 (Below Shorts/Videos)', labelEnglish: 'Above Photo Gallery' },
               { slug: 'mobile-ad-slot-16', labelTelugu: 'హోమ్: స్లాట్ 16 (Below Photo Gallery)', labelEnglish: 'Bottom Footer Ad' },
 

@@ -29,6 +29,7 @@ import {
   rasipalaluNews,
   districtNews,
   adyathmikamNews,
+  upadiNews,
   getMergedArticles,
 } from '@/lib/mockData';
 import Image from 'next/image';
@@ -266,6 +267,7 @@ export default function HomePage() {
   const [businessList, setBusinessList] = useState(businessNews);
   const [technologyList, setTechnologyList] = useState(technologyNews);
   const [viralList, setViralList] = useState(viralNews);
+  const [upadiList, setUpadiList] = useState(upadiNews);
   const [healthList, setHealthList] = useState(healthNews);
   const [featuredList, setFeaturedList] = useState(featuredNews);
   const [rasipalaluList, setRasipalaluList] = useState(rasipalaluNews);
@@ -326,6 +328,7 @@ export default function HomePage() {
         setBusinessList(getMergedList(businessNews, 'business'));
         setTechnologyList(getMergedList(technologyNews, 'technology'));
         setViralList(getMergedList(viralNews, 'viral'));
+        setUpadiList(getMergedList(upadiNews, 'upadi'));
         setHealthList(getMergedList(healthNews, 'health'));
         setRasipalaluList(getMergedList(rasipalaluNews, 'rasipalalu'));
         setAdyathmikamList(getMergedList(adyathmikamNews, 'adyathmikam'));
@@ -633,7 +636,7 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
               <div>
-                <NewsSection title="Viral" titleTelugu="వైరల్" articles={viralList} viewAllLink="/category/viral" accentColor="#dc2626" layout="list" />
+                <NewsSection title="Upadi" titleTelugu="ఉపాధి" articles={upadiList} viewAllLink="/category/upadi" accentColor="#16a34a" layout="list" />
               </div>
               <div>
                 <NewsSection title="Health" titleTelugu="హెల్త్" articles={healthList} viewAllLink="/category/health" accentColor="#0891b2" layout="list" />
