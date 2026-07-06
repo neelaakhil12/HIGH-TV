@@ -144,10 +144,11 @@ export default async function CategoryPage({
   // 1. Fetch latest articles from the database
   let dbArticles: any[] = [];
   let deletedArticles: any[] = [];
+  let pinsSetting: any = null;
     const shouldSelectBody = category === 'shorts' || category === 'sampadakiyam';
 
     try {
-      [dbArticles, deletedArticles] = await Promise.all([
+      [dbArticles, deletedArticles, pinsSetting] = await Promise.all([
         prisma.article.findMany({
           where: { isDeleted: false, isApproved: true },
           orderBy: { publishedAt: 'desc' },
@@ -173,6 +174,9 @@ export default async function CategoryPage({
         prisma.article.findMany({
           where: { isDeleted: true },
           select: { id: true, slug: true }
+        }),
+        prisma.setting.findUnique({
+          where: { key: 'sidebar_category_pins' }
         })
       ]);
   } catch (e) {
@@ -207,7 +211,65 @@ export default async function CategoryPage({
   if (category === 'latest') {
     articles = allArticlesList.filter((n) => n.isBreaking);
   } else if (category === 'trending') {
-    articles = allArticlesList.filter((n) => n.isTrending);
+    let pinnedTrendingIds: string[] = [];
+    try {
+      if (pinsSetting?.value) {
+        const parsed = JSON.parse(pinsSetting.value);
+        const catPins = parsed['home'] || { trending: [], breaking: [] };
+        pinnedTrendingIds = (catPins.trending || []).map(String);
+      }
+    } catch (err) {
+      console.error("Error parsing sidebar_category_pins on category page:", err);
+    }
+
+    if (pinnedTrendingIds.length > 0) {
+      const articlesMap = new Map<string, any>();
+      allArticlesList.forEach((art) => {
+        articlesMap.set(String(art.id), art);
+      });
+
+      const missingIds = pinnedTrendingIds.filter(id => !articlesMap.has(id));
+      let dbMissing: any[] = [];
+      if (missingIds.length > 0) {
+        try {
+          dbMissing = await prisma.article.findMany({
+            where: { id: { in: missingIds }, isDeleted: false, isApproved: true },
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              categorySlug: true,
+              districtSlug: true,
+              category: true,
+              author: true,
+              publishedAt: true,
+              description: true,
+              image: true,
+              views: true,
+              isBreaking: true,
+              isTrending: true,
+              isFeatured: true,
+              body: shouldSelectBody,
+            }
+          });
+        } catch (e) {
+          console.error("Error fetching missing trending articles from DB:", e);
+        }
+      }
+
+      const mergedMissing = dbMissing.map((art) => ({ ...art, content: art.body || '' }));
+
+      const finalTrendingList: any[] = [];
+      pinnedTrendingIds.forEach(id => {
+        const found = articlesMap.get(id) || mergedMissing.find(art => String(art.id) === id);
+        if (found) {
+          finalTrendingList.push(found);
+        }
+      });
+      articles = finalTrendingList;
+    } else {
+      articles = allArticlesList.filter((n) => n.isTrending);
+    }
   } else if (category === 'featured') {
     articles = allArticlesList.filter((n) => n.isFeatured);
     if (articles.length === 0) {

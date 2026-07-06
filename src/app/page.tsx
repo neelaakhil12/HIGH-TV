@@ -589,7 +589,7 @@ export default function HomePage() {
             </div>
 
             {/* Trending వార్తలు */}
-            <NewsSection title="Trending" titleTelugu="ట్రెండింగ్ వార్తలు" articles={trendingList} viewAllLink="" accentColor="#ea580c" layout="featured-left" />
+            <NewsSection title="Trending" titleTelugu="ట్రెండింగ్ వార్తలు" articles={trendingList} viewAllLink="/category/trending" accentColor="#ea580c" layout="featured-left" />
 
             {/* ── MOBILE AD 6 (after Trending, before Politics) ── */}
             <div className="block md:hidden my-3">
