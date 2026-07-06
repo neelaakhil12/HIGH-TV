@@ -1673,10 +1673,10 @@ export default function AdminPage() {
       fetchEpapersData();
       fetchEpaperSections();
     }
-    if (activeTab === 'employees' && userRole === 'super-admin') {
+    if (activeTab === 'employees' && (userRole === 'super-admin' || isSlugAllowed('tab-employees'))) {
       fetchEmployees();
     }
-  }, [activeTab, userRole]);
+  }, [activeTab, userRole, employeeInfo]);
 
   // Authorization Check
   useEffect(() => {
@@ -4439,341 +4439,381 @@ export default function AdminPage() {
             </div>
           )}
 
-          {userRole === 'super-admin' && (
-            <>
-              <button
-                onClick={() => { setActiveTab('news'); setNewsViewMode('list'); setFilterCategory('pending'); }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                  activeTab === 'news' && filterCategory === 'pending' ? 'bg-amber-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <UserCheck className="w-4 h-4" />
-                  <span>Pending Approval</span>
-                </div>
-                {customNewsList.filter((a) => a.isApproved === false).length > 0 && (
-                  <span className="bg-amber-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">
-                    {customNewsList.filter((a) => a.isApproved === false).length}
-                  </span>
-                )}
-              </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-pending')) && (
+            <button
+              onClick={() => { setActiveTab('news'); setNewsViewMode('list'); setFilterCategory('pending'); }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'news' && filterCategory === 'pending' ? 'bg-amber-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <UserCheck className="w-4 h-4" />
+                <span>Pending Approval</span>
+              </div>
+              {customNewsList.filter((a) => a.isApproved === false).length > 0 && (
+                <span className="bg-amber-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">
+                  {customNewsList.filter((a) => a.isApproved === false).length}
+                </span>
+              )}
+            </button>
+          )}
 
-              <button
-            onClick={() => { setActiveTab('breaking'); }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'breaking' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Megaphone className="w-4 h-4" />
-              <span>Flash News Ticker</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-breaking')) && (
+            <button
+              onClick={() => { setActiveTab('breaking'); }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'breaking' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Megaphone className="w-4 h-4" />
+                <span>Flash News Ticker</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => { setActiveTab('trending'); }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'trending' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <TrendingUp className="w-4 h-4" />
-              <span>Trending Ticker</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-trending')) && (
+            <button
+              onClick={() => { setActiveTab('trending'); }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'trending' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <TrendingUp className="w-4 h-4" />
+                <span>Trending Ticker</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => { setActiveTab('slider'); }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'slider' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Sliders className="w-4 h-4" />
-              <span>Homepage Slides</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-slider')) && (
+            <button
+              onClick={() => { setActiveTab('slider'); }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'slider' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Sliders className="w-4 h-4" />
+                <span>Homepage Slides</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => { setActiveTab('sidebar-news'); }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'sidebar-news' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <FileCheck className="w-4 h-4" />
-              <span>Sidebar News Config</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-sidebar-news')) && (
+            <button
+              onClick={() => { setActiveTab('sidebar-news'); }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'sidebar-news' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <FileCheck className="w-4 h-4" />
+                <span>Sidebar News Config</span>
+              </div>
+            </button>
+          )}
 
+          {(userRole === 'super-admin' || isSlugAllowed('tab-epaper')) && (
+            <button
+              onClick={() => { setActiveTab('epaper'); }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'epaper' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Tv className="w-4 h-4" />
+                <span>E-Paper editions</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => { setActiveTab('epaper'); }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'epaper' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Tv className="w-4 h-4" />
-              <span>E-Paper editions</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-weather')) && (
+            <button
+              onClick={() => { setActiveTab('weather'); }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'weather' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <CloudSun className="w-4 h-4" />
+                <span>Weather Page Details</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => { setActiveTab('weather'); }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'weather' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <CloudSun className="w-4 h-4" />
-              <span>Weather Page Details</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-horoscope')) && (
+            <button
+              onClick={() => { setActiveTab('horoscope'); }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'horoscope' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Sparkles className="w-4 h-4" />
+                <span>శుభఫలాలు (Horoscope)</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => { setActiveTab('horoscope'); }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'horoscope' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Sparkles className="w-4 h-4" />
-              <span>శుభఫలాలు (Horoscope)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-webstories')) && (
+            <button
+              onClick={() => {
+                setActiveTab('webstories');
+                setWebStoryFormMode('list');
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'webstories' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Layers className="w-4 h-4" />
+                <span>వెబ్ స్టోరీస్ (Web Stories)</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => {
-              setActiveTab('webstories');
-              setWebStoryFormMode('list');
-            }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'webstories' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Layers className="w-4 h-4" />
-              <span>వెబ్ స్టోరీస్ (Web Stories)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-shorts-videos')) && (
+            <button
+              onClick={() => {
+                setActiveTab('shorts-videos');
+                setShortsFormMode('list');
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'shorts-videos' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Video className="w-4 h-4" />
+                <span>షార్ట్స్ వీడియోలు (Upload Videos)</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => {
-              setActiveTab('shorts-videos');
-              setShortsFormMode('list');
-            }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'shorts-videos' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Video className="w-4 h-4" />
-              <span>షార్ట్స్ వీడియోలు (Upload Videos)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-high-tv-videos')) && (
+            <button
+              onClick={() => {
+                setActiveTab('high-tv-videos');
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'high-tv-videos' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Tv className="w-4 h-4" />
+                <span>హై టీవీ వీడియోస్ (High TV Videos)</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => {
-              setActiveTab('high-tv-videos');
-            }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'high-tv-videos' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Tv className="w-4 h-4" />
-              <span>హై టీవీ వీడియోస్ (High TV Videos)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-photos-gallery')) && (
+            <button
+              onClick={() => {
+                setActiveTab('photos-gallery');
+                setPhotosFormMode('list');
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'photos-gallery' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <ImageIcon className="w-4 h-4" />
+                <span>ఫోటో గ్యాలరీ (Upload Photos)</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => {
-              setActiveTab('photos-gallery');
-              setPhotosFormMode('list');
-            }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'photos-gallery' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <ImageIcon className="w-4 h-4" />
-              <span>ఫోటో గ్యాలరీ (Upload Photos)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-polls-manager')) && (
+            <button
+              onClick={() => {
+                setActiveTab('polls-manager');
+                setPollsFormMode('list');
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'polls-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <BarChart3 className="w-4 h-4" />
+                <span>పోల్స్ మేనేజర్ (Manage Polls)</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => {
-              setActiveTab('polls-manager');
-              setPollsFormMode('list');
-            }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'polls-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <BarChart3 className="w-4 h-4" />
-              <span>పోల్స్ మేనేజర్ (Manage Polls)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-team-manager')) && (
+            <button
+              onClick={() => {
+                setActiveTab('team-manager');
+                setTeamFormMode('list');
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'team-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Users className="w-4 h-4" />
+                <span>మా టీమ్ (Our Team Manager)</span>
+              </div>
+            </button>
+          )}
 
-                    <button
-            onClick={() => {
-              setActiveTab('team-manager');
-              setTeamFormMode('list');
-            }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'team-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Users className="w-4 h-4" />
-              <span>మా టీమ్ (Our Team Manager)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-sidebar-ads')) && (
+            <button
+              onClick={() => {
+                setActiveTab('sidebar-ads');
+                setAdFormMode('list');
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'sidebar-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Megaphone className="w-4 h-4" />
+                <span>సైడ్‌బార్ యాడ్స్ (Sidebar Ads Manager)</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => {
-              setActiveTab('sidebar-ads');
-              setAdFormMode('list');
-            }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'sidebar-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Megaphone className="w-4 h-4" />
-              <span>సైడ్‌బార్ యాడ్స్ (Sidebar Ads Manager)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-mobile-ads')) && (
+            <button
+              onClick={() => {
+                setActiveTab('mobile-ads');
+                setActiveAdSpot('mobile_leaderboard');
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'mobile-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <MonitorSmartphone className="w-4 h-4" />
+                <span>మొబైల్ యాడ్స్ (Mobile Ads Manager)</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => {
-              setActiveTab('mobile-ads');
-              setActiveAdSpot('mobile_leaderboard');
-            }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'mobile-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <MonitorSmartphone className="w-4 h-4" />
-              <span>మొబైల్ యాడ్స్ (Mobile Ads Manager)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-skyscraper-ads')) && (
+            <button
+              onClick={() => {
+                setActiveTab('skyscraper-ads');
+                setSkyscraperAdPage('');
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'skyscraper-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Megaphone className="w-4 h-4" />
+                <span>స్కైస్క్రాపర్ యాడ్స్ (Skyscraper Ads Manager)</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => {
-              setActiveTab('skyscraper-ads');
-              setSkyscraperAdPage(''); // Home page by default
-            }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'skyscraper-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Megaphone className="w-4 h-4" />
-              <span>స్కైస్క్రాపర్ యాడ్స్ (Skyscraper Ads Manager)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-editorial')) && (
+            <button
+              onClick={() => {
+                setActiveTab('editorial');
+                setEditorialFormMode('none');
+                try {
+                  const saved = localStorage.getItem('editorial_sections_config');
+                  if (saved) {
+                    const parsed = JSON.parse(saved);
+                    const migrated = parsed.map((s: any) => {
+                      if (s.slug === 'sampadakiyam' && s.title === 'సంపాదకీయం') {
+                        return { ...s, title: 'ఎడిటోరియల్' };
+                      }
+                      return s;
+                    });
+                    setEditorialSections(migrated);
+                    localStorage.setItem('editorial_sections_config', JSON.stringify(migrated));
+                  }
+                } catch {}
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'editorial' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <FileText className="w-4 h-4" />
+                <span>ఎడిటోరియల్ పేజీ (Editorial Manager)</span>
+              </div>
+            </button>
+          )}
 
-<button
-            onClick={() => {
-              setActiveTab('editorial');
-              setEditorialFormMode('none');
-              // Load sections from localStorage if available
-              try {
-                const saved = localStorage.getItem('editorial_sections_config');
-                if (saved) {
-                  const parsed = JSON.parse(saved);
-                  const migrated = parsed.map((s: any) => {
-                    if (s.slug === 'sampadakiyam' && s.title === 'సంపాదకీయం') {
-                      return { ...s, title: 'ఎడిటోరియల్' };
-                    }
-                    return s;
-                  });
-                  setEditorialSections(migrated);
-                  localStorage.setItem('editorial_sections_config', JSON.stringify(migrated));
-                }
-              } catch {}
-            }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'editorial' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <FileText className="w-4 h-4" />
-              <span>ఎడిటోరియల్ పేజీ (Editorial Manager)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-popup-manager')) && (
+            <button
+              onClick={() => { setActiveTab('popup-manager'); }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'popup-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <MonitorSmartphone className="w-4 h-4" />
+                <span>పాప్‌అప్ మేనేజర్ (Popup Manager)</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => { setActiveTab('popup-manager'); }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'popup-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <MonitorSmartphone className="w-4 h-4" />
-              <span>పాప్‌అప్ మేనేజర్ (Popup Manager)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-jilla-sidebar')) && (
+            <button
+              onClick={() => { setActiveTab('jilla-sidebar'); }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'jilla-sidebar' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <MapPin className="w-4 h-4" />
+                <span>జిల్లా వార్తలు సైడ్‌బార్ (District Sidebar)</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => { setActiveTab('jilla-sidebar'); }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'jilla-sidebar' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <MapPin className="w-4 h-4" />
-              <span>జిల్లా వార్తలు సైడ్‌బార్ (District Sidebar)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-live-updates')) && (
+            <button
+              onClick={() => { setActiveTab('live-updates'); setListingFormMode('none'); setPostFormMode('none'); }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'live-updates' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Zap className="w-4 h-4 text-amber-400" />
+                <span>లైవ్ అప్‌డేట్స్ (Live Updates)</span>
+              </div>
+            </button>
+          )}
 
-          <button
-            onClick={() => { setActiveTab('live-updates'); setListingFormMode('none'); setPostFormMode('none'); }}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'live-updates' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Zap className="w-4 h-4 text-amber-400" />
-              <span>లైవ్ అప్‌డేట్స్ (Live Updates)</span>
-            </div>
-          </button>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-employees')) && (
+            <button
+              onClick={() => {
+                setActiveTab('employees');
+                setEmployeeFormMode('list');
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'employees' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <UserCheck className="w-4 h-4" />
+                <span>మెంబర్స్ (Manage Employees)</span>
+              </div>
+            </button>
+          )}
 
-              <button
-                onClick={() => {
-                  setActiveTab('employees');
-                  setEmployeeFormMode('list');
-                }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                  activeTab === 'employees' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <UserCheck className="w-4 h-4" />
-                  <span>మెంబర్స్ (Manage Employees)</span>
-                </div>
-              </button>
-
-              <button
-                onClick={() => {
-                  setActiveTab('employee-posts-tracker');
-                  setSelectedEmpForPosts(null);
-                  fetchEmployees();
-                }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                  activeTab === 'employee-posts-tracker' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <BookOpen className="w-4 h-4" />
-                  <span>రిపోర్టర్ ఆర్టికల్స్ (Reporter Posts)</span>
-                </div>
-              </button>
-            </>
+          {(userRole === 'super-admin' || isSlugAllowed('tab-employee-posts-tracker')) && (
+            <button
+              onClick={() => {
+                setActiveTab('employee-posts-tracker');
+                setSelectedEmpForPosts(null);
+                fetchEmployees();
+              }}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                activeTab === 'employee-posts-tracker' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <BookOpen className="w-4 h-4" />
+                <span>రిపోర్టర్ ఆర్టికల్స్ (Reporter Posts)</span>
+              </div>
+            </button>
           )}
 
         </nav>
@@ -13698,7 +13738,7 @@ export default function AdminPage() {
       )}
 
       {/* ══════════════ VIEW: EMPLOYEES MANAGEMENT ══════════════ */}
-      {activeTab === 'employees' && userRole === 'super-admin' && (
+      {activeTab === 'employees' && (userRole === 'super-admin' || isSlugAllowed('tab-employees')) && (
         <div className="flex flex-col gap-6 animate-fade-in text-left">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -14002,6 +14042,88 @@ export default function AdminPage() {
                     })()}
                   </div>
                 </div>
+
+                {/* Admin Tabs Permissions Group */}
+                <div className="border border-slate-200/60 rounded-2xl p-5 flex flex-col gap-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <span className="text-xs font-black text-rose-600 uppercase tracking-wider">ఆడ్మిన్ ట్యాబ్‌ల అనుమతులు (Admin Tabs Permissions)</span>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const tabSlugs = [
+                            'tab-pending', 'tab-breaking', 'tab-trending', 'tab-slider',
+                            'tab-sidebar-news', 'tab-epaper', 'tab-weather', 'tab-horoscope',
+                            'tab-webstories', 'tab-shorts-videos', 'tab-high-tv-videos',
+                            'tab-photos-gallery', 'tab-polls-manager', 'tab-team-manager',
+                            'tab-sidebar-ads', 'tab-mobile-ads', 'tab-skyscraper-ads',
+                            'tab-editorial', 'tab-popup-manager', 'tab-jilla-sidebar',
+                            'tab-live-updates', 'tab-employees', 'tab-employee-posts-tracker'
+                          ];
+                          setEmployeeCategories(prev => {
+                            const withoutTabs = prev.filter(slug => !slug.startsWith('tab-'));
+                            return [...withoutTabs, ...tabSlugs];
+                          });
+                        }}
+                        className="text-[10px] font-bold text-rose-600 hover:underline"
+                      >
+                        Select Group
+                      </button>
+                      <span className="text-slate-300">|</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEmployeeCategories(prev => prev.filter(slug => !slug.startsWith('tab-')));
+                        }}
+                        className="text-[10px] font-bold text-slate-500 hover:underline"
+                      >
+                        Clear Group
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                    {[
+                      { slug: 'tab-pending', name: 'Pending Approval' },
+                      { slug: 'tab-breaking', name: 'Flash News Ticker (బ్రేకింగ్ న్యూస్)' },
+                      { slug: 'tab-trending', name: 'Trending Ticker (ట్రెండింగ్ టిక్కర్)' },
+                      { slug: 'tab-slider', name: 'Homepage Slides (హోమ్‌పేజీ స్లైడర్)' },
+                      { slug: 'tab-sidebar-news', name: 'Sidebar News Config (సైడ్‌బార్ కాన్ఫిగ్)' },
+                      { slug: 'tab-epaper', name: 'E-Paper editions (ఈ-పేపర్ ఎడిషన్లు)' },
+                      { slug: 'tab-weather', name: 'Weather Page Details (వాతావరణ పేజీ)' },
+                      { slug: 'tab-horoscope', name: 'శుభఫలాలు / Horoscope (రాశిఫలాలు)' },
+                      { slug: 'tab-webstories', name: 'వెబ్ స్టోరీస్ / Web Stories' },
+                      { slug: 'tab-shorts-videos', name: 'షార్ట్స్ వీడియోలు / Upload Videos' },
+                      { slug: 'tab-high-tv-videos', name: 'హై టీవీ వీడియోలు / High TV Videos' },
+                      { slug: 'tab-photos-gallery', name: 'ఫోటో గ్యాలరీ / Upload Photos' },
+                      { slug: 'tab-polls-manager', name: 'పోల్స్ మేనేజర్ / Manage Polls' },
+                      { slug: 'tab-team-manager', name: 'మా టీమ్ / Our Team Manager' },
+                      { slug: 'tab-sidebar-ads', name: 'సైడ్‌బార్ యాడ్స్ / Sidebar Ads' },
+                      { slug: 'tab-mobile-ads', name: 'మొబైల్ యాడ్స్ / Mobile Ads' },
+                      { slug: 'tab-skyscraper-ads', name: 'స్కైస్క్రాపర్ యాడ్స్ / Skyscraper Ads' },
+                      { slug: 'tab-editorial', name: 'ఎడిటోరియల్ పేజీ / Editorial Manager' },
+                      { slug: 'tab-popup-manager', name: 'పాప్‌అప్ మేనేజర్ / Popup Manager' },
+                      { slug: 'tab-jilla-sidebar', name: 'జిల్లా వార్తలు సైడ్‌బార్ / District Sidebar' },
+                      { slug: 'tab-live-updates', name: 'లైవ్ అప్‌డేట్స్ / Live Updates' },
+                      { slug: 'tab-employees', name: 'మెంబర్స్ / Manage Employees' },
+                      { slug: 'tab-employee-posts-tracker', name: 'రిపోర్టర్ ఆర్టికల్స్ / Reporter Posts' },
+                    ].map((tab) => {
+                      const isSelected = employeeCategories.includes(tab.slug);
+                      return (
+                        <label
+                          key={tab.slug}
+                          onClick={() => toggleEmployeeCategory(tab.slug)}
+                          className={`flex items-center justify-center py-2 px-3 rounded-xl border text-[11px] font-bold cursor-pointer transition-all select-none text-center active:scale-[0.98] ${
+                            isSelected
+                              ? 'bg-rose-50 border-rose-300 text-rose-700 shadow-3xs font-extrabold'
+                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                          }`}
+                        >
+                          {tab.name}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
               {/* Submit Bar */}
@@ -14127,7 +14249,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      {activeTab === 'employee-posts-tracker' && userRole === 'super-admin' && (
+      {activeTab === 'employee-posts-tracker' && (userRole === 'super-admin' || isSlugAllowed('tab-employee-posts-tracker')) && (
         <div className="flex flex-col gap-6 animate-fade-in text-left">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
