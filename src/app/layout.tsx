@@ -12,18 +12,18 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "హై టీవీ | తెలుగు వార్తలు - Breaking Telugu News",
-  description: "హై టీవీ - ఆంధ్రప్రదేశ్, తెలంగాణ, నేషనల్, వరల్డ్, రాజకీయాలు, ఫిల్మ్, స్పోర్ట్స్ మరియు వ్యాపార వార్తలు. HIGH TV Express Telugu News Platform.",
+  title: "High TV | Telugu News - Breaking Telugu News",
+  description: "High TV - Latest breaking news in Telugu from Andhra Pradesh, Telangana, India, Politics, Sports, Movies, Health, and Business. HIGH TV Express News Platform.",
   keywords: "Telugu News, High TV, హై టీవీ, తెలుగు వార్తలు, Breaking News, AP News, Telangana News",
   openGraph: {
-    title: "హై టీవీ | Express Telugu News Platform",
-    description: "తెలుగు వార్తలు - Latest Breaking News in Telugu",
+    title: "High TV | Express Telugu News Platform",
+    description: "Telugu News - Latest Breaking News in Telugu",
     type: "website",
     locale: "te_IN",
   },
   twitter: {
     card: "summary_large_image",
-    title: "హై టీవీ | Express Telugu News",
+    title: "High TV | Express Telugu News",
   },
 };
 
