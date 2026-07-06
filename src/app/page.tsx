@@ -286,10 +286,12 @@ export default function HomePage() {
   const [activeRegionalFeed, setActiveRegionalFeed] = useState<'default' | 'tg' | 'ap'>('default');
 
   useEffect(() => {
-    // 1. Fetch main news feed (excluding body, limit 150)
-    fetch('/api/articles?limit=150&excludeBody=true&t=' + Date.now())
-      .then(res => res.json())
-      .then(dbArticlesData => {
+    // 1. Fetch main news feed (excluding body, limit 150) and sidebar category pins
+    Promise.all([
+      fetch('/api/articles?limit=150&excludeBody=true&t=' + Date.now()).then(res => res.json()),
+      fetch('/api/settings?key=sidebar_category_pins&t=' + Date.now()).then(res => res.ok ? res.json() : ({} as any))
+    ])
+      .then(async ([dbArticlesData, settingsData]) => {
         if (!Array.isArray(dbArticlesData)) return;
         
         const filteredDb = dbArticlesData.filter((art: any) => 
@@ -336,9 +338,51 @@ export default function HomePage() {
         const filteredFeaturedStatic = featuredNews.filter((art) => !featuredIds.has(art.id));
         setFeaturedList([...featuredToPrepend, ...filteredFeaturedStatic]);
 
-        // Compute and set trendingList
-        const customTrending = mergedAll.filter((art: any) => art.isTrending);
-        setTrendingList(customTrending);
+        // Compute and set trendingList from sidebar_category_pins for 'home' page
+        let pinnedTrendingIds: string[] = [];
+        try {
+          const savedPins = settingsData.sidebar_category_pins;
+          if (savedPins) {
+            const parsed = typeof savedPins === 'string' ? JSON.parse(savedPins) : savedPins;
+            const catPins = parsed['home'] || { trending: [], breaking: [] };
+            pinnedTrendingIds = (catPins.trending || []).map(String);
+          }
+        } catch (err) {
+          console.error("Error reading sidebar_category_pins on home page", err);
+        }
+
+        const trendingArticlesMap = new Map<string, any>();
+        mappedArticles.forEach((art) => {
+          trendingArticlesMap.set(String(art.id), art);
+        });
+
+        const missingIds = pinnedTrendingIds.filter(id => !trendingArticlesMap.has(id));
+        const fetchedMissing: any[] = [];
+        if (missingIds.length > 0) {
+          await Promise.all(
+            missingIds.map(async (id) => {
+              try {
+                const res = await fetch(`/api/articles/${id}`);
+                if (res.ok) {
+                  const art = await res.json();
+                  if (art) fetchedMissing.push(art);
+                }
+              } catch (e) {
+                console.error(`Error fetching missing trending article ${id}:`, e);
+              }
+            })
+          );
+        }
+
+        const finalTrendingList: any[] = [];
+        pinnedTrendingIds.forEach(id => {
+          const found = trendingArticlesMap.get(id) || fetchedMissing.find(art => String(art.id) === id);
+          if (found) {
+            finalTrendingList.push(found);
+          }
+        });
+
+        setTrendingList(finalTrendingList);
       })
       .catch(e => {
         console.error('Error loading custom articles on homepage', e);
@@ -545,7 +589,7 @@ export default function HomePage() {
             </div>
 
             {/* Trending వార్తలు */}
-            <NewsSection title="Trending" titleTelugu="ట్రెండింగ్ వార్తలు" articles={trendingList} viewAllLink="/category/trending" accentColor="#ea580c" layout="featured-left" />
+            <NewsSection title="Trending" titleTelugu="ట్రెండింగ్ వార్తలు" articles={trendingList} viewAllLink="" accentColor="#ea580c" layout="featured-left" />
 
             {/* ── MOBILE AD 6 (after Trending, before Politics) ── */}
             <div className="block md:hidden my-3">

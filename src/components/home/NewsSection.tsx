@@ -8,7 +8,7 @@ interface NewsSectionProps {
   title: string;
   titleTelugu: string;
   articles: NewsArticle[];
-  viewAllLink: string;
+  viewAllLink?: string;
   accentColor?: string;
   layout?: 'grid3' | 'grid4' | 'featured-left' | 'list';
 }
@@ -17,7 +17,7 @@ export default function NewsSection({
   title,
   titleTelugu,
   articles,
-  viewAllLink,
+  viewAllLink = '',
   accentColor = '#02599c',
   layout = 'grid3',
 }: NewsSectionProps) {
@@ -70,15 +70,17 @@ export default function NewsSection({
               {titleTelugu}
             </h2>
           </div>
-          <div className="flex items-center gap-2.5">
-            <Link
-              href={viewAllLink}
-              className="flex items-center gap-1 text-sm font-semibold hover:gap-2 transition-all"
-              style={{ color: accentColor }}
-            >
-              అన్నీ చూడండి <ArrowRight size={14} />
-            </Link>
-          </div>
+          {viewAllLink && (
+            <div className="flex items-center gap-2.5">
+              <Link
+                href={viewAllLink}
+                className="flex items-center gap-1 text-sm font-semibold hover:gap-2 transition-all"
+                style={{ color: accentColor }}
+              >
+                అన్నీ చూడండి <ArrowRight size={14} />
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* 2 in a Row Grid (2x2 Layout) */}
@@ -104,9 +106,11 @@ export default function NewsSection({
               {titleTelugu}
             </h2>
           </div>
-          <Link href={viewAllLink} className="text-sm font-semibold flex items-center gap-1" style={{ color: accentColor }}>
-            అన్నీ <ArrowRight size={12} />
-          </Link>
+          {viewAllLink && (
+            <Link href={viewAllLink} className="text-sm font-semibold flex items-center gap-1" style={{ color: accentColor }}>
+              అన్నీ <ArrowRight size={12} />
+            </Link>
+          )}
         </div>
         <div className="space-y-0">
           {articles.slice(0, 4).map((article) => (
@@ -130,9 +134,11 @@ export default function NewsSection({
               {titleTelugu}
             </h2>
           </div>
-          <Link href={viewAllLink} className="flex items-center gap-1 text-sm font-semibold hover:gap-2 transition-all" style={{ color: accentColor }}>
-            అన్నీ చూడండి <ArrowRight size={14} />
-          </Link>
+          {viewAllLink && (
+            <Link href={viewAllLink} className="flex items-center gap-1 text-sm font-semibold hover:gap-2 transition-all" style={{ color: accentColor }}>
+              అన్నీ చూడండి <ArrowRight size={14} />
+            </Link>
+          )}
         </div>
         <div className="flex overflow-x-auto gap-4 pb-2.5 snap-x hide-scrollbar sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:pb-0">
           {articles.slice(0, 4).map((article) => (
@@ -156,9 +162,11 @@ export default function NewsSection({
             {titleTelugu}
           </h2>
         </div>
-        <Link href={viewAllLink} className="flex items-center gap-1 text-sm font-semibold hover:gap-2 transition-all" style={{ color: accentColor }}>
-          అన్నీ చూడండి <ArrowRight size={14} />
-        </Link>
+        {viewAllLink && (
+          <Link href={viewAllLink} className="flex items-center gap-1 text-sm font-semibold hover:gap-2 transition-all" style={{ color: accentColor }}>
+            అన్నీ చూడండి <ArrowRight size={14} />
+          </Link>
+        )}
       </div>
       <div className="flex overflow-x-auto gap-4 pb-2.5 snap-x hide-scrollbar sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:pb-0">
         {articles.slice(0, 3).map((article) => (

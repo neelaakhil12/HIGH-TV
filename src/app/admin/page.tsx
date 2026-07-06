@@ -93,7 +93,6 @@ import { ZodiacIcon } from '@/components/astrology/HoroscopePageClient';
 // Main 22 Pages/Categories List (excluding subpages and editorial which has its own tab)
 const MAIN_CATEGORIES_LIST = [
   { slug: 'latest', name: 'బ్రేకింగ్ న్యూస్ (Breaking)' },
-  { slug: 'trending', name: 'ట్రెండింగ్ వార్తలు (Trending)' },
   { slug: 'featured', name: 'ముఖ్య వార్తలు (Featured)' },
   { slug: 'politics', name: 'పాలిటిక్స్ (Politics)' },
   { slug: 'national', name: 'నేషనల్ (National)' },
