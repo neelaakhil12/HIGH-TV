@@ -206,9 +206,6 @@ export default async function CategoryPage({
   }
   if (category === 'latest') {
     articles = allArticlesList.filter((n) => n.isBreaking);
-    if (articles.length === 0) {
-      articles = allArticlesList.slice(0, 12);
-    }
   } else if (category === 'trending') {
     articles = allArticlesList.filter((n) => n.isTrending);
   } else if (category === 'featured') {
@@ -593,7 +590,7 @@ export default async function CategoryPage({
                   className="text-lg md:text-4xl font-black text-[#e60000] telugu-text leading-snug"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
                 >
-                  {category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్ వార్తలు' : category === 'telangana' ? 'తెలంగాణ వార్తలు' : `${cat?.name || category} వార్తలు`}
+                  {category === 'andhra-pradesh' ? 'ఆంధ్రప్రదేశ్' : category === 'telangana' ? 'తెలంగాణ' : cat?.name || category}
                 </h1>
               </div>
 
