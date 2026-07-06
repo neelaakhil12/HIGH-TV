@@ -618,6 +618,8 @@ export default function AdminPage() {
 
   // Form field states
   const [newsTitle, setNewsTitle] = useState('');
+  const [editorTrigger, setEditorTrigger] = useState(0);
+  const [draftRestoredStatus, setDraftRestoredStatus] = useState(false);
   const [newsSlug, setNewsSlug] = useState('');
   const [newsDescription, setNewsDescription] = useState('');
   const [newsTags, setNewsTags] = useState<{ name: string; linkedArticleSlug: string | null }[]>([]);
@@ -2041,6 +2043,100 @@ export default function AdminPage() {
     }
   }, [newsTitle, newsViewMode]);
 
+  // Auto-save draft to localStorage whenever fields or body edits change (only in 'add' mode)
+  useEffect(() => {
+    if (newsViewMode !== 'add') return;
+
+    const timer = setTimeout(() => {
+      const draftData = {
+        newsTitle,
+        newsSlug,
+        newsDescription,
+        metaDescription,
+        newsTags,
+        newsAuthor,
+        newsPublishedDate,
+        newsImage,
+        newsImageCaption,
+        newsVideo,
+        isBreakingChecked,
+        isTrendingChecked,
+        isFeaturedChecked,
+        selectedCategories,
+        bodyHTML: editorRef.current?.innerHTML || ''
+      };
+      try {
+        localStorage.setItem('hightv_news_draft', JSON.stringify(draftData));
+      } catch (e) {
+        // Quota exceeded (usually due to large base64 image). Save without image.
+        try {
+          const draftNoImage = { ...draftData, newsImage: '' };
+          localStorage.setItem('hightv_news_draft', JSON.stringify(draftNoImage));
+        } catch (err) {
+          console.error("Failed to save draft to localStorage:", err);
+        }
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [
+    newsViewMode,
+    newsTitle,
+    newsSlug,
+    newsDescription,
+    metaDescription,
+    newsTags,
+    newsAuthor,
+    newsPublishedDate,
+    newsImage,
+    newsImageCaption,
+    newsVideo,
+    isBreakingChecked,
+    isTrendingChecked,
+    isFeaturedChecked,
+    selectedCategories,
+    editorTrigger
+  ]);
+
+  // Restore draft when transitioning to 'add' view mode
+  useEffect(() => {
+    if (newsViewMode === 'add') {
+      const saved = localStorage.getItem('hightv_news_draft');
+      if (saved) {
+        try {
+          const draft = JSON.parse(saved);
+          if (draft.newsTitle) setNewsTitle(draft.newsTitle);
+          if (draft.newsSlug) setNewsSlug(draft.newsSlug);
+          if (draft.newsDescription) setNewsDescription(draft.newsDescription);
+          if (draft.metaDescription) setMetaDescription(draft.metaDescription);
+          if (draft.newsTags) setNewsTags(draft.newsTags);
+          if (draft.newsAuthor) setNewsAuthor(draft.newsAuthor);
+          if (draft.newsPublishedDate) setNewsPublishedDate(draft.newsPublishedDate);
+          if (draft.newsImage) setNewsImage(draft.newsImage);
+          if (draft.newsImageCaption) setNewsImageCaption(draft.newsImageCaption);
+          if (draft.newsVideo) setNewsVideo(draft.newsVideo);
+          if (draft.isBreakingChecked !== undefined) setIsBreakingChecked(draft.isBreakingChecked);
+          if (draft.isTrendingChecked !== undefined) setIsTrendingChecked(draft.isTrendingChecked);
+          if (draft.isFeaturedChecked !== undefined) setIsFeaturedChecked(draft.isFeaturedChecked);
+          if (draft.selectedCategories) setSelectedCategories(draft.selectedCategories);
+
+          setTimeout(() => {
+            if (editorRef.current && draft.bodyHTML) {
+              editorRef.current.innerHTML = draft.bodyHTML;
+            }
+            if (newsTitleRef.current && draft.newsTitle) {
+              newsTitleRef.current.innerHTML = draft.newsTitle;
+            }
+          }, 150);
+
+          setDraftRestoredStatus(true);
+        } catch (err) {
+          console.error("Failed to restore news draft:", err);
+        }
+      }
+    }
+  }, [newsViewMode]);
+
   // Canvas Image Compression (rescale to max 800px width, 70% quality JPG)
   const handleCompressAndSetImage = (file: File, callback: (base64: string) => void) => {
     const reader = new FileReader();
@@ -3237,6 +3333,7 @@ export default function AdminPage() {
         if (response.ok) {
           const added = await response.json();
           setCustomNewsList(prev => [added, ...prev]);
+          localStorage.removeItem('hightv_news_draft');
           alert('Article published successfully!');
           fetchAllTags();
         } else {
@@ -5538,6 +5635,51 @@ export default function AdminPage() {
                 </button>
               </div>
 
+              {/* Draft recovery banner */}
+              {draftRestoredStatus && (
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-2 text-xs font-bold">
+                    <span className="text-base select-none">📝</span>
+                    <span>డ్రాఫ్ట్ విజయవంతంగా పునరుద్ధరించబడింది! (Auto-saved draft recovered successfully!)</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setDraftRestoredStatus(false)}
+                      className="text-xs font-black text-slate-600 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl border border-slate-200 transition-all cursor-pointer"
+                    >
+                      గమనించాను (Dismiss)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        localStorage.removeItem('hightv_news_draft');
+                        setNewsTitle('');
+                        setNewsSlug('');
+                        setNewsDescription('');
+                        setMetaDescription('');
+                        setNewsTags([]);
+                        setNewsAuthor('హై టీవీ డెస్క్');
+                        setNewsPublishedDate('');
+                        setNewsImage('');
+                        setNewsImageCaption('');
+                        setNewsVideo('');
+                        setIsBreakingChecked(false);
+                        setIsTrendingChecked(false);
+                        setIsFeaturedChecked(false);
+                        setSelectedCategories([]);
+                        if (editorRef.current) editorRef.current.innerHTML = '';
+                        if (newsTitleRef.current) newsTitleRef.current.innerHTML = '';
+                        setDraftRestoredStatus(false);
+                      }}
+                      className="text-xs font-black text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100/80 px-3 py-1.5 rounded-xl border border-rose-100 transition-all cursor-pointer"
+                    >
+                      కొత్తది ప్రారంభించండి (Clear / Start Fresh)
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Two Column Grid */}
               <form onSubmit={handleSaveArticle} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
@@ -5553,7 +5695,10 @@ export default function AdminPage() {
                         contentEditable
                         ref={newsTitleRef}
                         suppressContentEditableWarning
-                        onInput={(e) => setNewsTitle(e.currentTarget.innerText)}
+                        onInput={(e) => {
+                          setNewsTitle(e.currentTarget.innerText);
+                          setEditorTrigger(prev => prev + 1);
+                        }}
                         data-placeholder="Enter a catchy headline..."
                         className="wysiwyg-editor-mini w-full bg-slate-50 border-t border-slate-200/60 focus:bg-white px-4 py-3.5 text-base font-bold outline-none transition-colors telugu-text text-slate-800"
                         style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
@@ -5902,6 +6047,7 @@ export default function AdminPage() {
                         ref={editorRef}
                         contentEditable
                         suppressContentEditableWarning
+                        onInput={() => setEditorTrigger(prev => prev + 1)}
                         data-placeholder="వార్త పూర్తి సమాచారాన్ని ఇక్కడ రాయండి..."
                         className="wysiwyg-editor w-full bg-slate-50 border border-slate-200/60 focus:bg-white focus:border-rose-500 rounded-2xl p-5 text-sm outline-none transition-all text-slate-800 overflow-y-auto leading-relaxed telugu-text"
                         style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
