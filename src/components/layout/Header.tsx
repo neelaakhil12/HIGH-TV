@@ -478,7 +478,7 @@ export default function Header() {
                 </button>
                 <div className={`absolute top-full left-0 ${isHealthDropdownOpen ? 'block' : 'hidden'} group-hover:block bg-white border border-gray-100 rounded-b-lg shadow-xl p-2.5 w-52 z-50 animate-fade-in border-t-2 border-[#025390]`}>
                   <div className="flex flex-col gap-0.5 text-left">
-                    <Link onClick={closeAllDropdowns} href="/category/health" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>హెల్త్ వార్తలు</Link>
+                    <Link onClick={closeAllDropdowns} href="/category/health" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>హెల్త్</Link>
                     <Link onClick={closeAllDropdowns} href="/category/doctors-corner" className="px-2.5 py-1.5 text-[17px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>డాక్టర్స్ కార్నర్</Link>
                   </div>
                 </div>
@@ -807,7 +807,7 @@ function MobileSubNav({
             className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/health' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
-            హెల్త్ వార్తలు
+            హెల్త్
           </Link>
           <div className="h-4 w-[1px] bg-white/20" />
           <Link 
@@ -828,7 +828,7 @@ function MobileSubNav({
             className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/vidya' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
-            విద్య హోమ్
+            విద్య
           </Link>
           <div className="h-4 w-[1px] bg-white/20" />
           <Link 
@@ -857,7 +857,7 @@ function MobileSubNav({
             className={`hover:text-[#ffb3d1] transition-colors ${pathname === '/category/upadi' ? 'text-[#ffb3d1]' : 'text-white/90'}`}
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
           >
-            ఉపాధి హోమ్
+            ఉపాధి
           </Link>
           <div className="h-4 w-[1px] bg-white/20" />
           <Link 
