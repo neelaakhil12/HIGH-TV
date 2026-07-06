@@ -50,8 +50,8 @@ export async function generateMetadata({
   const district = allDistricts.find((d) => d.slug === districtSlug);
   const stateName = state === 'telangana' ? 'తెలంగాణ' : 'ఆంధ్రప్రదేశ్';
   return {
-    title: `${district?.name || districtSlug} వార్తలు | హై టీవీ`,
-    description: `${district?.name || districtSlug}, ${stateName} తాజా వార్తలు - హై టీవీ`,
+    title: `${district?.name || districtSlug} వార్తలు | High TV`,
+    description: `${district?.name || districtSlug}, ${stateName} తాజా వార్తలు - High TV`,
   };
 }
 

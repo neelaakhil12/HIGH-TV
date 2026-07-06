@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     : (reporterProfiles[slug] || reporterProfiles['default']);
 
   return {
-    title: `${profile.name} - మా టీమ్ ప్రొఫైల్ & వార్తలు | హై టీవీ`,
+    title: `${profile.name} - Profile & News | High TV`,
     description: profile.bio || '',
   };
 }

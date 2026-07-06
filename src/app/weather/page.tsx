@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import WeatherPageClient from '@/components/weather/WeatherPageClient';
 
 export const metadata: Metadata = {
-  title: 'వాతావరణ సమాచారం - తెలుగు రాష్ట్రాల వాతావరణ అప్‌డేట్స్ | హై టీవీ',
+  title: 'వాతావరణ సమాచారం - తెలుగు రాష్ట్రాల వాతావరణ అప్‌డేట్స్ | High TV',
   description: 'ఆంధ్రప్రదేశ్ మరియు తెలంగాణ నగరాల తాజా వాతావరణ నివేదికలు, ఉష్ణోగ్రతలు మరియు వర్షపాతం అంచనాలు.',
 };
 

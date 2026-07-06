@@ -124,8 +124,8 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${titleName} | హై టీవీ`,
-    description: `${titleName} తాజా వార్తలు - హై టీవీ`,
+    title: `${titleName} | High TV`,
+    description: `${titleName} Latest News - High TV`,
   };
 }
 

@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import HoroscopePageClient from '@/components/astrology/HoroscopePageClient';
 
 export const metadata: Metadata = {
-  title: 'గ్రహం అనుగ్రహం - దినఫలాలు, వారఫలాలు, రాశి ఫలాలు | హై టీవీ',
+  title: 'గ్రహం అనుగ్రహం - దినఫలాలు, వారఫలాలు, రాశి ఫలాలు | High TV',
   description: 'మేషం, వృషభం, మిథునం, కర్కాటకం, సింహం, కన్య, తుల, వృశ్చికం, ధనుస్సు, మకరం, కుంభం, మీనం రాశుల తాజా దిన జాతక ఫలితాలు.',
 };
 

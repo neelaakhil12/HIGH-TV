@@ -127,18 +127,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       ? `https://hightv.in${article.image}`
       : article.image;
 
-  const cleanTitle = article?.title ? article.title.replace(/<[^>]*>/g, '') : 'వార్త | హై టీవీ';
+  const cleanTitle = article?.title ? article.title.replace(/<[^>]*>/g, '') : 'News | High TV';
   const rawDesc = article?.metaDescription || article?.description || '';
   const cleanDesc = rawDesc.replace(/<[^>]*>/g, '');
 
   return {
-    title: `${cleanTitle} | హై టీవీ`,
+    title: `${cleanTitle} | High TV`,
     description: cleanDesc || undefined,
     openGraph: {
-      title: `${cleanTitle} | హై టీవీ`,
+      title: `${cleanTitle} | High TV`,
       description: cleanDesc || undefined,
       url: `https://hightv.in/news/${encodeURIComponent(decodedSlug)}`,
-      siteName: 'హై టీవీ',
+      siteName: 'High TV',
       images: [
         {
           url: imageUrl,
@@ -152,7 +152,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${cleanTitle} | హై టీవీ`,
+      title: `${cleanTitle} | High TV`,
       description: cleanDesc || undefined,
       images: [imageUrl],
     }
