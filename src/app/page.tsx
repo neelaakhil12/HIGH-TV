@@ -665,7 +665,7 @@ export default function HomePage() {
           </div>
 
           {/* ══════════════ RIGHT AD COLUMN (30%) — continuous, no breaks ══════════════ */}
-          <RightSidebar />
+          <RightSidebar categorySlug="home" />
         </div>
       </main>
 

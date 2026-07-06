@@ -25,7 +25,7 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
         const adCat = categorySlug ? `sidebar-ad-category-${categorySlug}` : 'sidebar-ad-category';
         const [catRes, defaultRes, bothRes] = await Promise.all([
           fetch(`/api/articles?category=${adCat}&limit=50&t=` + Date.now()).then(r => r.json()),
-          (categorySlug && categorySlug !== 'home') ? fetch('/api/articles?category=sidebar-ad-category&limit=50&t=' + Date.now()).then(r => r.json()) : Promise.resolve([]),
+          (categorySlug) ? fetch('/api/articles?category=sidebar-ad-category&limit=50&t=' + Date.now()).then(r => r.json()) : Promise.resolve([]),
           fetch('/api/articles?category=sidebar-ad-both&limit=50&t=' + Date.now()).then(r => r.json())
         ]);
         

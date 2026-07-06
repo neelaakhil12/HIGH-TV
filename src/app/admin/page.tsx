@@ -11954,11 +11954,13 @@ export default function AdminPage() {
                         >
                           <span>
                             {sidebarAdTargetCategory
-                              ? sidebarAdTargetCategory === 'telangana'
-                                ? 'తెలంగాణ (Telangana)'
-                                : sidebarAdTargetCategory === 'andhra-pradesh'
-                                  ? 'ఆంధ్రప్రదేశ్ (Andhra Pradesh)'
-                                  : MAIN_CATEGORIES_LIST.find((c) => c.slug === sidebarAdTargetCategory)?.name || sidebarAdTargetCategory
+                              ? sidebarAdTargetCategory === 'home'
+                                ? 'హోమ్ పేజీ (Home Page)'
+                                : sidebarAdTargetCategory === 'telangana'
+                                  ? 'తెలంగాణ (Telangana)'
+                                  : sidebarAdTargetCategory === 'andhra-pradesh'
+                                    ? 'ఆంధ్రప్రదేశ్ (Andhra Pradesh)'
+                                    : MAIN_CATEGORIES_LIST.find((c) => c.slug === sidebarAdTargetCategory)?.name || sidebarAdTargetCategory
                               : 'అన్ని పేజీలు / డిఫాల్ట్ (All Pages / Default)'}
                           </span>
                           <ChevronDown className="w-4 h-4 text-slate-450" />
@@ -11977,6 +11979,16 @@ export default function AdminPage() {
                                 className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-50 text-slate-700 cursor-pointer"
                               >
                                 అన్ని పేజీలు / డిఫాల్ట్ (All Pages / Default)
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSidebarAdTargetCategory('home');
+                                  setIsTargetCatOpen(false);
+                                }}
+                                className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-50 text-slate-700 cursor-pointer"
+                              >
+                                హోమ్ పేజీ (Home Page)
                               </button>
                               <button
                                 type="button"
