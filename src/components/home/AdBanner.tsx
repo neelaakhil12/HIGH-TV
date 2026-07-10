@@ -343,6 +343,9 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
   const [mobileAds, setMobileAds] = useState<{ image: string; link: string }[]>([]);
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
 
+  // Bottom slots show all ads stacked; other slots rotate
+  const isBottomSlot = position.includes('bottom') || position === 'mobile-ad-slot-16' || position === 'slot-16';
+
   useEffect(() => {
     const isMobileSlot = position.startsWith('mobile-ad-');
     if (isMobileSlot || position === 'leaderboard' || position === 'sidebar' || position === 'rectangle') {
@@ -364,13 +367,15 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
     }
   }, [position]);
 
+  // Rotation interval only for non-bottom slots with multiple ads
   useEffect(() => {
+    if (isBottomSlot) return; // bottom slots show all stacked, no rotation
     if (mobileAds.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentAdIndex(prev => (prev + 1) % mobileAds.length);
-    }, 4000); // cycle one ad per 4 seconds
+    }, 4000);
     return () => clearInterval(interval);
-  }, [mobileAds]);
+  }, [mobileAds, isBottomSlot]);
 
 
   useEffect(() => {
@@ -459,6 +464,41 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
   }, [position]);
 
   if (mobileAds.length > 0) {
+    // BOTTOM SLOTS: show all ads stacked one below the other
+    if (isBottomSlot) {
+      return (
+        <div className="w-full flex flex-col items-center gap-3 select-none my-3">
+          {mobileAds.map((ad, idx) => (
+            <div key={idx} className="w-full flex flex-col items-center">
+              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 font-sans md:hidden">ADVERTISEMENT</span>
+              <a
+                href={ad.link}
+                target={ad.link === '#' ? '_self' : '_blank'}
+                rel="noopener noreferrer"
+                onClick={(e) => { if (ad.link === '#') e.preventDefault(); }}
+                className="relative block w-full rounded-lg border border-slate-200/30 overflow-hidden shadow-md group hover:border-[#02599c]/50 transition-colors bg-slate-50"
+              >
+                <div className="absolute top-1.5 left-2 bg-black/50 text-[#ffb3d1] text-[6.5px] font-black px-1.5 py-0.5 rounded leading-none uppercase tracking-wider font-sans z-10">
+                  Sponsor
+                </div>
+                <img
+                  src={ad.image}
+                  alt="Advertisement"
+                  className="w-full h-auto block group-hover:scale-[1.005] transition-transform duration-300"
+                />
+                <div className="absolute top-1.5 right-1.5 opacity-35 z-10">
+                  <svg className="w-2.5 h-2.5 text-white fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                  </svg>
+                </div>
+              </a>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // OTHER SLOTS: show one ad at a time (rotating)
     const activeAd = mobileAds[currentAdIndex] || mobileAds[0];
     return (
       <div className="w-full flex flex-col items-center select-none my-3">
@@ -467,25 +507,18 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
           href={activeAd.link}
           target={activeAd.link === '#' ? '_self' : '_blank'}
           rel="noopener noreferrer"
-          onClick={(e) => {
-            if (activeAd.link === '#') e.preventDefault();
-          }}
+          onClick={(e) => { if (activeAd.link === '#') e.preventDefault(); }}
           className="relative block w-full rounded-lg border border-slate-200/30 overflow-hidden shadow-md group hover:border-[#02599c]/50 transition-colors bg-slate-50"
         >
-          {/* Ad label */}
           <div className="absolute top-1.5 left-2 bg-black/50 text-[#ffb3d1] text-[6.5px] font-black px-1.5 py-0.5 rounded leading-none uppercase tracking-wider font-sans z-10 font-bold">
             Sponsor
           </div>
-
-          {/* Image — natural size, no crop, no clip */}
           <img
             key={currentAdIndex}
             src={activeAd.image}
             alt="Advertisement"
             className="w-full h-auto block group-hover:scale-[1.005] transition-transform duration-300 animate-fade-in"
           />
-
-          {/* Adchoices badge */}
           <div className="absolute top-1.5 right-1.5 opacity-35 z-10">
             <svg className="w-2.5 h-2.5 text-white fill-current" viewBox="0 0 24 24">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
