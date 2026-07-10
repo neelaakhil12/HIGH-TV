@@ -3727,7 +3727,8 @@ export default function AdminPage() {
       'epaper',
       'shorts-videos',
       'hightv-videos',
-      'photos'
+      'photos',
+      'citizen-reporter'
     ];
     setEmployeeCategories(allSlugs);
   };
@@ -3752,7 +3753,8 @@ export default function AdminPage() {
         'epaper',
         'shorts-videos',
         'hightv-videos',
-        'photos'
+        'photos',
+        'citizen-reporter'
       ];
     }
     setEmployeeCategories(prev => {
@@ -3781,7 +3783,8 @@ export default function AdminPage() {
         'epaper',
         'shorts-videos',
         'hightv-videos',
-        'photos'
+        'photos',
+        'citizen-reporter'
       ];
     }
     setEmployeeCategories(prev => prev.filter(c => !slugs.includes(c)));
@@ -7284,6 +7287,12 @@ export default function AdminPage() {
               { slug: 'mobile-ad-cat-sampadakiyam', labelTelugu: 'కేటగిరీ పేజీ: సంపాదకీయం (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Editorial (Between Trending & Polls)' },
               { slug: 'mobile-ad-cat-citizen-reporter', labelTelugu: 'కేటగిరీ పేజీ: సిటిజన్ రిపోర్టర్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Citizen Reporter (Between Trending & Polls)' },
               { slug: 'mobile-ad-cat-weather', labelTelugu: 'కేటగిరీ పేజీ: వాతావరణం (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Weather (Between Trending & Polls)' },
+              { slug: 'mobile-ad-cat-telangana-districts', labelTelugu: 'కేటగిరీ పేజీ: తెలంగాణ జిల్లా వార్తలు (Jillavarthalu)', labelEnglish: 'Category Page: Telangana Districts' },
+              { slug: 'mobile-ad-cat-andhra-pradesh-districts', labelTelugu: 'కేటగిరీ పేజీ: ఆంధ్రప్రదేశ్ జిల్లా వార్తలు (Jillavarthalu)', labelEnglish: 'Category Page: AP Districts' },
+              { slug: 'mobile-ad-cat-doctors-corner', labelTelugu: 'కేటగిరీ పేజీ: డాక్టర్స్ కార్నర్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Doctors Corner' },
+              { slug: 'mobile-ad-cat-admissions', labelTelugu: 'కేటగిరీ పేజీ: అడ్మిషన్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Admissions' },
+              { slug: 'mobile-ad-cat-current-affairs', labelTelugu: 'కేటగిరీ పేజీ: కరెంట్ అఫైర్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Current Affairs' },
+              { slug: 'mobile-ad-cat-notification', labelTelugu: 'కేటగిరీ పేజీ: నోటిఫికేషన్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Notifications' },
 
               // --- ARTICLE PAGES MOBILE ADS (Top rotating / bottom continuous) ---
               { slug: 'mobile-ad-article-top-global', labelTelugu: 'వ్యాసం పేజీ: గ్లోబల్ టాప్ యాడ్ (Global Top Rotating Ad)', labelEnglish: 'Article Page: Global Top' },
@@ -14187,6 +14196,7 @@ export default function AdminPage() {
                         { slug: 'shorts-videos', name: "షార్ట్స్ వీడియోలు (Shorts Videos)" },
                         { slug: 'hightv-videos', name: "హై టీవీ వీడియోలు (HighTV Videos)" },
                         { slug: 'photos', name: "ఫోటో గ్యాలరీ (Photo Gallery)" },
+                        { slug: 'citizen-reporter', name: "సిటిజన్ రిపోర్టర్ (Citizen Reporter)" },
                       ];
                       return [...baseCategories, ...extraSubcategories].map((cat) => {
                         const isSelected = employeeCategories.includes(cat.slug);

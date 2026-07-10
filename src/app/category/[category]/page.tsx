@@ -9,7 +9,7 @@ import NewsCard from '@/components/cards/NewsCard';
 import AdBanner from '@/components/home/AdBanner';
 import RightSidebar from '@/components/layout/RightSidebar';
 import EPaperReader from '@/components/epaper/EPaperReader';
-import CategoryArticlesFeed from '@/components/category/CategoryArticlesFeed';
+import CategoryArticlesFeed, { MobileCategoryFooter } from '@/components/category/CategoryArticlesFeed';
 import WebStoriesPage from '@/components/category/WebStoriesPage';
 import ShortsPage from '@/components/category/ShortsPage';
 import PhotosPage from '@/components/category/PhotosPage';
@@ -641,6 +641,8 @@ export default async function CategoryPage({
                         </div>
                       ))}
                     </div>
+                    {/* Mobile category ads footer */}
+                    <MobileCategoryFooter categorySlug={`${category}-districts`} />
                   </div>
 
                   {/* Sidebar (30%) */}
@@ -655,6 +657,8 @@ export default async function CategoryPage({
                       districts={targetDistricts}
                       initialArticles={allArticlesList}
                     />
+                    {/* Mobile category ads footer */}
+                    <MobileCategoryFooter categorySlug={`${category}-districts`} />
                   </div>
                   {/* Sidebar (30%) */}
                   <RightSidebar categorySlug={`${category}-districts`} />

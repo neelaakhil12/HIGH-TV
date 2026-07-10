@@ -11,7 +11,7 @@ interface CategoryArticlesFeedProps {
   districtSlug?: string;
 }
 
-function MobileCategoryFooter({ categorySlug }: { categorySlug: string }) {
+export function MobileCategoryFooter({ categorySlug }: { categorySlug: string }) {
   const [ads, setAds] = useState<any[]>([]);
 
   useEffect(() => {

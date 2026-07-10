@@ -7,6 +7,7 @@ import BackButton from '@/components/layout/BackButton';
 import RightSidebar from '@/components/layout/RightSidebar';
 import DistrictDropdown from '@/components/layout/DistrictDropdown';
 import AdBanner from '@/components/home/AdBanner';
+import { MobileCategoryFooter } from '@/components/category/CategoryArticlesFeed';
 import { Home, ChevronRight, MapPin } from 'lucide-react';
 import {
   apDistricts,
@@ -227,6 +228,8 @@ export default async function DistrictPage({
                 ))}
               </div>
             )}
+            {/* Mobile category ads footer */}
+            <MobileCategoryFooter categorySlug={`${state}-districts`} />
           </div>
 
           {/* Sidebar (30%) */}
