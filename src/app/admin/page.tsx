@@ -11925,16 +11925,6 @@ export default function AdminPage() {
                       📰 ఈ-పేపర్ హెడర్ యాడ్
                     </button>
                     <button
-                      onClick={() => setAdActiveSubTab('epaper-mobile')}
-                      className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
-                        adActiveSubTab === 'epaper-mobile'
-                          ? 'bg-rose-600 text-white shadow-sm'
-                          : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-                      }`}
-                    >
-                      📰 ఈ-పేపర్ మొబైల్ యాడ్
-                    </button>
-                    <button
                       onClick={() => setAdActiveSubTab('header-ad')}
                       className={`flex-1 py-2.5 px-3 text-center font-black text-xs rounded-xl transition-all cursor-pointer ${
                         adActiveSubTab === 'header-ad'
@@ -12161,7 +12151,7 @@ export default function AdminPage() {
                         <option value="epaper-left">📰 ఈ-పేపర్ ఎడమ సైడ్ యాడ్ (E-Paper Left Side Ad)</option>
                         <option value="epaper-right">📰 ఈ-పేపర్ కుడి సైడ్ యాడ్ (E-Paper Right Side Ad)</option>
                         <option value="epaper-header">📰 ఈ-పేపర్ హెడర్ యాడ్ (E-Paper Header Ad)</option>
-                        <option value="epaper-mobile">📰 ఈ-పేపర్ మొబైల్ యాడ్ (E-Paper Mobile Ad)</option>
+
                         <option value="header-ad">🏠 హెడర్ బ్యానర్ (Header Banner — Top of Page)</option>
                       </select>
                     </div>
