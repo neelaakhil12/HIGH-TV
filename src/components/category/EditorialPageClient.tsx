@@ -206,7 +206,7 @@ export default function EditorialPageClient({ allArticles }: { allArticles: Arti
     <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
       {/* Breadcrumb Row */}
       <div className="flex items-center justify-between gap-4 mb-5 border-b border-gray-100 pb-3 overflow-hidden">
-        <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
+        <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-x-auto hide-scrollbar">
           <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
             <Home className="w-3.5 h-3.5 flex-shrink-0" /> Home
           </Link>

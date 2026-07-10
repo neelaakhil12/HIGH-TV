@@ -139,7 +139,7 @@ export default async function DistrictPage({
         <main className="flex-1 max-w-[1050px] bg-white shadow-md border-x border-gray-200 px-4 py-5 text-left min-w-0">
         {/* Breadcrumb row with dropdown before back button */}
         <div className="flex items-center justify-between gap-4 mb-4 border-b border-gray-100 pb-3 overflow-visible">
-          <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
+          <div className="flex items-center gap-1 md:gap-2 text-[11px] md:text-[15.5px] text-gray-500 font-sans whitespace-nowrap overflow-x-auto hide-scrollbar">
             <Link href="/" className="hover:text-[#025390] transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
               <Home className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" /> Home
             </Link>

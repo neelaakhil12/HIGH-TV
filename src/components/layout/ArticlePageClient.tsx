@@ -741,7 +741,7 @@ export default function ArticlePageClient({
         {/* Breadcrumb & Back Button */}
 
         <div className="flex items-center justify-between gap-4 mb-3 border-b border-gray-100 pb-3 overflow-hidden">
-          <div className="flex items-center gap-1 md:gap-2 text-[13px] md:text-[17.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
+          <div className="flex items-center gap-1 md:gap-2 text-[13px] md:text-[17.5px] text-gray-500 font-sans whitespace-nowrap overflow-x-auto hide-scrollbar">
             <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
               <Home size={14} className="flex-shrink-0" /> Home
             </Link>
@@ -1424,7 +1424,7 @@ export default function ArticlePageClient({
 
       {/* Breadcrumb & Back Button */}
       <div className="flex items-center justify-between gap-4 mb-4 border-b border-gray-100 pb-3 overflow-hidden">
-        <div className="flex items-center gap-1 md:gap-2 text-[13px] md:text-[17.5px] text-gray-500 font-sans whitespace-nowrap overflow-hidden">
+        <div className="flex items-center gap-1 md:gap-2 text-[13px] md:text-[17.5px] text-gray-500 font-sans whitespace-nowrap overflow-x-auto hide-scrollbar">
           <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-0.5 md:gap-1 font-bold flex-shrink-0">
             <Home size={14} className="flex-shrink-0" /> Home
           </Link>

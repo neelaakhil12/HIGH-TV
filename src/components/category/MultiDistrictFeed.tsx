@@ -63,10 +63,10 @@ export default function MultiDistrictFeed({
         <Link
           key={art.id}
           href={`/district/${state}/${art.districtSlug}`}
-          className="flex gap-4 p-3 bg-white hover:bg-blue-50/25 rounded-xl border border-gray-150 transition-all group items-center"
+          className="flex flex-col sm:flex-row gap-4 p-3 bg-white hover:bg-blue-50/25 rounded-xl border border-gray-150 transition-all group sm:items-center"
         >
-          {/* Left Side: Smaller Image */}
-          <div className="w-[110px] h-[75px] sm:w-[140px] sm:h-[95px] flex-shrink-0 rounded-lg overflow-hidden bg-black/5 relative">
+          {/* Left/Top Side: Image */}
+          <div className="w-full h-[180px] sm:w-[140px] sm:h-[95px] flex-shrink-0 rounded-lg overflow-hidden bg-black/5 relative">
             <img
               src={art.image || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop"}
               alt={art.title?.replace(/<[^>]*>/g, '')}
