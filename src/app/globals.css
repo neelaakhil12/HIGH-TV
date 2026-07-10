@@ -48,6 +48,8 @@
 html {
   scroll-behavior: smooth;
   font-size: 120%; /* Global text scale-up — increases all rem units site-wide */
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
