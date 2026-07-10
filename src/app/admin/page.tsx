@@ -23,6 +23,8 @@ import {
   UserCheck,
   Eye,
   CheckCircle,
+  Menu as MenuIcon,
+  X,
   ChevronDown,
   ChevronRight,
   Pencil,
@@ -1393,6 +1395,11 @@ export default function AdminPage() {
   // User Role and Employee states
   const [userRole, setUserRole] = useState<'super-admin' | 'employee'>('super-admin');
   const [employeeInfo, setEmployeeInfo] = useState<any | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [activeTab, newsViewMode, filterCategory]);
 
   // Employees tab states
   const [employeesList, setEmployeesList] = useState<any[]>([]);
@@ -4354,18 +4361,34 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex font-sans admin-theme-wrapper">
       
+      {/* Drawer Overlay Backdrop on Mobile */}
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="fixed inset-0 bg-black/60 z-[45] md:hidden"
+        />
+      )}
+
       {/* ── STICKY LEFT SIDEBAR (Balagam TV Theme) ────────────────────────── */}
-      <aside className="w-64 border-r border-slate-900 bg-[#0b1329] flex flex-col shrink-0 sticky top-0 h-screen select-none">
+      <aside className={`fixed md:sticky top-0 left-0 z-50 md:z-auto h-screen w-64 border-r border-slate-900 bg-[#0b1329] flex flex-col shrink-0 transition-transform duration-300 select-none ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         
         {/* Branding header area */}
-        <div className="p-5 border-b border-slate-900 flex items-center gap-3 shrink-0">
-          <Link href="/" className="block max-w-[45px]">
-            <img src="/logo.png" alt="High TV" className="w-full h-auto object-contain" />
-          </Link>
-          <div className="flex flex-col">
-            <span className="text-sm font-black text-white leading-tight telugu-text">హై టీవీ</span>
-            <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">CMS Panel</span>
+        <div className="p-5 border-b border-slate-900 flex items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-3">
+            <Link href="/" className="block max-w-[45px]">
+              <img src="/logo.png" alt="High TV" className="w-full h-auto object-contain" />
+            </Link>
+            <div className="flex flex-col text-left">
+              <span className="text-sm font-black text-white leading-tight telugu-text">హై టీవీ</span>
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">CMS Panel</span>
+            </div>
           </div>
+          <button
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="md:hidden text-slate-400 hover:text-white p-1 cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Sidebar Navigation */}
@@ -4939,6 +4962,16 @@ export default function AdminPage() {
         {/* Workspace Top Header (Navy Blue Category Navigation Bar) */}
         <div className="flex bg-[#0b1329] border-b border-slate-900 select-none z-30 relative items-center justify-between py-3 px-6 md:px-8 flex-wrap gap-4" ref={dropdownRef}>
           
+          {/* Menu Toggle for Mobile */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden text-slate-300 hover:text-white p-1.5 rounded-lg border border-slate-800 bg-slate-900/60 cursor-pointer"
+            title="Toggle Menu"
+          >
+            <MenuIcon className="w-5 h-5" />
+          </button>
+
           {/* Left: Website Pages Navigation */}
           {userRole !== 'employee' && (
             <div className="flex items-center gap-2 md:gap-3 flex-wrap">

@@ -1,10 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { ArrowUp, Share2 } from 'lucide-react';
 
 export default function ScrollToTopButton() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
+
+  const isAdminOrEmployee = pathname?.startsWith('/admin') || pathname?.startsWith('/employee') || pathname === '/superadminlogin';
+  if (isAdminOrEmployee) return null;
 
   useEffect(() => {
     // Scroll visibility toggle for Back-to-Top button

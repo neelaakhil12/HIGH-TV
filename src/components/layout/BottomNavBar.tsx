@@ -9,6 +9,9 @@ export default function BottomNavBar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
+  const isAdminOrEmployee = pathname?.startsWith('/admin') || pathname?.startsWith('/employee') || pathname === '/superadminlogin';
+  if (isAdminOrEmployee) return null;
+
   // Close the drawer when path changes
   useEffect(() => {
     setIsOpen(false);
