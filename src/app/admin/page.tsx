@@ -5351,15 +5351,7 @@ export default function AdminPage() {
                   <div className="bg-white border border-slate-200/60 p-5 rounded-2xl flex flex-col gap-1 shadow-sm">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Website Articles (వెబ్‌సైట్ ఆర్టికల్స్)</span>
                     <span className="text-2xl font-bold text-slate-800">
-                      {customNewsList.filter(art => {
-                        const excludeCategories = [
-                          'team-member', 'team-section', 'sidebar-ad-category',
-                          'sidebar-ad-article-left', 'sidebar-ad-article-right', 'sidebar-ad-both',
-                          'header-ad', 'sidebar-ad-epaper-left', 'sidebar-ad-epaper-right',
-                          'sidebar-ad-epaper-header', 'sidebar-ad-epaper-mobile', 'polls'
-                        ];
-                        return !excludeCategories.includes(art.categorySlug) && art.isApproved !== false && art.isDeleted === false;
-                      }).length}
+                      {allArticles.length}
                     </span>
                     <span className="text-[10px] text-emerald-600 font-bold mt-1">Live approved articles</span>
                   </div>
