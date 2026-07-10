@@ -57,8 +57,8 @@ export async function POST(req: NextRequest) {
       auth: { user, pass },
     });
 
-    // Reset Link URL - use env var so it always points to production domain
-    const origin = (process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin).replace(/\/$/, '');
+    // Reset Link URL - hardcoded to production domain to avoid localhost issue on EC2
+    const origin = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, '') || 'https://hightv.in';
     const resetUrl = `${origin}/superadminlogin/reset?token=${token}`;
 
     const mailOptions = {
