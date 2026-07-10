@@ -21,7 +21,28 @@ export async function GET(req: NextRequest) {
 
     const tag = searchParams.get('tag');
 
-    if (category === 'latest') where.isBreaking = true;
+    if (category === 'latest') {
+      const pinsSetting = await prisma.setting.findUnique({
+        where: { key: 'sidebar_category_pins' }
+      });
+      let pinnedBreakingIds: string[] = [];
+      if (pinsSetting?.value) {
+        try {
+          const parsed = JSON.parse(pinsSetting.value);
+          Object.values(parsed).forEach((catPins: any) => {
+            if (catPins && Array.isArray(catPins.breaking)) {
+              catPins.breaking.forEach((id: any) => pinnedBreakingIds.push(String(id)));
+            }
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      where.OR = [
+        { isBreaking: true },
+        { id: { in: pinnedBreakingIds } }
+      ];
+    }
     else if (category === 'trending') where.isTrending = true;
     else if (category === 'featured') where.isFeatured = true;
     else if (category && category !== 'all') {

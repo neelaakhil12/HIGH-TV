@@ -9216,10 +9216,7 @@ export default function AdminPage() {
                       {/* Target Placements */}
                       <div className="flex flex-col gap-2">
                         <label className="text-[10px] font-black text-[#02599c] uppercase tracking-widest">Target Placements</label>
-                        <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
-                          <input type="checkbox" checked={isBreakingChecked} onChange={(e) => setIsBreakingChecked(e.target.checked)} className="w-3.5 h-3.5" />
-                          Breaking News
-                        </label>
+                        {/* Breaking News placement is handled dynamically via Sidebar News Config Pins */}
                         <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
                           <input type="checkbox" checked={isTrendingChecked} onChange={(e) => setIsTrendingChecked(e.target.checked)} className="w-3.5 h-3.5" />
                           Trending News

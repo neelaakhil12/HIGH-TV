@@ -175,7 +175,26 @@ export default async function CategoryPage({
       }
       whereClause.categorySlug = { in: editorialSlugs };
     } else if (category === 'latest') {
-      whereClause.isBreaking = true;
+      const pinsSettingLocal = await prisma.setting.findUnique({
+        where: { key: 'sidebar_category_pins' }
+      });
+      let pinnedBreakingIds: string[] = [];
+      if (pinsSettingLocal?.value) {
+        try {
+          const parsed = JSON.parse(pinsSettingLocal.value);
+          Object.values(parsed).forEach((catPins: any) => {
+            if (catPins && Array.isArray(catPins.breaking)) {
+              catPins.breaking.forEach((id: any) => pinnedBreakingIds.push(String(id)));
+            }
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      whereClause.OR = [
+        { isBreaking: true },
+        { id: { in: pinnedBreakingIds } }
+      ];
     } else if (category === 'trending') {
       whereClause.isTrending = true;
     } else if (category === 'featured') {
@@ -250,7 +269,21 @@ export default async function CategoryPage({
     articles = articles.filter((n) => !n.districtSlug);
   }
   if (category === 'latest') {
-    articles = allArticlesList.filter((n) => n.isBreaking);
+    let pinnedBreakingIds: string[] = [];
+    if (pinsSetting?.value) {
+      try {
+        const parsed = JSON.parse(pinsSetting.value);
+        Object.values(parsed).forEach((catPins: any) => {
+          if (catPins && Array.isArray(catPins.breaking)) {
+            catPins.breaking.forEach((id: any) => pinnedBreakingIds.push(String(id)));
+          }
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    const pinnedSet = new Set(pinnedBreakingIds);
+    articles = allArticlesList.filter((n) => n.isBreaking || pinnedSet.has(String(n.id)));
   } else if (category === 'trending') {
     let pinnedTrendingIds: string[] = [];
     try {

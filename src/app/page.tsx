@@ -311,11 +311,26 @@ export default function HomePage() {
           art.categorySlug !== 'header-ad'
         );
 
+        let pinnedBreakingIdsSet = new Set<string>();
+        try {
+          const savedPins = settingsData.sidebar_category_pins;
+          if (savedPins) {
+            const parsed = typeof savedPins === 'string' ? JSON.parse(savedPins) : savedPins;
+            Object.values(parsed).forEach((catPins: any) => {
+              if (catPins && Array.isArray(catPins.breaking)) {
+                catPins.breaking.forEach((id: any) => pinnedBreakingIdsSet.add(String(id)));
+              }
+            });
+          }
+        } catch (err) {
+          console.error("Error reading sidebar_category_pins on home page", err);
+        }
+
         const mappedArticles = filteredDb.map((art: any) => ({
           ...art,
+          isBreaking: art.isBreaking || pinnedBreakingIdsSet.has(String(art.id)),
           content: art.body || '',
         }));
-
 
         setDbArticles(mappedArticles);
 
