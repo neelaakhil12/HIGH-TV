@@ -3321,7 +3321,14 @@ export default function AdminPage() {
       isBreaking: isBreakingChecked,
       isTrending: isTrendingChecked,
       isFeatured: isFeaturedChecked,
-      isApproved: userRole === 'super-admin' ? true : finalAutoPublish
+      isApproved: userRole === 'super-admin'
+        ? true
+        : (editingArticle
+            ? (editingArticle.isApproved || finalAutoPublish)
+            : finalAutoPublish),
+      ...(newsViewMode === 'add'
+        ? { createdBy: userRole === 'employee' && employeeInfo ? employeeInfo.email : 'super-admin' }
+        : { updatedBy: userRole === 'employee' && employeeInfo ? employeeInfo.email : 'super-admin' })
     };
 
     if (newsViewMode === 'add') {
@@ -14446,7 +14453,12 @@ export default function AdminPage() {
                 <div className="bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-200/60 flex flex-col">
                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Articles</span>
                   <span className="text-xl font-bold text-slate-850">
-                    {customNewsList.filter((art) => art.author?.toLowerCase().trim() === selectedEmpForPosts.name?.toLowerCase().trim() && !art.isDeleted).length}
+                    {customNewsList.filter((art) => {
+                      if (art.isDeleted) return false;
+                      return art.createdBy
+                        ? art.createdBy === selectedEmpForPosts.email
+                        : art.author?.toLowerCase().trim() === selectedEmpForPosts.name?.toLowerCase().trim();
+                    }).length}
                   </span>
                 </div>
               </div>
@@ -14466,9 +14478,12 @@ export default function AdminPage() {
                     <tbody className="divide-y divide-slate-100 text-xs text-slate-700 font-medium">
                       {(() => {
                         const empArticles = customNewsList.filter(
-                          (art) =>
-                            art.author?.toLowerCase().trim() === selectedEmpForPosts.name?.toLowerCase().trim() &&
-                            !art.isDeleted
+                          (art) => {
+                            if (art.isDeleted) return false;
+                            return art.createdBy
+                              ? art.createdBy === selectedEmpForPosts.email
+                              : art.author?.toLowerCase().trim() === selectedEmpForPosts.name?.toLowerCase().trim();
+                          }
                         );
 
                         if (empArticles.length === 0) {
@@ -14568,7 +14583,12 @@ export default function AdminPage() {
                     ) : (
                       employeesList.map((emp) => {
                         const postsCount = customNewsList.filter(
-                          (art) => art.author?.toLowerCase().trim() === emp.name?.toLowerCase().trim() && !art.isDeleted
+                          (art) => {
+                            if (art.isDeleted) return false;
+                            return art.createdBy
+                              ? art.createdBy === emp.email
+                              : art.author?.toLowerCase().trim() === emp.name?.toLowerCase().trim();
+                          }
                         ).length;
 
                         return (

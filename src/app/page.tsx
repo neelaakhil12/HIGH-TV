@@ -180,10 +180,15 @@ function LatestNewsFeed() {
   const [latestArticles, setLatestArticles] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('/api/articles?limit=500&t=' + Date.now())
-      .then(res => res.json())
-      .then(dbArticles => {
+    Promise.all([
+      fetch('/api/articles?limit=500&t=' + Date.now()).then(res => res.json()),
+      fetch('/api/deleted-articles?t=' + Date.now()).then(res => res.ok ? res.json() : ({ deletedIds: [], deletedSlugs: [] }))
+    ])
+      .then(([dbArticles, deletedData]) => {
         if (!Array.isArray(dbArticles)) return;
+        
+        const deletedIds = new Set((deletedData?.deletedIds || []).map(String));
+        const deletedSlugs = new Set((deletedData?.deletedSlugs || []).map(String));
         
         const filteredDb = dbArticles.filter((art: any) => 
           !art.categorySlug.startsWith('sidebar-ad-') &&
@@ -205,7 +210,7 @@ function LatestNewsFeed() {
             return true;
           });
           const dbIds = new Set(dbFiltered.map(a => a.id));
-          const filteredStatic = staticList.filter(a => !dbIds.has(a.id));
+          const filteredStatic = staticList.filter(a => !dbIds.has(a.id) && !deletedIds.has(String(a.id)) && !deletedSlugs.has(String(a.slug)));
           return [...dbFiltered, ...filteredStatic];
         };
 
@@ -290,12 +295,16 @@ export default function HomePage() {
   useEffect(() => {
     // 1. Fetch main news feed (excluding body, limit 150) and sidebar category pins
     Promise.all([
-      fetch('/api/articles?limit=150&excludeBody=true&t=' + Date.now()).then(res => res.json()),
-      fetch('/api/settings?key=sidebar_category_pins&t=' + Date.now()).then(res => res.ok ? res.json() : ({} as any))
+      fetch('/api/articles?limit=5000&excludeBody=true&t=' + Date.now()).then(res => res.json()),
+      fetch('/api/settings?key=sidebar_category_pins&t=' + Date.now()).then(res => res.ok ? res.json() : ({} as any)),
+      fetch('/api/deleted-articles?t=' + Date.now()).then(res => res.ok ? res.json() : ({ deletedIds: [], deletedSlugs: [] }))
     ])
-      .then(async ([dbArticlesData, settingsData]) => {
+      .then(async ([dbArticlesData, settingsData, deletedData]) => {
         if (!Array.isArray(dbArticlesData)) return;
         
+        const deletedIds = new Set((deletedData?.deletedIds || []).map(String));
+        const deletedSlugs = new Set((deletedData?.deletedSlugs || []).map(String));
+
         const filteredDb = dbArticlesData.filter((art: any) => 
           !art.categorySlug.startsWith('sidebar-ad-') &&
           !art.categorySlug.startsWith('mobile-ad-') &&
@@ -318,7 +327,7 @@ export default function HomePage() {
             return true;
           });
           const dbIds = new Set(dbFiltered.map(a => a.id));
-          const filteredStatic = staticList.filter(a => !dbIds.has(a.id));
+          const filteredStatic = staticList.filter(a => !dbIds.has(a.id) && !deletedIds.has(String(a.id)) && !deletedSlugs.has(String(a.slug)));
           return [...dbFiltered, ...filteredStatic];
         };
 

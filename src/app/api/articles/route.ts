@@ -70,6 +70,8 @@ export async function GET(req: NextRequest) {
       isTrending: true,
       isFeatured: true,
       isApproved: true,
+      createdBy: true,
+      updatedBy: true,
     };
 
     if (!excludeBody) {

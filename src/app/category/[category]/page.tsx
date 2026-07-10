@@ -152,40 +152,68 @@ export default async function CategoryPage({
   let dbArticles: any[] = [];
   let deletedArticles: any[] = [];
   let pinsSetting: any = null;
-    const shouldSelectBody = category === 'shorts' || category === 'sampadakiyam';
+  const shouldSelectBody = category === 'shorts' || category === 'sampadakiyam';
 
-    try {
-      [dbArticles, deletedArticles, pinsSetting] = await Promise.all([
-        prisma.article.findMany({
-          where: { isDeleted: false, isApproved: true },
-          orderBy: { publishedAt: 'desc' },
-          take: 100,
-          select: {
-            id: true,
-            title: true,
-            slug: true,
-            categorySlug: true,
-            districtSlug: true,
-            category: true,
-            author: true,
-            publishedAt: true,
-            description: true,
-            image: true,
-            views: true,
-            isBreaking: true,
-            isTrending: true,
-            isFeatured: true,
-            body: shouldSelectBody,
+  // Build category-specific database filter
+  const whereClause: any = { isDeleted: false, isApproved: true };
+  let editorialSlugs = ['sampadakiyam', 'adyathmikam', 'antharmadanam'];
+
+  try {
+    if (category === 'sampadakiyam') {
+      const config = await prisma.setting.findUnique({
+        where: { key: 'editorial_sections_config' }
+      });
+      if (config?.value) {
+        try {
+          const parsed = JSON.parse(config.value);
+          if (Array.isArray(parsed)) {
+            editorialSlugs = parsed.map((s: any) => s.slug).filter(Boolean);
           }
-        }),
-        prisma.article.findMany({
-          where: { isDeleted: true },
-          select: { id: true, slug: true }
-        }),
-        prisma.setting.findUnique({
-          where: { key: 'sidebar_category_pins' }
-        })
-      ]);
+        } catch (e) {
+          console.error("Error parsing editorial_sections_config:", e);
+        }
+      }
+      whereClause.categorySlug = { in: editorialSlugs };
+    } else if (category === 'latest') {
+      whereClause.isBreaking = true;
+    } else if (category === 'trending') {
+      whereClause.isTrending = true;
+    } else if (category === 'featured') {
+      whereClause.isFeatured = true;
+    } else if (category && category !== 'all') {
+      whereClause.categorySlug = category;
+    }
+
+    [dbArticles, deletedArticles, pinsSetting] = await Promise.all([
+      prisma.article.findMany({
+        where: whereClause,
+        orderBy: { publishedAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          categorySlug: true,
+          districtSlug: true,
+          category: true,
+          author: true,
+          publishedAt: true,
+          description: true,
+          image: true,
+          views: true,
+          isBreaking: true,
+          isTrending: true,
+          isFeatured: true,
+          body: shouldSelectBody,
+        }
+      }),
+      prisma.article.findMany({
+        where: { isDeleted: true },
+        select: { id: true, slug: true }
+      }),
+      prisma.setting.findUnique({
+        where: { key: 'sidebar_category_pins' }
+      })
+    ]);
   } catch (e) {
     console.error('Error fetching articles for category page:', e);
   }

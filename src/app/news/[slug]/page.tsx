@@ -194,10 +194,38 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     );
   }
 
-  // 1. Fetch latest articles from the live database
+  // 1. Fetch requested article by slug and latest articles from the live database
+  let requestedDbArticle: any = null;
   let dbArticles: any[] = [];
   let deletedArticles: any[] = [];
   try {
+    requestedDbArticle = await prisma.article.findUnique({
+      where: { slug: decodedSlug, isDeleted: false, isApproved: true },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        categorySlug: true,
+        districtSlug: true,
+        category: true,
+        author: true,
+        publishedAt: true,
+        description: true,
+        metaDescription: true,
+        image: true,
+        imageCaption: true,
+        tags: {
+          select: { name: true, linkedArticleSlug: true }
+        },
+        views: true,
+        isBreaking: true,
+        isTrending: true,
+        isFeatured: true,
+        updatedAt: true,
+        body: true
+      }
+    });
+
     [dbArticles, deletedArticles] = await Promise.all([
       prisma.article.findMany({
         where: { isDeleted: false, isApproved: true },
@@ -212,7 +240,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           category: true,
           author: true,
           publishedAt: true,
-           description: true,
+          description: true,
           metaDescription: true,
           image: true,
           imageCaption: true,
@@ -247,6 +275,16 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     publishedAt: art.publishedAt instanceof Date ? art.publishedAt.toISOString() : art.publishedAt,
     updatedAt: art.updatedAt instanceof Date ? art.updatedAt.toISOString() : art.updatedAt,
   }));
+
+  if (requestedDbArticle && !mappedDbArticles.some(a => a.id === requestedDbArticle.id)) {
+    mappedDbArticles.unshift({
+      ...requestedDbArticle,
+      body: requestedDbArticle.body || '',
+      content: requestedDbArticle.body || '',
+      publishedAt: requestedDbArticle.publishedAt instanceof Date ? requestedDbArticle.publishedAt.toISOString() : requestedDbArticle.publishedAt,
+      updatedAt: requestedDbArticle.updatedAt instanceof Date ? requestedDbArticle.updatedAt.toISOString() : requestedDbArticle.updatedAt,
+    });
+  }
 
   const filteredAllNews = allNews.filter(art => !deletedIds.has(art.id) && !deletedSlugs.has(art.slug));
   const combinedNews = [...mappedDbArticles, ...filteredAllNews];
