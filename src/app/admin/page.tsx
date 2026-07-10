@@ -5332,7 +5332,22 @@ export default function AdminPage() {
                   </div>
                   <div className="bg-white border border-slate-200/60 p-5 rounded-2xl flex flex-col gap-1 shadow-sm">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Your Uploaded Articles (మీరు అప్‌లోడ్ చేసిన ఆర్టికల్స్)</span>
-                    <span className="text-2xl font-bold text-slate-800">{allArticles.length}</span>
+                    <span className="text-2xl font-bold text-slate-800">
+                      {(() => {
+                        const empName = employeeInfo?.name?.toLowerCase().trim();
+                        if (!empName) return 0;
+                        const excludeCategories = [
+                          'team-member', 'team-section', 'sidebar-ad-category',
+                          'sidebar-ad-article-left', 'sidebar-ad-article-right', 'sidebar-ad-both',
+                          'header-ad', 'sidebar-ad-epaper-left', 'sidebar-ad-epaper-right',
+                          'sidebar-ad-epaper-header', 'sidebar-ad-epaper-mobile', 'polls'
+                        ];
+                        return customNewsList.filter(art => 
+                          !excludeCategories.includes(art.categorySlug) &&
+                          art.author?.toLowerCase().trim() === empName
+                        ).length;
+                      })()}
+                    </span>
                     <span className="text-[10px] text-[#02599c] font-bold mt-1">Uploaded by you</span>
                   </div>
                 </div>
