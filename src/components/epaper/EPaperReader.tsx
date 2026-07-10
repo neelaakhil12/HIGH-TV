@@ -2104,7 +2104,7 @@ export default function EPaperReader() {
 
           {/* E-Paper Header Ad */}
           {epaperHeaderAd && (
-            <div className="w-full max-w-[1200px] mx-auto px-4 mt-6">
+            <div className="hidden md:block w-full max-w-[1200px] mx-auto px-4 mt-6">
               <span className="text-[9px] font-bold text-gray-405 uppercase tracking-widest mb-1 block text-center font-sans">ADVERTISEMENT</span>
               <a 
                 href={epaperHeaderAd.link} 
