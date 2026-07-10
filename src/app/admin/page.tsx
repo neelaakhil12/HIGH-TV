@@ -1927,8 +1927,8 @@ export default function AdminPage() {
         setInlineImageEnabled(getSetting('inline_article_image_enabled') === 'true');
         setInlineImageData(getSetting('inline_article_image_data') || '');
         setInlineImageCaption(getSetting('inline_article_image_caption') || 'యోగ ఆసనాలు వేస్తున్న మోదీ..');
-        const savedInlinePromos = getSetting('inline_article_promos_enabled', 'true');
-        setInlinePromosEnabled(savedInlinePromos === null ? true : savedInlinePromos === 'true');
+        const savedInlinePromos = getSetting('inline_article_promos_enabled', 'false');
+        setInlinePromosEnabled(savedInlinePromos === 'true');
 
         // 8. Homepage banner slides fallback
         const savedSlides = getSetting('homepage_banner_slides');

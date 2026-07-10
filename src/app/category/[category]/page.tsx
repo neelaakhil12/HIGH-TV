@@ -232,6 +232,12 @@ export default async function CategoryPage({
   const seenSlugs = new Set<string>();
   const allArticlesList = combinedNews.filter((n) => {
     if (seenSlugs.has(n.slug)) return false;
+    // Exclude ads, team members, team sections from normal news grids/feeds
+    const isAdOrMock = n.categorySlug.startsWith('mobile-ad-') ||
+                       n.categorySlug.startsWith('desktop-ad-') ||
+                       n.categorySlug === 'team-member' ||
+                       n.categorySlug === 'team-section';
+    if (isAdOrMock) return false;
     seenSlugs.add(n.slug);
     return true;
   });

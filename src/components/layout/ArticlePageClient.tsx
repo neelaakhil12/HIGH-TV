@@ -496,12 +496,12 @@ export default function ArticlePageClient({
         }
 
         const savedPromos = getSetting('inline_article_promos_enabled');
-        setInlinePromosEnabled(savedPromos === null ? true : savedPromos === 'true');
+        setInlinePromosEnabled(savedPromos === 'true');
         setIsMounted(true);
       })
       .catch(() => {
         setInlineImage(null);
-        setInlinePromosEnabled(true);
+        setInlinePromosEnabled(false);
         setIsMounted(true);
       });
   }, []);
