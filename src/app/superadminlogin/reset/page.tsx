@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { KeyRound, ShieldCheck, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { KeyRound, ShieldCheck, ShieldAlert, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -11,6 +11,8 @@ function ResetPasswordForm() {
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [isValidating, setIsValidating] = useState(true);
   const [isTokenValid, setIsTokenValid] = useState(false);
   const [error, setError] = useState('');
@@ -134,28 +136,38 @@ function ResetPasswordForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-black text-slate-400 uppercase tracking-wider">New Password</label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Min 6 characters"
-              className="w-full bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-3 text-sm outline-none transition-colors text-white"
-            />
+            <div className="relative">
+              <input
+                type={showNew ? 'text' : 'password'}
+                required
+                minLength={6}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Min 6 characters"
+                className="w-full bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-3 pr-11 text-sm outline-none transition-colors text-white"
+              />
+              <button type="button" onClick={() => setShowNew(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer">
+                {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Confirm Password</label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
-              className="w-full bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-3 text-sm outline-none transition-colors text-white"
-            />
+            <div className="relative">
+              <input
+                type={showConfirm ? 'text' : 'password'}
+                required
+                minLength={6}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm new password"
+                className="w-full bg-slate-950 border border-slate-800 focus:border-[#02599c] rounded-xl px-4 py-3 pr-11 text-sm outline-none transition-colors text-white"
+              />
+              <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer">
+                {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <button

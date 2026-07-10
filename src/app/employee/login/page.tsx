@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { KeyRound, ShieldAlert, LogIn } from 'lucide-react';
+import { KeyRound, ShieldAlert, LogIn, Eye, EyeOff } from 'lucide-react';
 
 export default function EmployeeLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -90,13 +91,20 @@ export default function EmployeeLoginPage() {
             <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Password</label>
             <div className="relative">
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
-                className="w-full bg-slate-950 border border-slate-800 focus:border-green-500 rounded-xl px-4 py-3 text-sm outline-none transition-colors text-white"
+                className="w-full bg-slate-950 border border-slate-800 focus:border-green-500 rounded-xl px-4 py-3 pr-11 text-sm outline-none transition-colors text-white"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
