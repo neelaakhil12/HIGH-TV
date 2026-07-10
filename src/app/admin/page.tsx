@@ -2928,21 +2928,20 @@ export default function AdminPage() {
 
   // Compile full article listings from the live database list
   const allArticles = useMemo(() => {
-    const excludeCategories = [
-      'team-member',
-      'team-section',
-      // 'polls' — intentionally NOT excluded so Polls Manager can list them
-      'sidebar-ad-category',
-      'sidebar-ad-article-left',
-      'sidebar-ad-article-right',
-      'sidebar-ad-both',
-      'header-ad',
-      'sidebar-ad-epaper-left',
-      'sidebar-ad-epaper-right',
-      'sidebar-ad-epaper-header',
-      'sidebar-ad-epaper-mobile'
-    ];
-    let list = [...customNewsList].filter((art) => !excludeCategories.includes(art.categorySlug));
+    let list = [...customNewsList].filter((art) => {
+      const slug = art.categorySlug || '';
+      // Exclude team member/section structures
+      if (slug === 'team-member' || slug === 'team-section') return false;
+      // Exclude all types of ad categories
+      if (slug.startsWith('mobile-ad-') || 
+          slug.startsWith('desktop-ad-') || 
+          slug.startsWith('sidebar-ad-') || 
+          slug.startsWith('header-ad-') || 
+          slug === 'header-ad') {
+        return false;
+      }
+      return true;
+    });
 
     // Show all articles for both super-admin and employee views
 
