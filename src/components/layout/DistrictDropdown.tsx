@@ -49,7 +49,7 @@ export default function DistrictDropdown({ state, currentSlug, districts }: Prop
       {/* Dropdown panel — 3 columns */}
       {open && (
         <div className="absolute left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-xl p-3 w-[450px] max-w-[calc(100vw-2rem)] md:max-w-[560px] overflow-x-auto">
-          <div className="min-w-[300px] md:min-w-[420px]">
+          <div className="min-w-[440px] md:min-w-[480px]">
             <p
               className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-2 px-1"
               style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
