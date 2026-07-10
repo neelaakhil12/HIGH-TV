@@ -7377,7 +7377,14 @@ export default function AdminPage() {
               { slug: 'mobile-ad-article-bottom-health', labelTelugu: 'వ్యాసం పేజీ: ఆరోగ్యం బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Health (Between Read More & Polls)' },
               { slug: 'mobile-ad-article-bottom-viral', labelTelugu: 'వ్యాసం పేజీ: వైరల్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Viral (Between Read More & Polls)' },
               { slug: 'mobile-ad-article-bottom-telangana', labelTelugu: 'వ్యాసం పేజీ: తెలంగాణ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Telangana (Between Read More & Polls)' },
-              { slug: 'mobile-ad-article-bottom-andhra-pradesh', labelTelugu: 'వ్యాసం పేజీ: ఆంధ్రప్రదేశ్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Andhra Pradesh (Between Read More & Polls)' }
+              { slug: 'mobile-ad-article-bottom-andhra-pradesh', labelTelugu: 'వ్యాసం పేజీ: ఆంధ్రప్రదేశ్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Andhra Pradesh (Between Read More & Polls)' },
+
+              // --- E-PAPER PAGE MOBILE ADS ---
+              { slug: 'mobile-ad-epaper-above-main', labelTelugu: 'ఈ-పేపర్ లిస్టింగ్: మెయిన్ ఎడిషన్స్ పైన యాడ్', labelEnglish: 'E-Paper Listing: Above Main Editions' },
+              { slug: 'mobile-ad-epaper-between-main-tg', labelTelugu: 'ఈ-పేపర్ లిస్టింగ్: మెయిన్ & తెలంగాణ మధ్య యాడ్', labelEnglish: 'E-Paper Listing: Between Main & Telangana Districts' },
+              { slug: 'mobile-ad-epaper-between-tg-ap', labelTelugu: 'ఈ-పేపర్ లిస్టింగ్: తెలంగాణ & ఆంధ్రప్రదేశ్ మధ్య యాడ్', labelEnglish: 'E-Paper Listing: Between Telangana & AP Districts' },
+              { slug: 'mobile-ad-epaper-viewer-above', labelTelugu: 'ఈ-పేపర్ వ్యూయర్: ఈ-పేపర్ పైన యాడ్', labelEnglish: 'E-Paper Viewer: Above E-Paper PDF' },
+              { slug: 'mobile-ad-epaper-viewer-below', labelTelugu: 'ఈ-పేపర్ వ్యూయర్: ఈ-పేపర్ కింద యాడ్', labelEnglish: 'E-Paper Viewer: Below E-Paper PDF' },
             ];
 
             return (

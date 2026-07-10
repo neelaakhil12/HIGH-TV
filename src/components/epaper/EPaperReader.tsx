@@ -636,6 +636,14 @@ export default function EPaperReader() {
   const [epaperHeaderAd, setEpaperHeaderAd] = useState<{ image: string; link: string } | null>(null);
   const [epaperMobileAd, setEpaperMobileAd] = useState<{ image: string; link: string } | null>(null);
 
+  // Mobile-only E-Paper Ad slots (managed from Mobile Ads Manager tab)
+  type MobileAd = { image: string; link: string } | null;
+  const [mobileAdAboveMain, setMobileAdAboveMain] = useState<MobileAd>(null);
+  const [mobileAdBetweenMainTg, setMobileAdBetweenMainTg] = useState<MobileAd>(null);
+  const [mobileAdBetweenTgAp, setMobileAdBetweenTgAp] = useState<MobileAd>(null);
+  const [mobileAdViewerAbove, setMobileAdViewerAbove] = useState<MobileAd>(null);
+  const [mobileAdViewerBelow, setMobileAdViewerBelow] = useState<MobileAd>(null);
+
   useEffect(() => {
     // Fetch E-Paper Left Ad
     fetch('/api/articles?category=sidebar-ad-epaper-left&limit=5&t=' + Date.now())
@@ -688,6 +696,24 @@ export default function EPaperReader() {
         }
       })
       .catch(err => console.error('Error fetching epaper mobile ad:', err));
+
+    // Fetch Mobile E-Paper Ad Slots (from Mobile Ads Manager)
+    const fetchMobileEpaperAd = (slug: string, setter: (v: MobileAd) => void) => {
+      fetch(`/api/articles?category=${slug}&limit=5&t=` + Date.now())
+        .then(r => r.ok ? r.json() : [])
+        .then((data: any[]) => {
+          if (Array.isArray(data) && data.length > 0) {
+            const activeAd = data.find((ad: any) => ad.category === 'active');
+            if (activeAd?.image) setter({ image: activeAd.image, link: activeAd.body || '#' });
+          }
+        })
+        .catch(err => console.error(`Error fetching ${slug}:`, err));
+    };
+    fetchMobileEpaperAd('mobile-ad-epaper-above-main', setMobileAdAboveMain);
+    fetchMobileEpaperAd('mobile-ad-epaper-between-main-tg', setMobileAdBetweenMainTg);
+    fetchMobileEpaperAd('mobile-ad-epaper-between-tg-ap', setMobileAdBetweenTgAp);
+    fetchMobileEpaperAd('mobile-ad-epaper-viewer-above', setMobileAdViewerAbove);
+    fetchMobileEpaperAd('mobile-ad-epaper-viewer-below', setMobileAdViewerBelow);
   }, []);
 
   // Clear active highlight when page details change
@@ -2142,11 +2168,30 @@ export default function EPaperReader() {
               
               {sectionsList.map((sec, secIdx) => {
                 const papers = getEditionsForSection(sec.key, sec.key === 'main' ? MAIN_EDITIONS : sec.key === 'telangana' ? TG_EDITIONS : sec.key === 'ap' ? AP_EDITIONS : []);
+
+                // Helper: render a mobile-only ad banner between sections
+                const MobileEpaperAdBlock = ({ ad }: { ad: NonNullable<MobileAd> }) => (
+                  <div className="w-full flex flex-col items-center justify-center my-4">
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">ADVERTISEMENT</span>
+                    <a
+                      href={ad.link}
+                      target={ad.link === '#' ? '_self' : '_blank'}
+                      rel="noopener noreferrer"
+                      onClick={(e) => { if (ad.link === '#') e.preventDefault(); }}
+                      className="block w-full max-w-[360px] overflow-hidden rounded-xl border border-gray-200 shadow-sm"
+                    >
+                      <img src={ad.image} className="w-full h-auto object-contain mx-auto bg-slate-50" alt="Advertisement" />
+                    </a>
+                  </div>
+                );
                 
                 // If it is the main section, render it as a grid of cards
                 if (sec.key === 'main') {
                   return (
                     <div key={sec.id} id={`${sec.key}-editions-section`} className="flex flex-col text-left">
+                      {/* Mobile Ad: Above Main Editions */}
+                      {isMobile && mobileAdAboveMain && <MobileEpaperAdBlock ad={mobileAdAboveMain} />}
+
                       <h2 className="text-xl font-black text-[#02599c] tracking-tight uppercase border-b-2 border-[#02599c] pb-1.5 mb-6">
                         {cleanSectionName(sec.name)}
                       </h2>
@@ -2187,24 +2232,9 @@ export default function EPaperReader() {
                           <div className="text-gray-400 text-sm py-4 col-span-full">No editions match your search.</div>
                         )}
                       </div>
-                      
-                      {secIdx === 0 && isMobile && (
-                        <div className="w-full flex justify-center mt-6">
-                          {epaperMobileAd ? (
-                            <a 
-                              href={epaperMobileAd.link} 
-                              target={epaperMobileAd.link === '#' ? '_self' : '_blank'} 
-                              rel="noopener noreferrer"
-                              onClick={(e) => { if (epaperMobileAd.link === '#') e.preventDefault(); }}
-                              className="block w-full max-w-[340px] overflow-hidden rounded-xl border border-gray-250 shadow-sm"
-                            >
-                              <img src={epaperMobileAd.image} className="w-full h-auto object-contain mx-auto bg-slate-50" alt="Mobile Ad" />
-                            </a>
-                          ) : (
-                            <AdBanner position="rectangle" />
-                          )}
-                        </div>
-                      )}
+
+                      {/* Mobile Ad: Between Main Editions and Telangana Districts */}
+                      {isMobile && mobileAdBetweenMainTg && <MobileEpaperAdBlock ad={mobileAdBetweenMainTg} />}
                     </div>
                   );
                 }
@@ -2219,6 +2249,8 @@ export default function EPaperReader() {
                     {papers.length === 0 && (
                       <div className="text-gray-400 text-sm py-4">No editions match your search.</div>
                     )}
+                    {/* Mobile Ad: Between Telangana Districts and AP Districts */}
+                    {sec.key === 'telangana' && isMobile && mobileAdBetweenTgAp && <MobileEpaperAdBlock ad={mobileAdBetweenTgAp} />}
                   </div>
                 );
               })}
@@ -2496,21 +2528,19 @@ export default function EPaperReader() {
 
                 {/* Page View Frame Wrapper and Mobile Ads */}
                 <div className="flex flex-col items-center gap-2 w-full">
-                  {isMobile && (
-                    <div className="w-full flex justify-center mb-1 px-4">
-                      {epaperMobileAd ? (
-                        <a 
-                          href={epaperMobileAd.link} 
-                          target={epaperMobileAd.link === '#' ? '_self' : '_blank'} 
-                          rel="noopener noreferrer"
-                          onClick={(e) => { if (epaperMobileAd.link === '#') e.preventDefault(); }}
-                          className="block w-full max-w-[340px] overflow-hidden rounded-xl border border-gray-250 shadow-sm"
-                        >
-                          <img src={epaperMobileAd.image} className="w-full h-auto object-contain mx-auto bg-slate-50" alt="Mobile Ad" />
-                        </a>
-                      ) : (
-                        <AdBanner position="leaderboard" />
-                      )}
+                  {/* Mobile Ad: Above E-Paper Viewer */}
+                  {isMobile && mobileAdViewerAbove && (
+                    <div className="w-full flex flex-col items-center justify-center mb-2 px-4">
+                      <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">ADVERTISEMENT</span>
+                      <a
+                        href={mobileAdViewerAbove.link}
+                        target={mobileAdViewerAbove.link === '#' ? '_self' : '_blank'}
+                        rel="noopener noreferrer"
+                        onClick={(e) => { if (mobileAdViewerAbove.link === '#') e.preventDefault(); }}
+                        className="block w-full max-w-[360px] overflow-hidden rounded-xl border border-gray-200 shadow-sm"
+                      >
+                        <img src={mobileAdViewerAbove.image} className="w-full h-auto object-contain mx-auto bg-slate-50" alt="Advertisement" />
+                      </a>
                     </div>
                   )}
 
@@ -2788,21 +2818,19 @@ export default function EPaperReader() {
                 </div>
               </div>
 
-              {isMobile && (
-                <div className="w-full flex justify-center mt-1 px-4 pb-14">
-                  {epaperMobileAd ? (
-                    <a 
-                      href={epaperMobileAd.link} 
-                      target={epaperMobileAd.link === '#' ? '_self' : '_blank'} 
-                      rel="noopener noreferrer"
-                      onClick={(e) => { if (epaperMobileAd.link === '#') e.preventDefault(); }}
-                      className="block w-full max-w-[340px] overflow-hidden rounded-xl border border-gray-250 shadow-sm"
-                    >
-                      <img src={epaperMobileAd.image} className="w-full h-auto object-contain mx-auto bg-slate-50" alt="Mobile Ad" />
-                    </a>
-                  ) : (
-                    <AdBanner position="rectangle" />
-                  )}
+              {/* Mobile Ad: Below E-Paper Viewer */}
+              {isMobile && mobileAdViewerBelow && (
+                <div className="w-full flex flex-col items-center justify-center mt-2 px-4 pb-14">
+                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">ADVERTISEMENT</span>
+                  <a
+                    href={mobileAdViewerBelow.link}
+                    target={mobileAdViewerBelow.link === '#' ? '_self' : '_blank'}
+                    rel="noopener noreferrer"
+                    onClick={(e) => { if (mobileAdViewerBelow.link === '#') e.preventDefault(); }}
+                    className="block w-full max-w-[360px] overflow-hidden rounded-xl border border-gray-200 shadow-sm"
+                  >
+                    <img src={mobileAdViewerBelow.image} className="w-full h-auto object-contain mx-auto bg-slate-50" alt="Advertisement" />
+                  </a>
                 </div>
               )}
             </div>
