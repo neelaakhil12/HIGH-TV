@@ -13,9 +13,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
-    // Retrieve super admin email configuration from settings, default to admin@hightv.in
+    // Retrieve super admin email configuration from settings, default to hightv353@gmail.com
     const emailSetting = await prisma.setting.findUnique({ where: { key: 'superadmin_email' } });
-    const correctEmail = (emailSetting?.value || 'admin@hightv.in').toLowerCase().trim();
+    const correctEmail = (emailSetting?.value || 'hightv353@gmail.com').toLowerCase().trim();
 
     if (email.toLowerCase().trim() !== correctEmail) {
       return NextResponse.json({ error: 'Invalid recovery email address' }, { status: 400 });
