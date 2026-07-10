@@ -5909,7 +5909,37 @@ export default function AdminPage() {
                         type="text"
                         value={tagInput}
                         onChange={(e) => {
-                          setTagInput(e.target.value);
+                          const val = e.target.value;
+                          if (val.includes(',')) {
+                            const parts = val.split(',').map(p => p.trim());
+                            if (val.endsWith(',')) {
+                              const tagsToAdd = parts.slice(0, -1).filter(Boolean);
+                              setNewsTags(prev => {
+                                let updated = [...prev];
+                                for (const t of tagsToAdd) {
+                                  if (!updated.some(x => (typeof x === 'string' ? x : x.name) === t)) {
+                                    updated.push({ name: t, linkedArticleSlug: null });
+                                  }
+                                }
+                                return updated;
+                              });
+                              setTagInput(parts[parts.length - 1] || '');
+                            } else {
+                              const tagsToAdd = parts.filter(Boolean);
+                              setNewsTags(prev => {
+                                let updated = [...prev];
+                                for (const t of tagsToAdd) {
+                                  if (!updated.some(x => (typeof x === 'string' ? x : x.name) === t)) {
+                                    updated.push({ name: t, linkedArticleSlug: null });
+                                  }
+                                }
+                                return updated;
+                              });
+                              setTagInput('');
+                            }
+                          } else {
+                            setTagInput(val);
+                          }
                           setShowSuggestions(true);
                         }}
                         onFocus={() => setShowSuggestions(true)}
@@ -5917,18 +5947,18 @@ export default function AdminPage() {
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault();
-                            const val = tagInput.trim().replace(/,/g, '');
-                            if (val && !newsTags.some(t => (typeof t === 'string' ? t : t.name) === val)) {
-                              setNewsTags([...newsTags, { name: val, linkedArticleSlug: null }]);
-                            }
-                            setTagInput('');
-                          }
-                        }}
-                        onKeyUp={(e) => {
-                          if (e.key === ',' || e.key === 'Enter') {
-                            const val = tagInput.trim().replace(/,/g, '');
-                            if (val && !newsTags.some(t => (typeof t === 'string' ? t : t.name) === val)) {
-                              setNewsTags([...newsTags, { name: val, linkedArticleSlug: null }]);
+                            const val = tagInput.trim();
+                            if (val) {
+                              const parts = val.split(',').map(p => p.trim()).filter(Boolean);
+                              setNewsTags(prev => {
+                                let updated = [...prev];
+                                for (const t of parts) {
+                                  if (!updated.some(x => (typeof x === 'string' ? x : x.name) === t)) {
+                                    updated.push({ name: t, linkedArticleSlug: null });
+                                  }
+                                }
+                                return updated;
+                              });
                             }
                             setTagInput('');
                           }
