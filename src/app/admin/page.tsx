@@ -2937,31 +2937,7 @@ export default function AdminPage() {
     ];
     let list = [...customNewsList].filter((art) => !excludeCategories.includes(art.categorySlug));
 
-    // Apply employee restrictions
-    if (userRole === 'employee' && employeeInfo) {
-      const empName = employeeInfo.name?.toLowerCase().trim();
-      let allowedCats: string[] = [];
-      if (employeeInfo.categories) {
-        try {
-          allowedCats = typeof employeeInfo.categories === 'string'
-            ? JSON.parse(employeeInfo.categories)
-            : employeeInfo.categories;
-        } catch {
-          allowedCats = [];
-        }
-      }
-      list = list.filter((art) => {
-        const isAuthored = art.author?.toLowerCase().trim() === empName;
-        if (!isAuthored) return false;
-
-        if (allowedCats.length > 0) {
-          const catAllowed = allowedCats.includes(art.categorySlug);
-          const distAllowed = art.districtSlug ? allowedCats.includes(art.districtSlug) : false;
-          return catAllowed || distAllowed;
-        }
-        return true;
-      });
-    }
+    // Show all articles for both super-admin and employee views
 
     return list.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
   }, [customNewsList, userRole, employeeInfo]);
@@ -5580,22 +5556,26 @@ export default function AdminPage() {
                                 >
                                   <Eye className="w-4 h-4" />
                                 </Link>
-                                <button
-                                  type="button"
-                                  onClick={() => startEditing(art)}
-                                  className="text-slate-500 hover:text-rose-600 p-2 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-slate-100"
-                                  title="Edit News Article"
-                                >
-                                  <Pencil className="w-4 h-4" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteArticle(art.id)}
-                                  className="text-slate-500 hover:text-red-600 p-2 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-slate-100"
-                                  title="Delete Article"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
+                                {(userRole === 'super-admin' || (employeeInfo && art.author?.toLowerCase().trim() === employeeInfo.name?.toLowerCase().trim())) && (
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() => startEditing(art)}
+                                      className="text-slate-500 hover:text-rose-600 p-2 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-slate-100"
+                                      title="Edit News Article"
+                                    >
+                                      <Pencil className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteArticle(art.id)}
+                                      className="text-slate-500 hover:text-red-600 p-2 transition-colors cursor-pointer inline-flex items-center justify-center rounded-lg hover:bg-slate-100"
+                                      title="Delete Article"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </>
+                                )}
                               </div>
                             </td>
                           </tr>
