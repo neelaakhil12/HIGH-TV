@@ -42,7 +42,9 @@ export default function DistrictDropdown({ state, currentSlug, districts }: Prop
         style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
       >
         <MapPin size={13} className="flex-shrink-0" />
-        {current?.name || 'జిల్లా ఎంచుకోండి'}
+        <span className="truncate max-w-[100px] sm:max-w-none">
+          {current?.name || 'జిల్లా ఎంచుకోండి'}
+        </span>
         <ChevronDown size={13} className={`flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
 
