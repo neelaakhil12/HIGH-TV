@@ -4329,7 +4329,13 @@ export default function AdminPage() {
 
   const handleLogout = () => {
     localStorage.removeItem('high_tv_admin_session');
-    router.push('/superadminlogin');
+    localStorage.removeItem('high_tv_admin_role');
+    localStorage.removeItem('high_tv_employee_info');
+    if (userRole === 'employee') {
+      router.push('/employee/login');
+    } else {
+      router.push('/superadminlogin');
+    }
   };
 
   // Loading Screen
