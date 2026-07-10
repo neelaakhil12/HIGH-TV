@@ -4981,7 +4981,7 @@ export default function AdminPage() {
               <button
                 onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'main' ? null : 'main')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
-                  activeTab === 'news' && MAIN_CATEGORIES_LIST.some(c => c.slug === filterCategory && c.slug !== 'rasipalalu' && c.slug !== 'weather' && c.slug !== 'webstories')
+                  activeTab === 'news' && MAIN_CATEGORIES_LIST.some(c => c.slug === filterCategory && c.slug !== 'rasipalalu' && c.slug !== 'weather' && c.slug !== 'webstories' && c.slug !== 'latest')
                     ? 'bg-rose-600 border-rose-500 text-white font-black'
                     : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
                 }`}
@@ -4993,7 +4993,7 @@ export default function AdminPage() {
                 <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-2xl shadow-2xl p-4 w-[480px]">
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-[300px] overflow-y-auto admin-scrollbar">
                     {MAIN_CATEGORIES_LIST
-                      .filter((cat) => cat.slug !== 'rasipalalu' && cat.slug !== 'weather' && cat.slug !== 'webstories')
+                      .filter((cat) => cat.slug !== 'rasipalalu' && cat.slug !== 'weather' && cat.slug !== 'webstories' && cat.slug !== 'latest')
                       .filter((cat) => isSlugAllowed(cat.slug))
                       .map((cat) => (
                         <button
