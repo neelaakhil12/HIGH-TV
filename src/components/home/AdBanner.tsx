@@ -392,7 +392,10 @@ export default function AdBanner({ position = 'leaderboard' }: AdBannerProps) {
         const distMatch = path.match(/\/district\/[a-zA-Z0-9_-]+\/([a-zA-Z0-9_-]+)/);
         
         if (catMatch && catMatch[1]) {
-          prefix = catMatch[1];
+          const val = catMatch[1];
+          if (val !== 'uma-insights' && val !== 'satya-bytes') {
+            prefix = val;
+          }
         } else if (distMatch && distMatch[1]) {
           prefix = distMatch[1];
         }

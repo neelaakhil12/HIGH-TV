@@ -22,10 +22,11 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
   useEffect(() => {
     const fetchCategoryAds = async () => {
       try {
-        const adCat = categorySlug ? `sidebar-ad-category-${categorySlug}` : 'sidebar-ad-category';
+        const isSeniorReporterCat = categorySlug === 'uma-insights' || categorySlug === 'satya-bytes';
+        const adCat = (categorySlug && !isSeniorReporterCat) ? `sidebar-ad-category-${categorySlug}` : 'sidebar-ad-category';
         const [catRes, defaultRes, bothRes] = await Promise.all([
           fetch(`/api/articles?category=${adCat}&limit=50&t=` + Date.now()).then(r => r.json()),
-          (categorySlug) ? fetch('/api/articles?category=sidebar-ad-category&limit=50&t=' + Date.now()).then(r => r.json()) : Promise.resolve([]),
+          (categorySlug && !isSeniorReporterCat) ? fetch('/api/articles?category=sidebar-ad-category&limit=50&t=' + Date.now()).then(r => r.json()) : Promise.resolve([]),
           fetch('/api/articles?category=sidebar-ad-both&limit=50&t=' + Date.now()).then(r => r.json())
         ]);
         
@@ -290,60 +291,62 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
       ))}
 
       {/* 4. Trending News Widget (ట్రెండింగ్ వార్తలు) */}
-      <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left">
-        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100">
-          <div className="w-1.5 h-6 bg-[#e60000] rounded-full"></div>
-          <h3 className="font-black text-gray-900 text-[18px] md:text-[20px] pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-            {catLabel ? `${catLabel} ట్రెండింగ్` : 'ట్రెండింగ్ వార్తలు'}
-          </h3>
-        </div>
+      {!(categorySlug === 'uma-insights' || categorySlug === 'satya-bytes') && (
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left">
+          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100">
+            <div className="w-1.5 h-6 bg-[#e60000] rounded-full"></div>
+            <h3 className="font-black text-gray-900 text-[18px] md:text-[20px] pl-1 leading-normal telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+              {catLabel ? `${catLabel} ట్రెండింగ్` : 'ట్రెండింగ్ వార్తలు'}
+            </h3>
+          </div>
 
-        {isLoading ? (
-          <div className="space-y-3.5">
-            {[1,2,3,4,5].map(i => (
-              <div key={i} className="flex items-start gap-3 pb-3 border-b border-gray-100 animate-pulse">
-                <div className="w-20 h-14 flex-shrink-0 bg-gray-200 rounded"></div>
-                <div className="flex-1 space-y-2 py-1">
-                  <div className="h-3 bg-gray-200 rounded w-full"></div>
-                  <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+          {isLoading ? (
+            <div className="space-y-3.5">
+              {[1,2,3,4,5].map(i => (
+                <div key={i} className="flex items-start gap-3 pb-3 border-b border-gray-100 animate-pulse">
+                  <div className="w-20 h-14 flex-shrink-0 bg-gray-200 rounded"></div>
+                  <div className="flex-1 space-y-2 py-1">
+                    <div className="h-3 bg-gray-200 rounded w-full"></div>
+                    <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-3.5">
-            {activeTrending.map((article, idx) => {
-              const cleanTitle = article.title ? article.title.replace(/<[^>]*>/g, '').trim() : '';
-              return (
-                <Link
-                  key={`${article.id}-${idx}`}
-                  href={`/news/${article.slug}`}
-                  className="flex items-start gap-3 pb-3 last:pb-0 last:border-b-0 border-b border-gray-55 group cursor-pointer"
-                >
-                  {/* Image thumbnail */}
-                  <div className="w-20 h-14 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
-                    <img
-                      src={article.image}
-                      alt={cleanTitle}
-                      className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
-                    />
-                  </div>
-                  {/* Text */}
-                  <div className="min-w-0 flex-1 py-0.5">
-                    <h4
-                      className="text-[14.5px] md:text-[15.5px] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-relaxed telugu-text line-clamp-2 pl-1.5 pb-0.5"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                    >
-                      {cleanTitle}
-                    </h4>
-                    <span className="text-[12px] text-gray-400 mt-0.5 block"></span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-3.5">
+              {activeTrending.map((article, idx) => {
+                const cleanTitle = article.title ? article.title.replace(/<[^>]*>/g, '').trim() : '';
+                return (
+                  <Link
+                    key={`${article.id}-${idx}`}
+                    href={`/news/${article.slug}`}
+                    className="flex items-start gap-3 pb-3 last:pb-0 last:border-b-0 border-b border-gray-55 group cursor-pointer"
+                  >
+                    {/* Image thumbnail */}
+                    <div className="w-20 h-14 flex-shrink-0 overflow-hidden rounded bg-gray-100 border border-gray-150 relative">
+                      <img
+                        src={article.image}
+                        alt={cleanTitle}
+                        className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-300"
+                      />
+                    </div>
+                    {/* Text */}
+                    <div className="min-w-0 flex-1 py-0.5">
+                      <h4
+                        className="text-[14.5px] md:text-[15.5px] font-bold text-gray-800 group-hover:text-[#02599c] transition-colors leading-relaxed telugu-text line-clamp-2 pl-1.5 pb-0.5"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      >
+                        {cleanTitle}
+                      </h4>
+                      <span className="text-[12px] text-gray-400 mt-0.5 block"></span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Ads between Trending News and Polls (Next 2 ads) */}
       {customSidebarAds.slice(2, 4).map((ad) => (
