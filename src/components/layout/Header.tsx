@@ -376,6 +376,8 @@ export default function Header() {
           <Link href="/category/politics"        className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/politics')}`}>పాలిటిక్స్</Link>
           <Link href="/category/sports"         className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/sports')}`}>స్పోర్ట్స్</Link>
           <Link href="/category/entertainment"  className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/entertainment')}`}>ఫిల్మ్</Link>
+          <Link href="/category/uma-insights"   className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/uma-insights')}`}>ఉమా ఇన్సైట్స్</Link>
+          <Link href="/category/satya-bytes"    className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/satya-bytes')}`}>సత్య బైట్స్</Link>
           <Link href="/category/technology"     className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/technology')}`}>టెక్నాలజీ</Link>
           <Link href="/category/viral"          className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/viral')}`}>వైరల్</Link>
           <Link href="/category/photos"         className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/photos')}`}>ఫోటో గ్యాలరీ</Link>
@@ -593,43 +595,21 @@ export default function Header() {
             </div>
 
             {/* Right: Search & Social Icons */}
-            <div className="hidden md:flex items-center gap-2.5 flex-shrink-0">
-              <Link href="/search" className="text-gray-500 hover:text-[#0b2545] transition-all duration-200 hover:scale-110 flex items-center justify-center" aria-label="Search">
-                <Search size={13.5} className="stroke-[2.5]" />
+            <div className="hidden md:flex items-center gap-2 flex-shrink-0">
+              <Link 
+                href="/category/uma-insights" 
+                className="bg-rose-50 hover:bg-rose-100/80 text-rose-700 text-[13.5px] font-extrabold px-3 py-1.5 rounded-xl border border-rose-250/30 transition-all shadow-3xs hover:scale-[1.02] telugu-text"
+                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+              >
+                ఉమా ఇన్సైట్స్
               </Link>
-              <div className="h-3 w-[1px] bg-gray-300" />
-              <div className="flex items-center gap-2">
-                {/* WhatsApp */}
-                <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#25D366] transition-all duration-200 hover:scale-110 flex items-center justify-center" aria-label="WhatsApp">
-                  <svg className="w-[13px] h-[13px] fill-current" viewBox="0 0 24 24">
-                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.5-5.739-1.453L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.97C16.388 2.017 13.916.99(11.313.99c-5.449 0-9.886 4.374-9.89 9.802-.001 1.765.463 3.49 1.345 5.021l-.998 3.645 3.791-.984zm11.387-5.464c-.301-.15-1.78-.879-2.056-.979-.275-.1-.475-.15-.675.15-.199.299-.775.979-.95 1.178-.175.199-.35.224-.651.075-3.007-1.503-4.937-2.89-6.938-6.315-.262-.449.262-.417.75-1.393.15-.3.075-.563-.038-.763-.113-.2-.979-2.357-1.342-3.237-.354-.852-.714-.737-.979-.75-.251-.012-.539-.015-.826-.015-.288 0-.751.108-1.14.53-.388.421-1.48 1.446-1.48 3.529 0 2.082 1.52 4.09 1.733 4.388.213.299 2.996 4.576 7.259 6.419 1.013.438 1.804.7 2.42.897 1.018.324 1.944.279 2.677.17.817-.121 1.78-.727 2.03-1.43.25-.702.25-1.303.175-1.43-.075-.127-.275-.201-.576-.351z"/>
-                  </svg>
-                </a>
-                {/* Telegram */}
-                <a href="https://t.me/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#0088cc] transition-all duration-200 hover:scale-110 flex items-center justify-center" aria-label="Telegram">
-                  <svg className="w-[13px] h-[13px] fill-current" viewBox="0 0 24 24">
-                    <path d="M11.944 0C5.347 0 0 5.348 0 11.947c0 6.598 5.347 11.947 11.944 11.947 6.598 0 11.948-5.349 11.948-11.947S18.542 0 11.944 0zm5.89 8.24l-1.974 9.297c-.148.653-.537.813-1.084.507l-3.007-2.213-1.452 1.395c-.161.161-.295.295-.606.295l.216-3.063 5.576-5.038c.242-.216-.053-.337-.375-.121L8.257 12.6l-2.969-.927c-.645-.202-.658-.645.135-.955l11.603-4.473c.537-.202 1.007.121.808 1.995z"/>
-                  </svg>
-                </a>
-                {/* Twitter */}
-                <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#0f1419] transition-all duration-200 hover:scale-110 flex items-center justify-center" aria-label="Twitter">
-                  <svg className="w-[12px] h-[12px] fill-current" viewBox="0 0 24 24">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                </a>
-                {/* Facebook */}
-                <a href="https://facebook.com/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#1877F2] transition-all duration-200 hover:scale-110 flex items-center justify-center" aria-label="Facebook">
-                  <svg className="w-[13px] h-[13px] fill-current" viewBox="0 0 24 24">
-                    <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/>
-                  </svg>
-                </a>
-                {/* Instagram */}
-                <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#E1306C] transition-all duration-200 hover:scale-110 flex items-center justify-center" aria-label="Instagram">
-                  <svg className="w-[13px] h-[13px] fill-current" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
-                  </svg>
-                </a>
-              </div>
+              <Link 
+                href="/category/satya-bytes" 
+                className="bg-blue-50 hover:bg-blue-100/80 text-blue-750 text-[13.5px] font-extrabold px-3 py-1.5 rounded-xl border border-blue-250/30 transition-all shadow-3xs hover:scale-[1.02] telugu-text"
+                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+              >
+                సత్య బైట్స్
+              </Link>
             </div>
             
           </div>
@@ -683,6 +663,8 @@ export default function Header() {
                   { href: '/category/politics',       label: 'పాలిటిక్స్'      },
                   { href: '/category/sports',         label: 'స్పోర్ట్స్'       },
                   { href: '/category/entertainment',  label: 'ఫిల్మ్'         },
+                  { href: '/category/uma-insights',   label: 'ఉమా ఇన్సైట్స్'   },
+                  { href: '/category/satya-bytes',    label: 'సత్య బైట్స్'    },
                   { href: '/category/technology',     label: 'టెక్నాలజీ'      },
                   { href: '/category/rasipalalu',     label: 'శుభఫలాలు'      },
                   { href: '/category/viral',          label: 'వైరల్'          },

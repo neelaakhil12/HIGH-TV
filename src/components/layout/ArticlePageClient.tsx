@@ -875,67 +875,124 @@ export default function ArticlePageClient({
           {/* Middle: Full Article Content */}
           <article className="bg-white border border-gray-200 rounded overflow-hidden flex-1 min-w-0 w-full max-w-[750px] mx-auto">
             <div className="p-4 md:p-5">
-              {article.isBreaking && (
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="bg-red-600 text-white text-[12px] font-black px-2 py-0.5 rounded breaking-badge">
-                    🔴 Breaking
-                  </span>
-                </div>
-              )}
+              {(() => {
+                const isSeniorReporterCategory = article.categorySlug === 'uma-insights' || article.categorySlug === 'satya-bytes';
+                if (isSeniorReporterCategory) {
+                  return (
+                    <>
+                      {/* Headline */}
+                      <h1
+                        className="main-headline telugu-text text-[#cc0000] mb-5 text-2xl md:text-3.5xl font-extrabold"
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        dangerouslySetInnerHTML={{ __html: article.title }}
+                      />
 
-              {/* Headline */}
-              <h1
-                className="main-headline telugu-text text-[#cc0000] mb-3"
-                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                dangerouslySetInnerHTML={{ __html: article.title }}
-              />
+                      {/* Reporter Profile Header */}
+                      <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-gray-150 text-left">
+                        <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border border-gray-200 shadow-sm shrink-0">
+                          {reporter && reporter.image ? (
+                            <img src={reporter.image} alt={reporter.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold">
+                              {reporter?.name?.charAt(0) || 'హై'}
+                            </div>
+                          )}
+                        </div>
+                        <div className="space-y-0.5">
+                          <h3 className="font-extrabold text-gray-900 text-base md:text-lg telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                            {reporter ? reporter.name.replace(/.* - /, '') : article.author}
+                          </h3>
+                          <p className="text-xs font-bold text-rose-600 uppercase tracking-wider">
+                            {reporter?.role || 'సీనియర్ జర్నలిస్ట్'}
+                          </p>
+                          <div className="flex items-center gap-1 text-[11px] text-gray-400 font-sans">
+                            <Clock size={10} />
+                            <span>Published: {formatDate(article.publishedAt)}</span>
+                          </div>
+                        </div>
+                        <div className="ml-auto">
+                          <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
+                        </div>
+                      </div>
 
-              {/* Meta row */}
-              <div className="flex flex-wrap items-center gap-3 text-gray-500 mb-4 pb-3 border-b border-gray-100 font-sans meta-info">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-6 h-6 bg-[#025390] rounded-full flex items-center justify-center">
-                    <span className="text-white text-[12px] font-black">హై</span>
-                  </div>
-                  <Link href={`/reporter/${reporter.slug}`} className="font-bold text-[#025390] hover:text-red-600 transition-colors telugu-text" style={{ fontFamily: 'Mandali, sans-serif' }}>
-                    {reporter.name}
-                  </Link>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock size={12} />
-                  <span className="font-semibold">Published: {formatDate(article.publishedAt)}</span>
-                </div>
-                <div className="ml-auto">
-                  <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
-                </div>
-              </div>
+                      {/* Excerpt Shorts Summary */}
+                      {article.description && (
+                        <p
+                          className="block article-summary telugu-text text-gray-800 border-l-4 border-rose-600 pl-4 bg-rose-50/20 py-3 pr-3 rounded-r mb-6 text-[14.5px] md:text-base leading-relaxed font-bold"
+                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          dangerouslySetInnerHTML={{ __html: article.description }}
+                        />
+                      )}
+                    </>
+                  );
+                }
 
-              {/* Description summary */}
-              <p
-                className="block article-summary telugu-text text-gray-700 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r mb-4 text-[14.5px] md:text-base leading-relaxed"
-                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                dangerouslySetInnerHTML={{ __html: article.description }}
-              />
+                return (
+                  <>
+                    {article.isBreaking && (
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="bg-red-600 text-white text-[12px] font-black px-2 py-0.5 rounded breaking-badge">
+                          🔴 Breaking
+                        </span>
+                      </div>
+                    )}
 
-              {/* Hero Image */}
-              <div className="overflow-hidden mb-0 w-full">
-                <FallbackImage
-                  src={article.image}
-                  alt={article.title?.replace(/<[^>]*>/g, '')}
-                  fill={false}
-                  width={1200}
-                  height={675}
-                  className="w-full h-auto block"
-                  style={{ display: 'block', width: '100%', height: 'auto' }}
-                />
-              </div>
-              {article.imageCaption && (
-                <div 
-                  className="mb-5 px-1 pb-1.5 pt-1 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100" 
-                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-                  dangerouslySetInnerHTML={{ __html: article.imageCaption }}
-                />
-              )}
-              {!article.imageCaption && <div className="mb-4" />}
+                    {/* Headline */}
+                    <h1
+                      className="main-headline telugu-text text-[#cc0000] mb-3"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      dangerouslySetInnerHTML={{ __html: article.title }}
+                    />
+
+                    {/* Meta row */}
+                    <div className="flex flex-wrap items-center gap-3 text-gray-500 mb-4 pb-3 border-b border-gray-100 font-sans meta-info">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-6 h-6 bg-[#025390] rounded-full flex items-center justify-center">
+                          <span className="text-white text-[12px] font-black">హై</span>
+                        </div>
+                        <Link href={`/reporter/${reporter.slug}`} className="font-bold text-[#025390] hover:text-red-600 transition-colors telugu-text" style={{ fontFamily: 'Mandali, sans-serif' }}>
+                          {reporter.name}
+                        </Link>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock size={12} />
+                        <span className="font-semibold">Published: {formatDate(article.publishedAt)}</span>
+                      </div>
+                      <div className="ml-auto">
+                        <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
+                      </div>
+                    </div>
+
+                    {/* Description summary */}
+                    <p
+                      className="block article-summary telugu-text text-gray-700 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r mb-4 text-[14.5px] md:text-base leading-relaxed"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      dangerouslySetInnerHTML={{ __html: article.description }}
+                    />
+
+                    {/* Hero Image */}
+                    <div className="overflow-hidden mb-0 w-full">
+                      <FallbackImage
+                        src={article.image}
+                        alt={article.title?.replace(/<[^>]*>/g, '')}
+                        fill={false}
+                        width={1200}
+                        height={675}
+                        className="w-full h-auto block"
+                        style={{ display: 'block', width: '100%', height: 'auto' }}
+                      />
+                    </div>
+                    {article.imageCaption && (
+                      <div 
+                        className="mb-5 px-1 pb-1.5 pt-1 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100" 
+                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        dangerouslySetInnerHTML={{ __html: article.imageCaption }}
+                      />
+                    )}
+                    {!article.imageCaption && <div className="mb-4" />}
+                  </>
+                );
+              })()}
 
               {/* Full Article Body */}
               <div className="telugu-text text-gray-800 article-body" style={{ fontFamily: 'Mandali, "Noto Sans Telugu", sans-serif', lineHeight: '1.85' }}>
@@ -1066,6 +1123,20 @@ export default function ArticlePageClient({
                       </div>
                     )}
                   </>
+                )}
+
+                {/* About Author Button for Senior Reporters */}
+                {isMounted && (article.categorySlug === 'uma-insights' || article.categorySlug === 'satya-bytes') && reporter && reporter.slug && (
+                  <div className="border-t border-gray-100 pt-6 mt-6 pb-2 text-center">
+                    <Link
+                      href={`/team#${reporter.slug}`}
+                      className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#025390] to-[#0269b3] hover:from-[#0b2545] hover:to-[#134074] text-white font-extrabold text-sm py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md hover:scale-[1.02] telugu-text"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    >
+                      <span>రచయిత గురించి (About Author)</span>
+                      <ArrowRight size={14} className="stroke-[2.5]" />
+                    </Link>
+                  </div>
                 )}
 
 

@@ -149,6 +149,8 @@ export default async function TeamPage() {
                       {sectionMembers.map((profile) => (
                         <div 
                           key={profile.slug}
+                          id={profile.slug}
+                          style={{ scrollMarginTop: '100px' }}
                           className="bg-white border border-gray-150 rounded-xl p-5 hover:shadow-md hover:border-blue-100 transition-all duration-300 flex flex-col sm:flex-row gap-5 items-center sm:items-start text-center sm:text-left group"
                         >
                           <Link href={`/reporter/${profile.slug}`} className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-gray-100 shadow-sm flex-shrink-0 relative block img-zoom-container">
@@ -197,6 +199,8 @@ export default async function TeamPage() {
                       {sectionMembers.map((profile) => (
                         <div 
                           key={profile.slug}
+                          id={profile.slug}
+                          style={{ scrollMarginTop: '100px' }}
                           className="bg-white border border-gray-150 rounded-xl p-5 hover:shadow-md hover:border-blue-100 transition-all duration-300 flex flex-col justify-between gap-3 text-left group"
                         >
                           <div className="space-y-2.5">

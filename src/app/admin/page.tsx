@@ -113,11 +113,15 @@ const MAIN_CATEGORIES_LIST = [
   { slug: 'citizen-reporter', name: 'సిటిజన్ రిపోర్టర్' },
   { slug: 'weather', name: 'వెదర్' },
   { slug: 'epaper', name: 'ఈ-పేపర్' },
+  { slug: 'uma-insights', name: 'ఉమా ఇన్సైట్స్ (Uma Insights)' },
+  { slug: 'satya-bytes', name: 'సత్య బైట్స్ (Satya Bytes)' },
 ];
 
 const getCategoryDisplayName = (slug: string) => {
   if (!slug) return '';
   const cleanSlug = slug.toLowerCase().trim();
+  if (cleanSlug === 'uma-insights') return 'ఉమా ఇన్సైట్స్';
+  if (cleanSlug === 'satya-bytes') return 'సత్య బైట్స్';
   if (cleanSlug === 'andhra-pradesh') return 'ఆంధ్రప్రదేశ్ వార్తలు (Andhra Pradesh News)';
   if (cleanSlug === 'telangana') return 'తెలంగాణ వార్తలు (Telangana News)';
   if (cleanSlug === 'home') return 'హోమ్ (Home)';
@@ -517,6 +521,8 @@ const SIDEBAR_CATEGORIES = [
   { slug: 'rasipalalu', name: 'శుభఫలాలు (Astrology)' },
   { slug: 'weather', name: 'వెదర్ (Weather)' },
   { slug: 'sampadakiyam', name: 'ఎడిటోరియల్ (Editorial)' },
+  { slug: 'uma-insights', name: 'ఉమా ఇన్సైట్స్ (Uma Insights)' },
+  { slug: 'satya-bytes', name: 'సత్య బైట్స్ (Satya Bytes)' },
 ];
 
 const getArticleCategoryName = (art: any) => {
@@ -5830,7 +5836,9 @@ export default function AdminPage() {
                                 'upadi': 'Employment News',
                                 'notification': 'Notification News',
                                 'citizen-reporter': 'Citizen Reporter',
-                                'weather': 'Weather News'
+                                'weather': 'Weather News',
+                                'uma-insights': 'ఉమా ఇన్సైట్స్',
+                                'satya-bytes': 'సత్య బైట్స్'
                               };
                               return mappings[slug] || slug;
                             };
@@ -14854,7 +14862,9 @@ export default function AdminPage() {
                       'upadi': 'Employment News',
                       'notification': 'Notification News',
                       'citizen-reporter': 'Citizen Reporter',
-                      'weather': 'Weather News'
+                      'weather': 'Weather News',
+                      'uma-insights': 'ఉమా ఇన్సైట్స్',
+                      'satya-bytes': 'సత్య బైట్స్'
                     };
                     return mappings[slug] || slug;
                   };

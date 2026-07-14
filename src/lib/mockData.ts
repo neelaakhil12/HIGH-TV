@@ -55,6 +55,8 @@ export const categories = [
   { name: 'ఉపాధి', slug: 'upadi', color: '#16a34a' },
   { name: 'నోటిఫికేషన్స్', slug: 'notification', color: '#15803d' },
   { name: 'సిటిజన్ రిపోర్టర్', slug: 'citizen-reporter', color: '#cc0000' },
+  { name: 'ఉమా ఇన్సైట్స్', slug: 'uma-insights', color: '#02599c' },
+  { name: 'సత్య బైట్స్', slug: 'satya-bytes', color: '#db2777' },
 ];
 
 
