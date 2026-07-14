@@ -892,9 +892,11 @@ export default function ArticlePageClient({
                         <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border border-gray-200 shadow-sm shrink-0">
                           {reporter && reporter.image ? (
                             <img src={reporter.image} alt={reporter.name} className="w-full h-full object-cover" />
+                          ) : article.image ? (
+                            <img src={article.image} alt={article.author} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold">
-                              {reporter?.name?.charAt(0) || 'హై'}
+                              {reporter?.name?.charAt(0) || article.author?.charAt(0) || 'హై'}
                             </div>
                           )}
                         </div>
@@ -903,7 +905,7 @@ export default function ArticlePageClient({
                             {reporter ? reporter.name.replace(/.* - /, '') : article.author}
                           </h3>
                           <p className="text-xs font-bold text-rose-600 uppercase tracking-wider">
-                            {reporter?.role || 'సీనియర్ జర్నలిస్ట్'}
+                            {reporter?.role || article.category || 'సీనియర్ జర్నలిస్ట్'}
                           </p>
                           <div className="flex items-center gap-1 text-[11px] text-gray-400 font-sans">
                             <Clock size={10} />

@@ -638,6 +638,7 @@ export default function AdminPage() {
   const [tagLinkSearchQuery, setTagLinkSearchQuery] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
   const [newsAuthor, setNewsAuthor] = useState('హై టీవీ డెస్క్');
+  const [seniorRole, setSeniorRole] = useState('');
 
 
 
@@ -662,6 +663,8 @@ export default function AdminPage() {
   const [sliderSearchQuery, setSliderSearchQuery] = useState('');
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  const isSeniorColumn = filterCategory === 'uma-insights' || filterCategory === 'satya-bytes' || selectedCategories.includes('uma-insights') || selectedCategories.includes('satya-bytes');
 
   // Shorts videos states
   const [shortsFormMode, setShortsFormMode] = useState<'list' | 'add' | 'edit'>('list');
@@ -2007,6 +2010,7 @@ export default function AdminPage() {
       } else {
         setNewsAuthor('హై టీవీ డెస్క్');
       }
+      setSeniorRole('');
       
       // Auto-check Target Placement based on current sidebar filterCategory
       setIsBreakingChecked(filterCategory === 'latest');
@@ -3288,11 +3292,15 @@ export default function AdminPage() {
       }
     }
 
+    const finalCategory = (categorySlug === 'uma-insights' || categorySlug === 'satya-bytes')
+      ? (seniorRole.trim() || resolvedCat)
+      : resolvedCat;
+
     const articleData = {
       title: titlePlainText,
       slug: slugToUse,
       categorySlug,
-      category: resolvedCat,
+      category: finalCategory,
       districtSlug,
       author: newsAuthor.trim() || 'హై టీవీ డెస్క్',
       // For new articles: always use the exact current time when Publish is clicked
@@ -3420,6 +3428,11 @@ export default function AdminPage() {
     setIsBreakingChecked(art.isBreaking || false);
     setIsTrendingChecked(art.isTrending || false);
     setIsFeaturedChecked(art.isFeatured || false);
+    if (art.categorySlug === 'uma-insights' || art.categorySlug === 'satya-bytes') {
+      setSeniorRole(art.category || '');
+    } else {
+      setSeniorRole('');
+    }
 
     // Helper to resolve media library URL placeholders to raw base64 for local editor view
     const convertPlaceholdersToBase64 = (htmlContent: string) => {
@@ -5729,7 +5742,9 @@ export default function AdminPage() {
                   
                   {/* Headline Block */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
-                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Headline (Telugu/English)</label>
+                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
+                      {isSeniorColumn ? 'Headline / శీర్షిక' : 'Headline (Telugu/English)'}
+                    </label>
                     <div className="flex flex-col border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
                       <MiniWysiwygToolbar editorRef={newsTitleRef} />
                       <div
@@ -5763,7 +5778,9 @@ export default function AdminPage() {
 
                   {/* Short Summary (Excerpt) Block */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
-                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Short Summary (Excerpt - Optional)</label>
+                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
+                      {isSeniorColumn ? 'Short Summary / లఘు వివరణ (Excerpt - Optional)' : 'Short Summary (Excerpt - Optional)'}
+                    </label>
                     <textarea
                       rows={2}
                       value={newsDescription}
@@ -5778,7 +5795,9 @@ export default function AdminPage() {
                   {/* Meta Description Block */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
                     <div className="flex items-center justify-between">
-                      <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Meta Description (SEO Summary - Optional)</label>
+                      <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
+                        {isSeniorColumn ? 'Meta Description / సెర్చ్ ఇంజిన్ వివరణ (SEO Summary - Optional)' : 'Meta Description (SEO Summary - Optional)'}
+                      </label>
                       <span className="text-[10px] font-bold text-slate-400">{metaDescription.length}/160 chars</span>
                     </div>
                     <textarea
@@ -5794,7 +5813,9 @@ export default function AdminPage() {
 
                   {/* Tags Block */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
-                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Tags / Keywords</label>
+                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
+                      {isSeniorColumn ? 'Meta Tags / శోధన ట్యాగ్‌లు' : 'Tags / Keywords'}
+                    </label>
                     
                     {/* Added Tags Chips Container */}
                     {newsTags.length > 0 && (
@@ -6011,7 +6032,9 @@ export default function AdminPage() {
 
                   {/* Article Content WYSIWYG Editor Block */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
-                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Article Content</label>
+                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
+                      {isSeniorColumn ? 'Full perception text / పూర్తి విశ్లేషణ' : 'Article Content'}
+                    </label>
                     
                     {/* Rich toolbar options */}
                     <div className="bg-slate-100 border border-slate-200 rounded-xl p-2 flex flex-wrap gap-1.5 items-center select-none text-slate-600">
@@ -6591,20 +6614,39 @@ export default function AdminPage() {
 
                         {/* Dependent Author Name Input or Dropdown */}
                         {selectedAuthorSection === 'custom' ? (
-                          <div className="flex flex-col gap-1">
-                            <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Reporter / Author Name</label>
-                            <input
-                              type="text"
-                              value={newsAuthor}
-                              onChange={(e) => setNewsAuthor(e.target.value)}
-                              placeholder="Reporter name"
-                              className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
-                              style={{ textIndent: '6px' }}
-                            />
-                          </div>
+                          <>
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
+                                {isSeniorColumn ? 'Senior Expertise Name / రచయిత పేరు' : 'Reporter / Author Name'}
+                              </label>
+                              <input
+                                type="text"
+                                value={newsAuthor}
+                                onChange={(e) => setNewsAuthor(e.target.value)}
+                                placeholder={isSeniorColumn ? "రచయిత పేరు" : "Reporter name"}
+                                className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                                style={{ textIndent: '6px' }}
+                              />
+                            </div>
+                            {isSeniorColumn && (
+                              <div className="flex flex-col gap-1">
+                                <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Senior Expertise Role / రచయిత హోదా</label>
+                                <input
+                                  type="text"
+                                  value={seniorRole}
+                                  onChange={(e) => setSeniorRole(e.target.value)}
+                                  placeholder="ఉదా: సీనియర్ జర్నలిస్ట్"
+                                  className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-4 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold"
+                                  style={{ textIndent: '6px' }}
+                                />
+                              </div>
+                            )}
+                          </>
                         ) : (
                           <div className="flex flex-col gap-1">
-                            <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Select Team Member / Reporter</label>
+                            <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
+                              {isSeniorColumn ? 'Select Senior Expertise / రచయితను ఎంచుకోండి' : 'Select Team Member / Reporter'}
+                            </label>
                             <select
                               value={selectedReporterId}
                               onChange={(e) => {
@@ -6614,7 +6656,7 @@ export default function AdminPage() {
                               }}
                               className="bg-slate-50 border border-slate-200/60 focus:border-rose-500 rounded-xl px-3 py-2.5 text-xs outline-none transition-colors text-slate-800 font-bold cursor-pointer"
                             >
-                              <option value="">-- రిపోర్టర్ ని ఎంచుకోండి --</option>
+                              <option value="">{isSeniorColumn ? '-- రచయితను ఎంచుకోండి --' : '-- రిపోర్టర్ ని ఎంచుకోండి --'}</option>
                               {teamMembers
                                 .filter(m => (m.body || 'reporters') === selectedAuthorSection)
                                 .map(m => (
@@ -6652,7 +6694,9 @@ export default function AdminPage() {
                   
                   {/* Featured Image Box */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
-                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">Featured Image</label>
+                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
+                      {isSeniorColumn ? 'Senior Expertise Photo / రచయిత చిత్రం' : 'Featured Image'}
+                    </label>
                     <div className="border-2 border-dashed border-slate-200 hover:border-rose-500 rounded-2xl p-4 bg-slate-50 text-center relative cursor-pointer min-h-[160px] flex items-center justify-center transition-colors">
                       <input
                         type="file"
@@ -6664,7 +6708,9 @@ export default function AdminPage() {
                       {!newsImage ? (
                         <div className="flex flex-col items-center gap-2">
                           <Upload className="w-6 h-6 text-slate-400" />
-                          <span className="text-xs font-bold text-slate-500">Click to upload featured image</span>
+                          <span className="text-xs font-bold text-slate-500">
+                            {isSeniorColumn ? 'Click to upload senior expertise photo' : 'Click to upload featured image'}
+                          </span>
                           <span className="text-[9px] text-slate-400 uppercase tracking-wider">Rescaled to max 800px width</span>
                         </div>
                       ) : (
