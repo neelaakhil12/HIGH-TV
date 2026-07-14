@@ -484,6 +484,15 @@ export default function Header() {
                 </div>
               </div>
 
+              {/* ఫిల్మ్ */}
+              <Link 
+                href="/category/entertainment" 
+                className={`px-3 h-full flex items-center hover:bg-black/15 transition-colors border-r border-white/20 flex-shrink-0 ${navCls('/category/entertainment')}`} 
+                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+              >
+                ఫిల్మ్
+              </Link>
+
               {/* విద్య Dropdown */}
               <div className="relative group border-r border-white/20 h-full flex-shrink-0">
                 <Link 
@@ -537,7 +546,6 @@ export default function Header() {
                         <Link onClick={closeAllDropdowns} href="/category/politics"      className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>పాలిటిక్స్</Link>
                         <Link onClick={closeAllDropdowns} href="/category/technology"    className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>టెక్నాలజీ</Link>
                         <Link onClick={closeAllDropdowns} href="/category/sports"        className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>స్పోర్ట్స్</Link>
-                        <Link onClick={closeAllDropdowns} href="/category/entertainment" className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఫిల్మ్</Link>
                         <Link onClick={closeAllDropdowns} href="/category/rasipalalu"    className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>శుభఫలాలు</Link>
                         <Link onClick={closeAllDropdowns} href="/category/viral"         className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>వైరల్</Link>
                         <Link onClick={closeAllDropdowns} href="/category/photos"        className="px-2 py-1 text-[16px] font-bold text-gray-700 hover:text-[#0b2545] hover:bg-blue-50 rounded-md transition-colors telugu-text block text-left" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>ఫోటో గ్యాలరీ</Link>
