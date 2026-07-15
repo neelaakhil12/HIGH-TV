@@ -41,11 +41,11 @@ export default function CategorySplash({ category }: CategorySplashProps) {
       }`}
     >
       <div className="text-center px-4 select-none">
-        <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-wide font-sans flex items-center justify-center gap-1">
+        <h1 className="text-2.5xl sm:text-4xl md:text-6xl lg:text-7.5xl font-black text-white tracking-wider font-sans flex items-center justify-center gap-1.5">
           <span className="bg-gradient-to-r from-white via-blue-100 to-blue-200 bg-clip-text text-transparent drop-shadow-md">
             {text}
           </span>
-          <span className="w-1.5 h-10 md:h-12 bg-rose-500 animate-pulse shrink-0 rounded-full" />
+          <span className="w-1 md:w-2.5 h-8 sm:h-11 md:h-18 bg-rose-500 animate-pulse shrink-0 rounded-full" />
         </h1>
         <div className="mt-4 text-xs md:text-sm font-bold text-blue-200/50 uppercase tracking-widest animate-pulse">
           High TV Special Column
