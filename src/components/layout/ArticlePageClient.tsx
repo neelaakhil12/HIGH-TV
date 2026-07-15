@@ -9,7 +9,7 @@ import ShareButton from '@/components/layout/ShareButton';
 import DistrictNewsTabs from '@/components/layout/DistrictNewsTabs';
 import AdBanner from '@/components/home/AdBanner';
 import PollWidget from '@/components/home/PollWidget';
-import { Home, ChevronRight, Clock, Calendar, ThumbsUp, TrendingUp } from 'lucide-react';
+import { Home, ChevronRight, Clock, Calendar, ThumbsUp, TrendingUp, ArrowRight } from 'lucide-react';
 import { tgDistricts, apDistricts, formatAuthorName } from '@/lib/mockData';
 
 function FallbackImage({ src, alt, className = '', fill, width, height, ...props }: {
