@@ -902,10 +902,10 @@ export default function ArticlePageClient({
                         </div>
                         <div className="space-y-0.5">
                           <h3 className="font-extrabold text-gray-900 text-base md:text-lg telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-                            {reporter ? reporter.name.replace(/.* - /, '') : article.author}
+                            {isSeniorReporterCategory ? article.author : (reporter ? reporter.name.replace(/.* - /, '') : article.author)}
                           </h3>
                           <p className="text-xs font-bold text-rose-600 uppercase tracking-wider">
-                            {reporter?.role || article.category || 'సీనియర్ జర్నలిస్ట్'}
+                            {isSeniorReporterCategory ? (article.category || 'సీనియర్ జర్నలిస్ట్') : (reporter?.role || article.category || 'స్టాఫ్ రిపోర్టర్')}
                           </p>
                           <div className="flex items-center gap-1 text-[11px] text-gray-400 font-sans">
                             <Clock size={10} />
