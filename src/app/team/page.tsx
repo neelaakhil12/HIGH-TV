@@ -88,7 +88,9 @@ export default async function TeamPage() {
       <Header />
 
       <main className="max-w-[1050px] mx-auto bg-white px-4 py-6 flex-1 shadow-md border-x border-gray-200 w-full">
-        <BackButton />
+        <div className="flex justify-end w-full mb-1">
+          <BackButton />
+        </div>
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-6 border-b border-gray-100 pb-3 flex-wrap font-sans">
           <Link href="/" className="hover:text-brand-blue transition-colors flex items-center gap-1 font-bold">
