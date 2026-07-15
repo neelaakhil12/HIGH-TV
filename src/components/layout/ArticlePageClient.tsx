@@ -100,7 +100,9 @@ function getCategoryLinkInfo(article: any, englishCategories: Record<string, str
     'notification': { label: 'Notification News', href: '/category/notification' },
     'citizen-reporter': { label: 'Citizen Reporter News', href: '/category/citizen-reporter' },
     'weather': { label: 'Weather News', href: '/category/weather' },
-    'live-updates': { label: 'Live Updates', href: '/category/live-updates' }
+    'live-updates': { label: 'Live Updates', href: '/category/live-updates' },
+    'uma-insights': { label: 'Uma Insights', href: '/category/uma-insights' },
+    'satya-bytes': { label: 'Satya Bytes', href: '/category/satya-bytes' }
   };
 
   if (categoryMap[slug]) {
