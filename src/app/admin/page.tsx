@@ -4437,6 +4437,34 @@ export default function AdminPage() {
             </div>
           </button>
 
+          {userRole === 'super-admin' && (
+            <>
+              <button
+                onClick={() => { setActiveTab('news'); setNewsViewMode('list'); setFilterCategory('uma-insights'); }}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                  activeTab === 'news' && filterCategory === 'uma-insights' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <FileText className="w-4 h-4" />
+                  <span className="telugu-text">ఉమా ఇన్సైట్స్ (Uma Insights)</span>
+                </div>
+              </button>
+
+              <button
+                onClick={() => { setActiveTab('news'); setNewsViewMode('list'); setFilterCategory('satya-bytes'); }}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
+                  activeTab === 'news' && filterCategory === 'satya-bytes' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <FileText className="w-4 h-4" />
+                  <span className="telugu-text">సత్య బైట్స్ (Satya Bytes)</span>
+                </div>
+              </button>
+            </>
+          )}
+
           {userRole === 'employee' && employeeInfo && employeeInfo.categories && (
             <div className="ml-4 pl-3.5 border-l border-slate-800 flex flex-col gap-1 mt-1">
               {(() => {
@@ -5000,7 +5028,7 @@ export default function AdminPage() {
               <button
                 onClick={() => setActiveHeaderDropdown(activeHeaderDropdown === 'main' ? null : 'main')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
-                  activeTab === 'news' && MAIN_CATEGORIES_LIST.some(c => c.slug === filterCategory && c.slug !== 'rasipalalu' && c.slug !== 'weather' && c.slug !== 'webstories' && c.slug !== 'latest')
+                  activeTab === 'news' && MAIN_CATEGORIES_LIST.some(c => c.slug === filterCategory && c.slug !== 'rasipalalu' && c.slug !== 'weather' && c.slug !== 'webstories' && c.slug !== 'latest' && c.slug !== 'uma-insights' && c.slug !== 'satya-bytes')
                     ? 'bg-rose-600 border-rose-500 text-white font-black'
                     : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
                 }`}
@@ -5012,7 +5040,7 @@ export default function AdminPage() {
                 <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-2xl shadow-2xl p-4 w-[480px]">
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-[300px] overflow-y-auto admin-scrollbar">
                     {MAIN_CATEGORIES_LIST
-                      .filter((cat) => cat.slug !== 'rasipalalu' && cat.slug !== 'weather' && cat.slug !== 'webstories' && cat.slug !== 'latest')
+                      .filter((cat) => cat.slug !== 'rasipalalu' && cat.slug !== 'weather' && cat.slug !== 'webstories' && cat.slug !== 'latest' && cat.slug !== 'uma-insights' && cat.slug !== 'satya-bytes')
                       .filter((cat) => isSlugAllowed(cat.slug))
                       .map((cat) => (
                         <button
