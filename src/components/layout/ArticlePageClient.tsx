@@ -916,7 +916,21 @@ export default function ArticlePageClient({
                             </div>
                           </div>
                         </div>
-                        <div className="mt-2.5 sm:mt-0 sm:ml-auto w-full sm:w-auto flex justify-start sm:justify-end">
+                        <div className="mt-2.5 sm:mt-0 sm:ml-auto w-full sm:w-auto flex flex-col items-start sm:items-end gap-1.5">
+                          {isMounted && isSeniorReporterCategory && (
+                            <Link
+                              href={
+                                article.categorySlug === 'uma-insights'
+                                  ? '/team#journalist-revuru-uma-maheswara-rao'
+                                  : '/team#satyapal-menon'
+                              }
+                              className="inline-flex items-center justify-center gap-1.5 bg-[#025390] hover:bg-[#0b2545] !text-white hover:!text-white !no-underline hover:!no-underline font-black text-[12px] py-1.5 px-3 rounded-lg transition-all duration-300 shadow-xs telugu-text cursor-pointer select-none active:scale-[0.98]"
+                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif', color: '#ffffff', textDecoration: 'none' }}
+                            >
+                              <span>రచయిత గురించి (About Author)</span>
+                              <ArrowRight size={11} className="stroke-[2.5]" style={{ color: '#ffffff' }} />
+                            </Link>
+                          )}
                           <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
                         </div>
                       </div>
@@ -1146,19 +1160,7 @@ export default function ArticlePageClient({
                   </>
                 )}
 
-                {/* About Author Button for Senior Reporters */}
-                {isMounted && (article.categorySlug === 'uma-insights' || article.categorySlug === 'satya-bytes') && reporter && reporter.slug && (
-                  <div className="border-t border-gray-100 pt-6 mt-6 pb-2 text-center">
-                    <Link
-                      href={`/team#${reporter.slug}`}
-                      className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#025390] to-[#0269b3] hover:from-[#0b2545] hover:to-[#134074] !text-white hover:!text-white !no-underline hover:!no-underline font-extrabold text-sm py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md hover:scale-[1.02] telugu-text"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif', color: '#ffffff', textDecoration: 'none' }}
-                    >
-                      <span style={{ color: '#ffffff', textDecoration: 'none' }}>రచయిత గురించి (About Author)</span>
-                      <ArrowRight size={14} className="stroke-[2.5]" style={{ color: '#ffffff' }} />
-                    </Link>
-                  </div>
-                )}
+
 
 
 
