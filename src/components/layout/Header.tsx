@@ -598,14 +598,14 @@ export default function Header() {
             <div className="hidden md:flex items-center gap-2 flex-shrink-0">
               <Link 
                 href="/category/uma-insights" 
-                className="bg-rose-50 hover:bg-rose-100/80 text-rose-700 text-[13.5px] font-extrabold px-3 py-1.5 rounded-xl border border-rose-250/30 transition-all shadow-3xs hover:scale-[1.02] telugu-text"
+                className="bg-red-50 hover:bg-red-100/80 text-red-700 text-[13.5px] font-extrabold px-3 py-1.5 rounded-xl border border-red-500/40 transition-all shadow-3xs hover:scale-[1.02] telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 ఉమా ఇన్సైట్స్
               </Link>
               <Link 
                 href="/category/satya-bytes" 
-                className="bg-blue-50 hover:bg-blue-100/80 text-blue-750 text-[13.5px] font-extrabold px-3 py-1.5 rounded-xl border border-blue-250/30 transition-all shadow-3xs hover:scale-[1.02] telugu-text"
+                className="bg-emerald-50 hover:bg-emerald-100/80 text-emerald-700 text-[13.5px] font-extrabold px-3 py-1.5 rounded-xl border border-emerald-500/40 transition-all shadow-3xs hover:scale-[1.02] telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
                 సత్య బైట్స్
