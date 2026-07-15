@@ -644,6 +644,7 @@ export default function AdminPage() {
 
   const [newsPublishedDate, setNewsPublishedDate] = useState('');
   const [newsImage, setNewsImage] = useState('');
+  const [seniorFeaturedImage, setSeniorFeaturedImage] = useState('');
   const [newsImageCaption, setNewsImageCaption] = useState('');
   const [newsVideo, setNewsVideo] = useState('');
 
@@ -2002,6 +2003,7 @@ export default function AdminPage() {
       setNewsTags([]);
       setMetaDescription('');
       setNewsImage('');
+      setSeniorFeaturedImage('');
       setNewsImageCaption('');
       setNewsVideo('');
       setEditingArticle(null);
@@ -2197,6 +2199,16 @@ export default function AdminPage() {
     if (file) {
       handleCompressAndSetImage(file, (base64) => {
         setNewsImage(base64);
+      });
+    }
+  };
+
+  // ── Handle senior featured image upload
+  const handleSeniorFeaturedImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleCompressAndSetImage(file, (base64) => {
+        setSeniorFeaturedImage(base64);
       });
     }
   };
@@ -3325,7 +3337,9 @@ export default function AdminPage() {
       description: excerptText,
       metaDescription: metaDescription.trim(),
       body: cleanBodyHTML,
-      image: newsImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop',
+      image: (categorySlug === 'uma-insights' || categorySlug === 'satya-bytes')
+        ? (seniorFeaturedImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop')
+        : (newsImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop'),
       imageCaption: newsImageCaption.trim() || null,
       tags: newsTags,
       isBreaking: isBreakingChecked,
@@ -3340,6 +3354,47 @@ export default function AdminPage() {
         ? { createdBy: userRole === 'employee' && employeeInfo ? employeeInfo.email : 'super-admin' }
         : { updatedBy: userRole === 'employee' && employeeInfo ? employeeInfo.email : 'super-admin' })
     };
+
+    // Sync custom senior reporter to database as a team-member
+    if ((categorySlug === 'uma-insights' || categorySlug === 'satya-bytes') && selectedAuthorSection === 'custom' && newsAuthor.trim()) {
+      try {
+        const checkRes = await fetch(`/api/articles?category=team-member&limit=100&t=${Date.now()}`);
+        if (checkRes.ok) {
+          const membersList = await checkRes.json();
+          const existingMember = Array.isArray(membersList) ? membersList.find((m: any) => m.title === newsAuthor.trim()) : null;
+          
+          const teamMemberData = {
+            title: newsAuthor.trim(),
+            slug: newsAuthor.trim().toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, ''),
+            categorySlug: 'team-member',
+            category: seniorRole.trim() || 'సీనియర్ జర్నలిస్ట్',
+            image: newsImage || 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop',
+            isApproved: true,
+            isDeleted: false,
+            body: 'desk'
+          };
+
+          if (existingMember) {
+            if (existingMember.image !== teamMemberData.image || existingMember.category !== teamMemberData.category) {
+              await fetch(`/api/articles/${existingMember.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...existingMember, ...teamMemberData })
+              });
+            }
+          } else {
+            await fetch('/api/articles', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(teamMemberData)
+            });
+          }
+          fetchTeamData();
+        }
+      } catch (err) {
+        console.error('Error syncing custom senior reporter to team-member list:', err);
+      }
+    }
 
     if (newsViewMode === 'add') {
         const response = await fetch('/api/articles', {
@@ -3419,7 +3474,21 @@ export default function AdminPage() {
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     };
     setNewsPublishedDate(art.publishedAt ? getLocalDatetimeString(art.publishedAt) : getLocalDatetimeString(new Date()));
-    setNewsImage(art.image || '');
+    const isSenior = art.categorySlug === 'uma-insights' || art.categorySlug === 'satya-bytes';
+    if (isSenior) {
+      setSeniorFeaturedImage(art.image || '');
+      const matchedMember = teamMembers.find((m: any) => m.title === art.author);
+      if (matchedMember) {
+        setNewsImage(matchedMember.image || '');
+        setSeniorRole(matchedMember.category || '');
+      } else {
+        setNewsImage('');
+        setSeniorRole(art.category || '');
+      }
+    } else {
+      setNewsImage(art.image || '');
+      setSeniorFeaturedImage('');
+    }
     setNewsImageCaption(art.imageCaption || '');
     
     // Resolve short video
@@ -5833,6 +5902,46 @@ export default function AdminPage() {
                     />
                     <span className="text-[10px] text-slate-400">This snippet is displayed on homepage categories, search pages, and article index card listings.</span>
                   </div>
+
+                  {/* Senior Column Featured Image Option */}
+                  {isSeniorColumn && (
+                    <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
+                      <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
+                        Featured Image / ప్రధాన ప్రదర్శన చిత్రం (Featured Image - Optional)
+                      </label>
+                      <div className="border-2 border-dashed border-slate-200 hover:border-rose-500 rounded-2xl p-4 bg-slate-50 text-center relative cursor-pointer min-h-[140px] flex items-center justify-center transition-colors">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleSeniorFeaturedImageChange}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        />
+                        {!seniorFeaturedImage ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <Upload className="w-6 h-6 text-slate-400" />
+                            <span className="text-xs font-bold text-slate-500">
+                              Click to upload featured image (ప్రధాన చిత్రం)
+                            </span>
+                            <span className="text-[9px] text-slate-400 uppercase tracking-wider">Rescaled to max 800px width</span>
+                          </div>
+                        ) : (
+                          <div className="relative w-full overflow-hidden rounded-xl bg-slate-900 border border-slate-200">
+                            <img src={seniorFeaturedImage} alt="Featured cover" className="w-full h-auto object-cover max-h-[140px] block" />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setSeniorFeaturedImage('');
+                              }}
+                              className="absolute top-2 right-2 bg-black/60 hover:bg-black/90 text-white rounded-full w-5 h-5 flex items-center justify-center transition-colors"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Meta Description Block */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">

@@ -925,6 +925,21 @@ export default function ArticlePageClient({
                           dangerouslySetInnerHTML={{ __html: article.description }}
                         />
                       )}
+
+                      {/* Featured Image */}
+                      {article.image && (
+                        <div className="overflow-hidden mb-6 w-full rounded-2xl border border-gray-100 shadow-xs">
+                          <FallbackImage
+                            src={article.image}
+                            alt={article.title?.replace(/<[^>]*>/g, '')}
+                            fill={false}
+                            width={1200}
+                            height={675}
+                            className="w-full h-auto block object-cover max-h-[480px]"
+                            style={{ display: 'block', width: '100%', height: 'auto' }}
+                          />
+                        </div>
+                      )}
                     </>
                   );
                 }
