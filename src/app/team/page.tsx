@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Header from '@/components/layout/Header';
 import BackButton from '@/components/layout/BackButton';
 import Footer from '@/components/layout/Footer';

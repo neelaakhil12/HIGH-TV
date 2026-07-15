@@ -890,31 +890,33 @@ export default function ArticlePageClient({
                       />
 
                       {/* Reporter Profile Header */}
-                      <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-gray-150 text-left">
-                        <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border border-gray-200 shadow-sm shrink-0">
-                          {reporter && reporter.image ? (
-                            <img src={reporter.image} alt={reporter.name} className="w-full h-full object-cover" />
-                          ) : article.image ? (
-                            <img src={article.image} alt={article.author} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold">
-                              {article.author?.charAt(0) || 'హై'}
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3.5 mb-6 pb-4 border-b border-gray-150 text-left">
+                        <div className="flex items-center gap-3.5 w-full sm:w-auto">
+                          <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border border-gray-200 shadow-sm shrink-0">
+                            {reporter && reporter.image ? (
+                              <img src={reporter.image} alt={reporter.name} className="w-full h-full object-cover" />
+                            ) : article.image ? (
+                              <img src={article.image} alt={article.author} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold">
+                                {article.author?.charAt(0) || 'హై'}
+                              </div>
+                            )}
+                          </div>
+                          <div className="space-y-0.5">
+                            <h3 className="font-extrabold text-gray-900 text-base md:text-lg telugu-text" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}>
+                              {isSeniorReporterCategory ? article.author : (reporter ? reporter.name.replace(/.* - /, '') : article.author)}
+                            </h3>
+                            <p className="text-xs font-bold text-rose-600 uppercase tracking-wider">
+                              {isSeniorReporterCategory ? (article.category || 'సీనియర్ జర్నలిస్ట్') : (reporter?.role || article.category || 'స్టాఫ్ రిపోర్టర్')}
+                            </p>
+                            <div className="flex items-center gap-1 text-[11px] text-gray-400 font-sans">
+                              <Clock size={10} />
+                              <span>Published: {formatDate(article.publishedAt)}</span>
                             </div>
-                          )}
-                        </div>
-                        <div className="space-y-0.5">
-                          <h3 className="font-extrabold text-gray-900 text-base md:text-lg telugu-text" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}>
-                            {isSeniorReporterCategory ? article.author : (reporter ? reporter.name.replace(/.* - /, '') : article.author)}
-                          </h3>
-                          <p className="text-xs font-bold text-rose-600 uppercase tracking-wider">
-                            {isSeniorReporterCategory ? (article.category || 'సీనియర్ జర్నలిస్ట్') : (reporter?.role || article.category || 'స్టాఫ్ రిపోర్టర్')}
-                          </p>
-                          <div className="flex items-center gap-1 text-[11px] text-gray-400 font-sans">
-                            <Clock size={10} />
-                            <span>Published: {formatDate(article.publishedAt)}</span>
                           </div>
                         </div>
-                        <div className="ml-auto">
+                        <div className="mt-2.5 sm:mt-0 sm:ml-auto w-full sm:w-auto flex justify-start sm:justify-end">
                           <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
                         </div>
                       </div>

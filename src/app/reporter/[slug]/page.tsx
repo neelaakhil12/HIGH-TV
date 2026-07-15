@@ -166,9 +166,6 @@ export default async function ReporterPage({ params }: { params: Promise<{ slug:
                 {/* Profile Info */}
                 <div className="flex-1 space-y-3">
                   <div className="space-y-1.5">
-                    <span className="bg-brand-blue/10 text-brand-blue text-[11px] font-bold px-2.5 py-1 rounded-full inline-block uppercase tracking-wider">
-                      Verified Reporter
-                    </span>
                     <h1 
                       className="text-2xl md:text-3xl font-black text-gray-950 telugu-text"
                       style={{ fontFamily: 'Mandali, sans-serif' }}

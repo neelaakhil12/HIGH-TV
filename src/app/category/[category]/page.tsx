@@ -391,7 +391,7 @@ export default async function CategoryPage({
           publishedTimeOnly: `[${19 - (idx % 3)}:${((50 - idx * 12) % 60 + 60) % 60}`.padEnd(7, '0').replace('NaN', '30') + ']'
         };
       })
-    : (category === 'telangana' || category === 'andhra-pradesh')
+    : (category === 'telangana' || category === 'andhra-pradesh' || category === 'uma-insights' || category === 'satya-bytes')
       ? []
       : allArticlesList.slice(0, 12).map((art, idx) => {
           const dist = activeDistrictObj || targetDistricts[idx % targetDistricts.length];
