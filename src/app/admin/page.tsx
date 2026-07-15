@@ -3264,7 +3264,14 @@ export default function AdminPage() {
     }
     const excerptText = newsDescription.trim() || descriptionPlainText || (editorRef.current ? editorRef.current.innerText.slice(0, 140).trim().replace(/<[^>]*>/g, '') + '...' : '');
 
-    const slugToUse = newsSlug.trim() || (() => {
+    const sanitizedSlug = newsSlug.trim().toLowerCase()
+      .replace(/[\u0C00-\u0C7F\u0900-\u097F\u0600-\u06FF]/g, '') // Strip Telugu/Hindi/Arabic
+      .replace(/[^a-z0-9\s-]/g, '')  // Keep only alphanumeric English, spaces, and hyphens
+      .replace(/\s+/g, '-')           // Replace spaces with hyphens
+      .replace(/-+/g, '-')            // Collapse multiple hyphens
+      .replace(/^-|-$/g, '');         // Trim leading/trailing hyphens
+
+    const slugToUse = sanitizedSlug || (() => {
       const base = titlePlainText.toLowerCase()
         .replace(/[\u0C00-\u0C7F\u0900-\u097F\u0600-\u06FF]/g, '') // Strip Telugu/Hindi/Arabic
         .replace(/[^a-z0-9\s-]/g, '')
