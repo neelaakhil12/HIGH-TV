@@ -1147,11 +1147,11 @@ export default function ArticlePageClient({
                   <div className="border-t border-gray-100 pt-6 mt-6 pb-2 text-center">
                     <Link
                       href={`/team#${reporter.slug}`}
-                      className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#025390] to-[#0269b3] hover:from-[#0b2545] hover:to-[#134074] text-white hover:text-white no-underline hover:no-underline font-extrabold text-sm py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md hover:scale-[1.02] telugu-text"
+                      className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#025390] to-[#0269b3] hover:from-[#0b2545] hover:to-[#134074] !text-white hover:!text-white !no-underline hover:!no-underline font-extrabold text-sm py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md hover:scale-[1.02] telugu-text"
                       style={{ fontFamily: 'Noto Sans Telugu, sans-serif', color: '#ffffff', textDecoration: 'none' }}
                     >
-                      <span>రచయిత గురించి (About Author)</span>
-                      <ArrowRight size={14} className="stroke-[2.5]" />
+                      <span style={{ color: '#ffffff', textDecoration: 'none' }}>రచయిత గురించి (About Author)</span>
+                      <ArrowRight size={14} className="stroke-[2.5]" style={{ color: '#ffffff' }} />
                     </Link>
                   </div>
                 )}
