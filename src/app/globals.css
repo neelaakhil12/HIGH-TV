@@ -303,6 +303,11 @@ body {
     line-height: 1.4;
   }
 }
+/* Allow admin-set inline font-size on span/font inside headline to show */
+.main-headline span[style*="font-size"],
+.main-headline font[style*="font-size"] {
+  font-size: revert !important;
+}
 
 /* Secondary Headlines: News cards and category-based articles */
 .secondary-headline {
@@ -372,6 +377,14 @@ body {
     font-size: 16.5px;
     line-height: 1.85;
   }
+}
+
+/* Allow admin-set inline font-size on span/font elements to override body defaults */
+.article-body span[style*="font-size"],
+.article-body font[style*="font-size"],
+.article-body p[style*="font-size"],
+.article-body div[style*="font-size"] {
+  font-size: revert !important;
 }
 
 /* Rich Text Content Formatting for Article and Live Updates Body */
@@ -547,14 +560,20 @@ body {
   }
 }
 .article-summary.telugu-text {
-  font-size: 16.5px !important;
-  line-height: 1.85 !important;
+  font-size: 16.5px;
+  line-height: 1.85;
 }
 @media (min-width: 768px) {
   .article-summary.telugu-text {
-    font-size: 17px !important;
-    line-height: 1.75 !important;
+    font-size: 17px;
+    line-height: 1.75;
   }
+}
+
+/* Allow admin-set inline font-size on spans inside article summary to show through */
+.article-summary span[style*="font-size"],
+.article-summary font[style*="font-size"] {
+  font-size: revert !important;
 }
 
 
