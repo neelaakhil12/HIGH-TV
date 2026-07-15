@@ -5,7 +5,7 @@ import BackButton from '@/components/layout/BackButton';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import NewsCard from '@/components/cards/NewsCard';
-import AdBanner from '@/components/home/AdBanner';
+
 import RightSidebar from '@/components/layout/RightSidebar';
 import { 
   politicsNews, 
@@ -187,7 +187,7 @@ export default async function ReporterPage({ params }: { params: Promise<{ slug:
               </div>
             </div>
 
-            <AdBanner position="leaderboard" />
+
 
             {/* Reporter Articles Grid */}
             <div className="mt-8">
