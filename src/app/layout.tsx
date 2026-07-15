@@ -4,6 +4,7 @@ import "./globals.css";
 import GlobalPromotionPopup from "@/components/layout/GlobalPromotionPopup";
 import BottomNavBar from "@/components/layout/BottomNavBar";
 import ScrollToTopButton from "@/components/layout/ScrollToTopButton";
+import CopyProtection from "@/components/layout/CopyProtection";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -43,6 +44,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full antialiased bg-white text-[#222222]">
+        <CopyProtection />
         {children}
         <BottomNavBar />
         <GlobalPromotionPopup />
