@@ -890,13 +890,13 @@ export default function ArticlePageClient({
                       {/* Reporter Profile Header */}
                       <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-gray-150 text-left">
                         <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border border-gray-200 shadow-sm shrink-0">
-                          {reporter && reporter.image ? (
-                            <img src={reporter.image} alt={reporter.name} className="w-full h-full object-cover" />
-                          ) : article.image ? (
+                          {article.image ? (
                             <img src={article.image} alt={article.author} className="w-full h-full object-cover" />
+                          ) : reporter && reporter.image ? (
+                            <img src={reporter.image} alt={reporter.name} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold">
-                              {reporter?.name?.charAt(0) || article.author?.charAt(0) || 'హై'}
+                              {article.author?.charAt(0) || 'హై'}
                             </div>
                           )}
                         </div>
