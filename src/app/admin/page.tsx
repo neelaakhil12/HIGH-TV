@@ -4461,7 +4461,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex font-sans admin-theme-wrapper">
+    <div className="min-h-screen bg-sky-950 text-slate-100 flex font-sans admin-theme-wrapper">
       
       {/* Drawer Overlay Backdrop on Mobile */}
       {isMobileMenuOpen && (
@@ -4472,17 +4472,17 @@ export default function AdminPage() {
       )}
 
       {/* ── STICKY LEFT SIDEBAR (Balagam TV Theme) ────────────────────────── */}
-      <aside className={`fixed md:sticky top-0 left-0 z-50 md:z-auto h-screen w-64 border-r border-slate-900 bg-[#0b1329] flex flex-col shrink-0 transition-transform duration-300 select-none ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+      <aside className={`fixed md:sticky top-0 left-0 z-50 md:z-auto h-screen w-64 border-r border-sky-700 bg-sky-600 flex flex-col shrink-0 transition-transform duration-300 select-none ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         
         {/* Branding header area */}
-        <div className="p-5 border-b border-slate-900 flex items-center justify-between gap-3 shrink-0">
+        <div className="p-5 border-b border-sky-700 flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-3">
             <Link href="/" className="block max-w-[45px]">
               <img src="/logo.png" alt="High TV" className="w-full h-auto object-contain" />
             </Link>
             <div className="flex flex-col text-left">
               <span className="text-sm font-black text-white leading-tight telugu-text">హై టీవీ</span>
-              <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">CMS Panel</span>
+              <span className="text-[10px] font-bold text-sky-200 tracking-wider uppercase">CMS Panel</span>
             </div>
           </div>
           <button
@@ -4496,11 +4496,11 @@ export default function AdminPage() {
         {/* Sidebar Navigation */}
         <nav className="p-4 flex flex-col gap-1 overflow-y-auto flex-1 hide-scrollbar">
           
-          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 pl-2">System Configs</span>
+          <span className="text-[10px] font-black text-sky-200/80 uppercase tracking-widest mb-2 pl-2">System Configs</span>
                     <button
             onClick={() => { setActiveTab('dashboard'); setNewsViewMode('list'); }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'dashboard' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-450 hover:text-white hover:bg-slate-900/50'
+              activeTab === 'dashboard' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -4512,7 +4512,7 @@ export default function AdminPage() {
           <button
             onClick={() => { setActiveTab('news'); setNewsViewMode('list'); setFilterCategory('all'); }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-              activeTab === 'news' && filterCategory === 'all' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+              activeTab === 'news' && filterCategory === 'all' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -4526,7 +4526,7 @@ export default function AdminPage() {
               <button
                 onClick={() => { setActiveTab('news'); setNewsViewMode('list'); setFilterCategory('uma-insights'); }}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                  activeTab === 'news' && filterCategory === 'uma-insights' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                  activeTab === 'news' && filterCategory === 'uma-insights' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -4538,7 +4538,7 @@ export default function AdminPage() {
               <button
                 onClick={() => { setActiveTab('news'); setNewsViewMode('list'); setFilterCategory('satya-bytes'); }}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                  activeTab === 'news' && filterCategory === 'satya-bytes' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                  activeTab === 'news' && filterCategory === 'satya-bytes' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -4550,7 +4550,7 @@ export default function AdminPage() {
           )}
 
           {userRole === 'employee' && employeeInfo && employeeInfo.categories && (
-            <div className="ml-4 pl-3.5 border-l border-slate-800 flex flex-col gap-1 mt-1">
+            <div className="ml-4 pl-3.5 border-l border-sky-500/30 flex flex-col gap-1 mt-1">
               {(() => {
                 let parsedSlugs: string[] = [];
                 try {
@@ -4582,7 +4582,7 @@ export default function AdminPage() {
                           className={`w-full text-left px-3 py-2 rounded-lg text-[13px] font-black cursor-pointer transition-all telugu-text truncate ${
                             activeTab === 'news' && filterCategory === slug
                               ? 'bg-rose-600/20 text-rose-455 border border-rose-500/30'
-                              : 'text-slate-450 hover:text-white hover:bg-slate-900/40'
+                              : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
                           }`}
                         >
                           📁 {displayName}
@@ -4595,7 +4595,7 @@ export default function AdminPage() {
                       <div className="flex flex-col gap-0.5 mt-1">
                         <button
                           onClick={() => toggleSidebarGroup('empAp')}
-                          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13px] font-black cursor-pointer transition-all text-slate-450 hover:text-white hover:bg-slate-900/40"
+                          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13px] font-black cursor-pointer transition-all text-sky-100 hover:text-white hover:bg-sky-700/60"
                         >
                           <div className="flex items-center gap-1.5 telugu-text">
                             <span>🗺️ ఆంధ్రప్రదేశ్ జిల్లాలు</span>
@@ -4621,7 +4621,7 @@ export default function AdminPage() {
                                   className={`w-full text-left px-3 py-1.5 rounded-lg text-[13px] font-black cursor-pointer transition-all telugu-text truncate ${
                                     activeTab === 'news' && filterCategory === slug
                                       ? 'bg-rose-600/20 text-rose-455 border border-rose-500/30'
-                                      : 'text-slate-450 hover:text-white hover:bg-slate-900/40'
+                                      : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
                                   }`}
                                 >
                                   📍 {displayName}
@@ -4638,7 +4638,7 @@ export default function AdminPage() {
                       <div className="flex flex-col gap-0.5 mt-1">
                         <button
                           onClick={() => toggleSidebarGroup('empTg')}
-                          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13px] font-black cursor-pointer transition-all text-slate-450 hover:text-white hover:bg-slate-900/40"
+                          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13px] font-black cursor-pointer transition-all text-sky-100 hover:text-white hover:bg-sky-700/60"
                         >
                           <div className="flex items-center gap-1.5 telugu-text">
                             <span>🗺️ తెలంగాణ జిల్లాలు</span>
@@ -4664,7 +4664,7 @@ export default function AdminPage() {
                                   className={`w-full text-left px-3 py-1.5 rounded-lg text-[13px] font-black cursor-pointer transition-all telugu-text truncate ${
                                     activeTab === 'news' && filterCategory === slug
                                       ? 'bg-rose-600/20 text-rose-455 border border-rose-500/30'
-                                      : 'text-slate-450 hover:text-white hover:bg-slate-900/40'
+                                      : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
                                   }`}
                                 >
                                   📍 {displayName}
@@ -4685,7 +4685,7 @@ export default function AdminPage() {
             <button
               onClick={() => { setActiveTab('news'); setNewsViewMode('list'); setFilterCategory('pending'); }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'news' && filterCategory === 'pending' ? 'bg-amber-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'news' && filterCategory === 'pending' ? 'bg-amber-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4704,7 +4704,7 @@ export default function AdminPage() {
             <button
               onClick={() => { setActiveTab('breaking'); }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'breaking' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'breaking' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4718,7 +4718,7 @@ export default function AdminPage() {
             <button
               onClick={() => { setActiveTab('trending'); }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'trending' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'trending' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4732,7 +4732,7 @@ export default function AdminPage() {
             <button
               onClick={() => { setActiveTab('slider'); }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'slider' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'slider' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4746,7 +4746,7 @@ export default function AdminPage() {
             <button
               onClick={() => { setActiveTab('sidebar-news'); }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'sidebar-news' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'sidebar-news' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4760,7 +4760,7 @@ export default function AdminPage() {
             <button
               onClick={() => { setActiveTab('epaper'); }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'epaper' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'epaper' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4774,7 +4774,7 @@ export default function AdminPage() {
             <button
               onClick={() => { setActiveTab('weather'); }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'weather' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'weather' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4788,7 +4788,7 @@ export default function AdminPage() {
             <button
               onClick={() => { setActiveTab('horoscope'); }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'horoscope' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'horoscope' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4805,7 +4805,7 @@ export default function AdminPage() {
                 setWebStoryFormMode('list');
               }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'webstories' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'webstories' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4822,7 +4822,7 @@ export default function AdminPage() {
                 setShortsFormMode('list');
               }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'shorts-videos' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'shorts-videos' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4838,7 +4838,7 @@ export default function AdminPage() {
                 setActiveTab('high-tv-videos');
               }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'high-tv-videos' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'high-tv-videos' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4855,7 +4855,7 @@ export default function AdminPage() {
                 setPhotosFormMode('list');
               }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'photos-gallery' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'photos-gallery' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4872,7 +4872,7 @@ export default function AdminPage() {
                 setPollsFormMode('list');
               }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'polls-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'polls-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4889,7 +4889,7 @@ export default function AdminPage() {
                 setTeamFormMode('list');
               }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'team-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'team-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4906,7 +4906,7 @@ export default function AdminPage() {
                 setAdFormMode('list');
               }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'sidebar-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'sidebar-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4923,7 +4923,7 @@ export default function AdminPage() {
                 setActiveAdSpot('mobile_leaderboard');
               }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'mobile-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'mobile-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4940,7 +4940,7 @@ export default function AdminPage() {
                 setSkyscraperAdPage('');
               }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'skyscraper-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'skyscraper-ads' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4971,7 +4971,7 @@ export default function AdminPage() {
                 } catch {}
               }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'editorial' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'editorial' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4985,7 +4985,7 @@ export default function AdminPage() {
             <button
               onClick={() => { setActiveTab('popup-manager'); }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'popup-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'popup-manager' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -4999,7 +4999,7 @@ export default function AdminPage() {
             <button
               onClick={() => { setActiveTab('jilla-sidebar'); }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'jilla-sidebar' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'jilla-sidebar' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -5013,7 +5013,7 @@ export default function AdminPage() {
             <button
               onClick={() => { setActiveTab('live-updates'); setListingFormMode('none'); setPostFormMode('none'); }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'live-updates' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'live-updates' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -5030,7 +5030,7 @@ export default function AdminPage() {
                 setEmployeeFormMode('list');
               }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'employees' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'employees' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -5048,7 +5048,7 @@ export default function AdminPage() {
                 fetchEmployees();
               }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all ${
-                activeTab === 'employee-posts-tracker' ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-455 hover:text-white hover:bg-slate-900/50'
+                activeTab === 'employee-posts-tracker' ? 'bg-rose-600 text-white shadow-lg' : 'text-sky-100 hover:text-white hover:bg-sky-700/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -5061,8 +5061,8 @@ export default function AdminPage() {
         </nav>
 
         {/* Profile and Logout area at bottom of sidebar */}
-        <div className="p-4 border-t border-slate-900 bg-slate-950/40 shrink-0 space-y-3">
-          <div className="flex items-center gap-3 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+        <div className="p-4 border-t border-sky-700 bg-black/20 shrink-0 space-y-3">
+          <div className="flex items-center gap-3 bg-black/10 p-2.5 rounded-xl border border-sky-500/30">
             <div className="w-8 h-8 rounded-full bg-rose-600 flex items-center justify-center text-white text-xs font-black">
               {userRole === 'employee' && employeeInfo ? employeeInfo.name.charAt(0).toUpperCase() : 'S'}
             </div>
@@ -5070,7 +5070,7 @@ export default function AdminPage() {
               <span className="text-xs font-black text-white truncate">
                 {userRole === 'employee' && employeeInfo ? employeeInfo.name : 'Super Admin'}
               </span>
-              <span className="text-[10px] text-slate-500 truncate">
+              <span className="text-[10px] text-sky-200/80 truncate">
                 {userRole === 'employee' && employeeInfo ? employeeInfo.email : 'admin@hightv.in'}
               </span>
             </div>
@@ -5090,7 +5090,7 @@ export default function AdminPage() {
       <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden min-w-0 bg-[#f8fafc] text-slate-700">
         
         {/* Workspace Top Header (Navy Blue Category Navigation Bar) */}
-        <div className="flex bg-[#0b1329] border-b border-slate-900 select-none z-30 relative items-center justify-between py-3 px-6 md:px-8 flex-wrap gap-4" ref={dropdownRef}>
+        <div className="flex bg-sky-600 border-b border-sky-700 select-none z-30 relative items-center justify-between py-3 px-6 md:px-8 flex-wrap gap-4" ref={dropdownRef}>
           
           {/* Menu Toggle for Mobile */}
           <button
@@ -5114,14 +5114,14 @@ export default function AdminPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all border ${
                   activeTab === 'news' && MAIN_CATEGORIES_LIST.some(c => c.slug === filterCategory && c.slug !== 'rasipalalu' && c.slug !== 'weather' && c.slug !== 'webstories' && c.slug !== 'latest' && c.slug !== 'uma-insights' && c.slug !== 'satya-bytes')
                     ? 'bg-rose-600 border-rose-500 text-white font-black'
-                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
+                    : 'bg-black/15 border-sky-500/30 text-sky-100 hover:text-white hover:bg-sky-700/80'
                 }`}
               >
                 <span>Main Categories</span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'main' ? 'rotate-180' : ''}`} />
               </button>
               {activeHeaderDropdown === 'main' && (
-                <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-2xl shadow-2xl p-4 w-[480px]">
+                <div className="absolute left-0 mt-2 z-50 bg-sky-700 border border-sky-600 rounded-2xl shadow-2xl p-4 w-[480px]">
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-[300px] overflow-y-auto admin-scrollbar">
                     {MAIN_CATEGORIES_LIST
                       .filter((cat) => cat.slug !== 'rasipalalu' && cat.slug !== 'weather' && cat.slug !== 'webstories' && cat.slug !== 'latest' && cat.slug !== 'uma-insights' && cat.slug !== 'satya-bytes')
@@ -5164,7 +5164,7 @@ export default function AdminPage() {
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'ap' ? 'rotate-180' : ''}`} />
                 </button>
                 {activeHeaderDropdown === 'ap' && (
-                  <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-2xl shadow-2xl p-4 w-[320px]">
+                  <div className="absolute left-0 mt-2 z-50 bg-sky-700 border border-sky-600 rounded-2xl shadow-2xl p-4 w-[320px]">
                     <div className="grid grid-cols-2 gap-1.5 max-h-[300px] overflow-y-auto admin-scrollbar">
                       {isSlugAllowed('andhra-pradesh') && (
                         <button
@@ -5222,7 +5222,7 @@ export default function AdminPage() {
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'telangana' ? 'rotate-180' : ''}`} />
                 </button>
                 {activeHeaderDropdown === 'telangana' && (
-                  <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-2xl shadow-2xl p-4 w-[320px]">
+                  <div className="absolute left-0 mt-2 z-50 bg-sky-700 border border-sky-600 rounded-2xl shadow-2xl p-4 w-[320px]">
                     <div className="grid grid-cols-2 gap-1.5 max-h-[300px] overflow-y-auto admin-scrollbar">
                       {isSlugAllowed('telangana') && (
                         <button
@@ -5280,7 +5280,7 @@ export default function AdminPage() {
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'health' ? 'rotate-180' : ''}`} />
                 </button>
                 {activeHeaderDropdown === 'health' && (
-                  <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
+                  <div className="absolute left-0 mt-2 z-50 bg-sky-700 border border-sky-600 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
                     {isSlugAllowed('health') && (
                       <button
                         onClick={() => {
@@ -5335,7 +5335,7 @@ export default function AdminPage() {
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'education' ? 'rotate-180' : ''}`} />
                 </button>
                 {activeHeaderDropdown === 'education' && (
-                  <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
+                  <div className="absolute left-0 mt-2 z-50 bg-sky-700 border border-sky-600 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
                     {isSlugAllowed('vidya') && (
                       <button
                         onClick={() => {
@@ -5407,7 +5407,7 @@ export default function AdminPage() {
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeHeaderDropdown === 'career' ? 'rotate-180' : ''}`} />
                 </button>
                 {activeHeaderDropdown === 'career' && (
-                  <div className="absolute left-0 mt-2 z-50 bg-[#0b1329] border border-slate-800 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
+                  <div className="absolute left-0 mt-2 z-50 bg-sky-700 border border-sky-600 rounded-xl shadow-2xl p-2 w-[200px] flex flex-col gap-1">
                     {isSlugAllowed('upadi') && (
                       <button
                         onClick={() => {
