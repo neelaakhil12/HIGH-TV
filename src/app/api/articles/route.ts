@@ -93,6 +93,8 @@ export async function GET(req: NextRequest) {
       isApproved: true,
       createdBy: true,
       updatedBy: true,
+      createdAt: true,
+      updatedAt: true,
     };
 
     if (!excludeBody) {

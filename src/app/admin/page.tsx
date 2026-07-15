@@ -3251,16 +3251,7 @@ export default function AdminPage() {
     // Resolve Telugu category name
     const resolvedCat = MAIN_CATEGORIES_LIST.find(c => c.slug === categorySlug)?.name.split(' ')[0] || categorySlug;
 
-    // Verify employee category permission
-    if (userRole === 'employee' && employeeInfo && employeeInfo.categories) {
-      const isCatAllowed = employeeInfo.categories.includes(categorySlug);
-      const isDistAllowed = districtSlug ? employeeInfo.categories.includes(districtSlug) : false;
-      if (!isCatAllowed && !isDistAllowed) {
-        alert('You do not have permission to publish or edit articles in this category / district!');
-        setIsSavingArticle(false);
-        return;
-      }
-    }
+    // Verify employee category permission bypassed (no restriction)
 
     // Save the raw HTML directly — base64 images are stored as-is in the DB
     // (No placeholder conversion: images display reliably without localStorage dependency)
@@ -3458,6 +3449,32 @@ export default function AdminPage() {
       startEditing(art);
       setActiveTab('news');
     }
+  };
+
+  const getEmployeeNameByEmail = (email: string | null | undefined) => {
+    if (!email) return 'N/A';
+    if (email === 'super-admin') return 'Super Admin';
+    const found = employeesList.find((emp: any) => emp.email === email);
+    return found ? found.name : email;
+  };
+
+  const formatRelativeTime = (dateString: string | Date | null | undefined) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHr = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHr / 24);
+
+    if (diffSec < 60) return 'Just now';
+    if (diffMin < 60) return `${diffMin} minute${diffMin > 1 ? 's' : ''} ago`;
+    if (diffHr < 24) return `${diffHr} hour${diffHr > 1 ? 's' : ''} ago`;
+    if (diffDay < 30) return `${diffDay} day${diffDay > 1 ? 's' : ''} ago`;
+    
+    return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + 
+           ' at ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   };
 
   const startEditing = (art: any) => {
@@ -5732,7 +5749,7 @@ export default function AdminPage() {
                                 >
                                   <Eye className="w-4 h-4" />
                                 </Link>
-                                {(userRole === 'super-admin' || (employeeInfo && art.author?.toLowerCase().trim() === employeeInfo.name?.toLowerCase().trim())) && (
+                                {(userRole === 'super-admin' || userRole === 'employee') && (
                                   <>
                                     <button
                                       type="button"
@@ -6882,6 +6899,68 @@ export default function AdminPage() {
                       )}
                     </div>
                   </div>
+
+                  {/* Article Metadata / Info Box (Super Admin Only, in Edit Mode) */}
+                  {userRole === 'super-admin' && editingArticle && (
+                    <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-4">
+                      
+                      {/* Green Status Bar */}
+                      <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-xs font-black">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span>Editing published version</span>
+                      </div>
+
+                      {/* Info Fields */}
+                      <div className="space-y-4">
+                        <div>
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block border-b border-slate-100 pb-1 mb-2.5">
+                            Information
+                          </span>
+                          
+                          <div className="space-y-2 text-xs font-bold text-slate-700">
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-450">Created</span>
+                              <span className="font-mono text-slate-500">{formatRelativeTime(editingArticle.createdAt)}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-450">By</span>
+                              <span className="text-slate-800 font-extrabold">{getEmployeeNameByEmail(editingArticle.createdBy)}</span>
+                            </div>
+                            <div className="h-px bg-slate-50 my-2" />
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-450">Last update</span>
+                              <span className="font-mono text-slate-500">{formatRelativeTime(editingArticle.updatedAt)}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-450">By</span>
+                              <span className="text-slate-800 font-extrabold">{getEmployeeNameByEmail(editingArticle.updatedBy)}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block border-b border-slate-100 pb-1 mb-2.5">
+                            Internationalization
+                          </span>
+                          
+                          <div className="space-y-2 text-xs font-bold text-slate-700">
+                            <div className="flex flex-col gap-1.5 text-left">
+                              <span className="text-slate-450 text-[10px] uppercase">Locales</span>
+                              <div className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-slate-800 text-xs font-bold flex items-center justify-between">
+                                <span>
+                                  {editingArticle.categorySlug === 'satya-bytes' ? 'English (en)' : 'Telugu (te)'}
+                                </span>
+                                <span className="text-[10px] text-slate-400 uppercase font-mono">
+                                  {editingArticle.categorySlug === 'satya-bytes' ? 'en' : 'te'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  )}
 
                   {/* Image Caption / Photo Write-up */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-2">
