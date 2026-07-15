@@ -883,7 +883,7 @@ export default function ArticlePageClient({
                       {/* Headline */}
                       <h1
                         className="main-headline telugu-text text-[#cc0000] mb-5 text-2xl md:text-3.5xl font-extrabold"
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
                         dangerouslySetInnerHTML={{ __html: article.title }}
                       />
 
@@ -901,7 +901,7 @@ export default function ArticlePageClient({
                           )}
                         </div>
                         <div className="space-y-0.5">
-                          <h3 className="font-extrabold text-gray-900 text-base md:text-lg telugu-text" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
+                          <h3 className="font-extrabold text-gray-900 text-base md:text-lg telugu-text" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}>
                             {isSeniorReporterCategory ? article.author : (reporter ? reporter.name.replace(/.* - /, '') : article.author)}
                           </h3>
                           <p className="text-xs font-bold text-rose-600 uppercase tracking-wider">
@@ -921,7 +921,7 @@ export default function ArticlePageClient({
                       {article.description && (
                         <p
                           className="block article-summary telugu-text text-gray-800 border-l-4 border-rose-600 pl-4 bg-rose-50/20 py-3 pr-3 rounded-r mb-6 text-[14.5px] md:text-base leading-relaxed font-bold"
-                          style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                          style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
                           dangerouslySetInnerHTML={{ __html: article.description }}
                         />
                       )}
@@ -957,7 +957,7 @@ export default function ArticlePageClient({
                     {/* Headline */}
                     <h1
                       className="main-headline telugu-text text-[#cc0000] mb-3"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
                       dangerouslySetInnerHTML={{ __html: article.title }}
                     />
 
@@ -967,7 +967,7 @@ export default function ArticlePageClient({
                         <div className="w-6 h-6 bg-[#025390] rounded-full flex items-center justify-center">
                           <span className="text-white text-[12px] font-black">హై</span>
                         </div>
-                        <Link href={`/reporter/${reporter.slug}`} className="font-bold text-[#025390] hover:text-red-600 transition-colors telugu-text" style={{ fontFamily: 'Mandali, sans-serif' }}>
+                        <Link href={`/reporter/${reporter.slug}`} className="font-bold text-[#025390] hover:text-red-600 transition-colors telugu-text" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Mandali, sans-serif' }}>
                           {reporter.name}
                         </Link>
                       </div>
@@ -983,7 +983,7 @@ export default function ArticlePageClient({
                     {/* Description summary */}
                     <p
                       className="block article-summary telugu-text text-gray-700 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r mb-4 text-[14.5px] md:text-base leading-relaxed"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
                       dangerouslySetInnerHTML={{ __html: article.description }}
                     />
 
@@ -1002,7 +1002,7 @@ export default function ArticlePageClient({
                     {article.imageCaption && (
                       <div 
                         className="mb-5 px-1 pb-1.5 pt-1 text-[13px] md:text-[14px] font-bold text-gray-600 telugu-text border-b border-gray-100" 
-                        style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                        style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
                         dangerouslySetInnerHTML={{ __html: article.imageCaption }}
                       />
                     )}
@@ -1012,7 +1012,7 @@ export default function ArticlePageClient({
               })()}
 
               {/* Full Article Body */}
-              <div className="telugu-text text-gray-800 article-body" style={{ fontFamily: 'Mandali, "Noto Sans Telugu", sans-serif', lineHeight: '1.85' }}>
+              <div className="telugu-text text-gray-800 article-body" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Mandali, "Noto Sans Telugu", sans-serif', lineHeight: '1.85' }}>
                 {article.body ? (
                   (() => {
                     // Extract inline-image-containers to prevent them from being split/broken by newline parser

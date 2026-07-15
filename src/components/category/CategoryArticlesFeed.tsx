@@ -116,14 +116,12 @@ export default function CategoryArticlesFeed({
                 <div className="flex-1 flex flex-col text-left">
                   <Link href={`/news/${article.slug}`}>
                     <h3
-                      className="text-base font-bold text-[#02599c] hover:text-[#013f70] hover:underline leading-relaxed telugu-text pb-1"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                      className="text-base font-bold text-[#02599c] hover:text-[#013f70] hover:underline leading-relaxed telugu-text pb-1" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
                       dangerouslySetInnerHTML={{ __html: article.title }}
                     />
                   </Link>
                   <p
-                    className="text-sm text-gray-550 mt-1 line-clamp-3 telugu-text leading-relaxed"
-                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    className="text-sm text-gray-550 mt-1 line-clamp-3 telugu-text leading-relaxed" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
                     dangerouslySetInnerHTML={{ __html: article.description }}
                   />
                 </div>
@@ -149,13 +147,12 @@ export default function CategoryArticlesFeed({
               {/* Text */}
               <div className="flex-1 min-w-0">
                 <h3
-                  className={`${headlineClass} font-black text-[#02599c] group-hover:text-[#013f70] line-clamp-2 telugu-text pl-2.5`}
-                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                  className={`${headlineClass} font-black text-[#02599c] group-hover:text-[#013f70] line-clamp-2 telugu-text pl-2.5`} style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
                   dangerouslySetInnerHTML={{ __html: article.title }}
                 />
                 <p
                   className={`${summaryClass} text-gray-550 mt-1 line-clamp-2 telugu-text pl-2.5`}
-                  style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                  style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
                   dangerouslySetInnerHTML={{ __html: article.description }}
                 />
               </div>

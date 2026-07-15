@@ -598,6 +598,7 @@ export default function AdminPage() {
   const [activeSidebarCategory, setActiveSidebarCategory] = useState<string>('home');
   const [activeSidebarDistrict, setActiveSidebarDistrict] = useState<string>(''); // for district sub-selection
   const [sidebarNewsSearch, setSidebarNewsSearch] = useState<string>('');
+  const [showAllSidebarArticles, setShowAllSidebarArticles] = useState<boolean>(false);
 
   // Expandable sections for sidebar groups
   const [expandedSidebar, setExpandedSidebar] = useState<Record<string, boolean>>({
@@ -7553,6 +7554,8 @@ export default function AdminPage() {
               { slug: 'mobile-ad-cat-admissions', labelTelugu: 'కేటగిరీ పేజీ: అడ్మిషన్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Admissions' },
               { slug: 'mobile-ad-cat-current-affairs', labelTelugu: 'కేటగిరీ పేజీ: కరెంట్ అఫైర్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Current Affairs' },
               { slug: 'mobile-ad-cat-notification', labelTelugu: 'కేటగిరీ పేజీ: నోటిఫికేషన్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Notifications' },
+              { slug: 'mobile-ad-cat-uma-insights', labelTelugu: 'కేటగిరీ పేజీ: ఉమా ఇన్సైట్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Uma Insights' },
+              { slug: 'mobile-ad-cat-satya-bytes', labelTelugu: 'కేటగిరీ పేజీ: సత్య బైట్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Satya Bytes' },
 
               // --- ARTICLE PAGES MOBILE ADS (Top rotating / bottom continuous) ---
               { slug: 'mobile-ad-article-top-global', labelTelugu: 'వ్యాసం పేజీ: గ్లోబల్ టాప్ యాడ్ (Global Top Rotating Ad)', labelEnglish: 'Article Page: Global Top' },
@@ -7568,6 +7571,8 @@ export default function AdminPage() {
               { slug: 'mobile-ad-article-top-viral', labelTelugu: 'వ్యాసం పేజీ: వైరల్ టాప్ (Top of Viral)', labelEnglish: 'Article Page: Top Viral' },
               { slug: 'mobile-ad-article-top-telangana', labelTelugu: 'వ్యాసం పేజీ: తెలంగాణ టాప్ (Top of Telangana)', labelEnglish: 'Article Page: Top Telangana' },
               { slug: 'mobile-ad-article-top-andhra-pradesh', labelTelugu: 'వ్యాసం పేజీ: ఆంధ్రప్రదేశ్ టాప్ (Top of AP)', labelEnglish: 'Article Page: Top Andhra Pradesh' },
+              { slug: 'mobile-ad-article-top-uma-insights', labelTelugu: 'వ్యాసం పేజీ: ఉమా ఇన్సైట్స్ టాప్ (Top of Uma Insights)', labelEnglish: 'Article Page: Top Uma Insights' },
+              { slug: 'mobile-ad-article-top-satya-bytes', labelTelugu: 'వ్యాసం పేజీ: సత్య బైట్స్ టాప్ (Top of Satya Bytes)', labelEnglish: 'Article Page: Top Satya Bytes' },
 
               { slug: 'mobile-ad-article-bottom-global', labelTelugu: 'వ్యాసం పేజీ: గ్లోబల్ బాటమ్ యాడ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Global Bottom (Between Read More & Polls)' },
               { slug: 'mobile-ad-article-bottom-latest', labelTelugu: 'వ్యాసం పేజీ: బ్రేకింగ్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Breaking (Between Read More & Polls)' },
@@ -7582,6 +7587,8 @@ export default function AdminPage() {
               { slug: 'mobile-ad-article-bottom-viral', labelTelugu: 'వ్యాసం పేజీ: వైరల్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Viral (Between Read More & Polls)' },
               { slug: 'mobile-ad-article-bottom-telangana', labelTelugu: 'వ్యాసం పేజీ: తెలంగాణ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Telangana (Between Read More & Polls)' },
               { slug: 'mobile-ad-article-bottom-andhra-pradesh', labelTelugu: 'వ్యాసం పేజీ: ఆంధ్రప్రదేశ్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Andhra Pradesh (Between Read More & Polls)' },
+              { slug: 'mobile-ad-article-bottom-uma-insights', labelTelugu: 'వ్యాసం పేజీ: ఉమా ఇన్సైట్స్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Uma Insights (Between Read More & Polls)' },
+              { slug: 'mobile-ad-article-bottom-satya-bytes', labelTelugu: 'వ్యాసం పేజీ: సత్య బైట్స్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Satya Bytes (Between Read More & Polls)' },
 
               // --- E-PAPER PAGE MOBILE ADS ---
               { slug: 'mobile-ad-epaper-above-main', labelTelugu: 'ఈ-పేపర్ లిస్టింగ్: మెయిన్ ఎడిషన్స్ పైన యాడ్', labelEnglish: 'E-Paper Listing: Above Main Editions' },
@@ -9665,7 +9672,9 @@ export default function AdminPage() {
               ? `district-${activeSidebarDistrict}`
               : activeSidebarCategory;
 
-            const catArticles = (activeSidebarCategory === 'home' || activeSidebarCategory === 'latest')
+            const catArticles = showAllSidebarArticles
+              ? allArticles
+              : (activeSidebarCategory === 'home' || activeSidebarCategory === 'latest')
               ? allArticles
               : activeSidebarCategory === 'telangana-districts'
               ? (activeSidebarDistrict
@@ -9793,15 +9802,29 @@ export default function AdminPage() {
                           </div>
                         )}
                       </div>
-                      <div className="relative w-full md:w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                        <input
-                          type="text"
-                          value={sidebarNewsSearch}
-                          onChange={e => setSidebarNewsSearch(e.target.value)}
-                          placeholder="Search this page's articles..."
-                          className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-slate-200 focus:border-[#02599c] rounded-xl outline-none text-slate-800"
-                        />
+                      <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto shrink-0">
+                        <label className="flex items-center gap-1.5 text-xs text-slate-600 font-bold cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={showAllSidebarArticles}
+                            onChange={(e) => {
+                              setShowAllSidebarArticles(e.target.checked);
+                              setSidebarNewsSearch('');
+                            }}
+                            className="rounded text-[#02599c] focus:ring-[#02599c] cursor-pointer"
+                          />
+                          <span>Show All Articles (అన్ని వార్తలు)</span>
+                        </label>
+                        <div className="relative w-full md:w-64">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                          <input
+                            type="text"
+                            value={sidebarNewsSearch}
+                            onChange={e => setSidebarNewsSearch(e.target.value)}
+                            placeholder={showAllSidebarArticles ? "Search all articles..." : "Search this page's articles..."}
+                            className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-slate-200 focus:border-[#02599c] rounded-xl outline-none text-slate-800"
+                          />
+                        </div>
                       </div>
                     </div>
 

@@ -152,8 +152,7 @@ export default function NewsCard({ article, variant = 'default', className, imag
         <div className="flex-1 min-w-0">
           <Link href={`/news/${article.slug}`}>
             <h3
-              className="secondary-headline headline-hover telugu-text line-clamp-2 pl-1.5 pb-0.5"
-              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+              className="secondary-headline headline-hover telugu-text line-clamp-2 pl-1.5 pb-0.5" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
               dangerouslySetInnerHTML={{ __html: article.title }}
             />
           </Link>
@@ -177,8 +176,7 @@ export default function NewsCard({ article, variant = 'default', className, imag
         <div className="flex-1">
           <Link href={`/news/${article.slug}`}>
             <p
-              className="secondary-headline headline-hover telugu-text line-clamp-2 pl-2.5 pr-1 pb-1"
-              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+              className="secondary-headline headline-hover telugu-text line-clamp-2 pl-2.5 pr-1 pb-1" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
               dangerouslySetInnerHTML={{ __html: article.title }}
             />
           </Link>
@@ -203,14 +201,12 @@ export default function NewsCard({ article, variant = 'default', className, imag
           <div>
             <Link href={`/news/${article.slug}`}>
               <h3
-                className="secondary-headline headline-hover telugu-text pl-2.5 pb-1"
-                style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                className="secondary-headline headline-hover telugu-text pl-2.5 pb-1" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
                 dangerouslySetInnerHTML={{ __html: article.title }}
               />
             </Link>
             <p
-              className="news-summary summary-truncate telugu-text pl-2.5 pr-1 gap-headline-summary"
-              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+              className="news-summary summary-truncate telugu-text pl-2.5 pr-1 gap-headline-summary" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
               dangerouslySetInnerHTML={{ __html: article.description }}
             />
           </div>
@@ -247,14 +243,12 @@ export default function NewsCard({ article, variant = 'default', className, imag
       <div className="card-padding flex flex-col flex-1">
         <Link href={`/news/${article.slug}`} className="flex-1">
           <h2
-            className="secondary-headline headline-hover telugu-text line-clamp-2 mb-2 pl-2.5 pr-1 pb-1"
-            style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+            className="secondary-headline headline-hover telugu-text line-clamp-2 mb-2 pl-2.5 pr-1 pb-1" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
             dangerouslySetInnerHTML={{ __html: article.title }}
           />
           {article.categorySlug !== 'rasipalalu' && (
             <p
-              className="news-summary summary-truncate telugu-text pl-2.5 pr-1 gap-headline-summary"
-              style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+              className="news-summary summary-truncate telugu-text pl-2.5 pr-1 gap-headline-summary" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
               dangerouslySetInnerHTML={{ __html: article.description }}
             />
           )}

@@ -22,11 +22,10 @@ export default function RightSidebar({ categorySlug }: RightSidebarProps) {
   useEffect(() => {
     const fetchCategoryAds = async () => {
       try {
-        const isSeniorReporterCat = categorySlug === 'uma-insights' || categorySlug === 'satya-bytes';
-        const adCat = (categorySlug && !isSeniorReporterCat) ? `sidebar-ad-category-${categorySlug}` : 'sidebar-ad-category';
+        const adCat = categorySlug ? `sidebar-ad-category-${categorySlug}` : 'sidebar-ad-category';
         const [catRes, defaultRes, bothRes] = await Promise.all([
           fetch(`/api/articles?category=${adCat}&limit=50&t=` + Date.now()).then(r => r.json()),
-          (categorySlug && !isSeniorReporterCat) ? fetch('/api/articles?category=sidebar-ad-category&limit=50&t=' + Date.now()).then(r => r.json()) : Promise.resolve([]),
+          categorySlug ? fetch('/api/articles?category=sidebar-ad-category&limit=50&t=' + Date.now()).then(r => r.json()) : Promise.resolve([]),
           fetch('/api/articles?category=sidebar-ad-both&limit=50&t=' + Date.now()).then(r => r.json())
         ]);
         
