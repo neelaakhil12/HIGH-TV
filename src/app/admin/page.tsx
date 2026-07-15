@@ -2122,6 +2122,13 @@ export default function AdminPage() {
       if (saved) {
         try {
           const draft = JSON.parse(saved);
+          
+          // Only restore draft if the draft's category matches the active filterCategory
+          const draftCategory = draft.selectedCategories?.[0] || '';
+          if (filterCategory !== 'all' && filterCategory !== 'pending' && draftCategory && draftCategory !== filterCategory) {
+            return;
+          }
+
           if (draft.newsTitle) setNewsTitle(draft.newsTitle);
           if (draft.newsSlug) setNewsSlug(draft.newsSlug);
           if (draft.newsDescription) setNewsDescription(draft.newsDescription);
@@ -2152,7 +2159,7 @@ export default function AdminPage() {
         }
       }
     }
-  }, [newsViewMode]);
+  }, [newsViewMode, filterCategory]);
 
   // Canvas Image Compression (rescale to max 800px width, 70% quality JPG)
   const handleCompressAndSetImage = (file: File, callback: (base64: string) => void) => {
