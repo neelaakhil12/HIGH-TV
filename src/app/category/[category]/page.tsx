@@ -18,6 +18,7 @@ import CitizenReporterPageClient from '@/components/category/CitizenReporterPage
 import LiveUpdatesPage from '@/components/category/LiveUpdatesPage';
 import MultiDistrictFeed from '@/components/category/MultiDistrictFeed';
 import EditorialPageClient from '@/components/category/EditorialPageClient';
+import CategorySplash from '@/components/category/CategorySplash';
 import { 
   categories, 
   politicsNews, 
@@ -410,6 +411,9 @@ export default async function CategoryPage({
 
   return (
     <div className="min-h-screen bg-[#f4f6f8] flex flex-col">
+      {(category === 'uma-insights' || category === 'satya-bytes') && (
+        <CategorySplash category={category} />
+      )}
       {!isEpaper && <Header />}
 
       {!isEpaper ? (
