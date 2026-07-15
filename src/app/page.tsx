@@ -16,6 +16,7 @@ import TabbedNewsWidget from '@/components/home/TabbedNewsWidget';
 import FlashNewsBar from '@/components/home/FlashNewsBar';
 import WeatherWidget from '@/components/home/WeatherWidget';
 import PollWidget from '@/components/home/PollWidget';
+import HomeSplash from '@/components/home/HomeSplash';
 
 import {
   politicsNews,
@@ -467,6 +468,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#f4f6f8]">
+      <HomeSplash />
       <Header />
 
       <div className="w-full flex justify-center items-start max-w-[1450px] mx-auto relative gap-5 px-4 overflow-visible">
