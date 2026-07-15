@@ -3207,7 +3207,7 @@ export default function AdminPage() {
     // Determine category configurations from checked boxes
     let categorySlug = 'politics';
     if (selectedCategories.length === 0) {
-      if (filterCategory === 'latest' || filterCategory === 'trending' || filterCategory === 'featured') {
+      if (filterCategory !== 'all' && filterCategory !== 'pending') {
         categorySlug = filterCategory;
       }
     }
