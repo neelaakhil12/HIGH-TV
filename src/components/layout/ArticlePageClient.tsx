@@ -820,7 +820,7 @@ export default function ArticlePageClient({
             )}
             <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
             <span className="text-gray-400 truncate max-w-[200px] telugu-text flex-shrink-0" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-              {article.title?.replace(/<[^>]*>/g, '')}
+              {(isTeluguActive && titleTe ? titleTe : titleEn).replace(/<[^>]*>/g, '')}
             </span>
           </div>
           <div className="flex-shrink-0">
@@ -1022,16 +1022,16 @@ export default function ArticlePageClient({
                               </Link>
                             )}
                           </div>
-                          <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
+                          <ShareButton title={(isTeluguActive && titleTe ? titleTe : titleEn).replace(/<[^>]*>/g, '')} />
                         </div>
                       </div>
 
                       {/* Excerpt Shorts Summary */}
-                      {article.description && (
+                      {(isTeluguActive && descTe ? descTe : descEn) && (
                         <p
                           className="block article-summary telugu-text text-gray-800 border-l-4 border-rose-600 pl-4 bg-rose-50/20 py-3 pr-3 rounded-r mb-6 text-[14.5px] md:text-base leading-relaxed font-bold"
                           style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
-                          dangerouslySetInnerHTML={{ __html: article.description }}
+                          dangerouslySetInnerHTML={{ __html: isTeluguActive && descTe ? descTe : descEn }}
                         />
                       )}
 
@@ -1040,7 +1040,7 @@ export default function ArticlePageClient({
                         <div className="overflow-hidden mb-6 w-full rounded-2xl border border-gray-100 shadow-xs">
                           <FallbackImage
                             src={article.image}
-                            alt={article.title?.replace(/<[^>]*>/g, '')}
+                            alt={(isTeluguActive && titleTe ? titleTe : titleEn).replace(/<[^>]*>/g, '')}
                             fill={false}
                             width={1200}
                             height={675}
@@ -1101,7 +1101,7 @@ export default function ArticlePageClient({
                             <div id="google_translate_element" className="google-translate-dropdown inline-block scale-[0.85] origin-right mr-1"></div>
                           )
                         )}
-                        <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
+                        <ShareButton title={(isTeluguActive && titleTe ? titleTe : titleEn).replace(/<[^>]*>/g, '')} />
                       </div>
                     </div>
 
@@ -1116,7 +1116,7 @@ export default function ArticlePageClient({
                     <div className="overflow-hidden mb-0 w-full">
                       <FallbackImage
                         src={article.image}
-                        alt={article.title?.replace(/<[^>]*>/g, '')}
+                        alt={(isTeluguActive && titleTe ? titleTe : titleEn).replace(/<[^>]*>/g, '')}
                         fill={false}
                         width={1200}
                         height={675}
@@ -1215,7 +1215,7 @@ export default function ArticlePageClient({
                   })()
                 ) : (
                   <>
-                    <p>{article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. హై టీవీ డెస్క్ నుండి తాజా సమాచారం ఇక్కడ లభిస్తుంది.</p>
+                    <p dangerouslySetInnerHTML={{ __html: `${isTeluguActive && descTe ? descTe : descEn} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. హై టీవీ డెస్క్ నుండి తాజా సమాచారం ఇక్కడ లభిస్తుంది.` }} />
                     <p>అధికారులు తెలిపిన వివరాల ప్రకారం, ఈ నిర్ణయం రాష్ట్ర ప్రజలకు అత్యంత ప్రయోజనకరంగా ఉంటుందని భావిస్తున్నారు. ఈ పరిణామాలు భవిష్యత్తులో మరింత సానుకూలమైన ఫలితాలను ఇస్తాయని నిపుణులు అభిప్రాయపడుతున్నారు.</p>
                   </>
                 )}
@@ -1658,7 +1658,7 @@ export default function ArticlePageClient({
           )}
           <ChevronRight size={14} className="text-gray-400 flex-shrink-0" />
           <span className="text-gray-400 truncate max-w-[200px] telugu-text flex-shrink-0" style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}>
-            {article.title?.replace(/<[^>]*>/g, '')}
+            {(isTeluguActive && titleTe ? titleTe : titleEn).replace(/<[^>]*>/g, '')}
           </span>
         </div>
         <div className="flex-shrink-0">
@@ -1674,7 +1674,7 @@ export default function ArticlePageClient({
           <div className="overflow-hidden w-full">
             <FallbackImage
               src={article.image}
-              alt={article.title?.replace(/<[^>]*>/g, '')}
+              alt={(isTeluguActive && titleTe ? titleTe : titleEn).replace(/<[^>]*>/g, '')}
               fill={false}
               width={900}
               height={600}
@@ -1705,7 +1705,7 @@ export default function ArticlePageClient({
           <h1
             className="main-headline telugu-text text-[#cc0000] mb-3.5"
             style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
-            dangerouslySetInnerHTML={{ __html: article.title }}
+            dangerouslySetInnerHTML={{ __html: isTeluguActive && titleTe ? titleTe : titleEn }}
           />
 
           {/* Limited Description & Toggled Read Button */}
@@ -1733,7 +1733,7 @@ export default function ArticlePageClient({
             )}
 
             <p className="article-summary telugu-text" dangerouslySetInnerHTML={{
-              __html: article.body ? article.description : `${article.description} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. తాజా సమాచారం ఇక్కడ లభిస్తుంది.`
+              __html: article.body ? (isTeluguActive && descTe ? descTe : descEn) : `${isTeluguActive && descTe ? descTe : descEn} ఈ వార్తకు సంబంధించిన విశేషాలు క్రింద వివరించబడ్డాయి. తాజా సమాచారం ఇక్కడ లభిస్తుంది.`
             }} />
           </div>
 
@@ -1763,7 +1763,7 @@ export default function ArticlePageClient({
                 }
               </Link>
             </div>
-            <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
+            <ShareButton title={(isTeluguActive && titleTe ? titleTe : titleEn).replace(/<[^>]*>/g, '')} />
           </div>
 
           {/* "పూర్తిగా చదవండి" button under reporter/share */}
