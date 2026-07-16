@@ -963,7 +963,9 @@ export default function ArticlePageClient({
                               </h3>
                             </Link>
                             <p className="text-xs font-bold text-rose-600 uppercase tracking-wider">
-                              {isSeniorReporterCategory ? (article.category || 'సీనియర్ జర్నలిస్ట్') : (reporter?.role || article.category || 'స్టాఫ్ రిపోర్టర్')}
+                              {article.categorySlug === 'uma-insights' || article.categorySlug === 'satya-bytes'
+                                ? 'Senior Journalist'
+                                : (isSeniorReporterCategory ? (article.category || 'సీనియర్ జర్నలిస్ట్') : (reporter?.role || article.category || 'స్టాఫ్ రిపోర్టర్'))}
                             </p>
                             <div className="flex items-center gap-1 text-[11px] text-gray-400 font-sans">
                               <Clock size={10} />
