@@ -14,6 +14,7 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [pollVotes, setPollVotes] = useState<Record<string, number>>({});
+  const [customDbPoll, setCustomDbPoll] = useState<any | null>(null);
 
   // Dynamic configuration states
   const [adImage, setAdImage] = useState('/popup-ad.png');
@@ -25,7 +26,7 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
     { id: 'opt_1', text: 'కాదు' }
   ]);
 
-  const handleVoteSubmit = () => {
+  const handleVoteSubmit = async () => {
     if (selectedOption && pollVotes) {
       const updatedVotes = {
         ...pollVotes,
@@ -33,25 +34,109 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
       };
       setPollVotes(updatedVotes);
 
-      // Save vote counts to database (shared across all profiles/users)
-      const votesKey = `promo_poll_${id}_votes_data`;
-      fetch('/api/settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          [votesKey]: JSON.stringify({ question: pollQuestion, votes: updatedVotes })
-        }),
-      }).catch(err => console.error('Error saving poll votes:', err));
+      if (customDbPoll) {
+        let options: any[] = [];
+        try {
+          options = JSON.parse(customDbPoll.body || '[]');
+        } catch (e) {}
+        
+        const updatedOptions = options.map((opt: any) =>
+          opt.id === selectedOption ? { ...opt, votes: (opt.votes || 0) + 1 } : opt
+        );
+        
+        const updatedArticle = {
+          ...customDbPoll,
+          body: JSON.stringify(updatedOptions),
+          views: (customDbPoll.views || 0) + 1
+        };
+        
+        try {
+          await fetch(`/api/articles/${customDbPoll.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedArticle)
+          });
+        } catch (err) {
+          console.error('Failed to submit dynamic poll vote:', err);
+        }
+        
+        const hasVotedKey = `promo_poll_db_${customDbPoll.id}_voted`;
+        try { localStorage.setItem(hasVotedKey, 'true'); } catch {}
+        setHasVoted(true);
+      } else {
+        // Save vote counts to database (shared across all profiles/users)
+        const votesKey = `promo_poll_${id}_votes_data`;
+        fetch('/api/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            [votesKey]: JSON.stringify({ question: pollQuestion, votes: updatedVotes })
+          }),
+        }).catch(err => console.error('Error saving poll votes:', err));
 
-      // Mark this browser as having voted (per-browser state — localStorage is correct here)
-      const hasVotedKey = `promo_poll_${id}_voted_for_${pollQuestion}`;
-      try { localStorage.setItem(hasVotedKey, 'true'); } catch {}
+        // Mark this browser as having voted (per-browser state — localStorage is correct here)
+        const hasVotedKey = `promo_poll_${id}_voted_for_${pollQuestion}`;
+        try { localStorage.setItem(hasVotedKey, 'true'); } catch {}
 
-      setHasVoted(true);
+        setHasVoted(true);
+      }
     }
   };
 
   useEffect(() => {
+    // 1. Check if pollId query parameter exists in the URL
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const urlPollId = searchParams.get('pollId');
+      if (urlPollId) {
+        if (urlPollId.startsWith('promo_')) {
+          const promoType = urlPollId.replace('promo_', '');
+          if (promoType === id) {
+            setTimeout(() => {
+              setPopupType('poll');
+              setIsOpen(true);
+            }, 500);
+          }
+        } else {
+          // Fetch dynamic database poll
+          fetch(`/api/articles/${urlPollId}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(art => {
+              if (art && art.categorySlug === 'polls') {
+                let options: any[] = [];
+                try {
+                  options = JSON.parse(art.body || '[]');
+                } catch (e) {}
+                
+                setPopupType('poll');
+                setPollQuestion(art.title);
+                setPollOptions(options.map((opt: any, idx: number) => ({
+                  id: opt.id || `opt_${idx}`,
+                  text: opt.label || opt.text
+                })));
+                
+                const votes: Record<string, number> = {};
+                options.forEach(opt => {
+                  votes[opt.id] = opt.votes || 0;
+                });
+                setPollVotes(votes);
+                
+                const hasVotedKey = `promo_poll_db_${art.id}_voted`;
+                let userHasVoted = false;
+                try { userHasVoted = localStorage.getItem(hasVotedKey) === 'true'; } catch {}
+                setHasVoted(userHasVoted);
+                
+                setCustomDbPoll(art);
+                setIsEnabled(true);
+                setIsOpen(true);
+              }
+            })
+            .catch(err => console.error('Error fetching shared poll:', err));
+          return;
+        }
+      }
+    }
+
     const keys = [
       `promo_popup_${id}_enabled`,
       `promo_popup_${id}_type`,
@@ -317,6 +402,59 @@ export default function PromotionPopup({ id = 'home' }: PromotionPopupProps) {
                 }`}>
                   {hasVoted ? 'Vote Submitted' : 'Poll Active'}
                 </div>
+
+                {/* Share Poll Section */}
+                {(() => {
+                  const pollIdToShare = customDbPoll ? customDbPoll.id : `promo_${id}`;
+                  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/?pollId=${pollIdToShare}` : '';
+                  return (
+                    <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
+                      <span className="text-[12px] font-bold text-gray-400">
+                        Share Poll
+                      </span>
+                      <div className="flex gap-2">
+                        {/* WhatsApp */}
+                        <a
+                          href={`https://wa.me/?text=${encodeURIComponent(pollQuestion)}%20${encodeURIComponent(shareUrl)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center w-7 h-7 rounded-full bg-[#25d366] text-white hover:scale-105 active:scale-95 transition-all shadow-sm cursor-pointer"
+                          title="WhatsApp"
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
+                          </svg>
+                        </a>
+                        {/* Telegram */}
+                        <a
+                          href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(pollQuestion)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center w-7 h-7 rounded-full bg-[#0088cc] text-white hover:scale-105 active:scale-95 transition-all shadow-sm cursor-pointer"
+                          title="Telegram"
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.944 0C5.347 0 0 5.348 0 11.947c0 6.598 5.347 11.947 11.944 11.947 6.598 0 11.948-5.349 11.948-11.947S18.542 0 11.944 0zm5.89 8.24l-1.974 9.297c-.148.653-.537.813-1.084.507l-3.007-2.213-1.452 1.395c-.161.161-.295.295-.606.295l.216-3.063 5.576-5.038c.242-.216-.053-.337-.375-.121L8.257 12.6l-2.969-.927c-.645-.202-.658-.645.135-.955l11.603-4.473c.537-.202 1.007.121.808 1.995z"/>
+                          </svg>
+                        </a>
+                        {/* Copy Link */}
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(shareUrl);
+                            alert('Poll link copied to clipboard!');
+                          }}
+                          className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-150 text-gray-600 hover:bg-gray-200 hover:scale-105 active:scale-95 transition-all shadow-sm cursor-pointer"
+                          title="Copy Link"
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           )}
