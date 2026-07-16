@@ -581,6 +581,7 @@ export default function AdminPage() {
   // Mode inside News Management: 'list', 'add', 'edit'
   const [newsViewMode, setNewsViewMode] = useState<'list' | 'add' | 'edit'>('list');
   const [isSavingArticle, setIsSavingArticle] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   
   // General configs states
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
@@ -3194,6 +3195,53 @@ export default function AdminPage() {
         return [...prev, slug];
       }
     });
+  };
+
+  const handleTranslateToTelugu = async () => {
+    const titleHtml = newsTitleRef.current?.innerHTML || '';
+    const bodyHtml = editorRef.current?.innerHTML || '';
+    const descText = newsDescription || '';
+
+    if (!titleHtml.trim() && !bodyHtml.trim()) {
+      alert('Please enter some English Title or Body Content to translate!');
+      return;
+    }
+
+    setIsTranslating(true);
+    try {
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: titleHtml,
+          description: descText,
+          body: bodyHtml
+        })
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Translation failed.');
+      }
+
+      const data = await res.json();
+      if (newsTitleRef.current && data.title) {
+        newsTitleRef.current.innerHTML = data.title;
+        setNewsTitle(newsTitleRef.current.innerText);
+      }
+      if (data.description) {
+        setNewsDescription(data.description);
+      }
+      if (editorRef.current && data.body) {
+        editorRef.current.innerHTML = data.body;
+      }
+      alert('Translated successfully into formal, professional Telugu!');
+    } catch (err: any) {
+      console.error('Translation error:', err);
+      alert('Translation Error: ' + err.message);
+    } finally {
+      setIsTranslating(false);
+    }
   };
 
   // Submit new news article or edit existing article details
@@ -5875,9 +5923,32 @@ export default function AdminPage() {
                   
                   {/* Headline Block */}
                   <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
-                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
-                      {isSeniorColumn ? 'Headline / శీర్షిక' : 'Headline (Telugu/English)'}
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
+                        {isSeniorColumn ? 'Headline / శీర్షిక' : 'Headline (Telugu/English)'}
+                      </label>
+                      {isSeniorColumn && (
+                        <button
+                          type="button"
+                          disabled={isTranslating}
+                          onClick={handleTranslateToTelugu}
+                          className={`text-xs font-black px-3.5 py-1.5 rounded-xl border transition-all cursor-pointer select-none active:scale-[0.98] ${
+                            isTranslating
+                              ? 'bg-amber-100 text-amber-700 border-amber-200 cursor-wait'
+                              : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500 shadow-sm hover:scale-[1.01]'
+                          }`}
+                        >
+                          {isTranslating ? (
+                            <span className="flex items-center gap-1.5 justify-center">
+                              <span className="animate-spin inline-block w-2.5 h-2.5 border-2 border-amber-700 border-t-transparent rounded-full"></span>
+                              Translating...
+                            </span>
+                          ) : (
+                            'Translate to Telugu (AI)'
+                          )}
+                        </button>
+                      )}
+                    </div>
                     <div className="flex flex-col border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
                       <MiniWysiwygToolbar editorRef={newsTitleRef} />
                       <div
