@@ -206,7 +206,7 @@ export default function NewsCard({ article, variant = 'default', className, imag
               />
             </Link>
             <p
-              className="news-summary summary-truncate telugu-text pl-2.5 pr-1 gap-headline-summary" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
+              className="news-summary summary-truncate telugu-text pl-2.5 pr-1 gap-headline-summary" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Poppins, sans-serif' : 'Noto Sans Telugu, sans-serif' }}
               dangerouslySetInnerHTML={{ __html: article.description }}
             />
           </div>
@@ -248,7 +248,7 @@ export default function NewsCard({ article, variant = 'default', className, imag
           />
           {article.categorySlug !== 'rasipalalu' && (
             <p
-              className="news-summary summary-truncate telugu-text pl-2.5 pr-1 gap-headline-summary" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
+              className="news-summary summary-truncate telugu-text pl-2.5 pr-1 gap-headline-summary" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Poppins, sans-serif' : 'Noto Sans Telugu, sans-serif' }}
               dangerouslySetInnerHTML={{ __html: article.description }}
             />
           )}

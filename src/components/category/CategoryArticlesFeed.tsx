@@ -121,7 +121,7 @@ export default function CategoryArticlesFeed({
                     />
                   </Link>
                   <p
-                    className="text-sm text-gray-550 mt-1 line-clamp-3 telugu-text leading-relaxed" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
+                    className="text-sm text-gray-550 mt-1 line-clamp-3 telugu-text leading-relaxed" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Poppins, sans-serif' : 'Noto Sans Telugu, sans-serif' }}
                     dangerouslySetInnerHTML={{ __html: article.description }}
                   />
                 </div>
@@ -152,7 +152,7 @@ export default function CategoryArticlesFeed({
                 />
                 <p
                   className={`${summaryClass} text-gray-550 mt-1 line-clamp-2 telugu-text pl-2.5`}
-                  style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
+                  style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Poppins, sans-serif' : 'Noto Sans Telugu, sans-serif' }}
                   dangerouslySetInnerHTML={{ __html: article.description }}
                 />
               </div>

@@ -347,6 +347,87 @@ export default function ArticlePageClient({
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [isLoadingTagNews, setIsLoadingTagNews] = useState(false);
 
+  // English to Telugu Translation State for Satya Bytes articles
+  const [translatedTitle, setTranslatedTitle] = useState<string | null>(null);
+  const [translatedDescription, setTranslatedDescription] = useState<string | null>(null);
+  const [translatedBody, setTranslatedBody] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [showTelugu, setShowTelugu] = useState(false);
+  const [showTranslatePopup, setShowTranslatePopup] = useState(false);
+  const [showTranslateModal, setShowTranslateModal] = useState(false);
+
+  const handleTranslate = async () => {
+    if (translatedTitle && translatedBody) {
+      setShowTranslateModal(true);
+      return;
+    }
+    
+    setIsTranslating(true);
+    setShowTranslateModal(true); // Open modal to show progress spinner
+    
+    try {
+      // 1. Translate Title
+      const titleText = article.title.replace(/<[^>]*>/g, '');
+      const titleRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=te&dt=t&q=${encodeURIComponent(titleText)}`);
+      if (!titleRes.ok) throw new Error('Title translation failed');
+      const titleJson = await titleRes.json();
+      const transTitle = titleJson[0].map((x: any) => x[0]).join('').trim();
+      
+      // 2. Translate Description
+      const descText = article.description ? article.description.replace(/<[^>]*>/g, '') : '';
+      let transDesc = '';
+      if (descText) {
+        const descRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=te&dt=t&q=${encodeURIComponent(descText)}`);
+        if (descRes.ok) {
+          const descJson = await descRes.json();
+          transDesc = descJson[0].map((x: any) => x[0]).join('').trim();
+        }
+      }
+
+      // 3. Translate Body
+      const bodyHtml = article.body || '';
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = bodyHtml;
+      
+      const elementsToTranslate = tempDiv.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, blockquote');
+      
+      if (elementsToTranslate.length > 0) {
+        for (let i = 0; i < elementsToTranslate.length; i++) {
+          const el = elementsToTranslate[i];
+          const originalText = el.textContent || '';
+          if (originalText.trim().length > 0) {
+            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=te&dt=t&q=${encodeURIComponent(originalText)}`);
+            if (res.ok) {
+              const json = await res.json();
+              const transText = json[0].map((x: any) => x[0]).join('').trim();
+              el.textContent = transText;
+            }
+          }
+        }
+      } else {
+        const originalText = tempDiv.textContent || '';
+        if (originalText.trim().length > 0) {
+          const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=te&dt=t&q=${encodeURIComponent(originalText)}`);
+          if (res.ok) {
+            const json = await res.json();
+            const transText = json[0].map((x: any) => x[0]).join('').trim();
+            tempDiv.textContent = transText;
+          }
+        }
+      }
+      
+      setTranslatedTitle(transTitle);
+      setTranslatedDescription(transDesc);
+      setTranslatedBody(tempDiv.innerHTML);
+    } catch (error) {
+      console.error('Translation error:', error);
+      alert('Translation failed. Please try again.');
+      setShowTranslateModal(false);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
   const handleTagClick = async (tagName: string) => {
     if (selectedTag === tagName) {
       setSelectedTag(null);
@@ -500,13 +581,23 @@ export default function ArticlePageClient({
         const savedPromos = getSetting('inline_article_promos_enabled');
         setInlinePromosEnabled(savedPromos === 'true');
         setIsMounted(true);
+        if (article.categorySlug === 'satya-bytes') {
+          setTimeout(() => {
+            setShowTranslatePopup(true);
+          }, 1500);
+        }
       })
       .catch(() => {
         setInlineImage(null);
         setInlinePromosEnabled(false);
         setIsMounted(true);
+        if (article.categorySlug === 'satya-bytes') {
+          setTimeout(() => {
+            setShowTranslatePopup(true);
+          }, 1500);
+        }
       });
-  }, []);
+  }, [article.categorySlug]);
   
   const currentCategorySlug = article.categorySlug;
   const categoryLinkInfo = getCategoryLinkInfo(article, englishCategories);
@@ -885,8 +976,8 @@ export default function ArticlePageClient({
                       {/* Headline */}
                       <h1
                         className="main-headline telugu-text text-[#cc0000] mb-5 text-2xl md:text-3.5xl font-extrabold"
-                        style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
-                        dangerouslySetInnerHTML={{ __html: article.title }}
+                        style={{ fontFamily: article.categorySlug === 'satya-bytes' ? (showTelugu ? 'Noto Sans Telugu, sans-serif' : 'Georgia, serif') : 'Noto Sans Telugu, sans-serif' }}
+                        dangerouslySetInnerHTML={{ __html: showTelugu && translatedTitle ? translatedTitle : article.title }}
                       />
 
                       {/* Reporter Profile Header */}
@@ -917,20 +1008,30 @@ export default function ArticlePageClient({
                           </div>
                         </div>
                         <div className="mt-2.5 sm:mt-0 sm:ml-auto w-full sm:w-auto flex flex-col items-start sm:items-end gap-1.5">
-                          {isMounted && isSeniorReporterCategory && (
-                            <Link
-                              href={
-                                article.categorySlug === 'uma-insights'
-                                  ? '/team#journalist-revuru-uma-maheswara-rao'
-                                  : '/team#satyapal-menon'
-                              }
-                              className="inline-flex items-center justify-center gap-1.5 bg-[#025390] hover:bg-[#0b2545] !text-white hover:!text-white !no-underline hover:!no-underline font-black text-[12px] py-1.5 px-3 rounded-lg transition-all duration-300 shadow-xs cursor-pointer select-none active:scale-[0.98]"
-                              style={{ color: '#ffffff', textDecoration: 'none' }}
-                            >
-                              <span>About Writer</span>
-                              <ArrowRight size={11} className="stroke-[2.5]" style={{ color: '#ffffff' }} />
-                            </Link>
-                          )}
+                          <div className="flex items-center gap-1.5 flex-wrap justify-start sm:justify-end">
+                            {isMounted && article.categorySlug === 'satya-bytes' && (
+                              <button
+                                onClick={handleTranslate}
+                                className="inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 !text-white font-black text-[12px] py-1.5 px-3 rounded-lg transition-all duration-300 shadow-xs cursor-pointer select-none active:scale-[0.98]"
+                              >
+                                <span>🌐 {showTelugu ? 'Show English' : 'Translate / తెలుగు'}</span>
+                              </button>
+                            )}
+                            {isMounted && isSeniorReporterCategory && (
+                              <Link
+                                href={
+                                  article.categorySlug === 'uma-insights'
+                                    ? '/team#journalist-revuru-uma-maheswara-rao'
+                                    : '/team#satyapal-menon'
+                                }
+                                className="inline-flex items-center justify-center gap-1.5 bg-[#025390] hover:bg-[#0b2545] !text-white hover:!text-white !no-underline hover:!no-underline font-black text-[12px] py-1.5 px-3 rounded-lg transition-all duration-300 shadow-xs cursor-pointer select-none active:scale-[0.98]"
+                                style={{ color: '#ffffff', textDecoration: 'none' }}
+                              >
+                                <span>About Writer</span>
+                                <ArrowRight size={11} className="stroke-[2.5]" style={{ color: '#ffffff' }} />
+                              </Link>
+                            )}
+                          </div>
                           <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
                         </div>
                       </div>
@@ -975,8 +1076,8 @@ export default function ArticlePageClient({
                     {/* Headline */}
                     <h1
                       className="main-headline telugu-text text-[#cc0000] mb-3"
-                      style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
-                      dangerouslySetInnerHTML={{ __html: article.title }}
+                      style={{ fontFamily: article.categorySlug === 'satya-bytes' ? (showTelugu ? 'Noto Sans Telugu, sans-serif' : 'Georgia, serif') : 'Noto Sans Telugu, sans-serif' }}
+                      dangerouslySetInnerHTML={{ __html: showTelugu && translatedTitle ? translatedTitle : article.title }}
                     />
 
                     {/* Meta row */}
@@ -993,7 +1094,15 @@ export default function ArticlePageClient({
                         <Clock size={12} />
                         <span className="font-semibold">Published: {formatDate(article.publishedAt)}</span>
                       </div>
-                      <div className="ml-auto">
+                      <div className="ml-auto flex items-center gap-2">
+                        {isMounted && article.categorySlug === 'satya-bytes' && (
+                          <button
+                            onClick={handleTranslate}
+                            className="inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 !text-white font-black text-[12px] py-1.5 px-3 rounded-lg transition-all duration-300 shadow-xs cursor-pointer select-none active:scale-[0.98]"
+                          >
+                            <span>🌐 {showTelugu ? 'Show English' : 'Translate / తెలుగు'}</span>
+                          </button>
+                        )}
                         <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
                       </div>
                     </div>
@@ -1001,8 +1110,8 @@ export default function ArticlePageClient({
                     {/* Description summary */}
                     <p
                       className="block article-summary telugu-text text-gray-700 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r mb-4 text-[14.5px] md:text-base leading-relaxed"
-                      style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}
-                      dangerouslySetInnerHTML={{ __html: article.description }}
+                      style={{ fontFamily: article.categorySlug === 'satya-bytes' ? (showTelugu ? 'Noto Sans Telugu, sans-serif' : 'Georgia, serif') : 'Noto Sans Telugu, sans-serif' }}
+                      dangerouslySetInnerHTML={{ __html: showTelugu && translatedDescription ? translatedDescription : article.description }}
                     />
 
                     {/* Hero Image */}
@@ -1030,12 +1139,21 @@ export default function ArticlePageClient({
               })()}
 
               {/* Full Article Body */}
-              <div className="telugu-text text-gray-800 article-body" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Mandali, "Noto Sans Telugu", sans-serif', lineHeight: '1.85' }}>
-                {article.body ? (
+              <div 
+                className="telugu-text text-gray-800 article-body" 
+                style={{ 
+                  fontFamily: article.categorySlug === 'satya-bytes' 
+                    ? (showTelugu ? 'Mandali, "Noto Sans Telugu", sans-serif' : 'Poppins, sans-serif') 
+                    : 'Mandali, "Noto Sans Telugu", sans-serif', 
+                  lineHeight: '1.85' 
+                }}
+              >
+                {(showTelugu && translatedBody ? translatedBody : article.body) ? (
                   (() => {
+                    const bodyToParse = showTelugu && translatedBody ? translatedBody : (article.body || '');
                     // Extract inline-image-containers to prevent them from being split/broken by newline parser
                     const placeholders: string[] = [];
-                    let normalized = article.body.replace(/(<div\b[^>]*\binline-image-container[\s\S]*?<\/div>\s*<\/div>)/gi, (match: string) => {
+                    let normalized = bodyToParse.replace(/(<div\b[^>]*\binline-image-container[\s\S]*?<\/div>\s*<\/div>)/gi, (match: string) => {
                       placeholders.push(match);
                       return `\n__INLINE_IMAGE_CONTAINER_PLACEHOLDER_${placeholders.length - 1}__\n`;
                     });
@@ -1696,6 +1814,133 @@ export default function ArticlePageClient({
         apNewsList={apNewsList}
         tgNewsList={tgNewsList}
       />
+
+      {/* English to Telugu Translate Popup Alert (slides in on bottom-right) */}
+      {isMounted && article.categorySlug === 'satya-bytes' && showTranslatePopup && (
+        <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 w-[330px] bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] border border-slate-100 p-4 flex flex-col gap-3 font-sans animate-fade-in text-left">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center text-rose-600 animate-pulse">
+                <span className="text-sm font-bold">🌐</span>
+              </div>
+              <div className="text-left">
+                <h4 className="text-sm font-black text-slate-800">English to Telugu translation</h4>
+                <p className="text-[11px] text-gray-400">Read this Satya Bytes article in Telugu</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setShowTranslatePopup(false)}
+              className="text-slate-400 hover:text-slate-600 transition-colors text-xs font-bold w-6 h-6 rounded-full hover:bg-slate-50 flex items-center justify-center cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+          <p className="text-[12px] text-slate-600 leading-normal pl-0.5 text-left">
+            You can translate the full article content to Telugu instantly using our automated reader.
+          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <button
+              onClick={() => {
+                setShowTranslatePopup(false);
+                handleTranslate();
+              }}
+              className="flex-1 bg-[#cc0000] hover:bg-[#b00000] text-white font-black text-[12px] py-2 px-3 rounded-lg shadow-sm active:scale-[0.98] transition-all duration-200 cursor-pointer"
+            >
+              Translate / తెలుగు అనువాదం
+            </button>
+            <button
+              onClick={() => setShowTranslatePopup(false)}
+              className="px-3 py-2 text-slate-500 hover:text-slate-700 hover:bg-slate-55 rounded-lg text-[12px] font-bold transition-all duration-200 cursor-pointer"
+            >
+              Later
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Translation Progress & Full-Screen Reading Modal */}
+      {isMounted && showTranslateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.25)] border border-slate-50 w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden font-sans transform scale-100 transition-all duration-300">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-100 bg-slate-50/50">
+              <div className="flex items-center gap-2 text-left">
+                <span className="text-xl">🌐</span>
+                <div>
+                  <h3 className="text-base font-black text-slate-800">English to Telugu Translation</h3>
+                  <p className="text-[11px] text-gray-400">Powered by Google Neural Translation API</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowTranslateModal(false)}
+                className="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center transition-colors text-sm font-bold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 select-text text-left">
+              {isTranslating ? (
+                <div className="flex flex-col items-center justify-center py-16 gap-4">
+                  <div className="w-12 h-12 border-4 border-red-600/20 border-t-red-600 rounded-full animate-spin"></div>
+                  <div className="text-center">
+                    <p className="text-sm font-black text-slate-700">Translating article content...</p>
+                    <p className="text-xs text-slate-400 mt-1">Applying neural linguistic translation for natural reading</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Translated Title */}
+                  <h2 
+                    className="text-2xl md:text-3xl font-black text-red-600 telugu-text leading-snug"
+                    style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    dangerouslySetInnerHTML={{ __html: translatedTitle || '' }}
+                  />
+
+                  {/* Translated Content */}
+                  <div 
+                    className="telugu-text text-slate-700 text-sm md:text-base leading-relaxed space-y-4 article-body"
+                    style={{ fontFamily: 'Mandali, "Noto Sans Telugu", sans-serif', lineHeight: '1.85' }}
+                    dangerouslySetInnerHTML={{ __html: translatedBody || '' }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            {!isTranslating && (
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+                <button
+                  onClick={() => {
+                    setShowTelugu(!showTelugu);
+                    setShowTranslateModal(false);
+                  }}
+                  className="bg-[#cc0000] hover:bg-[#b00000] text-white font-black text-xs md:text-sm py-2.5 px-4 rounded-xl shadow-xs transition-all duration-200 active:scale-[0.98] cursor-pointer text-center"
+                >
+                  {showTelugu ? 'Show English on Main Page' : 'Apply Telugu to Main Page / పేజీలో చదవండి'}
+                </button>
+                <div className="flex gap-2 justify-end">
+                  <button
+                    onClick={() => {
+                      setShowTelugu(!showTelugu);
+                    }}
+                    className="border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs md:text-sm py-2.5 px-4 rounded-xl transition-all duration-200 cursor-pointer"
+                  >
+                    {showTelugu ? 'View English Text' : 'View Telugu Text'}
+                  </button>
+                  <button
+                    onClick={() => setShowTranslateModal(false)}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs md:text-sm py-2.5 px-4 rounded-xl transition-all cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
