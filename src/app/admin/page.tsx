@@ -1590,6 +1590,7 @@ export default function AdminPage() {
       if (editorLangTab === 'en') {
         // Prevent overwriting original English with Google-translated Telugu text if the page is currently translated
         const isCurrentlyTranslated = typeof document !== 'undefined' && (
+          (document.documentElement.lang && document.documentElement.lang !== 'en') ||
           document.documentElement.className.includes('translated') || 
           document.body.className.includes('translated')
         );
@@ -3465,6 +3466,7 @@ export default function AdminPage() {
 
     // Check if Google Translate is currently translating the page
     const isCurrentlyTranslated = typeof document !== 'undefined' && (
+      (document.documentElement.lang && document.documentElement.lang !== 'en') ||
       document.documentElement.className.includes('translated') || 
       document.body.className.includes('translated')
     );
