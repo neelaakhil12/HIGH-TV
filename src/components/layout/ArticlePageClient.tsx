@@ -366,58 +366,46 @@ export default function ArticlePageClient({
     setShowTranslateModal(true); // Open modal to show progress spinner
     
     try {
-      // 1. Translate Title
-      const titleText = article.title.replace(/<[^>]*>/g, '');
-      const titleRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=te&dt=t&q=${encodeURIComponent(titleText)}`);
-      if (!titleRes.ok) throw new Error('Title translation failed');
-      const titleJson = await titleRes.json();
-      const transTitle = titleJson[0].map((x: any) => x[0]).join('').trim();
-      
-      // 2. Translate Description
-      const descText = article.description ? article.description.replace(/<[^>]*>/g, '') : '';
-      let transDesc = '';
-      if (descText) {
-        const descRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=te&dt=t&q=${encodeURIComponent(descText)}`);
-        if (descRes.ok) {
-          const descJson = await descRes.json();
-          transDesc = descJson[0].map((x: any) => x[0]).join('').trim();
-        }
-      }
-
-      // 3. Translate Body
+      // 1. Prepare paragraphs to translate
       const bodyHtml = article.body || '';
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = bodyHtml;
       
       const elementsToTranslate = tempDiv.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, blockquote');
+      const paragraphs: string[] = [];
+      elementsToTranslate.forEach(el => {
+        paragraphs.push(el.textContent || '');
+      });
       
-      if (elementsToTranslate.length > 0) {
-        for (let i = 0; i < elementsToTranslate.length; i++) {
-          const el = elementsToTranslate[i];
-          const originalText = el.textContent || '';
-          if (originalText.trim().length > 0) {
-            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=te&dt=t&q=${encodeURIComponent(originalText)}`);
-            if (res.ok) {
-              const json = await res.json();
-              const transText = json[0].map((x: any) => x[0]).join('').trim();
-              el.textContent = transText;
-            }
-          }
-        }
-      } else {
-        const originalText = tempDiv.textContent || '';
+      // 2. Fetch all translations in one single request to our server API
+      const response = await fetch('/api/translate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: article.title.replace(/<[^>]*>/g, ''),
+          description: article.description || '',
+          paragraphs
+        })
+      });
+      
+      if (!response.ok) throw new Error('Server translation failed');
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      
+      // 3. Re-apply translated paragraphs back to the DOM template
+      let paragraphIndex = 0;
+      elementsToTranslate.forEach(el => {
+        const originalText = el.textContent || '';
         if (originalText.trim().length > 0) {
-          const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=te&dt=t&q=${encodeURIComponent(originalText)}`);
-          if (res.ok) {
-            const json = await res.json();
-            const transText = json[0].map((x: any) => x[0]).join('').trim();
-            tempDiv.textContent = transText;
-          }
+          el.textContent = data.paragraphs[paragraphIndex] || originalText;
         }
-      }
+        paragraphIndex++;
+      });
       
-      setTranslatedTitle(transTitle);
-      setTranslatedDescription(transDesc);
+      setTranslatedTitle(data.title);
+      setTranslatedDescription(data.description);
       setTranslatedBody(tempDiv.innerHTML);
     } catch (error) {
       console.error('Translation error:', error);
