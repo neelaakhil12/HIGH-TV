@@ -1484,7 +1484,7 @@ export default function AdminPage() {
     // 1. Save current DOM contents of the editor to the active tab's state
     const currentTitle = newsTitleRef.current?.innerHTML || '';
     const currentBody = editorRef.current?.innerHTML || '';
-    const currentDesc = newsDescription;
+    const currentDesc = newsDescriptionRef.current?.innerHTML || newsDescription;
 
     if (editorLangTab === 'en') {
       setNewsTitleEn(currentTitle);
@@ -1507,6 +1507,9 @@ export default function AdminPage() {
     }
     if (editorRef.current) {
       editorRef.current.innerHTML = targetBody;
+    }
+    if (newsDescriptionRef.current) {
+      newsDescriptionRef.current.innerHTML = targetDesc;
     }
     setNewsDescription(targetDesc);
 
@@ -1552,7 +1555,7 @@ export default function AdminPage() {
     // 1. Capture current DOM values (which are showing the translated Telugu text)
     const currentTitle = newsTitleRef.current?.innerHTML || '';
     const currentBody = editorRef.current?.innerHTML || '';
-    const currentDesc = newsDescription;
+    const currentDesc = newsDescriptionRef.current?.innerHTML || newsDescription;
 
     if (!currentTitle.trim() && !currentBody.trim()) {
       alert("No content found in the editor to import!");
@@ -1572,6 +1575,9 @@ export default function AdminPage() {
     if (editorRef.current) {
       editorRef.current.innerHTML = newsBodyEn;
     }
+    if (newsDescriptionRef.current) {
+      newsDescriptionRef.current.innerHTML = newsDescriptionEn;
+    }
     setNewsDescription(newsDescriptionEn);
 
     // 4. Reset active language tab to English
@@ -1585,7 +1591,7 @@ export default function AdminPage() {
     if (newsViewMode === 'add' || newsViewMode === 'edit') {
       const currentTitle = newsTitleRef.current?.innerHTML || '';
       const currentBody = editorRef.current?.innerHTML || '';
-      const currentDesc = newsDescription;
+      const currentDesc = newsDescriptionRef.current?.innerHTML || newsDescription;
 
       if (editorLangTab === 'en') {
         // Prevent overwriting original English with Google-translated Telugu text if the page is currently translated
@@ -6267,13 +6273,17 @@ export default function AdminPage() {
                     <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
                       {isSeniorColumn ? 'Short Summary / లఘు వివరణ (Excerpt - Optional)' : 'Short Summary (Excerpt - Optional)'}
                     </label>
-                    <textarea
-                      rows={2}
-                      value={newsDescription}
-                      onChange={(e) => setNewsDescription(e.target.value)}
-                      placeholder="Enter a brief summary snippet to display on article list pages and cards..."
-                      className="w-full bg-slate-50 border border-slate-200/60 focus:bg-white focus:border-rose-500 rounded-xl px-4 py-3 text-xs outline-none transition-colors telugu-text text-slate-800 resize-y"
-                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
+                    <div
+                      contentEditable
+                      ref={newsDescriptionRef}
+                      suppressContentEditableWarning
+                      onInput={(e) => {
+                        setNewsDescription(e.currentTarget.innerText);
+                        setEditorTrigger(prev => prev + 1);
+                      }}
+                      data-placeholder="Enter a brief summary snippet to display on article list pages and cards..."
+                      className="wysiwyg-editor-mini w-full bg-slate-50 border border-slate-200/60 focus:bg-white focus:border-rose-500 rounded-xl px-4 py-3 text-xs outline-none transition-colors telugu-text text-slate-800"
+                      style={{ fontFamily: 'Noto Sans Telugu, sans-serif', minHeight: '60px' }}
                     />
                     <span className="text-[10px] text-slate-400">This snippet is displayed on homepage categories, search pages, and article index card listings.</span>
                   </div>
