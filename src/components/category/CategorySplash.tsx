@@ -11,7 +11,7 @@ export default function CategorySplash({ category }: CategorySplashProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [shouldRender, setShouldRender] = useState(true);
 
-  const targetText = category === 'uma-insights' ? 'ఉమా ఇన్‌సైట్స' : 'Satya Bytes';
+  const targetText = category === 'uma-insights' ? 'ఉమా ఇన్‌సైట్స' : 'SatyaBytes';
 
   useEffect(() => {
     let index = 0;

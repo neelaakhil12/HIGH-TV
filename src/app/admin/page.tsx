@@ -114,14 +114,14 @@ const MAIN_CATEGORIES_LIST = [
   { slug: 'weather', name: 'వెదర్' },
   { slug: 'epaper', name: 'ఈ-పేపర్' },
   { slug: 'uma-insights', name: 'ఉమా ఇన్‌సైట్స' },
-  { slug: 'satya-bytes', name: 'Satya Bytes' },
+  { slug: 'satya-bytes', name: 'SatyaBytes' },
 ];
 
 const getCategoryDisplayName = (slug: string) => {
   if (!slug) return '';
   const cleanSlug = slug.toLowerCase().trim();
   if (cleanSlug === 'uma-insights') return 'ఉమా ఇన్‌సైట్స';
-  if (cleanSlug === 'satya-bytes') return 'Satya Bytes';
+  if (cleanSlug === 'satya-bytes') return 'SatyaBytes';
   if (cleanSlug === 'andhra-pradesh') return 'ఆంధ్రప్రదేశ్ వార్తలు (Andhra Pradesh News)';
   if (cleanSlug === 'telangana') return 'తెలంగాణ వార్తలు (Telangana News)';
   if (cleanSlug === 'home') return 'హోమ్ (Home)';
@@ -522,7 +522,7 @@ const SIDEBAR_CATEGORIES = [
   { slug: 'weather', name: 'వెదర్ (Weather)' },
   { slug: 'sampadakiyam', name: 'ఎడిటోరియల్ (Editorial)' },
   { slug: 'uma-insights', name: 'ఉమా ఇన్‌సైట్స' },
-  { slug: 'satya-bytes', name: 'Satya Bytes' },
+  { slug: 'satya-bytes', name: 'SatyaBytes' },
 ];
 
 const getArticleCategoryName = (art: any) => {
@@ -3310,8 +3310,12 @@ export default function AdminPage() {
       }
     }
 
-    const finalCategory = (categorySlug === 'uma-insights' || categorySlug === 'satya-bytes')
-      ? (seniorRole.trim() || resolvedCat)
+    const finalAuthor = categorySlug === 'uma-insights'
+      ? 'Revuru umamaheswara rao'
+      : (categorySlug === 'satya-bytes' ? 'SATYAPAL MENON' : (newsAuthor.trim() || 'హై టీవీ డెస్క్'));
+
+    const finalCategory = categorySlug === 'uma-insights' || categorySlug === 'satya-bytes'
+      ? 'Senior Journalist'
       : resolvedCat;
 
     const articleData = {
@@ -3320,7 +3324,7 @@ export default function AdminPage() {
       categorySlug,
       category: finalCategory,
       districtSlug,
-      author: newsAuthor.trim() || 'హై టీవీ డెస్క్',
+      author: finalAuthor,
       // For new articles: always use the exact current time when Publish is clicked
       // For edited articles: use the existing/manually set date
       publishedAt: newsViewMode === 'add'
@@ -3348,7 +3352,7 @@ export default function AdminPage() {
     };
 
     // Sync custom senior reporter to database as a team-member
-    if ((categorySlug === 'uma-insights' || categorySlug === 'satya-bytes') && selectedAuthorSection === 'custom' && newsAuthor.trim()) {
+    if ((categorySlug === 'uma-insights' || categorySlug === 'satya-bytes') && selectedAuthorSection === 'custom' && newsAuthor.trim() && categorySlug !== 'uma-insights' && categorySlug !== 'satya-bytes') {
       try {
         const checkRes = await fetch(`/api/articles?category=team-member&limit=100&t=${Date.now()}`);
         if (checkRes.ok) {
@@ -4560,7 +4564,7 @@ export default function AdminPage() {
               >
                 <div className="flex items-center gap-2.5">
                   <FileText className="w-4 h-4" />
-                  <span className="telugu-text">Satya Bytes</span>
+                  <span className="telugu-text">SatyaBytes</span>
                 </div>
               </button>
             </>
@@ -6028,7 +6032,7 @@ export default function AdminPage() {
                                 'citizen-reporter': 'Citizen Reporter',
                                 'weather': 'Weather News',
                                 'uma-insights': 'ఉమా ఇన్‌సైట్స',
-                                'satya-bytes': 'Satya Bytes'
+                                'satya-bytes': 'SatyaBytes'
                               };
                               return mappings[slug] || slug;
                             };
@@ -6870,43 +6874,45 @@ export default function AdminPage() {
                 <div className="space-y-6">
                   
                   {/* Featured Image Box */}
-                  <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
-                    <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
-                      {isSeniorColumn ? 'Senior Expertise Photo / రచయిత చిత్రం' : 'Featured Image'}
-                    </label>
-                    <div className="border-2 border-dashed border-slate-200 hover:border-rose-500 rounded-2xl p-4 bg-slate-50 text-center relative cursor-pointer min-h-[160px] flex items-center justify-center transition-colors">
-                      <input
-                        type="file"
-                        ref={featuredImageInputRef}
-                        accept="image/*"
-                        onChange={handleFeaturedImageChange}
-                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                      />
-                      {!newsImage ? (
-                        <div className="flex flex-col items-center gap-2">
-                          <Upload className="w-6 h-6 text-slate-400" />
-                          <span className="text-xs font-bold text-slate-500">
-                            {isSeniorColumn ? 'Click to upload senior expertise photo' : 'Click to upload featured image'}
-                          </span>
-                          <span className="text-[9px] text-slate-400 uppercase tracking-wider">Rescaled to max 800px width</span>
-                        </div>
-                      ) : (
-                        <div className="relative w-full overflow-hidden rounded-xl bg-slate-900 border border-slate-200">
-                          <img src={newsImage} alt="Featured cover" className="w-full h-auto object-cover max-h-[160px] block" />
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setNewsImage('');
-                            }}
-                            className="absolute top-2 right-2 bg-black/60 hover:bg-black/90 text-white rounded-full w-5 h-5 flex items-center justify-center transition-colors"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      )}
+                  {!(selectedCategories.includes('uma-insights') || selectedCategories.includes('satya-bytes')) && (
+                    <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
+                      <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
+                        {isSeniorColumn ? 'Senior Expertise Photo / రచయిత చిత్రం' : 'Featured Image'}
+                      </label>
+                      <div className="border-2 border-dashed border-slate-200 hover:border-rose-500 rounded-2xl p-4 bg-slate-50 text-center relative cursor-pointer min-h-[160px] flex items-center justify-center transition-colors">
+                        <input
+                          type="file"
+                          ref={featuredImageInputRef}
+                          accept="image/*"
+                          onChange={handleFeaturedImageChange}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        />
+                        {!newsImage ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <Upload className="w-6 h-6 text-slate-400" />
+                            <span className="text-xs font-bold text-slate-500">
+                              {isSeniorColumn ? 'Click to upload senior expertise photo' : 'Click to upload featured image'}
+                            </span>
+                            <span className="text-[9px] text-slate-400 uppercase tracking-wider">Rescaled to max 800px width</span>
+                          </div>
+                        ) : (
+                          <div className="relative w-full overflow-hidden rounded-xl bg-slate-900 border border-slate-200">
+                            <img src={newsImage} alt="Featured cover" className="w-full h-auto object-cover max-h-[160px] block" />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setNewsImage('');
+                              }}
+                              className="absolute top-2 right-2 bg-black/60 hover:bg-black/90 text-white rounded-full w-5 h-5 flex items-center justify-center transition-colors"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Article Metadata / Info Box (Super Admin Only, in Edit Mode) */}
                   {userRole === 'super-admin' && editingArticle && (
@@ -7642,7 +7648,7 @@ export default function AdminPage() {
               { slug: 'mobile-ad-cat-current-affairs', labelTelugu: 'కేటగిరీ పేజీ: కరెంట్ అఫైర్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Current Affairs' },
               { slug: 'mobile-ad-cat-notification', labelTelugu: 'కేటగిరీ పేజీ: నోటిఫికేషన్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Notifications' },
               { slug: 'mobile-ad-cat-uma-insights', labelTelugu: 'కేటగిరీ పేజీ: ఉమా ఇన్‌సైట్స (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Uma Insights' },
-              { slug: 'mobile-ad-cat-satya-bytes', labelTelugu: 'కేటగిరీ పేజీ: Satya Bytes (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Satya Bytes' },
+              { slug: 'mobile-ad-cat-satya-bytes', labelTelugu: 'కేటగిరీ పేజీ: SatyaBytes (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: SatyaBytes' },
 
               // --- ARTICLE PAGES MOBILE ADS (Top rotating / bottom continuous) ---
               { slug: 'mobile-ad-article-top-global', labelTelugu: 'వ్యాసం పేజీ: గ్లోబల్ టాప్ యాడ్ (Global Top Rotating Ad)', labelEnglish: 'Article Page: Global Top' },
@@ -7659,7 +7665,7 @@ export default function AdminPage() {
               { slug: 'mobile-ad-article-top-telangana', labelTelugu: 'వ్యాసం పేజీ: తెలంగాణ టాప్ (Top of Telangana)', labelEnglish: 'Article Page: Top Telangana' },
               { slug: 'mobile-ad-article-top-andhra-pradesh', labelTelugu: 'వ్యాసం పేజీ: ఆంధ్రప్రదేశ్ టాప్ (Top of AP)', labelEnglish: 'Article Page: Top Andhra Pradesh' },
               { slug: 'mobile-ad-article-top-uma-insights', labelTelugu: 'వ్యాసం పేజీ: ఉమా ఇన్‌సైట్స టాప్ (Top of Uma Insights)', labelEnglish: 'Article Page: Top Uma Insights' },
-              { slug: 'mobile-ad-article-top-satya-bytes', labelTelugu: 'వ్యాసం పేజీ: Satya Bytes టాప్ (Top of Satya Bytes)', labelEnglish: 'Article Page: Top Satya Bytes' },
+              { slug: 'mobile-ad-article-top-satya-bytes', labelTelugu: 'వ్యాసం పేజీ: SatyaBytes టాప్ (Top of SatyaBytes)', labelEnglish: 'Article Page: Top SatyaBytes' },
 
               { slug: 'mobile-ad-article-bottom-global', labelTelugu: 'వ్యాసం పేజీ: గ్లోబల్ బాటమ్ యాడ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Global Bottom (Between Read More & Polls)' },
               { slug: 'mobile-ad-article-bottom-latest', labelTelugu: 'వ్యాసం పేజీ: బ్రేకింగ్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Breaking (Between Read More & Polls)' },
@@ -7675,7 +7681,7 @@ export default function AdminPage() {
               { slug: 'mobile-ad-article-bottom-telangana', labelTelugu: 'వ్యాసం పేజీ: తెలంగాణ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Telangana (Between Read More & Polls)' },
               { slug: 'mobile-ad-article-bottom-andhra-pradesh', labelTelugu: 'వ్యాసం పేజీ: ఆంధ్రప్రదేశ్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Andhra Pradesh (Between Read More & Polls)' },
               { slug: 'mobile-ad-article-bottom-uma-insights', labelTelugu: 'వ్యాసం పేజీ: ఉమా ఇన్‌సైట్స బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Uma Insights (Between Read More & Polls)' },
-              { slug: 'mobile-ad-article-bottom-satya-bytes', labelTelugu: 'వ్యాసం పేజీ: Satya Bytes బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Satya Bytes (Between Read More & Polls)' },
+              { slug: 'mobile-ad-article-bottom-satya-bytes', labelTelugu: 'వ్యాసం పేజీ: SatyaBytes బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom SatyaBytes (Between Read More & Polls)' },
 
               // --- E-PAPER PAGE MOBILE ADS ---
               { slug: 'mobile-ad-epaper-above-main', labelTelugu: 'ఈ-పేపర్ లిస్టింగ్: మెయిన్ ఎడిషన్స్ పైన యాడ్', labelEnglish: 'E-Paper Listing: Above Main Editions' },
@@ -15171,7 +15177,7 @@ export default function AdminPage() {
                       'citizen-reporter': 'Citizen Reporter',
                       'weather': 'Weather News',
                       'uma-insights': 'ఉమా ఇన్‌సైట్స',
-                      'satya-bytes': 'Satya Bytes'
+                      'satya-bytes': 'SatyaBytes'
                     };
                     return mappings[slug] || slug;
                   };

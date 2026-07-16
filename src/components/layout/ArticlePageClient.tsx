@@ -102,7 +102,7 @@ function getCategoryLinkInfo(article: any, englishCategories: Record<string, str
     'weather': { label: 'Weather News', href: '/category/weather' },
     'live-updates': { label: 'Live Updates', href: '/category/live-updates' },
     'uma-insights': { label: 'ఉమా ఇన్‌సైట్స', href: '/category/uma-insights' },
-    'satya-bytes': { label: 'Satya Bytes', href: '/category/satya-bytes' }
+    'satya-bytes': { label: 'SatyaBytes', href: '/category/satya-bytes' }
   };
 
   if (categoryMap[slug]) {
@@ -349,26 +349,40 @@ export default function ArticlePageClient({
 
   useEffect(() => {
     if (article.categorySlug === 'satya-bytes') {
-      // Define global init function
-      (window as any).googleTranslateElementInit = () => {
-        new (window as any).google.translate.TranslateElement(
-          {
-            pageLanguage: 'en',
-            includedLanguages: 'te',
-            layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE
-          },
-          'google_translate_element'
-        );
+      const originalLang = document.documentElement.lang;
+      document.documentElement.lang = 'en';
+
+      const initTranslate = () => {
+        if ((window as any).google?.translate?.TranslateElement) {
+          new (window as any).google.translate.TranslateElement(
+            {
+              pageLanguage: 'en',
+              includedLanguages: 'te',
+              layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE
+            },
+            'google_translate_element'
+          );
+        }
       };
 
-      // Check if script is already added
+      (window as any).googleTranslateElementInit = initTranslate;
+
       const existingScript = document.getElementById('google-translate-script');
       if (!existingScript) {
         const addScript = document.createElement('script');
         addScript.id = 'google-translate-script';
         addScript.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
         document.body.appendChild(addScript);
+      } else {
+        // If script is already loaded, initialize the widget directly
+        initTranslate();
       }
+
+      return () => {
+        if (originalLang) {
+          document.documentElement.lang = originalLang;
+        }
+      };
     }
   }, [article.categorySlug]);
 
@@ -802,7 +816,7 @@ export default function ArticlePageClient({
         <div className="grid grid-cols-1 lg:grid-cols-[185px_1fr_185px] gap-3">
           
           {/* Left Sidebar */}
-          <aside className="hidden lg:flex flex-col gap-3">
+          <aside className={`hidden lg:flex flex-col gap-3 ${article.categorySlug === 'satya-bytes' ? 'notranslate' : ''}`}>
             {/* District Selector */}
             {!!article.districtSlug && (
               <div className="bg-white border border-gray-200 rounded p-2.5 flex flex-col gap-2 shadow-xs">
@@ -916,8 +930,15 @@ export default function ArticlePageClient({
 
                       {/* Reporter Profile Header */}
                       <div className="flex flex-col sm:flex-row sm:items-center gap-3.5 mb-6 pb-4 border-b border-gray-150 text-left">
-                        <div className="flex items-center gap-3.5 w-full sm:w-auto">
-                          <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border border-gray-200 shadow-sm shrink-0">
+                        <div className={`flex items-center gap-3.5 w-full sm:w-auto ${article.categorySlug === 'satya-bytes' ? 'notranslate' : ''}`}>
+                          <Link 
+                            href={
+                              article.categorySlug === 'uma-insights' 
+                                ? '/reporter/journalist-revuru-uma-maheswara-rao' 
+                                : '/reporter/satyapal-menon'
+                            }
+                            className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border border-gray-200 shadow-sm shrink-0 hover:opacity-85 transition-opacity"
+                          >
                             {reporter && reporter.image ? (
                               <img src={reporter.image} alt={reporter.name} className="w-full h-full object-cover" />
                             ) : article.image ? (
@@ -927,11 +948,20 @@ export default function ArticlePageClient({
                                 {article.author?.charAt(0) || 'హై'}
                               </div>
                             )}
-                          </div>
+                          </Link>
                           <div className="space-y-0.5">
-                            <h3 className="font-extrabold text-gray-900 text-base md:text-lg telugu-text" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}>
-                              {isSeniorReporterCategory ? article.author : (reporter ? reporter.name.replace(/.* - /, '') : article.author)}
-                            </h3>
+                            <Link 
+                              href={
+                                article.categorySlug === 'uma-insights' 
+                                  ? '/reporter/journalist-revuru-uma-maheswara-rao' 
+                                  : '/reporter/satyapal-menon'
+                              }
+                              className="hover:text-rose-600 transition-colors"
+                            >
+                              <h3 className="font-extrabold text-gray-900 text-base md:text-lg telugu-text" style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, serif' : 'Noto Sans Telugu, sans-serif' }}>
+                                {isSeniorReporterCategory ? article.author : (reporter ? reporter.name.replace(/.* - /, '') : article.author)}
+                              </h3>
+                            </Link>
                             <p className="text-xs font-bold text-rose-600 uppercase tracking-wider">
                               {isSeniorReporterCategory ? (article.category || 'సీనియర్ జర్నలిస్ట్') : (reporter?.role || article.category || 'స్టాఫ్ రిపోర్టర్')}
                             </p>
@@ -950,8 +980,8 @@ export default function ArticlePageClient({
                               <Link
                                 href={
                                   article.categorySlug === 'uma-insights'
-                                    ? '/team#journalist-revuru-uma-maheswara-rao'
-                                    : '/team#satyapal-menon'
+                                    ? '/reporter/journalist-revuru-uma-maheswara-rao'
+                                    : '/reporter/satyapal-menon'
                                 }
                                 className="inline-flex items-center justify-center gap-1.5 bg-[#025390] hover:bg-[#0b2545] !text-white hover:!text-white !no-underline hover:!no-underline font-black text-[12px] py-1.5 px-3 rounded-lg transition-all duration-300 shadow-xs cursor-pointer select-none active:scale-[0.98]"
                                 style={{ color: '#ffffff', textDecoration: 'none' }}
@@ -1353,7 +1383,7 @@ export default function ArticlePageClient({
 
 
               {/* Bottom Section: మరిన్ని వార్తలు చదవండి (Read More News) */}
-              <div className="mt-8 pt-5 border-t border-gray-150 text-left">
+              <div className={`mt-8 pt-5 border-t border-gray-150 text-left ${article.categorySlug === 'satya-bytes' ? 'notranslate' : ''}`}>
                 <h2
                   className="font-black text-[#cc0000] text-[18px] md:text-[22px] mb-3.5 telugu-text"
                   style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
@@ -1392,18 +1422,20 @@ export default function ArticlePageClient({
               </div>
 
               {/* Mobile-only Sidebar components (Trending, Breaking, District News, Poll, Ads) */}
-              <MobileArticleFooter
-                categorySlug={currentCategorySlug}
-                displayTrending={displayTrending}
-                displayLatest={displayLatest}
-                apNewsList={apNewsList}
-                tgNewsList={tgNewsList}
-              />
+              <div className={article.categorySlug === 'satya-bytes' ? 'notranslate' : ''}>
+                <MobileArticleFooter
+                  categorySlug={currentCategorySlug}
+                  displayTrending={displayTrending}
+                  displayLatest={displayLatest}
+                  apNewsList={apNewsList}
+                  tgNewsList={tgNewsList}
+                />
+              </div>
             </div>
           </article>
 
           {/* Right Sidebar */}
-          <aside className="hidden lg:flex flex-col gap-3">
+          <aside className={`hidden lg:flex flex-col gap-3 ${article.categorySlug === 'satya-bytes' ? 'notranslate' : ''}`}>
             {/* District Selector */}
             {!!article.districtSlug && (
               <div className="bg-white border border-gray-200 rounded p-2.5 flex flex-col gap-2 shadow-xs">
@@ -1669,15 +1701,29 @@ export default function ArticlePageClient({
               <div className="w-5.5 h-5.5 bg-[#025390] rounded-full flex items-center justify-center">
                 <span className="text-white text-[10px] font-black">హై</span>
               </div>
-              <Link href={`/reporter/${reporter.slug}`} className="font-bold text-[#025390] hover:text-red-600 transition-colors telugu-text" style={{ fontFamily: 'Mandali, sans-serif' }}>
-                {reporter.name}
+              <Link 
+                href={
+                  article.categorySlug === 'uma-insights' 
+                    ? '/reporter/journalist-revuru-uma-maheswara-rao' 
+                    : (article.categorySlug === 'satya-bytes' ? '/reporter/satyapal-menon' : (reporter ? `/reporter/${reporter.slug}` : '#'))
+                } 
+                className="font-bold text-[#025390] hover:text-red-600 transition-colors telugu-text" 
+                style={{ fontFamily: 'Mandali, sans-serif' }}
+              >
+                {article.categorySlug === 'uma-insights' 
+                  ? 'Revuru umamaheswara rao' 
+                  : (article.categorySlug === 'satya-bytes' 
+                      ? 'SATYAPAL MENON' 
+                      : (reporter ? reporter.name.replace(/.* - /, '') : article.author)
+                    )
+                }
               </Link>
             </div>
             <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
           </div>
 
           {/* "పూర్తిగా చదవండి" button under reporter/share */}
-          <div className="mt-4">
+          <div className={`mt-4 ${article.categorySlug === 'satya-bytes' ? 'notranslate' : ''}`}>
             <button
               onClick={() => setIsExpanded(true)}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#cc0000] hover:bg-[#e60000] text-white font-black text-[15px] md:text-[16px] px-6 py-2.5 rounded-lg transition-colors shadow-sm cursor-pointer select-none telugu-text"
@@ -1691,7 +1737,7 @@ export default function ArticlePageClient({
       </div>
 
       {/* Bottom Section: మరిన్ని వార్తలు చదవండి (Read More News) */}
-      <div className="mt-6 text-left">
+      <div className={`mt-6 text-left ${article.categorySlug === 'satya-bytes' ? 'notranslate' : ''}`}>
         <h2
           className="font-black text-[#cc0000] text-[20px] md:text-[24px] mb-3.5 telugu-text"
           style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
@@ -1731,16 +1777,17 @@ export default function ArticlePageClient({
       </div>
 
       {/* Mobile-only Sidebar components (Trending, Breaking, District News, Poll, Ads) */}
-      <MobileArticleFooter
-        categorySlug={currentCategorySlug}
-        displayTrending={displayTrending}
-        displayLatest={displayLatest}
-        apNewsList={apNewsList}
-        tgNewsList={tgNewsList}
-      />
+      <div className={article.categorySlug === 'satya-bytes' ? 'notranslate' : ''}>
+        <MobileArticleFooter
+          categorySlug={currentCategorySlug}
+          displayTrending={displayTrending}
+          displayLatest={displayLatest}
+          apNewsList={apNewsList}
+          tgNewsList={tgNewsList}
+        />
+      </div>
 
-      {/* Hidden container for Google Translate Widget initialization */}
-      <div id="google_translate_element" style={{ display: 'none' }}></div>
+
     </main>
   );
 }

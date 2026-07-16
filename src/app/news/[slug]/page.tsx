@@ -89,7 +89,7 @@ const englishCategories: Record<string, string> = {
   'citizen-reporter': 'Citizen Reporter',
   'weather': 'Weather',
   'uma-insights': 'ఉమా ఇన్‌సైట్స',
-  'satya-bytes': 'Satya Bytes'
+  'satya-bytes': 'SatyaBytes'
 };
 
 import { prisma } from '@/lib/prisma';
@@ -307,7 +307,20 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   // Find the reporter profile dynamically from the DB first (or fall back to mockData)
   let reporter: any = null;
-  if (article && article.author) {
+  if (article && (article.categorySlug === 'uma-insights' || article.categorySlug === 'satya-bytes')) {
+    const isUma = article.categorySlug === 'uma-insights';
+    reporter = {
+      name: isUma ? 'Revuru umamaheswara rao' : 'SATYAPAL MENON',
+      slug: isUma ? 'journalist-revuru-uma-maheswara-rao' : 'satyapal-menon',
+      role: 'Senior Journalist',
+      bio: isUma 
+        ? 'రేవూరి ఉమామహేశ్వర రావు తెలుగు జర్నలిజం రంగంలో దశాబ్దాల కాలంగా చెరగని ముద్ర వేసిన సీనియర్ జర్నలిస్ట్.' 
+        : 'Satyapal Menon is Senior Journalist, Documentary Filmmaker, and media educator.',
+      image: isUma 
+        ? '/uploads/articles/journalist-revuru-uma-maheswara-rao-1783238444370.jpg' 
+        : '/uploads/articles/satyapal-menon-1784118442227.jpg'
+    };
+  } else if (article && article.author) {
     const dbMembers = await prisma.article.findMany({
       where: { categorySlug: 'team-member', isDeleted: false }
     });
@@ -373,10 +386,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const apDistrictNews = allArticles.filter((n) => n.categorySlug === 'andhra-pradesh' && n.districtSlug).slice(0, 5);
   const tgDistrictNews = allArticles.filter((n) => n.categorySlug === 'telangana' && n.districtSlug).slice(0, 5);
 
+  const isSatyaBytes = article?.categorySlug === 'satya-bytes';
+
   return (
     <div className="min-h-screen bg-[#f0f2f5]">
 
-      <Header />
+      <div className={isSatyaBytes ? "notranslate" : ""}>
+        <Header />
+      </div>
 
       <Suspense fallback={null}>
         <ArticlePageClient
@@ -391,7 +408,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         />
       </Suspense>
 
-      <Footer />
+      <div className={isSatyaBytes ? "notranslate" : ""}>
+        <Footer />
+      </div>
     </div>
   );
 }
