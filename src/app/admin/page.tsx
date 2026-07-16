@@ -113,15 +113,15 @@ const MAIN_CATEGORIES_LIST = [
   { slug: 'citizen-reporter', name: 'సిటిజన్ రిపోర్టర్' },
   { slug: 'weather', name: 'వెదర్' },
   { slug: 'epaper', name: 'ఈ-పేపర్' },
-  { slug: 'uma-insights', name: 'ఉమా ఇన్సైట్స్ (Uma Insights)' },
-  { slug: 'satya-bytes', name: 'సత్య బైట్స్ (Satya Bytes)' },
+  { slug: 'uma-insights', name: 'ఉమా ఇన్‌సైట్స' },
+  { slug: 'satya-bytes', name: 'Satya Bytes' },
 ];
 
 const getCategoryDisplayName = (slug: string) => {
   if (!slug) return '';
   const cleanSlug = slug.toLowerCase().trim();
-  if (cleanSlug === 'uma-insights') return 'ఉమా ఇన్సైట్స్';
-  if (cleanSlug === 'satya-bytes') return 'సత్య బైట్స్';
+  if (cleanSlug === 'uma-insights') return 'ఉమా ఇన్‌సైట్స';
+  if (cleanSlug === 'satya-bytes') return 'Satya Bytes';
   if (cleanSlug === 'andhra-pradesh') return 'ఆంధ్రప్రదేశ్ వార్తలు (Andhra Pradesh News)';
   if (cleanSlug === 'telangana') return 'తెలంగాణ వార్తలు (Telangana News)';
   if (cleanSlug === 'home') return 'హోమ్ (Home)';
@@ -521,8 +521,8 @@ const SIDEBAR_CATEGORIES = [
   { slug: 'rasipalalu', name: 'శుభఫలాలు (Astrology)' },
   { slug: 'weather', name: 'వెదర్ (Weather)' },
   { slug: 'sampadakiyam', name: 'ఎడిటోరియల్ (Editorial)' },
-  { slug: 'uma-insights', name: 'ఉమా ఇన్సైట్స్ (Uma Insights)' },
-  { slug: 'satya-bytes', name: 'సత్య బైట్స్ (Satya Bytes)' },
+  { slug: 'uma-insights', name: 'ఉమా ఇన్‌సైట్స' },
+  { slug: 'satya-bytes', name: 'Satya Bytes' },
 ];
 
 const getArticleCategoryName = (art: any) => {
@@ -4548,7 +4548,7 @@ export default function AdminPage() {
               >
                 <div className="flex items-center gap-2.5">
                   <FileText className="w-4 h-4" />
-                  <span className="telugu-text">ఉమా ఇన్సైట్స్ (Uma Insights)</span>
+                  <span className="telugu-text">ఉమా ఇన్‌సైట్స</span>
                 </div>
               </button>
 
@@ -4560,7 +4560,7 @@ export default function AdminPage() {
               >
                 <div className="flex items-center gap-2.5">
                   <FileText className="w-4 h-4" />
-                  <span className="telugu-text">సత్య బైట్స్ (Satya Bytes)</span>
+                  <span className="telugu-text">Satya Bytes</span>
                 </div>
               </button>
             </>
@@ -6027,8 +6027,8 @@ export default function AdminPage() {
                                 'notification': 'Notification News',
                                 'citizen-reporter': 'Citizen Reporter',
                                 'weather': 'Weather News',
-                                'uma-insights': 'ఉమా ఇన్సైట్స్',
-                                'satya-bytes': 'సత్య బైట్స్'
+                                'uma-insights': 'ఉమా ఇన్‌సైట్స',
+                                'satya-bytes': 'Satya Bytes'
                               };
                               return mappings[slug] || slug;
                             };
@@ -6211,9 +6211,14 @@ export default function AdminPage() {
                       {/* Style normal header dropdown mockup */}
                       <div className="relative">
                         <select 
-                          onChange={(e) => handleFormat('formatBlock', e.target.value)}
+                          onChange={(e) => {
+                            handleFormat('formatBlock', e.target.value);
+                            e.target.value = '';
+                          }}
                           className="bg-white border border-slate-200 text-[10px] font-black rounded-lg px-2 py-1 outline-none cursor-pointer"
+                          defaultValue=""
                         >
+                          <option value="" disabled>Format</option>
                           <option value="p">Normal</option>
                           <option value="h1">Heading 1</option>
                           <option value="h2">Heading 2</option>
@@ -6223,7 +6228,10 @@ export default function AdminPage() {
 
                       <div className="relative">
                         <select 
-                          onChange={(e) => handleFontSize(e.target.value)}
+                          onChange={(e) => {
+                            handleFontSize(e.target.value);
+                            e.target.value = '';
+                          }}
                           className="bg-white border border-slate-200 text-[10px] font-black rounded-lg px-2 py-1 outline-none cursor-pointer text-slate-700"
                           defaultValue=""
                         >
@@ -7633,8 +7641,8 @@ export default function AdminPage() {
               { slug: 'mobile-ad-cat-admissions', labelTelugu: 'కేటగిరీ పేజీ: అడ్మిషన్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Admissions' },
               { slug: 'mobile-ad-cat-current-affairs', labelTelugu: 'కేటగిరీ పేజీ: కరెంట్ అఫైర్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Current Affairs' },
               { slug: 'mobile-ad-cat-notification', labelTelugu: 'కేటగిరీ పేజీ: నోటిఫికేషన్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Notifications' },
-              { slug: 'mobile-ad-cat-uma-insights', labelTelugu: 'కేటగిరీ పేజీ: ఉమా ఇన్సైట్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Uma Insights' },
-              { slug: 'mobile-ad-cat-satya-bytes', labelTelugu: 'కేటగిరీ పేజీ: సత్య బైట్స్ (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Satya Bytes' },
+              { slug: 'mobile-ad-cat-uma-insights', labelTelugu: 'కేటగిరీ పేజీ: ఉమా ఇన్‌సైట్స (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Uma Insights' },
+              { slug: 'mobile-ad-cat-satya-bytes', labelTelugu: 'కేటగిరీ పేజీ: Satya Bytes (ట్రెండింగ్ & పోల్స్ మధ్య)', labelEnglish: 'Category Page: Satya Bytes' },
 
               // --- ARTICLE PAGES MOBILE ADS (Top rotating / bottom continuous) ---
               { slug: 'mobile-ad-article-top-global', labelTelugu: 'వ్యాసం పేజీ: గ్లోబల్ టాప్ యాడ్ (Global Top Rotating Ad)', labelEnglish: 'Article Page: Global Top' },
@@ -7650,8 +7658,8 @@ export default function AdminPage() {
               { slug: 'mobile-ad-article-top-viral', labelTelugu: 'వ్యాసం పేజీ: వైరల్ టాప్ (Top of Viral)', labelEnglish: 'Article Page: Top Viral' },
               { slug: 'mobile-ad-article-top-telangana', labelTelugu: 'వ్యాసం పేజీ: తెలంగాణ టాప్ (Top of Telangana)', labelEnglish: 'Article Page: Top Telangana' },
               { slug: 'mobile-ad-article-top-andhra-pradesh', labelTelugu: 'వ్యాసం పేజీ: ఆంధ్రప్రదేశ్ టాప్ (Top of AP)', labelEnglish: 'Article Page: Top Andhra Pradesh' },
-              { slug: 'mobile-ad-article-top-uma-insights', labelTelugu: 'వ్యాసం పేజీ: ఉమా ఇన్సైట్స్ టాప్ (Top of Uma Insights)', labelEnglish: 'Article Page: Top Uma Insights' },
-              { slug: 'mobile-ad-article-top-satya-bytes', labelTelugu: 'వ్యాసం పేజీ: సత్య బైట్స్ టాప్ (Top of Satya Bytes)', labelEnglish: 'Article Page: Top Satya Bytes' },
+              { slug: 'mobile-ad-article-top-uma-insights', labelTelugu: 'వ్యాసం పేజీ: ఉమా ఇన్‌సైట్స టాప్ (Top of Uma Insights)', labelEnglish: 'Article Page: Top Uma Insights' },
+              { slug: 'mobile-ad-article-top-satya-bytes', labelTelugu: 'వ్యాసం పేజీ: Satya Bytes టాప్ (Top of Satya Bytes)', labelEnglish: 'Article Page: Top Satya Bytes' },
 
               { slug: 'mobile-ad-article-bottom-global', labelTelugu: 'వ్యాసం పేజీ: గ్లోబల్ బాటమ్ యాడ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Global Bottom (Between Read More & Polls)' },
               { slug: 'mobile-ad-article-bottom-latest', labelTelugu: 'వ్యాసం పేజీ: బ్రేకింగ్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Breaking (Between Read More & Polls)' },
@@ -7666,8 +7674,8 @@ export default function AdminPage() {
               { slug: 'mobile-ad-article-bottom-viral', labelTelugu: 'వ్యాసం పేజీ: వైరల్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Viral (Between Read More & Polls)' },
               { slug: 'mobile-ad-article-bottom-telangana', labelTelugu: 'వ్యాసం పేజీ: తెలంగాణ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Telangana (Between Read More & Polls)' },
               { slug: 'mobile-ad-article-bottom-andhra-pradesh', labelTelugu: 'వ్యాసం పేజీ: ఆంధ్రప్రదేశ్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Andhra Pradesh (Between Read More & Polls)' },
-              { slug: 'mobile-ad-article-bottom-uma-insights', labelTelugu: 'వ్యాసం పేజీ: ఉమా ఇన్సైట్స్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Uma Insights (Between Read More & Polls)' },
-              { slug: 'mobile-ad-article-bottom-satya-bytes', labelTelugu: 'వ్యాసం పేజీ: సత్య బైట్స్ బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Satya Bytes (Between Read More & Polls)' },
+              { slug: 'mobile-ad-article-bottom-uma-insights', labelTelugu: 'వ్యాసం పేజీ: ఉమా ఇన్‌సైట్స బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Uma Insights (Between Read More & Polls)' },
+              { slug: 'mobile-ad-article-bottom-satya-bytes', labelTelugu: 'వ్యాసం పేజీ: Satya Bytes బాటమ్ (మరిన్ని వార్తలు & పోల్స్ మధ్య)', labelEnglish: 'Article Page: Bottom Satya Bytes (Between Read More & Polls)' },
 
               // --- E-PAPER PAGE MOBILE ADS ---
               { slug: 'mobile-ad-epaper-above-main', labelTelugu: 'ఈ-పేపర్ లిస్టింగ్: మెయిన్ ఎడిషన్స్ పైన యాడ్', labelEnglish: 'E-Paper Listing: Above Main Editions' },
@@ -15162,8 +15170,8 @@ export default function AdminPage() {
                       'notification': 'Notification News',
                       'citizen-reporter': 'Citizen Reporter',
                       'weather': 'Weather News',
-                      'uma-insights': 'ఉమా ఇన్సైట్స్',
-                      'satya-bytes': 'సత్య బైట్స్'
+                      'uma-insights': 'ఉమా ఇన్‌సైట్స',
+                      'satya-bytes': 'Satya Bytes'
                     };
                     return mappings[slug] || slug;
                   };

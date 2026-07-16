@@ -101,7 +101,7 @@ function getCategoryLinkInfo(article: any, englishCategories: Record<string, str
     'citizen-reporter': { label: 'Citizen Reporter News', href: '/category/citizen-reporter' },
     'weather': { label: 'Weather News', href: '/category/weather' },
     'live-updates': { label: 'Live Updates', href: '/category/live-updates' },
-    'uma-insights': { label: 'Uma Insights', href: '/category/uma-insights' },
+    'uma-insights': { label: 'ఉమా ఇన్‌సైట్స', href: '/category/uma-insights' },
     'satya-bytes': { label: 'Satya Bytes', href: '/category/satya-bytes' }
   };
 

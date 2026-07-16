@@ -97,8 +97,8 @@ const englishCategories: Record<string, string> = {
   'citizen-reporter': 'Citizen Reporter',
   'weather': 'Weather',
   'trending': 'Trending',
-  'uma-insights': 'ఉమా ఇన్సైట్స్',
-  'satya-bytes': 'సత్య బైట్స్'
+  'uma-insights': 'ఉమా ఇన్‌సైట్స',
+  'satya-bytes': 'Satya Bytes'
 };
 
 export async function generateStaticParams() {

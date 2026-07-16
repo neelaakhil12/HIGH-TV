@@ -376,8 +376,8 @@ export default function Header() {
           <Link href="/category/politics"        className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/politics')}`}>పాలిటిక్స్</Link>
           <Link href="/category/sports"         className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/sports')}`}>స్పోర్ట్స్</Link>
           <Link href="/category/entertainment"  className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/entertainment')}`}>ఫిల్మ్</Link>
-          <Link href="/category/uma-insights"   className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/uma-insights')}`}>ఉమా ఇన్సైట్స్</Link>
-          <Link href="/category/satya-bytes"    className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/satya-bytes')}`}>సత్య బైట్స్</Link>
+          <Link href="/category/uma-insights"   className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/uma-insights')}`}>ఉమా ఇన్‌సైట్స</Link>
+          <Link href="/category/satya-bytes"    className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/satya-bytes')}`}>Satya Bytes</Link>
           <Link href="/category/technology"     className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/technology')}`}>టెక్నాలజీ</Link>
           <Link href="/category/viral"          className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/viral')}`}>వైరల్</Link>
           <Link href="/category/photos"         className={`px-2.5 h-full flex items-center hover:bg-black/15 border-r border-white/20 flex-shrink-0 ${navCls('/category/photos')}`}>ఫోటో గ్యాలరీ</Link>
@@ -601,14 +601,14 @@ export default function Header() {
                 className="bg-red-50 hover:bg-red-100/80 text-red-700 text-[13.5px] font-extrabold px-3 py-1.5 rounded-xl border border-red-500/40 transition-all shadow-3xs hover:scale-[1.02] telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
-                ఉమా ఇన్సైట్స్
+                ఉమా ఇన్‌సైట్స
               </Link>
               <Link 
                 href="/category/satya-bytes" 
                 className="bg-emerald-50 hover:bg-emerald-100/80 text-emerald-700 text-[13.5px] font-extrabold px-3 py-1.5 rounded-xl border border-emerald-500/40 transition-all shadow-3xs hover:scale-[1.02] telugu-text"
                 style={{ fontFamily: 'Noto Sans Telugu, sans-serif' }}
               >
-                సత్య బైట్స్
+                Satya Bytes
               </Link>
             </div>
             
@@ -663,8 +663,8 @@ export default function Header() {
                   { href: '/category/politics',       label: 'పాలిటిక్స్'      },
                   { href: '/category/sports',         label: 'స్పోర్ట్స్'       },
                   { href: '/category/entertainment',  label: 'ఫిల్మ్'         },
-                  { href: '/category/uma-insights',   label: 'ఉమా ఇన్సైట్స్'   },
-                  { href: '/category/satya-bytes',    label: 'సత్య బైట్స్'    },
+                  { href: '/category/uma-insights',   label: 'ఉమా ఇన్‌సైట్స'   },
+                  { href: '/category/satya-bytes',    label: 'Satya Bytes'    },
                   { href: '/category/technology',     label: 'టెక్నాలజీ'      },
                   { href: '/category/rasipalalu',     label: 'శుభఫలాలు'      },
                   { href: '/category/viral',          label: 'వైరల్'          },

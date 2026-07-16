@@ -88,8 +88,8 @@ const englishCategories: Record<string, string> = {
   'notification': 'Notification',
   'citizen-reporter': 'Citizen Reporter',
   'weather': 'Weather',
-  'uma-insights': 'ఉమా ఇన్సైట్స్',
-  'satya-bytes': 'సత్య బైట్స్'
+  'uma-insights': 'ఉమా ఇన్‌సైట్స',
+  'satya-bytes': 'Satya Bytes'
 };
 
 import { prisma } from '@/lib/prisma';
