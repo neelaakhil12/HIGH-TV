@@ -924,10 +924,10 @@ export default function ArticlePageClient({
                                   ? '/team#journalist-revuru-uma-maheswara-rao'
                                   : '/team#satyapal-menon'
                               }
-                              className="inline-flex items-center justify-center gap-1.5 bg-[#025390] hover:bg-[#0b2545] !text-white hover:!text-white !no-underline hover:!no-underline font-black text-[12px] py-1.5 px-3 rounded-lg transition-all duration-300 shadow-xs telugu-text cursor-pointer select-none active:scale-[0.98]"
-                              style={{ fontFamily: 'Noto Sans Telugu, sans-serif', color: '#ffffff', textDecoration: 'none' }}
+                              className="inline-flex items-center justify-center gap-1.5 bg-[#025390] hover:bg-[#0b2545] !text-white hover:!text-white !no-underline hover:!no-underline font-black text-[12px] py-1.5 px-3 rounded-lg transition-all duration-300 shadow-xs cursor-pointer select-none active:scale-[0.98]"
+                              style={{ color: '#ffffff', textDecoration: 'none' }}
                             >
-                              <span>రచయిత గురించి (About Author)</span>
+                              <span>About Writer</span>
                               <ArrowRight size={11} className="stroke-[2.5]" style={{ color: '#ffffff' }} />
                             </Link>
                           )}
