@@ -759,4 +759,42 @@ body {
   top: 0px !important;
 }
 
+/* Force Google Translate widget elements to stay in a single horizontal row */
+#google_translate_element,
+#google_translate_element * {
+  white-space: nowrap !important;
+  word-wrap: normal !important;
+  word-break: keep-all !important;
+}
+
+#google_translate_element {
+  display: inline-block !important;
+  vertical-align: middle !important;
+  min-width: 140px !important;
+}
+
+/* Style Google Translate simple widget to look premium and horizontal */
+.goog-te-gadget-simple {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  text-decoration: none !important;
+}
+
+.goog-te-gadget-simple img {
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
+.goog-te-gadget-simple span {
+  display: inline-block !important;
+  vertical-align: middle !important;
+  color: #374151 !important;
+  font-size: 13px !important;
+}
+
 
