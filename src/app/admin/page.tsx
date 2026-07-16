@@ -1484,7 +1484,8 @@ export default function AdminPage() {
     // 1. Save current DOM contents of the editor to the active tab's state
     const currentTitle = newsTitleRef.current?.innerHTML || '';
     const currentBody = editorRef.current?.innerHTML || '';
-    const currentDesc = newsDescriptionRef.current?.innerHTML || newsDescription;
+    const currentDescRaw = newsDescriptionRef.current?.innerHTML || newsDescription;
+    const currentDesc = currentDescRaw.replace(/<[^>]*>/g, '').trim();
 
     if (editorLangTab === 'en') {
       setNewsTitleEn(currentTitle);
@@ -1509,7 +1510,7 @@ export default function AdminPage() {
       editorRef.current.innerHTML = targetBody;
     }
     if (newsDescriptionRef.current) {
-      newsDescriptionRef.current.innerHTML = targetDesc;
+      newsDescriptionRef.current.innerHTML = `<p>${targetDesc || ''}</p>`;
     }
     setNewsDescription(targetDesc);
 
@@ -1555,7 +1556,8 @@ export default function AdminPage() {
     // 1. Capture current DOM values (which are showing the translated Telugu text)
     const currentTitle = newsTitleRef.current?.innerHTML || '';
     const currentBody = editorRef.current?.innerHTML || '';
-    const currentDesc = newsDescriptionRef.current?.innerHTML || newsDescription;
+    const currentDescRaw = newsDescriptionRef.current?.innerHTML || newsDescription;
+    const currentDesc = currentDescRaw.replace(/<[^>]*>/g, '').trim();
 
     if (!currentTitle.trim() && !currentBody.trim()) {
       alert("No content found in the editor to import!");
@@ -1576,7 +1578,7 @@ export default function AdminPage() {
       editorRef.current.innerHTML = newsBodyEn;
     }
     if (newsDescriptionRef.current) {
-      newsDescriptionRef.current.innerHTML = newsDescriptionEn;
+      newsDescriptionRef.current.innerHTML = `<p>${newsDescriptionEn || ''}</p>`;
     }
     setNewsDescription(newsDescriptionEn);
 
@@ -1591,7 +1593,8 @@ export default function AdminPage() {
     if (newsViewMode === 'add' || newsViewMode === 'edit') {
       const currentTitle = newsTitleRef.current?.innerHTML || '';
       const currentBody = editorRef.current?.innerHTML || '';
-      const currentDesc = newsDescriptionRef.current?.innerHTML || newsDescription;
+      const currentDescRaw = newsDescriptionRef.current?.innerHTML || newsDescription;
+      const currentDesc = currentDescRaw.replace(/<[^>]*>/g, '').trim();
 
       if (editorLangTab === 'en') {
         // Prevent overwriting original English with Google-translated Telugu text if the page is currently translated
@@ -3877,9 +3880,9 @@ export default function AdminPage() {
     setNewsViewMode('edit');
     setTimeout(() => {
       if (newsTitleRef.current) newsTitleRef.current.innerHTML = titleEnVal;
-      if (newsDescriptionRef.current) newsDescriptionRef.current.innerHTML = descEnVal;
+      if (newsDescriptionRef.current) newsDescriptionRef.current.innerHTML = `<p>${descEnVal || ''}</p>`;
       if (weatherTitleRef.current) weatherTitleRef.current.innerHTML = titleEnVal;
-      if (weatherDescriptionRef.current) weatherDescriptionRef.current.innerHTML = descEnVal;
+      if (weatherDescriptionRef.current) weatherDescriptionRef.current.innerHTML = `<p>${descEnVal || ''}</p>`;
 
       if (editorRef.current) {
         let displayBody = bodyEnVal;
