@@ -1577,7 +1577,7 @@ export default function AdminPage() {
     // 4. Reset active language tab to English
     setEditorLangTab('en');
 
-    alert("Telugu translation imported successfully into the Telugu Tab! Switch to the 'Telugu (Telugu)' tab to view or edit it.");
+    alert("Telugu translation captured successfully! Note: Please click the close [X] button or 'Show Original' on the Google Translate bar at the top of your browser to restore the English version in the editor.");
   };
 
   // Real-time synchronization of editor contents to En/Te states
@@ -3435,15 +3435,6 @@ export default function AdminPage() {
     const bodyHtml = isWeather ? '' : (editorRef.current?.innerHTML || '');
     const descText = newsDescription;
 
-    // Plain text conversions for checks and slug generation
-    const titlePlainText = titleHtml.replace(/<[^>]*>/g, '').trim();
-    const descriptionPlainText = descriptionHtml.replace(/<[^>]*>/g, '').trim();
-
-    if (!titlePlainText || (!isWeather && !bodyHtml.trim())) {
-      alert('Title and Article Body Content are required!');
-      return;
-    }
-
     // Determine category configurations from checked boxes
     let categorySlug = 'politics';
     if (selectedCategories.length === 0) {
@@ -3472,6 +3463,12 @@ export default function AdminPage() {
 
     const isSenior = categorySlug === 'uma-insights' || categorySlug === 'satya-bytes';
 
+    // Check if Google Translate is currently translating the page
+    const isCurrentlyTranslated = typeof document !== 'undefined' && (
+      document.documentElement.className.includes('translated') || 
+      document.body.className.includes('translated')
+    );
+
     // Synchronize current DOM editor contents to English/Telugu state components
     let finalTitleEn = newsTitleEn;
     let finalTitleTe = newsTitleTe;
@@ -3482,9 +3479,16 @@ export default function AdminPage() {
 
     if (isSenior && !isWeather) {
       if (editorLangTab === 'en') {
-        finalTitleEn = titleHtml;
-        finalBodyEn = bodyHtml;
-        finalDescEn = descText;
+        if (isCurrentlyTranslated) {
+          // If Google Translate is active, the DOM has Telugu, so use the saved English states instead of DOM!
+          finalTitleEn = newsTitleEn;
+          finalBodyEn = newsBodyEn;
+          finalDescEn = newsDescriptionEn;
+        } else {
+          finalTitleEn = titleHtml;
+          finalBodyEn = bodyHtml;
+          finalDescEn = descText;
+        }
       } else {
         finalTitleTe = titleHtml;
         finalBodyTe = bodyHtml;
@@ -3498,9 +3502,21 @@ export default function AdminPage() {
         return;
       }
     } else {
-      finalTitleEn = titleHtml;
-      finalBodyEn = bodyHtml;
-      finalDescEn = descText;
+      if (isCurrentlyTranslated) {
+        finalTitleEn = newsTitleEn || titleHtml;
+        finalBodyEn = newsBodyEn || bodyHtml;
+        finalDescEn = newsDescriptionEn || descText;
+      } else {
+        finalTitleEn = titleHtml;
+        finalBodyEn = bodyHtml;
+        finalDescEn = descText;
+      }
+
+      const simpleTitleText = finalTitleEn.replace(/<[^>]*>/g, '').trim();
+      if (!simpleTitleText || (!isWeather && !finalBodyEn.trim())) {
+        alert('Title and Article Body Content are required!');
+        return;
+      }
     }
 
     setIsSavingArticle(true);
