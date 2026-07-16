@@ -1516,31 +1516,37 @@ export default function AdminPage() {
 
   // Load Google Translate in Admin Panel
   useEffect(() => {
-    const initTranslate = () => {
-      if ((window as any).google?.translate?.TranslateElement) {
-        new (window as any).google.translate.TranslateElement(
-          {
-            pageLanguage: 'en',
-            includedLanguages: 'te',
-            layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE
-          },
-          'google_translate_element'
-        );
+    if (newsViewMode === 'add' || newsViewMode === 'edit') {
+      const initTranslate = () => {
+        if ((window as any).google?.translate?.TranslateElement) {
+          const container = document.getElementById('google_translate_element');
+          if (container) {
+            container.innerHTML = '';
+            new (window as any).google.translate.TranslateElement(
+              {
+                pageLanguage: 'en',
+                includedLanguages: 'te',
+                layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE
+              },
+              'google_translate_element'
+            );
+          }
+        }
+      };
+
+      (window as any).googleTranslateElementInit = initTranslate;
+
+      const existingScript = document.getElementById('google-translate-script-admin');
+      if (!existingScript) {
+        const addScript = document.createElement('script');
+        addScript.id = 'google-translate-script-admin';
+        addScript.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        document.body.appendChild(addScript);
+      } else {
+        setTimeout(initTranslate, 150);
       }
-    };
-
-    (window as any).googleTranslateElementInit = initTranslate;
-
-    const existingScript = document.getElementById('google-translate-script-admin');
-    if (!existingScript) {
-      const addScript = document.createElement('script');
-      addScript.id = 'google-translate-script-admin';
-      addScript.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-      document.body.appendChild(addScript);
-    } else {
-      initTranslate();
     }
-  }, []);
+  }, [newsViewMode]);
 
   // Image Resizer overlay state
   const [selectedImage, setSelectedImage] = useState<HTMLImageElement | null>(null);
