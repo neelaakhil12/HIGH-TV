@@ -345,88 +345,22 @@ export default function ArticlePageClient({
   const [isMounted, setIsMounted] = useState(false);
   const [tagFilteredArticles, setTagFilteredArticles] = useState<any[]>([]);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [translatedTitle, setTranslatedTitle] = useState<string | null>(null);
-  const [translatedDesc, setTranslatedDesc] = useState<string | null>(null);
-  const [translatedBody, setTranslatedBody] = useState<string | null>(null);
-  const [isTranslatingClient, setIsTranslatingClient] = useState(false);
   const [isTeluguActive, setIsTeluguActive] = useState(false);
 
-  const handleClientTranslate = async () => {
-    if (isTeluguActive) {
-      setIsTeluguActive(false);
-      return;
-    }
+  const titleParts = (article.title || '').split('<!-- TELUGU_SPLIT -->');
+  const titleEn = titleParts[0];
+  const titleTe = titleParts[1] || '';
 
-    if (translatedTitle && translatedBody) {
-      setIsTeluguActive(true);
-      return;
-    }
+  const descParts = (article.description || '').split('<!-- TELUGU_SPLIT -->');
+  const descEn = descParts[0];
+  const descTe = descParts[1] || '';
 
-    setIsTranslatingClient(true);
-    try {
-      const promises = [];
+  const bodyParts = (article.body || '').split('<!-- TELUGU_SPLIT -->');
+  const bodyEn = bodyParts[0];
+  const bodyTe = bodyParts[1] || '';
 
-      if (article.title?.trim()) {
-        promises.push(
-          fetch('/api/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ html: article.title })
-          }).then(async (res) => {
-            if (!res.ok) throw new Error('Title translation failed');
-            return { type: 'title', val: await res.text() };
-          })
-        );
-      }
-
-      if (article.description?.trim()) {
-        promises.push(
-          fetch('/api/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: article.description })
-          }).then(async (res) => {
-            if (!res.ok) throw new Error('Description translation failed');
-            return { type: 'desc', val: await res.text() };
-          })
-        );
-      }
-
-      if (article.body?.trim()) {
-        promises.push(
-          fetch('/api/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ html: article.body })
-          }).then(async (res) => {
-            if (!res.ok) throw new Error('Body translation failed');
-            return { type: 'body', val: await res.text() };
-          })
-        );
-      }
-
-      const results = await Promise.all(promises);
-
-      let newTitle = translatedTitle;
-      let newDesc = translatedDesc;
-      let newBody = translatedBody;
-
-      results.forEach((res) => {
-        if (res.type === 'title') newTitle = res.val;
-        else if (res.type === 'desc') newDesc = res.val;
-        else if (res.type === 'body') newBody = res.val;
-      });
-
-      setTranslatedTitle(newTitle);
-      setTranslatedDesc(newDesc);
-      setTranslatedBody(newBody);
-      setIsTeluguActive(true);
-    } catch (err) {
-      console.error(err);
-      alert('Translation failed. Please try again.');
-    } finally {
-      setIsTranslatingClient(false);
-    }
+  const handleClientTranslate = () => {
+    setIsTeluguActive(prev => !prev);
   };
 
   useEffect(() => {
@@ -1007,7 +941,7 @@ export default function ArticlePageClient({
                       <h1
                         className="main-headline telugu-text text-[#cc0000] mb-5 text-2xl md:text-3.5xl font-extrabold"
                         style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, "Noto Serif Telugu", serif' : 'Noto Sans Telugu, sans-serif' }}
-                        dangerouslySetInnerHTML={{ __html: isTeluguActive && translatedTitle ? translatedTitle : article.title }}
+                        dangerouslySetInnerHTML={{ __html: isTeluguActive && titleTe ? titleTe : titleEn }}
                       />
 
                       {/* Reporter Profile Header */}
@@ -1058,27 +992,20 @@ export default function ArticlePageClient({
                         <div className="mt-2.5 sm:mt-0 sm:ml-auto w-full sm:w-auto flex flex-col items-start sm:items-end gap-1.5">
                           <div className="flex items-center gap-1.5 flex-wrap justify-start sm:justify-end">
                             {isMounted && article.categorySlug === 'satya-bytes' && (
-                              <>
+                              titleTe ? (
                                 <button
                                   onClick={handleClientTranslate}
-                                  disabled={isTranslatingClient}
                                   className={`inline-flex items-center justify-center gap-1 font-extrabold text-[11px] py-1.5 px-3 rounded-lg transition-all shadow-xs cursor-pointer select-none active:scale-[0.98] mr-2 ${
                                     isTeluguActive 
                                       ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-                                      : 'bg-rose-600 hover:bg-rose-700 text-white'
+                                      : 'bg-[#025390] hover:bg-[#0b2545] text-white'
                                   }`}
                                 >
-                                  {isTranslatingClient ? (
-                                    <span className="flex items-center gap-1">
-                                      <span className="animate-spin inline-block w-2.5 h-2.5 border-2 border-white border-t-transparent rounded-full"></span>
-                                      Translating...
-                                    </span>
-                                  ) : (
-                                    isTeluguActive ? 'Show English' : 'Translate to Telugu (AI)'
-                                  )}
+                                  {isTeluguActive ? 'Show English' : 'Switch to Telugu (తెలుగు)'}
                                 </button>
+                              ) : (
                                 <div id="google_translate_element" className="google-translate-dropdown inline-block scale-[0.85] origin-right mr-1"></div>
-                              </>
+                              )
                             )}
                             {isMounted && isSeniorReporterCategory && (
                               <Link
@@ -1140,7 +1067,7 @@ export default function ArticlePageClient({
                     <h1
                       className="main-headline telugu-text text-[#cc0000] mb-3"
                       style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, "Noto Serif Telugu", serif' : 'Noto Sans Telugu, sans-serif' }}
-                      dangerouslySetInnerHTML={{ __html: isTeluguActive && translatedTitle ? translatedTitle : article.title }}
+                      dangerouslySetInnerHTML={{ __html: isTeluguActive && titleTe ? titleTe : titleEn }}
                     />
 
                     {/* Meta row */}
@@ -1159,27 +1086,20 @@ export default function ArticlePageClient({
                       </div>
                       <div className="ml-auto flex items-center gap-2.5">
                         {isMounted && article.categorySlug === 'satya-bytes' && (
-                          <>
+                          titleTe ? (
                             <button
                               onClick={handleClientTranslate}
-                              disabled={isTranslatingClient}
                               className={`inline-flex items-center justify-center gap-1 font-extrabold text-[11px] py-1.5 px-3 rounded-lg transition-all shadow-xs cursor-pointer select-none active:scale-[0.98] mr-2 ${
                                 isTeluguActive 
                                   ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-                                  : 'bg-rose-600 hover:bg-rose-700 text-white'
+                                  : 'bg-[#025390] hover:bg-[#0b2545] text-white'
                               }`}
                             >
-                              {isTranslatingClient ? (
-                                <span className="flex items-center gap-1">
-                                  <span className="animate-spin inline-block w-2.5 h-2.5 border-2 border-white border-t-transparent rounded-full"></span>
-                                  Translating...
-                                </span>
-                              ) : (
-                                isTeluguActive ? 'Show English' : 'Translate to Telugu (AI)'
-                              )}
+                              {isTeluguActive ? 'Show English' : 'Switch to Telugu (తెలుగు)'}
                             </button>
+                          ) : (
                             <div id="google_translate_element" className="google-translate-dropdown inline-block scale-[0.85] origin-right mr-1"></div>
-                          </>
+                          )
                         )}
                         <ShareButton title={article.title?.replace(/<[^>]*>/g, '')} />
                       </div>
@@ -1189,7 +1109,7 @@ export default function ArticlePageClient({
                     <p
                       className="block article-summary telugu-text text-gray-700 border-l-4 border-[#025390] pl-3 bg-blue-50/40 py-2 pr-3 rounded-r mb-4 text-[14.5px] md:text-base leading-relaxed"
                       style={{ fontFamily: article.categorySlug === 'satya-bytes' ? 'Georgia, "Noto Serif Telugu", serif' : 'Noto Sans Telugu, sans-serif' }}
-                      dangerouslySetInnerHTML={{ __html: isTeluguActive && translatedDesc ? translatedDesc : article.description }}
+                      dangerouslySetInnerHTML={{ __html: isTeluguActive && descTe ? descTe : descEn }}
                     />
 
                     {/* Hero Image */}
@@ -1228,7 +1148,7 @@ export default function ArticlePageClient({
               >
                 {article.body ? (
                   (() => {
-                    const bodyToParse = isTeluguActive && translatedBody ? translatedBody : (article.body || '');
+                    const bodyToParse = isTeluguActive && bodyTe ? bodyTe : bodyEn;
                     // Extract inline-image-containers to prevent them from being split/broken by newline parser
                     const placeholders: string[] = [];
                     let normalized = bodyToParse.replace(/(<div\b[^>]*\binline-image-container[\s\S]*?<\/div>\s*<\/div>)/gi, (match: string) => {

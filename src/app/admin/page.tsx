@@ -1466,9 +1466,81 @@ export default function AdminPage() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const featuredImageInputRef = useRef<HTMLInputElement>(null);
-  const newsVideoInputRef = useRef<HTMLInputElement>(null);
   const postTitleEditorRef = useRef<HTMLDivElement>(null);
   const postBulletsEditorRef = useRef<HTMLDivElement>(null);
+
+  // Multi-Language input states for SatyaBytes and Uma Insights
+  const [editorLangTab, setEditorLangTab] = useState<'en' | 'te'>('en');
+  const [newsTitleEn, setNewsTitleEn] = useState('');
+  const [newsTitleTe, setNewsTitleTe] = useState('');
+  const [newsDescriptionEn, setNewsDescriptionEn] = useState('');
+  const [newsDescriptionTe, setNewsDescriptionTe] = useState('');
+  const [newsBodyEn, setNewsBodyEn] = useState('');
+  const [newsBodyTe, setNewsBodyTe] = useState('');
+
+  const switchEditorLangTab = (newTab: 'en' | 'te') => {
+    if (newTab === editorLangTab) return;
+
+    // 1. Save current DOM contents of the editor to the active tab's state
+    const currentTitle = newsTitleRef.current?.innerHTML || '';
+    const currentBody = editorRef.current?.innerHTML || '';
+    const currentDesc = newsDescription;
+
+    if (editorLangTab === 'en') {
+      setNewsTitleEn(currentTitle);
+      setNewsBodyEn(currentBody);
+      setNewsDescriptionEn(currentDesc);
+    } else {
+      setNewsTitleTe(currentTitle);
+      setNewsBodyTe(currentBody);
+      setNewsDescriptionTe(currentDesc);
+    }
+
+    // 2. Load the target tab's contents into the DOM and inputs
+    const targetTitle = newTab === 'en' ? newsTitleEn : newsTitleTe;
+    const targetBody = newTab === 'en' ? newsBodyEn : newsBodyTe;
+    const targetDesc = newTab === 'en' ? newsDescriptionEn : newsDescriptionTe;
+
+    if (newsTitleRef.current) {
+      newsTitleRef.current.innerHTML = targetTitle;
+      setNewsTitle(newsTitleRef.current.innerText);
+    }
+    if (editorRef.current) {
+      editorRef.current.innerHTML = targetBody;
+    }
+    setNewsDescription(targetDesc);
+
+    // 3. Set the active tab state
+    setEditorLangTab(newTab);
+  };
+
+  // Load Google Translate in Admin Panel
+  useEffect(() => {
+    const initTranslate = () => {
+      if ((window as any).google?.translate?.TranslateElement) {
+        new (window as any).google.translate.TranslateElement(
+          {
+            pageLanguage: 'en',
+            includedLanguages: 'te',
+            layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE
+          },
+          'google_translate_element'
+        );
+      }
+    };
+
+    (window as any).googleTranslateElementInit = initTranslate;
+
+    const existingScript = document.getElementById('google-translate-script-admin');
+    if (!existingScript) {
+      const addScript = document.createElement('script');
+      addScript.id = 'google-translate-script-admin';
+      addScript.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      document.body.appendChild(addScript);
+    } else {
+      initTranslate();
+    }
+  }, []);
 
   // Image Resizer overlay state
   const [selectedImage, setSelectedImage] = useState<HTMLImageElement | null>(null);
@@ -2000,6 +2072,13 @@ export default function AdminPage() {
     if (newsViewMode === 'add') {
       setNewsPublishedDate(''); // Will be auto-set to current time when Publish is clicked
       setNewsTitle('');
+      setNewsTitleEn('');
+      setNewsTitleTe('');
+      setNewsDescriptionEn('');
+      setNewsDescriptionTe('');
+      setNewsBodyEn('');
+      setNewsBodyTe('');
+      setEditorLangTab('en');
       setNewsSlug('');
       setNewsDescription('');
       setNewsTags([]);
@@ -3289,18 +3368,17 @@ export default function AdminPage() {
     const isWeather = (weatherArticleFormMode !== 'list');
     const titleHtml = (isWeather ? weatherTitleRef.current?.innerHTML : newsTitleRef.current?.innerHTML) || '';
     const descriptionHtml = (isWeather ? weatherDescriptionRef.current?.innerHTML : newsDescriptionRef.current?.innerHTML) || '';
+    const bodyHtml = isWeather ? '' : (editorRef.current?.innerHTML || '');
+    const descText = newsDescription;
 
     // Plain text conversions for checks and slug generation
     const titlePlainText = titleHtml.replace(/<[^>]*>/g, '').trim();
     const descriptionPlainText = descriptionHtml.replace(/<[^>]*>/g, '').trim();
 
-    if (!titlePlainText || !editorRef.current?.innerHTML.trim()) {
+    if (!titlePlainText || (!isWeather && !bodyHtml.trim())) {
       alert('Title and Article Body Content are required!');
       return;
     }
-
-    setIsSavingArticle(true);
-    try {
 
     // Determine category configurations from checked boxes
     let categorySlug = 'politics';
@@ -3309,18 +3387,13 @@ export default function AdminPage() {
         categorySlug = filterCategory;
       }
     }
-    let districtSlug = '';
-    
-    // Auto-resolve AP/TG district names, or categories
     const isApDist = apDistricts.find(d => selectedCategories.includes(d.slug));
     const isTgDist = tgDistricts.find(d => selectedCategories.includes(d.slug));
 
     if (isApDist) {
       categorySlug = 'andhra-pradesh';
-      districtSlug = isApDist.slug;
     } else if (isTgDist) {
       categorySlug = 'telangana';
-      districtSlug = isTgDist.slug;
     } else if (selectedCategories.includes('doctors-corner')) {
       categorySlug = 'doctors-corner';
     } else if (selectedCategories.includes('admissions')) {
@@ -3333,14 +3406,56 @@ export default function AdminPage() {
       categorySlug = selectedCategories[0];
     }
 
+    const isSenior = categorySlug === 'uma-insights' || categorySlug === 'satya-bytes';
+
+    // Synchronize current DOM editor contents to English/Telugu state components
+    let finalTitleEn = newsTitleEn;
+    let finalTitleTe = newsTitleTe;
+    let finalDescEn = newsDescriptionEn;
+    let finalDescTe = newsDescriptionTe;
+    let finalBodyEn = newsBodyEn;
+    let finalBodyTe = newsBodyTe;
+
+    if (isSenior && !isWeather) {
+      if (editorLangTab === 'en') {
+        finalTitleEn = titleHtml;
+        finalBodyEn = bodyHtml;
+        finalDescEn = descText;
+      } else {
+        finalTitleTe = titleHtml;
+        finalBodyTe = bodyHtml;
+        finalDescTe = descText;
+      }
+
+      // Check required English contents
+      const englishTitleText = finalTitleEn.replace(/<[^>]*>/g, '').trim();
+      if (!englishTitleText || !finalBodyEn.trim()) {
+        alert('English Title and English Article Body Content are required!');
+        return;
+      }
+    } else {
+      finalTitleEn = titleHtml;
+      finalBodyEn = bodyHtml;
+      finalDescEn = descText;
+    }
+
+    setIsSavingArticle(true);
+    try {
+
+    let districtSlug = '';
+    
+    // Auto-resolve AP/TG district names
+    if (isApDist) {
+      districtSlug = isApDist.slug;
+    } else if (isTgDist) {
+      districtSlug = isTgDist.slug;
+    }
+
     // Resolve Telugu category name
     const resolvedCat = MAIN_CATEGORIES_LIST.find(c => c.slug === categorySlug)?.name.split(' ')[0] || categorySlug;
 
-    // Verify employee category permission bypassed (no restriction)
-
     // Save the raw HTML directly — base64 images are stored as-is in the DB
-    // (No placeholder conversion: images display reliably without localStorage dependency)
-    let cleanBodyHTML = editorRef.current.innerHTML;
+    let cleanBodyHTML = finalBodyEn;
     
     if (selectedCategories.includes('shorts')) {
       // Strip any existing video tags to avoid duplication
@@ -3351,7 +3466,15 @@ export default function AdminPage() {
         cleanBodyHTML = `<video src="${newsVideo}" controls class="w-full h-auto rounded-xl my-4 block"></video>` + cleanBodyHTML;
       }
     }
-    const excerptText = newsDescription.trim() || descriptionPlainText || (editorRef.current ? editorRef.current.innerText.slice(0, 140).trim().replace(/<[^>]*>/g, '') + '...' : '');
+
+    // Prepare Excerpt:
+    const excerptTextEn = finalDescEn.trim() || finalTitleEn.replace(/<[^>]*>/g, '').slice(0, 140).trim() + '...';
+    const excerptTextTe = finalDescTe.trim();
+
+    // Prepare final combined strings to save in DB
+    const finalTitleToSave = (isSenior && finalTitleTe.trim()) ? `${finalTitleEn}<!-- TELUGU_SPLIT -->${finalTitleTe}` : finalTitleEn;
+    const finalDescToSave = (isSenior && excerptTextTe.trim()) ? `${excerptTextEn}<!-- TELUGU_SPLIT -->${excerptTextTe}` : excerptTextEn;
+    const finalBodyToSave = (isSenior && finalBodyTe.trim()) ? `${finalBodyEn}<!-- TELUGU_SPLIT -->${finalBodyTe}` : finalBodyEn;
 
     const sanitizedSlug = newsSlug.trim().toLowerCase()
       .replace(/[\u0C00-\u0C7F\u0900-\u097F\u0600-\u06FF]/g, '') // Strip Telugu/Hindi/Arabic
@@ -3360,8 +3483,10 @@ export default function AdminPage() {
       .replace(/-+/g, '-')            // Collapse multiple hyphens
       .replace(/^-|-$/g, '');         // Trim leading/trailing hyphens
 
+    // Use English part for slug generation
+    const baseSlugSource = finalTitleEn.replace(/<[^>]*>/g, '').toLowerCase();
     const slugToUse = sanitizedSlug || (() => {
-      const base = titlePlainText.toLowerCase()
+      const base = baseSlugSource
         .replace(/[\u0C00-\u0C7F\u0900-\u097F\u0600-\u06FF]/g, '') // Strip Telugu/Hindi/Arabic
         .replace(/[^a-z0-9\s-]/g, '')
         .replace(/\s+/g, '-')
@@ -3404,20 +3529,18 @@ export default function AdminPage() {
       : resolvedCat;
 
     const articleData = {
-      title: titlePlainText,
+      title: finalTitleToSave,
       slug: slugToUse,
       categorySlug,
       category: finalCategory,
       districtSlug,
       author: finalAuthor,
-      // For new articles: always use the exact current time when Publish is clicked
-      // For edited articles: use the existing/manually set date
       publishedAt: newsViewMode === 'add'
         ? new Date().toISOString()
         : new Date(newsPublishedDate || Date.now()).toISOString(),
-      description: excerptText,
+      description: finalDescToSave,
       metaDescription: metaDescription.trim(),
-      body: cleanBodyHTML,
+      body: finalBodyToSave,
       image: (categorySlug === 'uma-insights' || categorySlug === 'satya-bytes')
         ? (seniorFeaturedImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop')
         : (newsImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=450&fit=crop'),
@@ -3568,9 +3691,31 @@ export default function AdminPage() {
 
   const startEditing = (art: any) => {
     setEditingArticle(art);
-    setNewsTitle(art.title || '');
+
+    // Split title, description/excerpt, and body by TELUGU_SPLIT
+    const titleParts = (art.title || '').split('<!-- TELUGU_SPLIT -->');
+    const titleEnVal = titleParts[0] || '';
+    const titleTeVal = titleParts[1] || '';
+    setNewsTitleEn(titleEnVal);
+    setNewsTitleTe(titleTeVal);
+    setNewsTitle(titleEnVal);
+
+    const descParts = (art.description || '').split('<!-- TELUGU_SPLIT -->');
+    const descEnVal = descParts[0] || '';
+    const descTeVal = descParts[1] || '';
+    setNewsDescriptionEn(descEnVal);
+    setNewsDescriptionTe(descTeVal);
+    setNewsDescription(descEnVal);
+
+    const rawBody = art.body || art.content || '';
+    const bodyParts = rawBody.split('<!-- TELUGU_SPLIT -->');
+    const bodyEnVal = bodyParts[0] || '';
+    const bodyTeVal = bodyParts[1] || '';
+    setNewsBodyEn(bodyEnVal);
+    setNewsBodyTe(bodyTeVal);
+    setEditorLangTab('en'); // Reset to English tab by default on load
+
     setNewsSlug(art.slug || '');
-    setNewsDescription(art.description || '');
     setNewsTags(art.tags ? art.tags.map((t: any) => ({ name: t.name, linkedArticleSlug: t.linkedArticleSlug || null })) : []);
     setMetaDescription(art.metaDescription || '');
     setNewsAuthor(art.author || '');
@@ -3643,16 +3788,13 @@ export default function AdminPage() {
 
     setNewsViewMode('edit');
     setTimeout(() => {
-      if (newsTitleRef.current) newsTitleRef.current.innerHTML = art.title || '';
-      if (newsDescriptionRef.current) newsDescriptionRef.current.innerHTML = art.description || '';
-      if (weatherTitleRef.current) weatherTitleRef.current.innerHTML = art.title || '';
-      if (weatherDescriptionRef.current) weatherDescriptionRef.current.innerHTML = art.description || '';
+      if (newsTitleRef.current) newsTitleRef.current.innerHTML = titleEnVal;
+      if (newsDescriptionRef.current) newsDescriptionRef.current.innerHTML = descEnVal;
+      if (weatherTitleRef.current) weatherTitleRef.current.innerHTML = titleEnVal;
+      if (weatherDescriptionRef.current) weatherDescriptionRef.current.innerHTML = descEnVal;
 
       if (editorRef.current) {
-        // Resolve any old-style placeholder paths back to base64 for articles that were
-        // saved before this fix, then display the body as-is for newer articles
-        const rawBody = art.body || art.content || '';
-        let displayBody = rawBody;
+        let displayBody = bodyEnVal;
         try {
           const mediaLibrary = JSON.parse(localStorage.getItem('custom_media_library') || '{}');
           Object.entries(mediaLibrary).forEach(([mediaPath, base64]) => {
@@ -5965,25 +6107,36 @@ export default function AdminPage() {
                         {isSeniorColumn ? 'Headline / శీర్షిక' : 'Headline (Telugu/English)'}
                       </label>
                       {isSeniorColumn && (
-                        <button
-                          type="button"
-                          disabled={isTranslating}
-                          onClick={handleTranslateToTelugu}
-                          className={`text-xs font-black px-3.5 py-1.5 rounded-xl border transition-all cursor-pointer select-none active:scale-[0.98] ${
-                            isTranslating
-                              ? 'bg-amber-100 text-amber-700 border-amber-200 cursor-wait'
-                              : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500 shadow-sm hover:scale-[1.01]'
-                          }`}
-                        >
-                          {isTranslating ? (
-                            <span className="flex items-center gap-1.5 justify-center">
-                              <span className="animate-spin inline-block w-2.5 h-2.5 border-2 border-amber-700 border-t-transparent rounded-full"></span>
-                              Translating...
-                            </span>
-                          ) : (
-                            'Translate to Telugu (AI)'
-                          )}
-                        </button>
+                        <div className="flex items-center gap-4 flex-wrap">
+                          {/* Google Translate dropdown widget */}
+                          <div id="google_translate_element" className="google-translate-dropdown scale-[0.8] origin-right"></div>
+                          
+                          {/* Tab buttons */}
+                          <div className="flex items-center gap-1.5 bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+                            <button
+                              type="button"
+                              onClick={() => switchEditorLangTab('en')}
+                              className={`text-[11px] font-black px-3 py-1.5 rounded-lg transition-all cursor-pointer select-none active:scale-[0.98] ${
+                                editorLangTab === 'en'
+                                  ? 'bg-[#02599c] text-white shadow-xs'
+                                  : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              English
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => switchEditorLangTab('te')}
+                              className={`text-[11px] font-black px-3 py-1.5 rounded-lg transition-all cursor-pointer select-none active:scale-[0.98] ${
+                                editorLangTab === 'te'
+                                  ? 'bg-[#02599c] text-white shadow-xs'
+                                  : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              Telugu (తెలుగు)
+                            </button>
+                          </div>
+                        </div>
                       )}
                     </div>
                     <div className="flex flex-col border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
