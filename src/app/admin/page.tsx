@@ -3209,32 +3209,69 @@ export default function AdminPage() {
 
     setIsTranslating(true);
     try {
-      const res = await fetch('/api/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: titleHtml,
-          description: descText,
-          body: bodyHtml
-        })
+      const promises = [];
+
+      if (titleHtml.trim()) {
+        promises.push(
+          fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ html: titleHtml })
+          }).then(async (res) => {
+            if (!res.ok) {
+              const errText = await res.text();
+              throw new Error(`Title translation failed: ${errText}`);
+            }
+            return { type: 'title', val: await res.text() };
+          })
+        );
+      }
+
+      if (descText.trim()) {
+        promises.push(
+          fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: descText })
+          }).then(async (res) => {
+            if (!res.ok) {
+              const errText = await res.text();
+              throw new Error(`Description translation failed: ${errText}`);
+            }
+            return { type: 'desc', val: await res.text() };
+          })
+        );
+      }
+
+      if (bodyHtml.trim()) {
+        promises.push(
+          fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ html: bodyHtml })
+          }).then(async (res) => {
+            if (!res.ok) {
+              const errText = await res.text();
+              throw new Error(`Body translation failed: ${errText}`);
+            }
+            return { type: 'body', val: await res.text() };
+          })
+        );
+      }
+
+      const results = await Promise.all(promises);
+
+      results.forEach((res) => {
+        if (res.type === 'title' && newsTitleRef.current) {
+          newsTitleRef.current.innerHTML = res.val;
+          setNewsTitle(newsTitleRef.current.innerText);
+        } else if (res.type === 'desc') {
+          setNewsDescription(res.val);
+        } else if (res.type === 'body' && editorRef.current) {
+          editorRef.current.innerHTML = res.val;
+        }
       });
 
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || 'Translation failed.');
-      }
-
-      const data = await res.json();
-      if (newsTitleRef.current && data.title) {
-        newsTitleRef.current.innerHTML = data.title;
-        setNewsTitle(newsTitleRef.current.innerText);
-      }
-      if (data.description) {
-        setNewsDescription(data.description);
-      }
-      if (editorRef.current && data.body) {
-        editorRef.current.innerHTML = data.body;
-      }
       alert('Translated successfully into formal, professional Telugu!');
     } catch (err: any) {
       console.error('Translation error:', err);

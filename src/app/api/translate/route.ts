@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    const { title, description, body } = await req.json();
+    const { title, description, body, text, html } = await req.json();
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -14,7 +14,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const prompt = `You are a professional English-to-Telugu translator for a premium news portal.
+    let prompt = '';
+    let responseMimeType = 'application/json';
+
+    if (text !== undefined) {
+      prompt = `You are a professional English-to-Telugu translator for a premium news portal.
+Translate the following English plain text into formal, professional, natural, and polite Telugu:
+${text}
+
+Return only the translated plain text.`;
+      responseMimeType = 'text/plain';
+    } else if (html !== undefined) {
+      prompt = `You are a professional English-to-Telugu translator for a premium news portal.
+Translate the following English HTML content into formal, professional, natural, and polite Telugu.
+Preserve all HTML tags (like <p>, <a>, <img>, <strong>, etc.) exactly unchanged. Only translate the textual content inside the HTML tags. Do not change links, class names, or attributes.
+
+English HTML Content:
+${html}
+
+Return only the translated HTML.`;
+      responseMimeType = 'text/plain';
+    } else {
+      prompt = `You are a professional English-to-Telugu translator for a premium news portal.
 Translate the following English content into formal, professional, natural, and polite Telugu.
 The tone should be engaging and journalism-appropriate (avoid literal/rude translations).
 
@@ -31,8 +52,10 @@ Return the output strictly in this JSON structure (do not wrap in markdown code 
   "description": "Translated Telugu Description/Excerpt",
   "body": "Translated Telugu Body HTML"
 }`;
+      responseMimeType = 'application/json';
+    }
 
-    // Call Google Gemini API
+    // Call Google Gemini API with 3 minutes timeout signal to prevent Undici HeadersTimeoutError
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
       {
@@ -47,9 +70,10 @@ Return the output strictly in this JSON structure (do not wrap in markdown code 
             },
           ],
           generationConfig: {
-            responseMimeType: 'application/json',
+            responseMimeType: responseMimeType,
           },
         }),
+        signal: AbortSignal.timeout(180000),
       }
     );
 
@@ -67,6 +91,13 @@ Return the output strictly in this JSON structure (do not wrap in markdown code 
 
     if (!textResponse) {
       return NextResponse.json({ error: 'Empty response from Gemini API' }, { status: 500 });
+    }
+
+    if (text !== undefined || html !== undefined) {
+      return new NextResponse(textResponse.trim(), {
+        status: 200,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      });
     }
 
     let parsedResult;

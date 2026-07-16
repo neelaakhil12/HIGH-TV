@@ -364,24 +364,62 @@ export default function ArticlePageClient({
 
     setIsTranslatingClient(true);
     try {
-      const res = await fetch('/api/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: article.title,
-          description: article.description,
-          body: article.body
-        })
-      });
+      const promises = [];
 
-      if (!res.ok) {
-        throw new Error('Translation failed');
+      if (article.title?.trim()) {
+        promises.push(
+          fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ html: article.title })
+          }).then(async (res) => {
+            if (!res.ok) throw new Error('Title translation failed');
+            return { type: 'title', val: await res.text() };
+          })
+        );
       }
 
-      const data = await res.json();
-      setTranslatedTitle(data.title);
-      setTranslatedDesc(data.description);
-      setTranslatedBody(data.body);
+      if (article.description?.trim()) {
+        promises.push(
+          fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: article.description })
+          }).then(async (res) => {
+            if (!res.ok) throw new Error('Description translation failed');
+            return { type: 'desc', val: await res.text() };
+          })
+        );
+      }
+
+      if (article.body?.trim()) {
+        promises.push(
+          fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ html: article.body })
+          }).then(async (res) => {
+            if (!res.ok) throw new Error('Body translation failed');
+            return { type: 'body', val: await res.text() };
+          })
+        );
+      }
+
+      const results = await Promise.all(promises);
+
+      let newTitle = translatedTitle;
+      let newDesc = translatedDesc;
+      let newBody = translatedBody;
+
+      results.forEach((res) => {
+        if (res.type === 'title') newTitle = res.val;
+        else if (res.type === 'desc') newDesc = res.val;
+        else if (res.type === 'body') newBody = res.val;
+      });
+
+      setTranslatedTitle(newTitle);
+      setTranslatedDesc(newDesc);
+      setTranslatedBody(newBody);
       setIsTeluguActive(true);
     } catch (err) {
       console.error(err);
