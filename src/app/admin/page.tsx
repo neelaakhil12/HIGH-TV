@@ -7243,7 +7243,7 @@ export default function AdminPage() {
                   {!(selectedCategories.includes('uma-insights') || selectedCategories.includes('satya-bytes')) && (
                     <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
                       <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
-                        {isSeniorColumn ? 'Senior Expertise Photo / రచయిత చిత్రం' : 'Featured Image'}
+                        Featured Image
                       </label>
                       <div className="border-2 border-dashed border-slate-200 hover:border-rose-500 rounded-2xl p-4 bg-slate-50 text-center relative cursor-pointer min-h-[160px] flex items-center justify-center transition-colors">
                         <input
@@ -7257,7 +7257,7 @@ export default function AdminPage() {
                           <div className="flex flex-col items-center gap-2">
                             <Upload className="w-6 h-6 text-slate-400" />
                             <span className="text-xs font-bold text-slate-500">
-                              {isSeniorColumn ? 'Click to upload senior expertise photo' : 'Click to upload featured image'}
+                              Click to upload featured image
                             </span>
                             <span className="text-[9px] text-slate-400 uppercase tracking-wider">Rescaled to max 800px width</span>
                           </div>
