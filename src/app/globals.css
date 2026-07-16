@@ -748,4 +748,15 @@ body.stories-active #mobile-bottom-nav-bar {
   display: none !important;
 }
 
+/* Hide Google Translate top banner, toolbar, and widgets */
+iframe.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+body {
+  top: 0px !important;
+}
+
 
