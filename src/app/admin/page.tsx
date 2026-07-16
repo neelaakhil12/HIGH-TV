@@ -1548,6 +1548,64 @@ export default function AdminPage() {
     }
   }, [newsViewMode]);
 
+  const importGoogleTranslation = () => {
+    // 1. Capture current DOM values (which are showing the translated Telugu text)
+    const currentTitle = newsTitleRef.current?.innerHTML || '';
+    const currentBody = editorRef.current?.innerHTML || '';
+    const currentDesc = newsDescription;
+
+    if (!currentTitle.trim() && !currentBody.trim()) {
+      alert("No content found in the editor to import!");
+      return;
+    }
+
+    // 2. Save these values into the Telugu states
+    setNewsTitleTe(currentTitle);
+    setNewsBodyTe(currentBody);
+    setNewsDescriptionTe(currentDesc);
+
+    // 3. Restore the English DOM elements back to their original English values
+    if (newsTitleRef.current) {
+      newsTitleRef.current.innerHTML = newsTitleEn;
+      setNewsTitle(newsTitleRef.current.innerText);
+    }
+    if (editorRef.current) {
+      editorRef.current.innerHTML = newsBodyEn;
+    }
+    setNewsDescription(newsDescriptionEn);
+
+    // 4. Reset active language tab to English
+    setEditorLangTab('en');
+
+    alert("Telugu translation imported successfully into the Telugu Tab! Switch to the 'Telugu (Telugu)' tab to view or edit it.");
+  };
+
+  // Real-time synchronization of editor contents to En/Te states
+  useEffect(() => {
+    if (newsViewMode === 'add' || newsViewMode === 'edit') {
+      const currentTitle = newsTitleRef.current?.innerHTML || '';
+      const currentBody = editorRef.current?.innerHTML || '';
+      const currentDesc = newsDescription;
+
+      if (editorLangTab === 'en') {
+        // Prevent overwriting original English with Google-translated Telugu text if the page is currently translated
+        const isCurrentlyTranslated = typeof document !== 'undefined' && (
+          document.documentElement.className.includes('translated') || 
+          document.body.className.includes('translated')
+        );
+        if (!isCurrentlyTranslated) {
+          setNewsTitleEn(currentTitle);
+          setNewsBodyEn(currentBody);
+          setNewsDescriptionEn(currentDesc);
+        }
+      } else {
+        setNewsTitleTe(currentTitle);
+        setNewsBodyTe(currentBody);
+        setNewsDescriptionTe(currentDesc);
+      }
+    }
+  }, [newsTitle, newsDescription, editorTrigger, editorLangTab, newsViewMode, newsTitleEn, newsBodyEn, newsDescriptionEn]);
+
   // Image Resizer overlay state
   const [selectedImage, setSelectedImage] = useState<HTMLImageElement | null>(null);
   const [resizerStyle, setResizerStyle] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
@@ -6142,6 +6200,16 @@ export default function AdminPage() {
                               Telugu (తెలుగు)
                             </button>
                           </div>
+
+                          {/* Import/Capture translation button */}
+                          <button
+                            type="button"
+                            onClick={importGoogleTranslation}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] py-1.5 px-3 rounded-lg cursor-pointer hover:scale-[1.01] active:scale-[0.98] transition-all shadow-xs"
+                            title="Click this AFTER using Google Translate to save it into the Telugu tab"
+                          >
+                            Capture Telugu Version
+                          </button>
                         </div>
                       )}
                     </div>
