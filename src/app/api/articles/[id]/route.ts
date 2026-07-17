@@ -43,6 +43,17 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
   }
 }
 
+function sanitizeField(value: string | null | undefined): string | null | undefined {
+  if (!value) return value;
+  if (value.includes('<!-- TELUGU_SPLIT -->')) {
+    return value
+      .split('<!-- TELUGU_SPLIT -->')
+      .map(part => part.replace(/<[^>]*>/g, '').trim())
+      .join('<!-- TELUGU_SPLIT -->');
+  }
+  return value.replace(/<[^>]*>/g, '').trim();
+}
+
 // PUT — update article fields (title, body, flags, etc.)
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -51,6 +62,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     // Remove fields that shouldn't be directly updated
     delete data.id;
     delete data.createdAt;
+
+    // Sanitize text inputs from copy-paste HTML tags
+    if (data.title) data.title = sanitizeField(data.title);
+    if (data.description) data.description = sanitizeField(data.description);
+    if (data.metaDescription) data.metaDescription = sanitizeField(data.metaDescription);
+    if (data.author) data.author = sanitizeField(data.author);
+
     // Convert base64 image to real file URL so social crawlers can fetch it
     if (data.image) {
       data.image = await resolveArticleImage(data.image, data.slug) ?? data.image;

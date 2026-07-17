@@ -129,10 +129,28 @@ export async function GET(req: NextRequest) {
   }
 }
 
+function sanitizeField(value: string | null | undefined): string | null | undefined {
+  if (!value) return value;
+  if (value.includes('<!-- TELUGU_SPLIT -->')) {
+    return value
+      .split('<!-- TELUGU_SPLIT -->')
+      .map(part => part.replace(/<[^>]*>/g, '').trim())
+      .join('<!-- TELUGU_SPLIT -->');
+  }
+  return value.replace(/<[^>]*>/g, '').trim();
+}
+
 // POST — create a new article
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
+    
+    // Sanitize text inputs from copy-paste HTML tags
+    if (data.title) data.title = sanitizeField(data.title);
+    if (data.description) data.description = sanitizeField(data.description);
+    if (data.metaDescription) data.metaDescription = sanitizeField(data.metaDescription);
+    if (data.author) data.author = sanitizeField(data.author);
+
     // Convert base64 image to a real file URL so social crawlers can fetch it
     if (data.image) {
       data.image = await resolveArticleImage(data.image, data.slug) ?? data.image;
