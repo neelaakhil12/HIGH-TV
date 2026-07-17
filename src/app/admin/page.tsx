@@ -1466,6 +1466,7 @@ export default function AdminPage() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const featuredImageInputRef = useRef<HTMLInputElement>(null);
+  const newsVideoInputRef = useRef<HTMLInputElement>(null);
   const postTitleEditorRef = useRef<HTMLDivElement>(null);
   const postBulletsEditorRef = useRef<HTMLDivElement>(null);
 
@@ -7239,7 +7240,46 @@ export default function AdminPage() {
                 {/* Right Column (Featured Image and Categories Checklist) */}
                 <div className="space-y-6">
                   
-
+                  {/* Featured Image Box */}
+                  {!isSeniorColumn && (
+                    <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col gap-3">
+                      <label className="text-[11px] font-black text-[#02599c] uppercase tracking-widest">
+                        Featured Image
+                      </label>
+                      <div className="border-2 border-dashed border-slate-200 hover:border-rose-500 rounded-2xl p-4 bg-slate-50 text-center relative cursor-pointer min-h-[160px] flex items-center justify-center transition-colors">
+                        <input
+                          type="file"
+                          ref={featuredImageInputRef}
+                          accept="image/*"
+                          onChange={handleFeaturedImageChange}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        />
+                        {!newsImage ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <Upload className="w-6 h-6 text-slate-400" />
+                            <span className="text-xs font-bold text-slate-500">
+                              Click to upload featured image
+                            </span>
+                            <span className="text-[9px] text-slate-400 uppercase tracking-wider">Rescaled to max 800px width</span>
+                          </div>
+                        ) : (
+                          <div className="relative w-full overflow-hidden rounded-xl bg-slate-900 border border-slate-200">
+                            <img src={newsImage} alt="Featured cover" className="w-full h-auto object-cover max-h-[160px] block" />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setNewsImage('');
+                              }}
+                              className="absolute top-2 right-2 bg-black/60 hover:bg-black/90 text-white rounded-full w-5 h-5 flex items-center justify-center transition-colors"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Article Metadata / Info Box (Super Admin Only, in Edit Mode) */}
                   {userRole === 'super-admin' && editingArticle && (

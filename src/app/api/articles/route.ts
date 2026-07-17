@@ -94,7 +94,6 @@ export async function GET(req: NextRequest) {
       createdBy: true,
       updatedBy: true,
       createdAt: true,
-      updatedAt: true,
     };
 
     if (!excludeBody) {

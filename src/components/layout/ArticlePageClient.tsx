@@ -345,6 +345,7 @@ export default function ArticlePageClient({
   const [isMounted, setIsMounted] = useState(false);
   const [tagFilteredArticles, setTagFilteredArticles] = useState<any[]>([]);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [isLoadingTagNews, setIsLoadingTagNews] = useState(false);
   const [isTeluguActive, setIsTeluguActive] = useState(false);
 
   const titleParts = (article.title || '').split('<!-- TELUGU_SPLIT -->');

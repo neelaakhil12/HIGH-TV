@@ -7,7 +7,7 @@ import { KeyRound, ShieldCheck, ShieldAlert, CheckCircle2, Eye, EyeOff } from 'l
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const token = searchParams.get('token');
+  const token = searchParams?.get('token');
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

@@ -8,10 +8,11 @@ export default function CopyProtection() {
   const [isAdminPage, setIsAdminPage] = useState(true);
 
   useEffect(() => {
-    const isControlPanel = 
+    const isControlPanel = pathname ? (
       pathname.startsWith('/admin') || 
       pathname.startsWith('/employee') || 
-      pathname.startsWith('/superadmin');
+      pathname.startsWith('/superadmin')
+    ) : false;
     
     setIsAdminPage(isControlPanel);
 
